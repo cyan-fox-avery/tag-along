@@ -1,8 +1,10 @@
-/* Tag, You're It — prototype v0.3.0
-   Research -> plan (region/depth/bait) -> dive -> tag -> collection book.
-   Cute sea puppies with lots of teeth. */
+/* Tag, You're It — prototype v0.5.0
+   Research -> plan (region/depth/bait) -> dive -> tag -> collection book. */
 
 "use strict";
+
+/* Build number — shown in the top corner of the page. Bump every release. */
+const VERSION = "v0.5.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -72,6 +74,38 @@ const ART = {
       <line x1="76" y1="48" x2="74" y2="60"/>
       <line x1="82" y1="47" x2="80" y2="61"/>
     </g>
+  </svg>`,
+  tiger: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Tiger shark">
+    <polygon points="160,54 200,32 198,86" fill="#5a6a72"/>
+    <ellipse cx="100" cy="58" rx="64" ry="20" fill="#6b7d85"/>
+    <ellipse cx="100" cy="66" rx="56" ry="11" fill="#d3dce0" opacity="0.8"/>
+    <polygon points="108,39 120,22 128,39" fill="#5a6a72"/>
+    <polygon points="86,74 76,94 98,75" fill="#5a6a72"/>
+    <circle cx="50" cy="53" r="3.2" fill="#1c2733"/>
+    <circle cx="51.2" cy="51.8" r="1.1" fill="#ffffff"/>
+    <g stroke="#4c5b63" stroke-width="3.4" opacity="0.5" stroke-linecap="round">
+      <line x1="92" y1="42" x2="90" y2="72"/>
+      <line x1="106" y1="40" x2="104" y2="74"/>
+      <line x1="120" y1="42" x2="118" y2="72"/>
+      <line x1="134" y1="46" x2="132" y2="68"/>
+    </g>
+  </svg>`,
+  sandtiger: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Sand tiger shark">
+    <polygon points="162,52 202,30 200,84" fill="#6e6250"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#7d6f5b"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#ddd2bd" opacity="0.8"/>
+    <polygon points="110,41 120,24 128,41" fill="#6e6250"/>
+    <polygon points="138,42 146,28 152,42" fill="#6e6250"/>
+    <polygon points="88,72 78,92 100,73" fill="#6e6250"/>
+    <polygon points="42,58 22,52 22,64" fill="#7d6f5b"/>
+    <g stroke="#ece5d3" stroke-width="1.6" stroke-linecap="round">
+      <line x1="29" y1="55" x2="25" y2="60"/>
+      <line x1="33" y1="57" x2="29" y2="62"/>
+    </g>
+    <circle cx="52" cy="52" r="3.2" fill="#1c2733"/>
+    <circle cx="53.2" cy="50.8" r="1.1" fill="#ffffff"/>
   </svg>`
 };
 
@@ -84,7 +118,10 @@ const REGIONS = {
   "maldives":     { name: "Maldives",             note: "Dolphins click and whistle in the distance." },
   "japan":        { name: "Sagami Bay, Japan",    note: "A lanternfish flickers in the dark." },
   "mediterranean":{ name: "Mediterranean Sea",    note: "A pod of dolphins crosses the bow." },
-  "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." }
+  "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
+  /* Win-state reward: these unlock once all six sharks are tagged. */
+  "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
+  "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true }
 };
 
 const DEPTHS = {
@@ -101,6 +138,9 @@ const BAITS = {
   "plankton":      "Plankton bloom — no bait, follow the bloom"
 };
 
+/* Field notes: short, dense, real. Everything the planner needs is in
+   here — region, depth range, food — but nothing is handed to you.
+   Read like a scientist, not a checklist. */
 const SHARKS = [
   {
     id: "nurse",
@@ -109,9 +149,10 @@ const SHARKS = [
     combo: { region: "caribbean", bait: "crustaceans" },
     depths: ["surface", "reef"],
     sizeRange: [2.0, 3.0],
-    research: "A bottom-dweller of the warm, shallow tropical Atlantic — the Caribbean Sea. By day it piles up with others under reef ledges; by night it hunts alone, vacuuming crabs and lobster off the sand with the little barbels on its snout — so bring crabs & lobster, not fish bait. It lives anywhere from the surface down to about 75 metres: try the surface waters or the reefs.",
+    research: "A bottom-dweller of the warm, shallow tropical Atlantic. In the Caribbean Sea, nurse sharks spend their days piled together under reef ledges — sometimes in heaps of forty. After dark they head out alone, sweeping the sandy shallows with the whisker-like barbels on their snouts, vacuuming up crabs and lobster. They rarely leave water shallower than about 75 metres.",
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor.",
     bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
+    cheer: "nurse sharks are the CUDDLIEST!!! they nap in piles of FORTY. forty sharks. just vibing. i'm SO jealous",
     nameIdeas: ["Puddles", "Biscuit", "Sandy", "Nugget"]
   },
   {
@@ -121,9 +162,10 @@ const SHARKS = [
     combo: { region: "open-atlantic", bait: "schooling-fish" },
     depths: ["reef", "twilight"],
     sizeRange: [3.0, 4.6],
-    research: "Follows warm water through tropical and temperate oceans worldwide, but your best bet is the open Atlantic. Spends the day deep below the sunlit layer and rises toward the surface at night. Hunts schooling fish — anchovies, herring, mackerel — stunning them with a whip of its enormous tail, half its body length, so bring schooling fish. It roams anywhere from about 30 to 550 metres: try the reefs or the twilight depths.",
+    research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel, then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down.",
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Threshers have been seen hunting in pairs, herding schools of fish into a tight ball before taking turns striking with their tails.",
+    cheer: "THRESHERS!!! their tail is HALF THEIR BODY. they hunt by WHIPPING it. that's the coolest thing any animal does and i will not be taking questions",
     nameIdeas: ["Whip", "Nervous Nigel", "Swoosh", "Comet"]
   },
   {
@@ -133,9 +175,10 @@ const SHARKS = [
     combo: { region: "philippines", bait: "plankton" },
     depths: ["surface", "reef"],
     sizeRange: [5.5, 12.0],
-    research: "Roams all tropical and warm-temperate seas, but this season the confirmed aggregation is off the Philippines. A filter feeder: it doesn't chase prey, it finds seasonal plankton blooms and swims through them with its enormous mouth open — so don't bring bait, follow the bloom. Each shark's spot pattern is unique, like a fingerprint. It usually cruises right at the surface, sometimes dipping a little deeper over reefs: check the surface waters or the shallow reefs.",
+    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs.",
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
     bonus: "Whale sharks can dive deeper than 1,900 metres — among the deepest dives ever recorded for any fish — then cruise back up to the surface to feed.",
+    cheer: "A WHALE SHARK!!! the biggest fish in the WHOLE OCEAN and you TAGGED one!!! did you see the spots?? every one is different like a fingerprint!!",
     nameIdeas: ["Dot", "Bus", "Domino", "Galaxy"]
   },
   {
@@ -145,10 +188,39 @@ const SHARKS = [
     combo: { region: "japan", bait: "squid" },
     depths: ["twilight", "deep"],
     sizeRange: [2.5, 4.0],
-    research: "A living fossil from deep continental slopes — most records come from Japan's Sagami Bay. Lives in darkness between 270 and 960 metres, ambushing deep-sea squid and fish — squid on the line is your best bet. Its jaws shoot forward like a slingshot, and it finds prey by sensing electricity. Check the twilight depths or the deep dark.",
+    research: "A living fossil from the deep continental slopes — most records come from Sagami Bay in Japan. Goblin sharks live in total darkness between about 270 and 960 metres, drifting over the seafloor and ambushing deep-sea squid and fish. Their jaws shoot forward like a slingshot, and they find prey by sensing the faint electricity of living things.",
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
     bonus: "A goblin shark's pink colour comes from blood vessels showing through its thin, almost translucent skin.",
+    cheer: "A GOBLIN SHARK?!?! the pink deep-sea weirdo!!! 125 million years old!!! did it look as weird in real life as in pictures",
     nameIdeas: ["Nosey", "Fossil", "Blush", "Slingshot"]
+  },
+  {
+    id: "tiger",
+    name: "Tiger Shark", latin: "Galeocerdo cuvier", status: "Near Threatened",
+    code: "TI",
+    /* The garbage can of the sea: bait is forgiving (any meaty bait),
+       so the real puzzle is WHERE. */
+    combo: { region: "maldives", bait: ["schooling-fish", "squid", "crustaceans"] },
+    depths: ["surface", "reef"],
+    sizeRange: [3.0, 5.5],
+    research: "Tiger sharks patrol tropical and subtropical waters worldwide — everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, rarely straying deeper than a few hundred metres. They'll eat almost anything that crosses their path: fish, turtles, seabirds, even the occasional floating oddity. Researchers have found license plates in their stomachs.",
+    hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
+    bonus: "Tiger sharks cross entire ocean basins. One tagged individual travelled more than 7,500 kilometres.",
+    cheer: "TIGER SHARK!!! the garbage can of the sea!!! they eat ANYTHING. license plates!!! i love them so much",
+    nameIdeas: ["Stripes", "Tigger", "Marbles", "Scout"]
+  },
+  {
+    id: "sandtiger",
+    name: "Sand Tiger Shark", latin: "Carcharias taurus", status: "Critically Endangered",
+    code: "ST",
+    combo: { region: "baja", bait: "squid" },
+    depths: ["surface", "reef"],
+    sizeRange: [2.0, 3.2],
+    research: "Sand tiger sharks haunt subtropical and temperate shores on both sides of the Americas, including the rocky reefs and kelp edges off Baja California. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing fish and squid. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks.",
+    hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
+    bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
+    cheer: "sand tiger!!! they look SO scary but they're actually big softies. they gulp air to FLOAT. like a weird balloon shark. tell it i said hi",
+    nameIdeas: ["Toothy", "Grin", "Smiley", "Baja"]
   }
 ];
 
@@ -268,6 +340,47 @@ const EASTER_EGGS = [
     text: "This is the kind of dark water old monster movies warned you about. You check over your shoulder anyway." }
 ];
 
+/* ---------- Shark tracking: simulated satellite-tag data ---------- */
+
+const TRACK_POOLS = {
+  nurse:     { spots: ["Coral Gardens", "Mangrove Channel", "Seagrass Flats", "The Ledge", "Turtle Cove"], hop: [4, 38] },
+  thresher:  { spots: ["Continental Slope", "Seamount X", "Upwelling Zone", "Open Atlantic Drift", "Deep Scattering Layer"], hop: [120, 480] },
+  whale:     { spots: ["Tubbataha Reefs", "Sulu Sea", "Coral Triangle", "Bird's Head Seascape", "Western Pacific"], hop: [300, 1400] },
+  goblin:    { spots: ["Tokyo Canyon", "Izu Ridge", "Suruga Slope", "Deep Terrace", "Canyon Mouth"], hop: [40, 220] },
+  tiger:     { spots: ["Rasdhoo Atoll", "Chagos Archipelago", "Open Indian Ocean", "Seychelles Bank", "Saya de Malha"], hop: [150, 700] },
+  sandtiger: { spots: ["Kelp Edge", "Rocky Point", "Sandy Flats", "Canyon Mouth", "Wreck Reef"], hop: [20, 120] }
+};
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* Simulated tag track: starts at the tag site, then plausible waypoints.
+   Distances fit the species — nurse sharks stay local, whale sharks roam. */
+function genTrack(species, rec) {
+  const pool = TRACK_POOLS[species.id] || TRACK_POOLS.nurse;
+  const n = 4 + Math.floor(Math.random() * 3); // 4–6 waypoints after tagging
+  const points = [{ label: rec.location, day: 0, km: 0 }];
+  let day = 0, totalKm = 0;
+  shuffle([...pool.spots]).slice(0, n - 1).forEach(sp => {
+    day += 3 + Math.floor(Math.random() * 12);
+    const km = Math.round(pool.hop[0] + Math.random() * (pool.hop[1] - pool.hop[0]));
+    totalKm += km;
+    points.push({ label: sp, day, km });
+  });
+  return { points, totalKm, days: day };
+}
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
 /* ---------- State ---------- */
 
 const store = {
@@ -288,12 +401,13 @@ const msgStore = {
 const _savedMsgs = msgStore.load();
 
 const state = {
-  tagged: store.load(),   // id -> {name, researchId, length, sex, location, date, sarahEgg}
+  tagged: store.load(),   // id -> {name, researchId, length, sex, location, date, sarahEgg, track}
   failures: 0,
   chatIdx: _savedMsgs.chatIdx || 0,
   messages: _savedMsgs.messages || [],
   unread: _savedMsgs.unread || 0,
-  pendingTag: null        // species object awaiting naming
+  pendingTag: null,       // species object awaiting naming
+  won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx });
@@ -326,12 +440,24 @@ function migrateIds() {
   });
   store.save(state.tagged);
 }
+/* Older saves predate tracking: give every tagged shark a track. */
+function migrateTracks() {
+  let changed = false;
+  Object.entries(state.tagged).forEach(([sid, t]) => {
+    if (!t.track) {
+      t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+      changed = true;
+    }
+  });
+  if (changed) store.save(state.tagged);
+}
 
 const $ = (id) => document.getElementById(id);
 const esc = (str) => String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const sharkById = (id) => SHARKS.find(s => s.id === id);
 const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
 migrateIds();
+migrateTracks();
 
 /* ---------- Tabs (each tab remembers its scroll position) ---------- */
 
@@ -387,7 +513,7 @@ function renderResearch() {
 
 /* ---------- Planner ---------- */
 
-function fillSelect(el, obj, key) {
+function fillSelect(el, obj) {
   el.innerHTML = "";
   Object.entries(obj).forEach(([id, v]) => {
     const o = document.createElement("option");
@@ -395,6 +521,24 @@ function fillSelect(el, obj, key) {
     o.textContent = typeof v === "string" ? v : v.name;
     el.appendChild(o);
   });
+}
+
+function fillRegions() {
+  const el = $("regionSelect");
+  const current = el.value;
+  el.innerHTML = "";
+  Object.entries(REGIONS).forEach(([id, v]) => {
+    const o = document.createElement("option");
+    o.value = id;
+    if (v.locked) {
+      o.textContent = `🔒 ${v.name} — tag all ${SHARKS.length} sharks to unlock`;
+      o.disabled = true;
+    } else {
+      o.textContent = v.name;
+    }
+    el.appendChild(o);
+  });
+  if (current && REGIONS[current] && !REGIONS[current].locked) el.value = current;
 }
 
 function renderPlanner() {
@@ -409,7 +553,7 @@ function renderPlanner() {
   });
   if (untagged().some(s => s.id === current)) t.value = current;
   if (!untagged().length) {
-    $("planner").innerHTML = `<p class="research-text" style="text-align:center">All four sharks tagged! Check your collection book. 🎉</p>`;
+    $("planner").innerHTML = `<p class="research-text" style="text-align:center">All six sharks tagged! Check your collection book. 🎉</p>`;
   }
 }
 
@@ -451,22 +595,22 @@ function spawnCreature(type) {
   setTimeout(() => el.remove(), 25000); // safety net
 }
 
-function maybeSighting(depth) {
+/* Guaranteed ambient life before the shark reveal: the scene must feel
+   alive first. One sighting always lands; a rare easter egg may join it. */
+async function showSighting(depth) {
   // Rare, quiet easter eggs: real phenomena, mentioned in passing.
   if (Math.random() < 0.22) {
     const eggs = EASTER_EGGS.filter(e => e.depths.includes(depth));
     if (eggs.length) {
       logLine(`✨ ${pick(eggs).text}`, "flavour");
-      return;
+      await wait(1500);
     }
   }
-  if (Math.random() < 0.7) {
-    const options = SIGHTINGS[depth] || [];
-    if (options.length) {
-      const s = pick(options);
-      logLine(`👁️ ${s.text}`, "flavour");
-      spawnCreature(s.creature);
-    }
+  const options = SIGHTINGS[depth] || [];
+  if (options.length) {
+    const s = pick(options);
+    logLine(`👁️ ${s.text}`, "flavour");
+    spawnCreature(s.creature);
   }
 }
 
@@ -487,29 +631,35 @@ async function runExpedition(plan) {
     : `Bait deployed: ${BAITS[plan.bait]}.`;
 
   logLine(`🛥️ <strong>Expedition begun</strong> — the research vessel leaves the harbor.`);
-  await wait(1100);
+  await wait(1700);
   logLine(`🪝 ${baitText}`);
-  await wait(1100);
+  await wait(1700);
   logLine(`🐟 First fish appear in the blue…`);
-  await wait(1100);
+  await wait(1800);
   logLine(`👀 ${REGIONS[plan.region].note}`);
-  await wait(1200);
+  await wait(1900);
   logLine(`🌊 ${pick(DEPTH_FLAVOUR[plan.depth])}`, "flavour");
-  await wait(1200);
-  maybeSighting(plan.depth);
-  await wait(1300);
+  await wait(1900);
+  // The scene must feel alive before the shark: at least one sighting,
+  // always, plus a rare quiet easter egg.
+  await showSighting(plan.depth);
+  await wait(2000);
   logLine(`⏳ The hours slip by…`);
-  await wait(1200);
-  logLine(`🌊 The light changes. Something moves below…`);
-  await wait(1400);
+  await wait(1900);
+  logLine(`🌊 The light shifts. The water goes still. Something moves below…`);
+  await wait(2100);
 
   // Who shows up? Any species whose region + bait match and whose depth
   // range includes the chosen depth. There's no single "right" depth.
-  const appeared = SHARKS.filter(s =>
-    s.combo.region === plan.region &&
-    s.depths.includes(plan.depth) &&
-    s.combo.bait === plan.bait
-  );
+  // (Tiger sharks aren't picky eaters: their bait entry is a list.)
+  const appeared = SHARKS.filter(s => {
+    const baitOk = Array.isArray(s.combo.bait)
+      ? s.combo.bait.includes(plan.bait)
+      : s.combo.bait === plan.bait;
+    return s.combo.region === plan.region &&
+      s.depths.includes(plan.depth) &&
+      baitOk;
+  });
   const taggable = appeared.filter(s => !state.tagged[s.id]);
   const alreadyTagged = appeared.filter(s => state.tagged[s.id]);
 
@@ -645,7 +795,11 @@ function confirmTag(name) {
     length: s._gen.length,
     sex: s._gen.sex,
     location: REGIONS[$("regionSelect").value].name,
-    date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+    date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
+    track: genTrack(s, {
+      location: REGIONS[$("regionSelect").value].name,
+      date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+    })
   };
   state.tagged[s.id] = rec;
   store.save(state.tagged);
@@ -654,10 +808,58 @@ function confirmTag(name) {
   const lb = $("launchBtn");
   if (lb) lb.disabled = false;
   state.pendingTag = null;
+  // Sarah celebrates wins, not just failures: excitement + a bonus fact.
+  state.messages.push([
+    { who: "them", text: `YOU TAGGED ONE?!?! tell me EVERYTHING` },
+    { who: "me", text: `A ${s.name} — ${rec.length} metres, ${rec.sex}. Research ID ${rec.researchId}. Released healthy. 🦈` },
+    { who: "them", text: s.cheer }
+  ]);
+  state.unread += 1;
+  saveMsgs();
+  updateMsgBadge();
+  renderMessages();
   maybeSarahEgg(s.id, rec);
   renderAll();
-  goTab("collection");
+  // Win state: all six tagged.
+  if (Object.keys(state.tagged).length >= SHARKS.length && !state.won) {
+    doWin();
+  } else {
+    goTab("collection");
+  }
 }
+
+/* ---------- Win state ---------- */
+
+const WIN_THREAD = [
+  { who: "them", text: "you did it. you tagged ALL of them." },
+  { who: "me", text: "Six for six. Couldn't have done it without my research assistant." },
+  { who: "them", text: "i'm going to tell EVERYONE at school that my cousin is a REAL shark scientist. this is the best day of my whole life" },
+  { who: "me", text: "Best day of mine too, kiddo. 🦈" }
+];
+
+function doWin() {
+  state.won = true;
+  try { localStorage.setItem("tyi-won", "1"); } catch {}
+  // Usable reward: two new regions open up.
+  REGIONS.galapagos.locked = false;
+  REGIONS["south-africa"].locked = false;
+  fillRegions();
+  renderPlanner();
+  // Sarah's heartfelt text.
+  state.messages.push(WIN_THREAD);
+  state.unread += 1;
+  saveMsgs();
+  updateMsgBadge();
+  renderMessages();
+  renderCollection();
+  renderResearch();
+  $("winOverlay").classList.remove("hidden");
+}
+
+$("winContinue").addEventListener("click", () => {
+  $("winOverlay").classList.add("hidden");
+  goTab("collection");
+});
 
 /* Easter egg: name a shark "Sarah" and the cousin finds out. */
 function maybeSarahEgg(speciesId, rec) {
@@ -688,12 +890,25 @@ function renderCollection() {
   const list = $("collectionList");
   list.innerHTML = "";
   const ids = Object.keys(state.tagged);
-  $("collectionCount").textContent = `${ids.length}/4`;
-  $("completeBanner").classList.toggle("hidden", ids.length < 4);
+  $("collectionCount").textContent = `${ids.length}/${SHARKS.length}`;
+  $("completeBanner").classList.toggle("hidden", ids.length < SHARKS.length);
 
-  if (!ids.length) {
+  if (!ids.length && !state.won) {
     list.innerHTML = `<div class="empty-note">No sharks tagged yet.<br>Do your research, then get out there. 🦈</div>`;
     return;
+  }
+  // Ceremonial win reward: the Master Shark Tagger certificate lives here.
+  if (state.won) {
+    const cert = document.createElement("button");
+    cert.type = "button";
+    cert.className = "grid-cell cert-cell";
+    cert.setAttribute("aria-label", "Open your Master Shark Tagger certificate");
+    cert.innerHTML = `
+      <div class="cert-trophy">🏆</div>
+      <h3>Master Shark Tagger</h3>
+      <p class="latin">Official certificate</p>`;
+    cert.addEventListener("click", openCertificate);
+    list.appendChild(cert);
   }
   SHARKS.filter(s => state.tagged[s.id]).forEach(s => {
     const t = state.tagged[s.id];
@@ -710,6 +925,19 @@ function renderCollection() {
     cell.addEventListener("click", () => openDetail(s.id));
     list.appendChild(cell);
   });
+}
+
+function openCertificate() {
+  const c = $("detailContent");
+  c.innerHTML = `
+    <div class="cert-trophy" style="font-size:44px">🏆</div>
+    <h3 style="margin:6px 0 0">Master Shark Tagger</h3>
+    <p class="latin">Tag, You're It — field program</p>
+    <div class="cert-body">
+      <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
+      <p class="cert-sig">Awarded with salt on it. 🦈</p>
+    </div>`;
+  $("detailOverlay").classList.remove("hidden");
 }
 
 function openDetail(id) {
@@ -738,10 +966,12 @@ function openDetail(id) {
       📍 Tagged at ${esc(t.location)}<br>
       📅 ${esc(t.date)}
     </p>
+    <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px">📍 Track this shark</button>
     <p class="hook">💡 ${s.hook}</p>
-    <p class="unlock">🔓 <strong>Unlocked by tagging:</strong> ${s.bonus}</p>
+    <p class="bonus-fact">✨ ${s.bonus}</p>
   `;
   $("detailOverlay").classList.remove("hidden");
+  $("trackBtn").addEventListener("click", () => openTrack(id));
   $("renameBtn").addEventListener("click", () => {
     $("renameForm").classList.remove("hidden");
     $("renameBtn").classList.add("hidden");
@@ -763,6 +993,59 @@ function openDetail(id) {
   });
 }
 
+/* ---------- Shark tracking: where are they now? ---------- */
+
+function openTrack(id) {
+  const s = sharkById(id);
+  const t = state.tagged[id];
+  if (!t.track) { t.track = genTrack(s, t); store.save(state.tagged); }
+  const tr = t.track;
+  const W = 320, H = 168, pad = 26;
+  const n = tr.points.length;
+  const pts = tr.points.map((p, i) => {
+    const x = pad + (n === 1 ? 0.5 : i / (n - 1)) * (W - pad * 2);
+    const jitter = ((hashStr(p.label) % 100) / 100 - 0.5) * (H - pad * 2 - 30);
+    const y = Math.round(H / 2 + jitter);
+    return { x: Math.round(x), y, p };
+  });
+  const pathD = pts.map((pt, i) => (i === 0 ? "M" : "L") + pt.x + " " + pt.y).join(" ");
+  const dots = pts.map((pt, i) => {
+    const first = i === 0, last = i === pts.length - 1;
+    return `<circle cx="${pt.x}" cy="${pt.y}" r="${last ? 6 : 4}" fill="${last ? "#ffd166" : "#4fd1c5"}" stroke="#0b2237" stroke-width="2"/>
+      ${first || last ? `<text x="${pt.x}" y="${pt.y - 10}" text-anchor="middle" fill="#a9c3d6" font-size="9">${esc(first ? "tagged here" : "last ping")}</text>` : ""}`;
+  }).join("");
+  const last = tr.points[tr.points.length - 1];
+  const stops = tr.points.map((p, i) =>
+    `<li>${i === 0 ? "📍" : "▫️"} Day ${p.day} — ${esc(p.label)}${p.km ? ` <span class="dim">(+${p.km.toLocaleString()} km)</span>` : ""}</li>`
+  ).join("");
+  const title = t.name ? `“${esc(t.name)}”` : esc(t.researchId);
+  $("trackContent").innerHTML = `
+    <div class="phone-head">📍 Tracking ${title} <span class="research-id">${esc(t.researchId)}</span></div>
+    <svg viewBox="0 0 ${W} ${H}" class="track-map" role="img" aria-label="Migration track map">
+      <rect x="0" y="0" width="${W}" height="${H}" rx="12" fill="#0a1c30"/>
+      ${[0.25, 0.5, 0.75].map(f => `<line x1="0" y1="${H * f}" x2="${W}" y2="${H * f}" stroke="#16405f" stroke-width="1" stroke-dasharray="4 6"/>`).join("")}
+      <path d="${pathD}" fill="none" stroke="#4fd1c5" stroke-width="2.5" stroke-dasharray="7 5" opacity="0.85"/>
+      ${dots}
+    </svg>
+    <div class="track-stats">
+      <div><strong>${tr.totalKm.toLocaleString()} km</strong><span>travelled</span></div>
+      <div><strong>${tr.days} days</strong><span>at liberty</span></div>
+      <div><strong>${tr.points.length}</strong><span>locations</span></div>
+    </div>
+    <ul class="track-stops">${stops}</ul>
+    <p class="track-note">Last ping: <strong>${esc(last.label)}</strong> · day ${last.day}<br>
+    <span class="dim">Illustrative track — real satellite tags ping just like this. 🛰️</span></p>
+  `;
+  $("trackOverlay").classList.remove("hidden");
+}
+
+$("trackClose").addEventListener("click", () => {
+  $("trackOverlay").classList.add("hidden");
+});
+$("trackOverlay").addEventListener("click", (e) => {
+  if (e.target === $("trackOverlay")) $("trackOverlay").classList.add("hidden");
+});
+
 $("detailClose").addEventListener("click", () => {
   $("detailOverlay").classList.add("hidden");
 });
@@ -780,7 +1063,8 @@ function renderAll() {
   updateMsgBadge();
 }
 
-fillSelect($("regionSelect"), REGIONS);
+fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
+$("buildTag").textContent = VERSION;
 renderAll();

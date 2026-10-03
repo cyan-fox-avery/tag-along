@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="build-tag" id="buildTag" title="Build version"></div>
   <div class="app">
     <header class="topbar">
       <p class="eyebrow">WORKING TITLE PROTOTYPE</p>
@@ -18,7 +19,7 @@
     <nav class="tabs" aria-label="Game sections">
       <button class="tab active" data-tab="research" type="button">📖 Research</button>
       <button class="tab" data-tab="expedition" type="button">🛥️ Expedition</button>
-      <button class="tab" data-tab="collection" type="button">🗂️ Collection <span id="collectionCount" class="count-badge">0/4</span></button>
+      <button class="tab" data-tab="collection" type="button">🗂️ Collection <span id="collectionCount" class="count-badge">0/6</span></button>
       <button class="tab" data-tab="messages" type="button">💬 Messages <span id="msgBadge" class="count-badge hidden">0</span></button>
     </nav>
 
@@ -79,10 +80,10 @@
       <section id="tab-collection" class="panel">
         <div class="section-head">
           <h2>Official collection book</h2>
-          <p>Tap a shark to open its full card. Tagging unlocks facts you won't find in the field notes.</p>
+          <p>Tap a shark to open its full card — there's more in the book than in the field notes.</p>
         </div>
         <div id="completeBanner" class="complete-banner hidden">
-          🎉 You tagged all four! 🦈
+          🎉 You tagged all six! Master Shark Tagger. 🦈
         </div>
         <div id="collectionList" class="collection-grid"></div>
       </section>
@@ -121,6 +122,33 @@
     <div class="phone">
       <div id="detailContent"></div>
       <button id="detailClose" class="secondary-button" type="button">Close</button>
+    </div>
+  </div>
+
+  <!-- Tracking modal -->
+  <div id="trackOverlay" class="overlay hidden">
+    <div class="phone">
+      <div id="trackContent"></div>
+      <button id="trackClose" class="secondary-button" type="button">Close</button>
+    </div>
+  </div>
+
+  <!-- Win state modal -->
+  <div id="winOverlay" class="overlay hidden">
+    <div class="phone">
+      <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
+      <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
+      <p class="latin" style="text-align:center">All six sharks tagged — officially.</p>
+      <div class="cert-body">
+        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of six successful tags and six healthy releases.</p>
+      </div>
+      <div class="reward-list">
+        <p>🎖️ <strong>Rewards unlocked:</strong></p>
+        <p>📜 Certificate added to your collection book</p>
+        <p>🗺️ Two new regions: Galápagos Islands &amp; South Africa</p>
+        <p>💬 Sarah texted you — go read it</p>
+      </div>
+      <button id="winContinue" class="primary-button" type="button">Continue</button>
     </div>
   </div>
 

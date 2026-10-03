@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.4.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.5.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,33 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.5.0 changes
+
+- No more "unlocked" labels: facts earned by tagging are just part of the
+  card now. You tagged the shark — you know.
+- Research rewritten as true field notes at a grade-6 reading level. Every
+  region, depth range, and bait you need is in the text, but nothing is
+  handed to you — read like a scientist, infer like one too.
+- Expeditions breathe slower: longer beats between dive-log lines, and
+  ambient sea life always appears before the shark does. Scene first,
+  shark last.
+- Sarah celebrates your wins now, not just your failures: successful tags
+  earn an excited text plus a bonus shark fact.
+- Win state: tagging all six unlocks a proper reward moment —
+  ceremonial (a Master Shark Tagger certificate in your collection book,
+  plus a heartfelt text from Sarah) and usable (two new expedition
+  regions: Galápagos Islands and South Africa — new waters for future
+  species).
+- Two new sharks join the roster: tiger shark and sand tiger shark, with
+  full research notes, planner options, art, cards, and tracking. The tiger
+  shark isn't picky — several baits will tempt it, so the real puzzle is
+  where to look.
+- Shark tracking: every tagged shark gets a satellite-tag style track view —
+  migration path, total distance travelled, locations visited, last known
+  location. Nurse sharks stay local; whale sharks cross ocean basins.
+- The build number now lives in the top corner of the page (new standing
+  rule), so it's always obvious which version is live.
 
 ## v0.4.0 changes
 
@@ -91,13 +118,14 @@ No build step — just vanilla HTML, CSS, and JavaScript, like nature intended.
    optionally give it a nickname too, and change nicknames later from the
    collection card.
 5. **Collect** — every tagged shark gets a card in your collection book, with
-   unlocked facts you couldn't read in the field notes.
+   facts that go beyond the field notes. Tap any card to track your shark's
+   satellite-tag migration.
 
 Between expeditions your little cousin Sarah may text you — her special
-interest is sharks and she thinks you're the coolest. Messages are optional:
+interest is sharks and she thinks you're the coolest. She celebrates your
+tags and gently nudges you if you keep striking out. Messages are optional:
 you'll get a notification badge on the Messages tab, and you can read them
-whenever you like. She's not a hint system — she's family. (Okay, she might
-gently nudge you if you keep striking out.)
+whenever you like. She's not a hint system — she's family.
 
 ## Prototype roster
 
@@ -105,6 +133,8 @@ gently nudge you if you keep striking out.)
 - Whale shark *(Rhincodon typus)*
 - Nurse shark *(Ginglymostoma cirratum)*
 - Goblin shark *(Mitsukurina owstoni)*
+- Tiger shark *(Galeocerdo cuvier)*
+- Sand tiger shark *(Carcharias taurus)*
 
 Locations, depths, and diets are based on real species data. Ranges are
 approximate — verify against a field guide before finalizing.
