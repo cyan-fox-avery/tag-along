@@ -1,17 +1,34 @@
 # Tag, You're It
 
-**v0.3.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
-
-> cute sea puppy with lots of teeth.
+**v0.4.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
 You are a conservation scientist. Research each shark's habits, plan an
 expedition (region, depth, bait), head out to sea, and tag one of every
-species for your official collection book. Less *Jaws*, more *cute sea
-puppy with lots of teeth*.
+species for your official collection book. Less *Jaws*, more careful field
+science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.4.0 changes
+
+- Expeditions are richer now: the dive log describes the area, the
+  surrounding wildlife, and the whole scene — not just mechanical updates.
+  Keep an eye out for quiet details: bioluminescent algae, the silhouette
+  of a scuttled ship, and the occasional familiar reference, mentioned in
+  passing.
+- Every tagged shark is now always assigned a scientific research ID
+  (e.g. NS-2026-014) on tagging, like real field science. Nicknames are a
+  separate, optional layer — a shark can have both, and there is never an
+  "Unnamed" state. Rename any shark later from its collection card.
+- Tone pass: the site itself stays neutral and scientific. The affectionate
+  "sea puppy" voice now lives only in Sarah's texts, where it belongs.
+- The dive window has ambient sea life: sea turtles, schools of fish, and
+  dolphins drift past as small silhouettes, sometimes paired with what the
+  dive log describes. Varies by depth.
+- Easter egg: name a shark "Sarah" (any capitalization) and see what happens.
+  (Hint: the cousin finds out.)
 
 ## v0.3.0 changes
 
@@ -69,9 +86,10 @@ No build step — just vanilla HTML, CSS, and JavaScript, like nature intended.
 1. **Research** — read short, dense, real field notes on each shark.
 2. **Plan** — pick a target species, then choose region, depth, and bait.
 3. **Dive** — watch the expedition play out through the dive log with a little suspense.
-4. **Tag** — if your target (or another untagged species!) shows up, tag one,
-   learn about that individual, and optionally give it a name (you can skip
-   it and rename the shark later from its collection card).
+4. **Tag** — if your target (or another untagged species!) shows up, tag one.
+   Every shark is assigned a scientific research ID automatically; you can
+   optionally give it a nickname too, and change nicknames later from the
+   collection card.
 5. **Collect** — every tagged shark gets a card in your collection book, with
    unlocked facts you couldn't read in the field notes.
 

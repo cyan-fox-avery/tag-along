@@ -211,4 +211,25 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
 .rename-actions .primary-button, .rename-actions .secondary-button { margin-top: 0; }
 .unlock { font-size: 13px; color: var(--teal); margin: 6px 0 10px; line-height: 1.55; }
 
+/* v0.4.0: research IDs, ambient sea life, flavour log */
+.research-id {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px; color: var(--teal);
+  background: rgba(79, 209, 197, 0.12);
+  border-radius: 6px; padding: 2px 8px; white-space: nowrap;
+}
+.grid-id {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px; color: var(--teal); margin-top: 4px;
+}
+.opt { font-weight: 400; font-style: italic; }
+.dive-log .flavour { color: #bcd6e6; font-style: italic; }
+.ambient {
+  position: absolute; top: 30%; left: -30%;
+  opacity: 0.55; pointer-events: none; z-index: 2;
+  animation-name: drift; animation-timing-function: linear; animation-fill-mode: forwards;
+}
+.ambient svg { height: 100%; width: auto; display: block; }
+@keyframes drift { from { left: -30%; } to { left: 112%; } }
+
 .hidden { display: none !important; }
