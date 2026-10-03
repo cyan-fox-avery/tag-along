@@ -79,12 +79,12 @@
       <section id="tab-collection" class="panel">
         <div class="section-head">
           <h2>Official collection book</h2>
-          <p>Every shark you tag gets its own card. They're all sea puppies.</p>
+          <p>Tap a shark to open its full card. Tagging unlocks facts you won't find in the field notes.</p>
         </div>
         <div id="completeBanner" class="complete-banner hidden">
           🎉 You tagged all four! 🦈
         </div>
-        <div id="collectionList" class="card-list"></div>
+        <div id="collectionList" class="collection-grid"></div>
       </section>
 
       <!-- MESSAGES -->
@@ -109,10 +109,19 @@
       <div id="tagSharkArt" class="tag-art"></div>
       <div id="tagInfo" class="tag-info"></div>
       <label class="field">
-        <span>Give this shark a name</span>
+        <span>Give this shark a name (optional)</span>
         <input id="sharkName" type="text" maxlength="24" placeholder="Name your shark…" />
       </label>
       <button id="tagConfirm" class="primary-button" type="button">Add to collection book</button>
+      <button id="tagSkip" class="secondary-button" type="button">Skip naming for now</button>
+    </div>
+  </div>
+
+  <!-- Collection detail modal -->
+  <div id="detailOverlay" class="overlay hidden">
+    <div class="phone">
+      <div id="detailContent"></div>
+      <button id="detailClose" class="secondary-button" type="button">Close</button>
     </div>
   </div>
 

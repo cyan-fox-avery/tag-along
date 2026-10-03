@@ -1,4 +1,4 @@
-/* Tag, You're It — prototype v0.2.0
+/* Tag, You're It — prototype v0.3.0
    Research -> plan (region/depth/bait) -> dive -> tag -> collection book.
    Cute sea puppies with lots of teeth. */
 
@@ -108,8 +108,9 @@ const SHARKS = [
     combo: { region: "caribbean", bait: "crustaceans" },
     depths: ["surface", "reef"],
     sizeRange: [2.0, 3.0],
-    research: "A bottom-dweller of the warm, shallow tropical Atlantic — the Caribbean, Florida, the Bahamas. By day it piles up with others under reef ledges; by night it hunts alone, vacuuming crabs, lobster and squid off the sand with the little barbels on its snout. It lives anywhere from the surface down to about 75 metres — try the surface waters or the reefs.",
+    research: "A bottom-dweller of the warm, shallow tropical Atlantic — the Caribbean Sea. By day it piles up with others under reef ledges; by night it hunts alone, vacuuming crabs and lobster off the sand with the little barbels on its snout — so bring crabs & lobster, not fish bait. It lives anywhere from the surface down to about 75 metres: try the surface waters or the reefs.",
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor. Peak sea puppy.",
+    bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
     nameIdeas: ["Puddles", "Biscuit", "Sandy", "Nugget"]
   },
   {
@@ -118,8 +119,9 @@ const SHARKS = [
     combo: { region: "open-atlantic", bait: "schooling-fish" },
     depths: ["reef", "twilight"],
     sizeRange: [3.0, 4.6],
-    research: "Follows warm water through tropical and temperate oceans worldwide, often over the open Atlantic. Spends the day deep below the sunlit layer and rises toward the surface at night. Hunts schooling fish — anchovies, herring, mackerel — stunning them with a whip of its enormous tail, half its body length. It roams anywhere from about 30 to 550 metres — try the reefs or the twilight depths.",
+    research: "Follows warm water through tropical and temperate oceans worldwide, but your best bet is the open Atlantic. Spends the day deep below the sunlit layer and rises toward the surface at night. Hunts schooling fish — anchovies, herring, mackerel — stunning them with a whip of its enormous tail, half its body length, so bring schooling fish. It roams anywhere from about 30 to 550 metres: try the reefs or the twilight depths.",
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
+    bonus: "Threshers have been seen hunting in pairs, herding schools of fish into a tight ball before taking turns striking with their tails.",
     nameIdeas: ["Whip", "Nervous Nigel", "Swoosh", "Comet"]
   },
   {
@@ -128,8 +130,9 @@ const SHARKS = [
     combo: { region: "philippines", bait: "plankton" },
     depths: ["surface", "reef"],
     sizeRange: [5.5, 12.0],
-    research: "Roams all tropical and warm-temperate seas — the Philippines, the Maldives, the Yucatan. A filter feeder: it doesn't chase prey, it finds seasonal plankton blooms and swims through them with its enormous mouth open. Each shark's spot pattern is unique, like a fingerprint. It usually cruises right at the surface, sometimes dipping a little deeper over reefs — check the surface waters or the shallow reefs.",
+    research: "Roams all tropical and warm-temperate seas, but this season the confirmed aggregation is off the Philippines. A filter feeder: it doesn't chase prey, it finds seasonal plankton blooms and swims through them with its enormous mouth open — so don't bring bait, follow the bloom. Each shark's spot pattern is unique, like a fingerprint. It usually cruises right at the surface, sometimes dipping a little deeper over reefs: check the surface waters or the shallow reefs.",
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
+    bonus: "Whale sharks can dive deeper than 1,900 metres — among the deepest dives ever recorded for any fish — then cruise back up to the surface to feed.",
     nameIdeas: ["Dot", "Bus", "Domino", "Galaxy"]
   },
   {
@@ -138,8 +141,9 @@ const SHARKS = [
     combo: { region: "japan", bait: "squid" },
     depths: ["twilight", "deep"],
     sizeRange: [2.5, 4.0],
-    research: "A living fossil from deep continental slopes — most records come from Japan's Sagami Bay. Lives in darkness between 270 and 960 metres, hunting deep-sea fish and squid. Its jaws shoot forward like a slingshot, and it finds prey by sensing electricity. Check the twilight depths or the deep dark.",
+    research: "A living fossil from deep continental slopes — most records come from Japan's Sagami Bay. Lives in darkness between 270 and 960 metres, ambushing deep-sea squid and fish — squid on the line is your best bet. Its jaws shoot forward like a slingshot, and it finds prey by sensing electricity. Check the twilight depths or the deep dark.",
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
+    bonus: "A goblin shark's pink colour comes from blood vessels showing through its thin, almost translucent skin.",
     nameIdeas: ["Nosey", "Fossil", "Blush", "Slingshot"]
   }
 ];
@@ -194,17 +198,22 @@ function saveMsgs() {
 }
 
 const $ = (id) => document.getElementById(id);
+const esc = (str) => String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const sharkById = (id) => SHARKS.find(s => s.id === id);
 const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
 
-/* ---------- Tabs ---------- */
+/* ---------- Tabs (each tab remembers its scroll position) ---------- */
 
+const tabScroll = {};
 document.querySelectorAll(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
+    const current = document.querySelector(".tab.active");
+    if (current) tabScroll[current.dataset.tab] = window.scrollY;
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
     if (btn.dataset.tab === "messages" && state.unread > 0) {
       state.unread = 0;
       saveMsgs();
@@ -231,9 +240,8 @@ function renderResearch() {
       <p class="latin">${s.latin}</p>
       <span class="status-pill">IUCN: ${s.status}</span>
       <p class="research-text">${s.research}</p>
-      <p class="hook">💡 ${s.hook}</p>
       ${done
-        ? `<p class="hook">Tagged: <strong>${state.tagged[s.id].name}</strong> 🎉</p>`
+        ? `<p class="hook">Tagged: <strong>${esc(state.tagged[s.id].name) || "Unnamed"}</strong> 🎉</p>`
         : `<button class="secondary-button" data-plan="${s.id}" type="button">Plan an expedition for this shark</button>`}
     `;
     list.appendChild(card);
@@ -449,17 +457,17 @@ function openTagging(species) {
     📍 Tagged at: ${REGIONS[$("regionSelect").value].name}<br>
     📅 ${new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
   `;
-  $("sharkName").value = pick(species.nameIdeas);
+  $("sharkName").value = "";
+  $("sharkName").placeholder = pick(species.nameIdeas) + "…";
   $("tagOverlay").classList.remove("hidden");
-  setTimeout(() => $("sharkName").select(), 100);
+  setTimeout(() => $("sharkName").focus(), 100);
 }
 
-$("tagConfirm").addEventListener("click", () => {
+function confirmTag(name) {
   const s = state.pendingTag;
   if (!s) return;
-  const name = $("sharkName").value.trim() || pick(s.nameIdeas);
   state.tagged[s.id] = {
-    name,
+    name: name || "",
     length: s._gen.length,
     sex: s._gen.sex,
     location: REGIONS[$("regionSelect").value].name,
@@ -473,9 +481,16 @@ $("tagConfirm").addEventListener("click", () => {
   state.pendingTag = null;
   renderAll();
   goTab("collection");
-});
+}
 
-/* ---------- Collection book ---------- */
+$("tagConfirm").addEventListener("click", () => confirmTag($("sharkName").value.trim()));
+$("tagSkip").addEventListener("click", () => confirmTag(""));
+
+/* ---------- Collection book: compact grid, tap for detail ---------- */
+
+function displayName(t) {
+  return t.name ? `“${esc(t.name)}”` : `<span class="unnamed">Unnamed</span>`;
+}
 
 function renderCollection() {
   const list = $("collectionList");
@@ -490,25 +505,75 @@ function renderCollection() {
   }
   SHARKS.filter(s => state.tagged[s.id]).forEach(s => {
     const t = state.tagged[s.id];
-    const card = document.createElement("div");
-    card.className = "book-card";
-    card.innerHTML = `
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = "grid-cell";
+    cell.setAttribute("aria-label", `Open details for ${esc(t.name) || "unnamed"} ${s.name}`);
+    cell.innerHTML = `
       <div class="shark-art">${ART[s.id]}</div>
-      <div class="given-name">“${t.name}”</div>
-      <h3 style="margin:0">${s.name}</h3>
-      <p class="latin">${s.latin}</p>
-      <span class="status-pill">IUCN: ${s.status}</span>
-      <p class="book-stats">
-        📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
-        📍 Tagged at ${t.location}<br>
-        📅 ${t.date}
-      </p>
-      <p class="research-text">${s.research}</p>
-      <p class="hook">💡 ${s.hook}</p>
-    `;
-    list.appendChild(card);
+      <div class="grid-name">${displayName(t)}</div>
+      <h3>${s.name}</h3>
+      <p class="latin">${s.latin}</p>`;
+    cell.addEventListener("click", () => openDetail(s.id));
+    list.appendChild(cell);
   });
 }
+
+function openDetail(id) {
+  const s = sharkById(id);
+  const t = state.tagged[id];
+  const c = $("detailContent");
+  c.innerHTML = `
+    <div class="shark-art">${ART[s.id]}</div>
+    <div class="detail-name-row">
+      <span class="given-name">${displayName(t)}</span>
+      <button id="renameBtn" class="mini-button" type="button">✏️ Rename</button>
+    </div>
+    <div id="renameForm" class="hidden">
+      <input id="renameInput" type="text" maxlength="24" value="${esc(t.name)}" placeholder="Name your shark…" />
+      <div class="rename-actions">
+        <button id="renameSave" class="primary-button" type="button">Save</button>
+        <button id="renameCancel" class="secondary-button" type="button">Cancel</button>
+      </div>
+    </div>
+    <h3 style="margin:6px 0 0">${s.name}</h3>
+    <p class="latin">${s.latin}</p>
+    <span class="status-pill">IUCN: ${s.status}</span>
+    <p class="book-stats">
+      📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
+      📍 Tagged at ${esc(t.location)}<br>
+      📅 ${esc(t.date)}
+    </p>
+    <p class="hook">💡 ${s.hook}</p>
+    <p class="unlock">🔓 <strong>Unlocked by tagging:</strong> ${s.bonus}</p>
+  `;
+  $("detailOverlay").classList.remove("hidden");
+  $("renameBtn").addEventListener("click", () => {
+    $("renameForm").classList.remove("hidden");
+    $("renameBtn").classList.add("hidden");
+    const inp = $("renameInput");
+    inp.focus();
+    inp.select();
+  });
+  $("renameCancel").addEventListener("click", () => {
+    $("renameForm").classList.add("hidden");
+    $("renameBtn").classList.remove("hidden");
+  });
+  $("renameSave").addEventListener("click", () => {
+    t.name = $("renameInput").value.trim();
+    store.save(state.tagged);
+    renderCollection();
+    renderResearch();
+    openDetail(id);
+  });
+}
+
+$("detailClose").addEventListener("click", () => {
+  $("detailOverlay").classList.add("hidden");
+});
+$("detailOverlay").addEventListener("click", (e) => {
+  if (e.target === $("detailOverlay")) $("detailOverlay").classList.add("hidden");
+});
 
 /* ---------- Boot ---------- */
 

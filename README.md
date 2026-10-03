@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.2.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.3.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 > cute sea puppy with lots of teeth.
 
@@ -12,6 +12,20 @@ species for your official collection book. Less *Jaws*, more *cute sea
 puppy with lots of teeth*.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.3.0 changes
+
+- Tab switching no longer yanks the page to the top — each tab remembers
+  its own scroll position.
+- Research and collection no longer repeat each other. Field notes stay as
+  the pre-expedition knowledge; tagging a shark now UNLOCKS new facts on its
+  collection card: the fun fact plus a bonus detail you couldn't read before.
+- Research notes were fleshed out so every planner choice is derivable from
+  the text — region, depth range, and bait are all stated clearly. No guessing.
+- Naming is optional: skip it during tagging (the shark shows as Unnamed)
+  and rename any tagged shark later from its collection card.
+- Collection is now a compact two-across grid on mobile (picture + common and
+  scientific names per cell); tapping a cell opens the full detail card.
 
 ## v0.2.0 changes
 
@@ -56,8 +70,10 @@ No build step — just vanilla HTML, CSS, and JavaScript, like nature intended.
 2. **Plan** — pick a target species, then choose region, depth, and bait.
 3. **Dive** — watch the expedition play out through the dive log with a little suspense.
 4. **Tag** — if your target (or another untagged species!) shows up, tag one,
-   learn about that individual, and give it a name.
-5. **Collect** — every tagged shark gets a card in your collection book.
+   learn about that individual, and optionally give it a name (you can skip
+   it and rename the shark later from its collection card).
+5. **Collect** — every tagged shark gets a card in your collection book, with
+   unlocked facts you couldn't read in the field notes.
 
 Between expeditions your little cousin Sarah may text you — her special
 interest is sharks and she thinks you're the coolest. Messages are optional:
