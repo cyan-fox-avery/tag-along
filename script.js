@@ -1,6 +1,6 @@
-/* Tag, You're It — prototype v1
+/* Tag, You're It — prototype v0.2.0
    Research -> plan (region/depth/bait) -> dive -> tag -> collection book.
-   For sarah. Cute sea puppies with lots of teeth. */
+   Cute sea puppies with lots of teeth. */
 
 "use strict";
 
@@ -88,10 +88,10 @@ const REGIONS = {
 };
 
 const DEPTHS = {
-  "shallow":  { name: "Shallow reef (0–30 m)",   scene: "depth-shallow" },
-  "surface":  { name: "Open surface (0–50 m)",   scene: "depth-surface" },
-  "midwater": { name: "Mid-water (100–300 m)",   scene: "depth-midwater" },
-  "deep":     { name: "Deep slope (300–1000 m)", scene: "depth-deep" }
+  "surface":  { name: "Surface waters (0–30 m)",     scene: "depth-surface" },
+  "reef":     { name: "Reef & shallows (30–100 m)", scene: "depth-shallow" },
+  "twilight": { name: "Twilight depths (100–400 m)", scene: "depth-midwater" },
+  "deep":     { name: "Deep dark (400–1000 m)",     scene: "depth-deep" }
 };
 
 const BAITS = {
@@ -105,56 +105,61 @@ const SHARKS = [
   {
     id: "nurse",
     name: "Nurse Shark", latin: "Ginglymostoma cirratum", status: "Vulnerable",
-    combo: { region: "caribbean", depth: "shallow", bait: "crustaceans" },
+    combo: { region: "caribbean", bait: "crustaceans" },
+    depths: ["surface", "reef"],
     sizeRange: [2.0, 3.0],
-    research: "A bottom-dweller of the warm, shallow tropical Atlantic — the Caribbean, Florida, the Bahamas. By day it piles up with others under reef ledges; by night it hunts alone, vacuuming crabs, lobster and squid off the sand with the little barbels on its snout.",
+    research: "A bottom-dweller of the warm, shallow tropical Atlantic — the Caribbean, Florida, the Bahamas. By day it piles up with others under reef ledges; by night it hunts alone, vacuuming crabs, lobster and squid off the sand with the little barbels on its snout. It lives anywhere from the surface down to about 75 metres — try the surface waters or the reefs.",
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor. Peak sea puppy.",
     nameIdeas: ["Puddles", "Biscuit", "Sandy", "Nugget"]
   },
   {
     id: "thresher",
     name: "Thresher Shark", latin: "Alopias vulpinus", status: "Vulnerable",
-    combo: { region: "open-atlantic", depth: "midwater", bait: "schooling-fish" },
+    combo: { region: "open-atlantic", bait: "schooling-fish" },
+    depths: ["reef", "twilight"],
     sizeRange: [3.0, 4.6],
-    research: "Follows warm water through tropical and temperate oceans worldwide, often over the open Atlantic. Spends the day deep below the sunlit layer and rises toward the surface at night. Hunts schooling fish — anchovies, herring, mackerel — stunning them with a whip of its enormous tail, half its body length.",
+    research: "Follows warm water through tropical and temperate oceans worldwide, often over the open Atlantic. Spends the day deep below the sunlit layer and rises toward the surface at night. Hunts schooling fish — anchovies, herring, mackerel — stunning them with a whip of its enormous tail, half its body length. It roams anywhere from about 30 to 550 metres — try the reefs or the twilight depths.",
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     nameIdeas: ["Whip", "Nervous Nigel", "Swoosh", "Comet"]
   },
   {
     id: "whale",
     name: "Whale Shark", latin: "Rhincodon typus", status: "Endangered",
-    combo: { region: "philippines", depth: "surface", bait: "plankton" },
+    combo: { region: "philippines", bait: "plankton" },
+    depths: ["surface", "reef"],
     sizeRange: [5.5, 12.0],
-    research: "Roams all tropical and warm-temperate seas — the Philippines, the Maldives, the Yucatan. A filter feeder: it doesn't chase prey, it finds seasonal plankton blooms and swims through them with its enormous mouth open. Each shark's spot pattern is unique, like a fingerprint.",
+    research: "Roams all tropical and warm-temperate seas — the Philippines, the Maldives, the Yucatan. A filter feeder: it doesn't chase prey, it finds seasonal plankton blooms and swims through them with its enormous mouth open. Each shark's spot pattern is unique, like a fingerprint. It usually cruises right at the surface, sometimes dipping a little deeper over reefs — check the surface waters or the shallow reefs.",
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
     nameIdeas: ["Dot", "Bus", "Domino", "Galaxy"]
   },
   {
     id: "goblin",
     name: "Goblin Shark", latin: "Mitsukurina owstoni", status: "Least Concern",
-    combo: { region: "japan", depth: "deep", bait: "squid" },
+    combo: { region: "japan", bait: "squid" },
+    depths: ["twilight", "deep"],
     sizeRange: [2.5, 4.0],
-    research: "A living fossil from deep continental slopes — most records come from Japan's Sagami Bay. Lives in darkness between 270 and 960 metres, hunting deep-sea fish and squid. Its jaws shoot forward like a slingshot, and it finds prey by sensing electricity.",
+    research: "A living fossil from deep continental slopes — most records come from Japan's Sagami Bay. Lives in darkness between 270 and 960 metres, hunting deep-sea fish and squid. Its jaws shoot forward like a slingshot, and it finds prey by sensing electricity. Check the twilight depths or the deep dark.",
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
     nameIdeas: ["Nosey", "Fossil", "Blush", "Slingshot"]
   }
 ];
 
-/* Cousin texts: genuine conversation, never a "hint" UI */
+/* Sarah's texts: genuine conversation, never a "hint" UI.
+   Weighted toward real shark knowledge — she can't help sharing it. */
 const COUSIN_CHATS = [
-  { them: "did you see any sharks today?? tell me EVERYTHING", me: "Working on it! The ocean is big, the sharks are sneaky." },
-  { them: "i drew a thresher shark at school today. the tail took up the WHOLE page lol", me: "As it should. That tail is half the shark." },
-  { them: "mom says i know more about sharks than my teacher. she's probably right", me: "She's definitely right." },
-  { them: "do whale sharks have belly buttons? asking for science", me: "Asking the important questions. I'll look into it." },
-  { them: "ranking sharks by cuddliness: nurse shark is winning by a lot", me: "Strong ranking. Hard to argue with a shark that naps in piles." },
-  { them: "if i was a shark i would be a goblin shark because nobody would bother me down there", me: "Honestly? Valid strategy." }
+  { them: "did you know nurse sharks can BREATHE without swimming?? most sharks have to keep moving but nurse sharks can pump water over their gills just sitting there. that's why they can nap in piles!!", me: "That explains the cuddle heaps. Peak sea puppy behavior." },
+  { them: "thresher shark fact!!! their tail is HALF their whole body. they whip it so fast it stuns the fish. like a whip made of shark", me: "A sword tail. Nature is ridiculous." },
+  { them: "whale sharks are the BIGGEST fish ever but they only eat tiny stuff. they just swim around with their mouth open like a big slow vacuum. i would also do that", me: "Honestly same. Big slow vacuum is a lifestyle." },
+  { them: "goblin sharks are PINK. and their jaw shoots out like in the movies. they live deeper than any diver can go. scientists mostly find them near japan", me: "Deep, pink, and weird. The best combo." },
+  { them: "if you want a nurse shark try the caribbean!! they sleep under reef ledges during the day in the SHALLOW parts. at night they go hunting on the sand", me: "Shallow reefs by day, sandy bottoms by night. Noted." },
+  { them: "threshers go deep during the day where it's dark and come up at night to hunt. so like... twilight zone deep. or the reefs if you're lucky", me: "So mid-water by day, up higher at night. Got it." }
 ];
 
 const COUSIN_NUDGES = {
-  nurse:   "nurse sharks sleep on the BOTTOM in the SHALLOW parts!! like where you could stand up. and they eat crabs off the sand!! try the caribbean reefs",
-  thresher:"threshers go DEEP during the day!! below where the sunlight reaches. and they hunt schools of little fish. deeper water + fish bait??",
-  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! you have to find the bloom. they're usually right at the surface where the water looks green",
-  goblin:  "goblin sharks live SO deep. deeper than any scuba diver can go. there's a really deep bay in japan where scientists find them!!"
+  nurse:   "nurse sharks are SHALLOW!! like surface-to-reef shallow, 0 to 75 metres. they nap under reef ledges during the day and vacuum crabs off the sand at night. caribbean + shallow + crabs!!",
+  thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish. reefs or twilight + fish bait??",
+  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! find the bloom at the surface. they're usually right at the top where the water looks green, sometimes a bit deeper over reefs",
+  goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!"
 };
 
 /* ---------- State ---------- */
@@ -167,12 +172,26 @@ const store = {
   save(data) { localStorage.setItem("tyi-collection", JSON.stringify(data)); }
 };
 
+const msgStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-messages") || '{"messages":[],"unread":0,"chatIdx":0}'); }
+    catch { return { messages: [], unread: 0, chatIdx: 0 }; }
+  },
+  save(d) { localStorage.setItem("tyi-messages", JSON.stringify(d)); }
+};
+const _savedMsgs = msgStore.load();
+
 const state = {
   tagged: store.load(),   // id -> {name, length, sex, location, date}
   failures: 0,
-  chatIdx: 0,
+  chatIdx: _savedMsgs.chatIdx || 0,
+  messages: _savedMsgs.messages || [],
+  unread: _savedMsgs.unread || 0,
   pendingTag: null        // species object awaiting naming
 };
+function saveMsgs() {
+  msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx });
+}
 
 const $ = (id) => document.getElementById(id);
 const sharkById = (id) => SHARKS.find(s => s.id === id);
@@ -186,6 +205,11 @@ document.querySelectorAll(".tab").forEach(btn => {
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab === "messages" && state.unread > 0) {
+      state.unread = 0;
+      saveMsgs();
+      updateMsgBadge();
+    }
   });
 });
 function goTab(name) {
@@ -300,10 +324,11 @@ async function runExpedition(plan) {
   logLine(`🌊 The light changes. Something moves below…`);
   await wait(1400);
 
-  // Who shows up? Any species whose combo matches, target or untagged other.
+  // Who shows up? Any species whose region + bait match and whose depth
+  // range includes the chosen depth. There's no single "right" depth.
   const appeared = SHARKS.filter(s =>
     s.combo.region === plan.region &&
-    s.combo.depth === plan.depth &&
+    s.depths.includes(plan.depth) &&
     s.combo.bait === plan.bait
   );
   const taggable = appeared.filter(s => !state.tagged[s.id]);
@@ -351,41 +376,60 @@ async function runExpedition(plan) {
   actions.appendChild(backBtn);
 }
 
-/* ---------- Cousin texts ---------- */
+/* ---------- Sarah's texts (optional — badge notifies, you open when you want) ---------- */
 
-function showCousin(messages) {
-  const thread = $("cousinThread");
-  thread.innerHTML = "";
-  messages.forEach(m => {
-    const b = document.createElement("div");
-    b.className = "bubble " + m.who;
-    b.textContent = m.text;
-    thread.appendChild(b);
-  });
-  $("cousinOverlay").classList.remove("hidden");
+function updateMsgBadge() {
+  const b = $("msgBadge");
+  b.textContent = state.unread;
+  b.classList.toggle("hidden", state.unread === 0);
 }
-$("cousinClose").addEventListener("click", () => {
-  $("cousinOverlay").classList.add("hidden");
-});
+
+function renderMessages() {
+  const list = $("messagesList");
+  list.innerHTML = "";
+  if (!state.messages.length) {
+    list.innerHTML = `<div class="empty-note">No messages yet.<br>Sarah will text you between expeditions. 💬</div>`;
+    return;
+  }
+  [...state.messages].reverse().forEach(thread => {
+    const card = document.createElement("div");
+    card.className = "species-card";
+    card.innerHTML = `<div class="phone-head">📱 Texts with Sarah</div><div class="phone-thread"></div>`;
+    const th = card.querySelector(".phone-thread");
+    thread.forEach(m => {
+      const b = document.createElement("div");
+      b.className = "bubble " + m.who;
+      b.textContent = m.text;
+      th.appendChild(b);
+    });
+    list.appendChild(card);
+  });
+}
 
 function afterExpedition(targetId) {
+  let thread;
   if (state.failures >= 3) {
     // gentle nudge, genuine-conversation style
-    showCousin([
+    thread = [
       { who: "them", text: "how's the shark hunting going??" },
       { who: "me", text: "Honestly? Struck out a few times. This one's tricky." },
       { who: "them", text: COUSIN_NUDGES[targetId] || "you'll get the next one!! i believe in you" },
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
-    ]);
+    ];
     state.failures = 0;
-    return;
+  } else {
+    const chat = COUSIN_CHATS[state.chatIdx % COUSIN_CHATS.length];
+    state.chatIdx += 1;
+    thread = [
+      { who: "them", text: chat.them },
+      { who: "me", text: chat.me }
+    ];
   }
-  const chat = COUSIN_CHATS[state.chatIdx % COUSIN_CHATS.length];
-  state.chatIdx += 1;
-  showCousin([
-    { who: "them", text: chat.them },
-    { who: "me", text: chat.me }
-  ]);
+  state.messages.push(thread);
+  state.unread += 1;
+  saveMsgs();
+  updateMsgBadge();
+  renderMessages();
 }
 
 /* ---------- Tagging ---------- */
@@ -472,6 +516,8 @@ function renderAll() {
   renderResearch();
   renderPlanner();
   renderCollection();
+  renderMessages();
+  updateMsgBadge();
 }
 
 fillSelect($("regionSelect"), REGIONS);

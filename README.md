@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.1.0 — Prototype** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.2.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 > cute sea puppy with lots of teeth.
 
@@ -12,6 +12,19 @@ species for your official collection book. Less *Jaws*, more *cute sea
 puppy with lots of teeth*.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.2.0 changes
+
+- "For Sarah" is no longer all over the page. There's now a prominent
+  Acknowledgements section at the bottom of the Research tab instead.
+- Depth is no longer a single right answer: each shark has a depth range and
+  can appear across multiple depth options. Depth options were redesigned to
+  non-overlapping ranges. Region and bait still narrow it down.
+- Cousin messages are now optional — you get a notification badge on the new
+  Messages tab instead of forced popups. Messages are more hint-weighted,
+  with real shark knowledge in every exchange.
+- The little cousin is now named Sarah.
+- Shark art is still placeholder (to be revisited in a later version).
 
 ## v0.1.0 changes
 
@@ -46,10 +59,11 @@ No build step — just vanilla HTML, CSS, and JavaScript, like nature intended.
    learn about that individual, and give it a name.
 5. **Collect** — every tagged shark gets a card in your collection book.
 
-Between expeditions you'll hear from your little cousin, whose special
-interest is sharks and who thinks you're the coolest. They're not a hint
-system — they're family. (Okay, they might gently nudge you if you keep
-striking out.)
+Between expeditions your little cousin Sarah may text you — her special
+interest is sharks and she thinks you're the coolest. Messages are optional:
+you'll get a notification badge on the Messages tab, and you can read them
+whenever you like. She's not a hint system — she's family. (Okay, she might
+gently nudge you if you keep striking out.)
 
 ## Prototype roster
 

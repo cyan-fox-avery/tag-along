@@ -12,13 +12,14 @@
     <header class="topbar">
       <p class="eyebrow">WORKING TITLE PROTOTYPE</p>
       <h1>Tag, You're It</h1>
-      <p class="subtitle">a tiny shark-tagging adventure for sarah 🦈</p>
+      <p class="subtitle">a tiny shark-tagging adventure 🦈</p>
     </header>
 
     <nav class="tabs" aria-label="Game sections">
       <button class="tab active" data-tab="research" type="button">📖 Research</button>
       <button class="tab" data-tab="expedition" type="button">🛥️ Expedition</button>
       <button class="tab" data-tab="collection" type="button">🗂️ Collection <span id="collectionCount" class="count-badge">0/4</span></button>
+      <button class="tab" data-tab="messages" type="button">💬 Messages <span id="msgBadge" class="count-badge hidden">0</span></button>
     </nav>
 
     <main>
@@ -29,13 +30,19 @@
           <p>Short, dense, and true. Read up, then go find them.</p>
         </div>
         <div id="researchList" class="card-list"></div>
+
+        <div class="ack-card">
+          <p class="eyebrow">ACKNOWLEDGEMENTS</p>
+          <p class="ack-name">For <span>Sarah</span></p>
+          <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
+        </div>
       </section>
 
       <!-- EXPEDITION -->
       <section id="tab-expedition" class="panel">
         <div class="section-head">
           <h2>Plan an expedition</h2>
-          <p>Pick your target, then choose region, depth, and bait. Choose wisely — sharks are picky.</p>
+          <p>Pick your target, then choose region, depth, and bait. Each shark roams a range of depths — region and bait narrow it down.</p>
         </div>
 
         <div id="planner" class="planner-card">
@@ -75,24 +82,24 @@
           <p>Every shark you tag gets its own card. They're all sea puppies.</p>
         </div>
         <div id="completeBanner" class="complete-banner hidden">
-          🎉 You tagged all four! Time to show sarah. 🦈
+          🎉 You tagged all four! 🦈
         </div>
         <div id="collectionList" class="card-list"></div>
+      </section>
+
+      <!-- MESSAGES -->
+      <section id="tab-messages" class="panel">
+        <div class="section-head">
+          <h2>Texts with Sarah</h2>
+          <p>Your little cousin. Their special interest is sharks, and you're the coolest cousin in the world.</p>
+        </div>
+        <div id="messagesList" class="card-list"></div>
       </section>
     </main>
 
     <footer class="foot">
-      <p>made with ♥ for sarah · remember: cute sea puppies with lots of teeth</p>
+      <p>remember: cute sea puppies with lots of teeth</p>
     </footer>
-  </div>
-
-  <!-- Cousin message -->
-  <div id="cousinOverlay" class="overlay hidden">
-    <div class="phone">
-      <div class="phone-head">📱 texts with cousin</div>
-      <div id="cousinThread" class="phone-thread"></div>
-      <button id="cousinClose" class="primary-button" type="button">ok!</button>
-    </div>
   </div>
 
   <!-- Tagging modal -->
