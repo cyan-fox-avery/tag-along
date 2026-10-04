@@ -4,7 +4,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.7.2";
+const VERSION = "v0.7.3";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -988,7 +988,10 @@ function logLine(html, cls) {
   log.appendChild(p);
   log.scrollTop = log.scrollHeight;
 }
-const wait = (ms) => new Promise(r => setTimeout(r, ms));
+/* v0.7.3: expedition pacing — a beat slower than reading speed, so the
+   day breathes. Tune PACE to adjust globally. */
+const PACE = 1.5;
+const wait = (ms) => new Promise(r => setTimeout(r, ms * PACE));
 
 /* Ambient sea life + quiet easter-egg flavour during the dive. */
 function spawnCreature(type) {
@@ -1129,6 +1132,8 @@ function doEncounter(species, plan) {
 async function runExpedition(plan) {
   state.currentPlan = plan;
   state.pendingWin = false;
+  state.taggedThisTrip = false;
+  tripDecks = { waiting: shuffled(WAITING_LINES), doing: shuffled(SIGHTING_DOINES) };
   $("launchBtn").disabled = true;
   $("diveView").classList.remove("hidden");
   $("diveActions").classList.add("hidden");
@@ -1183,7 +1188,7 @@ async function runExpedition(plan) {
       await wait(1200);
       if (headBack) { endedEarly = true; break; }
     } else {
-      logLine(`👀 ${pick(WAITING_LINES)}`);
+      logLine(`👀 ${deal(tripDecks.waiting, WAITING_LINES)}`);
       await wait(1800);
     }
   }
@@ -1232,7 +1237,7 @@ function recordSighting(species, plan) {
   const entry = {
     speciesId: species.id,
     name: species.name,
-    doing: pick(SIGHTING_DOINES),
+    doing: tripDecks ? deal(tripDecks.doing, SIGHTING_DOINES) : pick(SIGHTING_DOINES),
     location: REGIONS[plan.region].name,
     date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
     ts: Date.now()
@@ -1299,6 +1304,10 @@ function renderMessages() {
 /* v0.7.0: no target species anymore, so the nudge picks an untagged
    shark to point at — a useful direction, not a correction. */
 function afterExpedition(plan) {
+  /* A trip with a successful tag already got its Sarah moment — the
+     species-relevant celebration thread. Don't follow it minutes later
+     with an unrelated random fact. */
+  if (state.taggedThisTrip) return;
   let thread;
   if (state.failures >= 3) {
     // gentle nudge, genuine-conversation style
@@ -1326,6 +1335,22 @@ function afterExpedition(plan) {
 
 const rand = (a, b) => Math.round((a + Math.random() * (b - a)) * 10) / 10;
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+/* v0.7.3: flavour lines are dealt like cards — shuffled per trip, each
+   line once, so phrases never repeat within a day. */
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+let tripDecks = null;
+function deal(deck, pool) {
+  if (!deck.length) deck.push(...shuffled(pool));
+  return deck.pop();
+}
 
 /* ---------- Tagging: tag -> health check -> release ----------
    v0.7.0: tagging happens mid-trip and the day goes on. After the tag is
@@ -1369,6 +1394,7 @@ function confirmTag(name) {
     track: genTrack(s, { location: regionName, date: dateStr })
   };
   state.tagged[s.id] = rec;
+  state.taggedThisTrip = true;
   store.save(state.tagged);
   state.pendingTag = null;
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
