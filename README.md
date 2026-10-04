@@ -11,6 +11,12 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.7.3 changes
+
+- Expedition pacing slowed across the board — the day now breathes at reading speed, not faster than it.
+- Flavour lines are dealt like cards now: shuffled per trip, each line once. No more repeated phrases within a day.
+- Fixed: Sarah no longer follows a successful tag with an unrelated random fact. The tag celebration is the moment; the trip's end stays quiet unless you came home empty.
+
 ## v0.7.2 changes
 
 - Expeditions no longer lock you into the full day: after each encounter you can keep diving or head back to the ship. Found what you came for? Your call.
