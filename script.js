@@ -4,7 +4,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.7.1";
+const VERSION = "v0.7.2";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -984,8 +984,9 @@ function logLine(html, cls) {
   const p = document.createElement("p");
   if (cls) p.className = cls;
   p.innerHTML = html;
-  $("diveLog").appendChild(p);
-  p.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const log = $("diveLog");
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
 }
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -1066,9 +1067,30 @@ function doEncounter(species, plan) {
     actions.classList.remove("hidden");
     actions.innerHTML = "";
     const finish = () => {
-      actions.classList.add("hidden");
+      /* The day doesn't end on its own — after each encounter the player
+         chooses: keep diving, or head back to the ship. */
       actions.innerHTML = "";
-      resolve();
+      const stayBtn = document.createElement("button");
+      stayBtn.className = "secondary-button";
+      stayBtn.type = "button";
+      stayBtn.textContent = "🌊 Keep diving";
+      stayBtn.addEventListener("click", () => {
+        actions.classList.add("hidden");
+        actions.innerHTML = "";
+        resolve(false);
+      });
+      const backBtn = document.createElement("button");
+      backBtn.className = "secondary-button";
+      backBtn.type = "button";
+      backBtn.textContent = "⛵ Head back to the ship";
+      backBtn.addEventListener("click", () => {
+        actions.classList.add("hidden");
+        actions.innerHTML = "";
+        resolve(true);
+      });
+      actions.appendChild(stayBtn);
+      actions.appendChild(backBtn);
+      actions.classList.remove("hidden");
     };
     const watchBtn = document.createElement("button");
     watchBtn.className = "secondary-button";
@@ -1142,6 +1164,7 @@ async function runExpedition(plan) {
   const shown = new Set();
   const slots = 2 + Math.floor(Math.random() * 3); // 2–4 encounters
   let sawShark = false;
+  let endedEarly = false;
   for (let i = 0; i < slots; i++) {
     $("diveShark").classList.add("hidden");
     if (i > 0) {
@@ -1156,17 +1179,22 @@ async function runExpedition(plan) {
     if (s) {
       shown.add(s.id);
       sawShark = true;
-      await doEncounter(s, plan);
+      const headBack = await doEncounter(s, plan);
       await wait(1200);
+      if (headBack) { endedEarly = true; break; }
     } else {
       logLine(`👀 ${pick(WAITING_LINES)}`);
       await wait(1800);
     }
   }
 
-  // Day's end — the trip closes naturally, never on a tag.
+  // Day's end — the trip closes naturally, or early if the player chose to head back.
   $("diveShark").classList.add("hidden");
-  logLine(`🌅 The light changes. Time to head in — the day is done.`);
+  if (endedEarly) {
+    logLine(`⛵ You call it a day and turn for home — a good day on the water.`);
+  } else {
+    logLine(`🌅 The light changes. Time to head in — the day is done.`);
+  }
   await wait(1800);
   if (!sawShark) {
     state.failures += 1;
@@ -1248,7 +1276,7 @@ function renderMessages() {
     list.innerHTML = `<div class="empty-note">No messages yet.<br>Sarah will text you between expeditions. 💬</div>`;
     return;
   }
-  [...state.messages].reverse().forEach(thread => {
+  state.messages.forEach(thread => {
     const wrap = document.createElement("div");
     wrap.className = "thread";
     const stamp = thread.ts
@@ -1264,6 +1292,8 @@ function renderMessages() {
     });
     list.appendChild(wrap);
   });
+  // Like a real chat: oldest at top, newest at the bottom, pinned to the latest.
+  list.scrollTop = list.scrollHeight;
 }
 
 /* v0.7.0: no target species anymore, so the nudge picks an untagged
