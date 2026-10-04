@@ -4,7 +4,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.7.0";
+const VERSION = "v0.7.1";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -887,7 +887,7 @@ function renderResearch() {
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
             ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the first six sharks to unlock them.</p>`
-            : `<button class="secondary-button" data-plan="${s.id}" type="button">Suggest waters for this shark</button>`}
+            : ``}
       </div>
     `;
     const head = row.querySelector(".guide-row-head");
@@ -899,18 +899,6 @@ function renderResearch() {
     });
     list.appendChild(row);
   });
-  /* "Suggest waters" fills the planner with this shark's combination as a
-     starting suggestion — fully editable, never a locked target. */
-  list.querySelectorAll("[data-plan]").forEach(b =>
-    b.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const s = sharkById(b.dataset.plan);
-      if (!s || (REGIONS[s.combo.region] && REGIONS[s.combo.region].locked)) return;
-      $("regionSelect").value = s.combo.region;
-      $("baitSelect").value = Array.isArray(s.combo.bait) ? s.combo.bait[0] : s.combo.bait;
-      goTab("expedition");
-    })
-  );
 }
 
 /* ---------- Planner ---------- */
