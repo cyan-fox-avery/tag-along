@@ -1,10 +1,10 @@
-/* Tag, You're It — prototype v0.6.0
-   Research -> plan (region/depth/bait) -> dive -> tag -> collection book. */
+/* Tag, You're It — prototype v0.7.0
+   Research -> plan (region/depth/bait) -> dive -> watch/tag -> collection book. */
 
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.6.0";
+const VERSION = "v0.7.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -106,6 +106,75 @@ const ART = {
     </g>
     <circle cx="52" cy="52" r="3.2" fill="#1c2733"/>
     <circle cx="53.2" cy="50.8" r="1.1" fill="#ffffff"/>
+  </svg>`,
+  galapagos: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Galapagos shark">
+    <polygon points="158,54 200,34 198,84" fill="#5f6b66"/>
+    <ellipse cx="100" cy="58" rx="64" ry="19" fill="#6e7b75"/>
+    <ellipse cx="100" cy="66" rx="56" ry="11" fill="#d5dcd6" opacity="0.8"/>
+    <polygon points="106,40 118,22 128,40" fill="#5f6b66"/>
+    <polygon points="86,74 76,94 98,75" fill="#5f6b66"/>
+    <polygon points="40,58 22,52 22,64" fill="#6e7b75"/>
+    <circle cx="48" cy="53" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="51.8" r="1.1" fill="#ffffff"/>
+  </svg>`,
+  greatwhite: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Great white shark">
+    <polygon points="160,54 204,30 200,88" fill="#5a6470"/>
+    <ellipse cx="102" cy="56" rx="66" ry="20" fill="#6b7683"/>
+    <ellipse cx="102" cy="65" rx="58" ry="12" fill="#eef1f3" opacity="0.9"/>
+    <polygon points="110,37 124,16 132,37" fill="#5a6470"/>
+    <polygon points="88,72 76,94 100,73" fill="#5a6470"/>
+    <polygon points="40,56 22,50 22,62" fill="#6b7683"/>
+    <circle cx="52" cy="51" r="3.4" fill="#14181d"/>
+  </svg>`,
+  hammerhead: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Great hammerhead shark">
+    <polygon points="160,54 200,32 198,86" fill="#5e6a70"/>
+    <ellipse cx="112" cy="58" rx="58" ry="18" fill="#6d7a81"/>
+    <ellipse cx="112" cy="66" rx="50" ry="10" fill="#d8dee1" opacity="0.8"/>
+    <rect x="18" y="48" width="56" height="16" rx="8" fill="#6d7a81"/>
+    <circle cx="27" cy="56" r="2.6" fill="#1c2733"/>
+    <circle cx="65" cy="56" r="2.6" fill="#1c2733"/>
+    <polygon points="118,41 130,24 138,41" fill="#5e6a70"/>
+    <polygon points="96,72 86,92 108,73" fill="#5e6a70"/>
+  </svg>`,
+  mako: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Shortfin mako shark">
+    <polygon points="162,54 206,34 202,84" fill="#3f5a7a"/>
+    <ellipse cx="104" cy="56" rx="64" ry="16" fill="#4a6a8c"/>
+    <ellipse cx="104" cy="63" rx="56" ry="9" fill="#dbe4ee" opacity="0.85"/>
+    <polygon points="110,41 122,24 130,41" fill="#3f5a7a"/>
+    <polygon points="90,70 80,90 102,71" fill="#3f5a7a"/>
+    <polygon points="42,56 24,50 24,62" fill="#4a6a8c"/>
+    <circle cx="54" cy="51" r="3.2" fill="#14181d"/>
+    <circle cx="55.2" cy="49.8" r="1.1" fill="#ffffff"/>
+  </svg>`,
+  basking: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Basking shark">
+    <polygon points="170,54 206,36 204,84" fill="#5c5a52"/>
+    <ellipse cx="104" cy="57" rx="70" ry="22" fill="#6b695f"/>
+    <ellipse cx="104" cy="66" rx="60" ry="12" fill="#d9d5c8" opacity="0.7"/>
+    <polygon points="112,36 124,18 132,36" fill="#5c5a52"/>
+    <circle cx="56" cy="52" r="2.6" fill="#1c2733"/>
+    <g stroke="#4a4840" stroke-width="2" stroke-linecap="round">
+      <line x1="76" y1="44" x2="74" y2="68"/>
+      <line x1="86" y1="43" x2="84" y2="69"/>
+      <line x1="96" y1="43" x2="94" y2="69"/>
+    </g>
+  </svg>`,
+  epaulette: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Epaulette shark">
+    <polygon points="168,56 200,42 198,76" fill="#7a6a4e"/>
+    <ellipse cx="108" cy="60" rx="58" ry="13" fill="#8a795c"/>
+    <ellipse cx="108" cy="65" rx="50" ry="8" fill="#ded3b8" opacity="0.8"/>
+    <polygon points="118,48 126,36 132,48" fill="#7a6a4e"/>
+    <circle cx="62" cy="56" r="2.8" fill="#1c2733"/>
+    <g fill="#4e4130" opacity="0.8">
+      <circle cx="90" cy="56" r="3"/><circle cx="110" cy="58" r="3"/><circle cx="130" cy="57" r="3"/>
+      <circle cx="150" cy="58" r="2.5"/>
+    </g>
+    <circle cx="140" cy="52" r="4" fill="none" stroke="#4e4130" stroke-width="2"/>
   </svg>`
 };
 
@@ -117,12 +186,12 @@ const REGIONS = {
   "philippines":  { name: "Philippines",          note: "A manta ray loops lazily overhead." },
   "maldives":     { name: "Maldives",             note: "Dolphins click and whistle in the distance." },
   "japan":        { name: "Sagami Bay, Japan",    note: "A lanternfish flickers in the dark." },
-  "mediterranean":{ name: "Mediterranean Sea",    note: "A pod of dolphins crosses the bow." },
   "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
-  /* Win-state reward: these unlock once all six sharks are tagged.
-     v0.6.0: no shark lives here yet, so they are honest "surveys coming soon"
-     teasers — visible but never selectable. Real species for these waters
-     will arrive in a future version. */
+  "cornwall":     { name: "Cornwall, UK",         note: "Gannets dive-bomb the water around the boat." },
+  "papua-new-guinea": { name: "Papua New Guinea", note: "The reef flat stretches out, impossibly clear and shallow." },
+  /* These unlock once the first six sharks are tagged — new waters earned,
+     not given. v0.7.0: real species live here now, so they are selectable,
+     not teasers. */
   "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
   "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true }
 };
@@ -240,6 +309,96 @@ const SHARKS = [
     opener: "A SAND TIGER?!?! the smiley balloon shark!!! did it do the floaty thing?!?! tell me EVERYTHING",
     sketchCap: "the grin (all teeth, no bite)",
     nameIdeas: ["Toothy", "Grin", "Smiley", "Baja"]
+  },
+  {
+    id: "galapagos",
+    name: "Galápagos Shark", latin: "Carcharhinus galapagensis", status: "Least Concern",
+    code: "GA",
+    combo: { region: "galapagos", bait: "schooling-fish" },
+    depths: ["surface", "reef"],
+    sizeRange: [2.4, 3.7],
+    research: "A reef shark of remote oceanic islands — and the one place it truly lives up to its name is the Galápagos. There, Galápagos sharks patrol the rocky reefs and island slopes, often in the clear shallows where schools of reef fish gather. They are bold and curious, sometimes circling divers for a closer look. They hunt jacks, groupers and other reef fish, mostly in water shallower than about 80 metres, rarely venturing into the deep.",
+    hook: "Bold island shark — known to circle divers just to check them out.",
+    bonus: "Galápagos sharks use nursery areas: pups grow up in sheltered island bays before heading out to the reefs.",
+    cheer: "GALÁPAGOS SHARK!!! the island shark!!! they're so curious they come right up to divers. did it check YOU out?!",
+    opener: "A GALÁPAGOS SHARK?!?! IN THE GALÁPAGOS!!! (where else lol) TELL ME EVERYTHING",
+    sketchCap: "the curious eye",
+    nameIdeas: ["Darwin", "Isla", "Booby", "Lava"]
+  },
+  {
+    id: "greatwhite",
+    name: "Great White Shark", latin: "Carcharodon carcharias", status: "Vulnerable",
+    code: "GW",
+    combo: { region: "south-africa", bait: "schooling-fish" },
+    depths: ["surface", "reef"],
+    sizeRange: [3.5, 6.0],
+    research: "The ocean's most famous hunter cruises temperate coasts worldwide — and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water. They eat seals, fish and the occasional drifting carcass, hunting mostly in the sunlit upper layers.",
+    hook: "Warm-bodied hunter; can breach fully out of the water.",
+    bonus: "A great white's bite is investigative — most encounters are a single test bite, then it lets go and moves on.",
+    cheer: "A GREAT WHITE!!! THE great white!!! did it breach?!?! they're warm-blooded which is SO weird for a fish",
+    opener: "A GREAT WHITE SHARK?!?! THE APEX!!! was it as big as they say?!?! TELL ME EVERYTHING",
+    sketchCap: "the countershaded flank",
+    nameIdeas: ["Bruce", "Chomp", "Apex", "Finley"]
+  },
+  {
+    id: "hammerhead",
+    name: "Great Hammerhead", latin: "Sphyrna mokarran", status: "Critically Endangered",
+    code: "HH",
+    combo: { region: "caribbean", bait: "schooling-fish" },
+    depths: ["surface", "reef"],
+    sizeRange: [2.5, 5.0],
+    research: "The largest of the hammerheads roams tropical seas, and the Caribbean's reefs are prime hunting ground. That wide hammer isn't just for show — it's packed with sensors that pick up the faint electricity of stingrays buried in the sand, their favourite food. Great hammerheads cruise the shallows and reef flats, rarely deeper than about 80 metres, sweeping their heads side to side like metal detectors.",
+    hook: "The hammer is a sensory array — it 'sees' stingrays hidden in sand.",
+    bonus: "Hammerhead pups are born with a soft, folded hammer that straightens out as they grow.",
+    cheer: "A HAMMERHEAD!!! their eyes are on the ENDS of the hammer!! 360 vision!!! nature said 'what if binoculars but shark'",
+    opener: "A GREAT HAMMERHEAD?!?! THE HAMMERHEAD!!! did you see the hammer up close?!?! TELL ME EVERYTHING",
+    sketchCap: "the hammer (a sensory array)",
+    nameIdeas: ["Hammer", "T-Bone", "Nail", "Mal"]
+  },
+  {
+    id: "mako",
+    name: "Shortfin Mako", latin: "Isurus oxyrinchus", status: "Endangered",
+    code: "MK",
+    combo: { region: "open-atlantic", bait: "squid" },
+    depths: ["surface", "reef"],
+    sizeRange: [2.0, 3.8],
+    research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They hunt in the sunlit surface waters, rarely diving below about 150 metres, where the light is good and the prey is quick. If something out here is moving at 70 kilometres an hour, it's a mako.",
+    hook: "Clocks ~70 km/h — the fastest shark alive.",
+    bonus: "Makos are warm-bodied like great whites — their swimming muscles run several degrees warmer than the water.",
+    cheer: "A MAKO!!! the fastest shark in the OCEAN!!! 70 kmh!!! that's faster than my bike!!!",
+    opener: "A MAKO?!?! THE SPEED DEMON!!! was it fast?!?! TELL ME EVERYTHING",
+    sketchCap: "the torpedo body",
+    nameIdeas: ["Dash", "Turbo", "Zip", "Rocket"]
+  },
+  {
+    id: "basking",
+    name: "Basking Shark", latin: "Cetorhinus maximus", status: "Endangered",
+    code: "BS",
+    combo: { region: "cornwall", bait: "plankton" },
+    depths: ["surface", "reef"],
+    sizeRange: [6.0, 9.0],
+    research: "The second-biggest fish in the ocean feeds like the biggest — by swimming slowly through plankton with its enormous mouth wide open. Basking sharks visit temperate coasts in summer, and the plankton-rich waters off Cornwall are a favourite. Look for the tall dorsal fin cutting the surface, the huge mouth agape. They feed right at the top where the water turns green, sometimes dipping a little deeper over the reefs.",
+    hook: "Second-largest fish on Earth; feeds with a mouth up to a metre wide.",
+    bonus: "A basking shark filters the equivalent of an Olympic swimming pool of water every hour.",
+    cheer: "A BASKING SHARK!!! the second-biggest fish!!! just vibing with its mouth open!!! the gentle giant's gentle giant",
+    opener: "A BASKING SHARK?!?! THE OTHER GENTLE GIANT!!! was its mouth HUGE?!?! TELL ME EVERYTHING",
+    sketchCap: "the gaping mouth",
+    nameIdeas: ["Sunny", "Lounge", "Drifter", "Mellow"]
+  },
+  {
+    id: "epaulette",
+    name: "Epaulette Shark", latin: "Hemiscyllium ocellatum", status: "Least Concern",
+    code: "EP",
+    combo: { region: "papua-new-guinea", bait: "crustaceans" },
+    depths: ["surface", "reef"],
+    sizeRange: [0.6, 1.0],
+    research: "A small reef shark with an extraordinary trick: it can walk. Epaulette sharks live on the shallow reef flats of Papua New Guinea, where the tide sometimes strands them in ankle-deep pools. Instead of panicking, they clamber from pool to pool on their paddle-like fins, hunting crabs and worms. They rarely leave water shallower than a few metres — the intertidal zone is their whole world.",
+    hook: "Walks between tide pools on its fins when the reef drains.",
+    bonus: "Epaulettes can survive over an hour out of water by slowing their bodies right down — the ultimate low-tide specialist.",
+    cheer: "AN EPAULETTE SHARK!!! IT WALKS!!! ON ITS FINS!!! like a little puppy walking on the reef!!! i can't cope",
+    opener: "AN EPAULETTE SHARK?!?! THE WALKING SHARK!!! DID IT WALK?!?! TELL ME EVERYTHING",
+    sketchCap: "the walking fin",
+    nameIdeas: ["Puddles", "Waddles", "Tiptoe", "Reef"]
   }
 ];
 
@@ -258,7 +417,15 @@ const COUSIN_NUDGES = {
   nurse:   "nurse sharks are SHALLOW!! like surface-to-reef shallow, 0 to 75 metres. they nap under reef ledges during the day and vacuum crabs off the sand at night. caribbean + shallow + crabs!!",
   thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish. reefs or twilight + fish bait??",
   whale:   "whale sharks don't eat bait!! they eat PLANKTON!! find the bloom at the surface. they're usually right at the top where the water looks green, sometimes a bit deeper over reefs",
-  goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!"
+  goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!",
+  tiger:    "tiger sharks aren't picky AT ALL!!! they'll eat fish, squid, even crabs!! try the maldives!! shallow lagoons!! the real question is WHERE not what!!",
+  sandtiger:"sand tigers look scary but they're softies!! baja california!! they hover in the shallows eating squid!! the floaty balloon sharks!!",
+  galapagos: "galápagos sharks!! they're reef sharks that LOVE oceanic islands. the galápagos obviously!! shallow reefs, and they eat reef fish!!",
+  greatwhite: "great whites!!! south africa!! they follow the seals. shallow water, and they eat FISH. they're warm-blooded-ish which is WILD for a shark",
+  hammerhead: "hammerheads!!! the caribbean has great hammerheads!! they hunt STINGRAYS on the reef. shallow water + fish bait!! their heads are basically metal detectors",
+  mako: "makos are the FASTEST sharks!!! open atlantic, and they love squid!! they hunt up near the surface. they're basically underwater race cars",
+  basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!!",
+  epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs!!"
 };
 
 /* Field-guide sketches: rough pencil-style drawings of one distinctive
@@ -321,6 +488,54 @@ const SKETCH = {
       <path d="M30,55 Q70,38 120,42 Q170,46 200,40"/>
       <path d="M30,55 Q70,68 120,66 Q170,64 200,60" stroke-dasharray="7 5"/>
       <path d="M44,52 l5,8 l5,-8 l5,8 l5,-8 l5,8 l5,-8"/>
+    </g>
+  </svg>`,
+  galapagos: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: Galapagos shark eye">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M70,55 Q110,35 150,55 Q110,75 70,55 Z"/>
+      <circle cx="110" cy="55" r="10"/>
+      <circle cx="110" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
+    </g>
+  </svg>`,
+  greatwhite: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: great white countershading">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M20,45 Q70,35 120,42 Q170,49 200,42"/>
+      <path d="M20,65 Q70,58 120,63 Q170,68 200,62" stroke-dasharray="7 5"/>
+      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>`,
+  hammerhead: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: hammerhead cephalofoil">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <rect x="40" y="42" width="140" height="26" rx="13"/>
+      <path d="M110,68 L110,96" stroke-dasharray="7 5"/>
+      <circle cx="55" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
+      <circle cx="165" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
+    </g>
+  </svg>`,
+  mako: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: mako torpedo body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M30,55 Q110,30 190,55 Q110,80 30,55 Z"/>
+      <path d="M190,55 L210,42 M190,55 L210,68"/>
+    </g>
+  </svg>`,
+  basking: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: basking shark mouth">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="55" rx="75" ry="24"/>
+      <path d="M45,55 Q110,85 175,55" stroke-width="3.5"/>
+      <path d="M45,55 Q110,30 175,55" stroke-dasharray="7 5"/>
+    </g>
+  </svg>`,
+  epaulette: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: epaulette walking fin">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M60,40 Q90,55 100,85"/>
+      <path d="M100,85 L85,100 M100,85 L100,102 M100,85 L115,100"/>
+      <line x1="14" y1="104" x2="206" y2="104" stroke-dasharray="4 7" opacity="0.6"/>
     </g>
   </svg>`
 };
@@ -433,6 +648,36 @@ const EASTER_EGGS = [
     text: "This is the kind of dark water old monster movies warned you about. You check over your shoulder anyway." }
 ];
 
+/* v0.7.0: the day is the expedition. Quiet beats for when the water
+   holds its sharks back a while — waiting is most of the job. */
+const WAITING_LINES = [
+  "You watch the blue, and wait. This is most of the job, honestly.",
+  "Nothing but water and light. You settle in — patience is the whole technique.",
+  "The bait drifts. Somewhere out there, something is deciding.",
+  "You scan the distance until your eyes ache pleasantly."
+];
+
+/* v0.7.0: sightings log — what a watched shark was doing. Pure value,
+   no progression attached. */
+const SIGHTING_DOINES = [
+  "cruising slow along the reef edge",
+  "circling lazily in the blue",
+  "gliding past without a hurry",
+  "hunting, focused and silent",
+  "drifting with the current",
+  "patrolling, unhurried and thorough",
+  "curious — circling back for a second look",
+  "feeding, oblivious to the boat"
+];
+
+/* v0.7.0: tagging the first six earns new waters. */
+const REGION_UNLOCK_THREAD = [
+  { who: "them", text: "SIX SHARKS?!?! you're officially a REAL shark scientist now!!" },
+  { who: "me", text: "Six for six. The institute just cleared two new survey regions for us." },
+  { who: "them", text: "THE GALÁPAGOS?!?! and SOUTH AFRICA?!?! i know EVERYTHING about those waters. ask me anything. ANYTHING" },
+  { who: "me", text: "I have a feeling I'm going to. 🦈" }
+];
+
 /* ---------- Shark tracking: simulated satellite-tag data ---------- */
 
 const TRACK_POOLS = {
@@ -441,7 +686,13 @@ const TRACK_POOLS = {
   whale:     { spots: ["Tubbataha Reefs", "Sulu Sea", "Coral Triangle", "Bird's Head Seascape", "Western Pacific"], hop: [300, 1400] },
   goblin:    { spots: ["Tokyo Canyon", "Izu Ridge", "Suruga Slope", "Deep Terrace", "Canyon Mouth"], hop: [40, 220] },
   tiger:     { spots: ["Rasdhoo Atoll", "Chagos Archipelago", "Open Indian Ocean", "Seychelles Bank", "Saya de Malha"], hop: [150, 700] },
-  sandtiger: { spots: ["Kelp Edge", "Rocky Point", "Sandy Flats", "Canyon Mouth", "Wreck Reef"], hop: [20, 120] }
+  sandtiger: { spots: ["Kelp Edge", "Rocky Point", "Sandy Flats", "Canyon Mouth", "Wreck Reef"], hop: [20, 120] },
+  galapagos:  { spots: ["Darwin Arch", "Wolf Volcano Reef", "Cabo Douglas", "Punta Vicente Roca", "Isabela Channel"], hop: [30, 200] },
+  greatwhite: { spots: ["Seal Island", "Dyer Island", "Mossel Bay", "False Bay", "Gansbaai"], hop: [100, 600] },
+  hammerhead: { spots: ["Bimini Flats", "Tiger Beach", "Andros Reef", "Exuma Sound", "Cay Sal Bank"], hop: [50, 300] },
+  mako:       { spots: ["Azores Front", "Gulf Stream Edge", "Sargasso Sea", "Shelf Break", "Open Atlantic Drift"], hop: [200, 800] },
+  basking:    { spots: ["Isle of Man", "Cornish Coast", "The Hebrides", "Donegal Bay", "Clyde Waters"], hop: [80, 400] },
+  epaulette:  { spots: ["Milne Bay Reef", "Kimbe Bay Flats", "Bootless Bay", "Tufi Reefs", "Rabaul Lagoon"], hop: [2, 15] }
 };
 
 function shuffle(arr) {
@@ -493,6 +744,19 @@ const msgStore = {
 };
 const _savedMsgs = msgStore.load();
 
+/* v0.7.0: the sightings log — spotted but not tagged. Pure field notes. */
+const sightStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-sightings") || "[]"); }
+    catch { return []; }
+  },
+  save(d) { localStorage.setItem("tyi-sightings", JSON.stringify(d)); }
+};
+
+/* v0.7.0: the first six sharks (the original roster). Tagging all six
+   unlocks the Galápagos and South Africa — new waters earned, not given. */
+const ORIGINAL_SIX = ["nurse", "thresher", "whale", "goblin", "tiger", "sandtiger"];
+
 /* v0.6.0: threads are {ts, msgs}. Migrate legacy bare-array threads. */
 function normThread(t) {
   if (Array.isArray(t)) return { ts: 0, msgs: t };
@@ -506,6 +770,11 @@ const state = {
   messages: (_savedMsgs.messages || []).map(normThread),
   unread: _savedMsgs.unread || 0,
   pendingTag: null,       // species object awaiting naming
+  sightings: sightStore.load(), // v0.7.0: watched-but-not-tagged log
+  regionsUnlocked: false, // v0.7.0: first six tagged -> Galápagos + South Africa
+  pendingWin: false,      // v0.7.0: final shark tagged mid-trip; ceremony at day's end
+  currentPlan: null,      // v0.7.0: the trip's region/depth/bait
+  encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
@@ -567,8 +836,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (str) => String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const sharkById = (id) => SHARKS.find(s => s.id === id);
 const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
-migrateIds();
-migrateTracks();
+/* Migrations run once at boot — see the boot section below. */
 
 /* ---------- Tabs (each tab remembers its scroll position) ---------- */
 
@@ -593,37 +861,53 @@ function goTab(name) {
   document.querySelector(`.tab[data-tab="${name}"]`).click();
 }
 
-/* ---------- Research: a true field guide ----------
-   v0.6.0: entries read like a field guide, not a card scroll. The written
-   notes are unchanged (every clue preserved) — but there are NO pictures
-   of the actual shark here. Each entry carries a rough field sketch of one
-   distinctive feature instead. The real face is earned at tagging. */
+/* ---------- Research: a field-guide database ----------
+   v0.7.0: the guide is a compact roster list; each row expands into the
+   full entry. Hard rule stands: NO pictures of the actual shark here —
+   sketches only. The real face is earned at tagging. */
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
   SHARKS.forEach(s => {
     const done = !!state.tagged[s.id];
-    const entry = document.createElement("div");
-    entry.className = "guide-entry";
-    entry.innerHTML = `
-      <div class="guide-head">
-        <div class="guide-title">
-          <h3>${s.name} ${done ? "✅" : ""}</h3>
-          <p class="latin">${s.latin}</p>
-          <span class="status-pill">IUCN: ${s.status}</span>
-        </div>
+    const regionLocked = REGIONS[s.combo.region] && REGIONS[s.combo.region].locked;
+    const row = document.createElement("div");
+    row.className = "guide-row";
+    row.innerHTML = `
+      <button type="button" class="guide-row-head" aria-expanded="false">
+        <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
+        <span class="latin">${s.latin}</span>
+        <span class="status-pill">IUCN: ${s.status}</span>
+        <span class="guide-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="guide-row-body hidden">
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
+        <p class="research-text">${s.research}</p>
+        ${done
+          ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
+          : regionLocked
+            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the first six sharks to unlock them.</p>`
+            : `<button class="secondary-button" data-plan="${s.id}" type="button">Suggest waters for this shark</button>`}
       </div>
-      <p class="research-text">${s.research}</p>
-      ${done
-        ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
-        : `<button class="secondary-button" data-plan="${s.id}" type="button">Plan an expedition for this shark</button>`}
     `;
-    list.appendChild(entry);
+    const head = row.querySelector(".guide-row-head");
+    const body = row.querySelector(".guide-row-body");
+    head.addEventListener("click", () => {
+      const isHidden = body.classList.toggle("hidden");
+      head.setAttribute("aria-expanded", String(!isHidden));
+      row.classList.toggle("open", !isHidden);
+    });
+    list.appendChild(row);
   });
+  /* "Suggest waters" fills the planner with this shark's combination as a
+     starting suggestion — fully editable, never a locked target. */
   list.querySelectorAll("[data-plan]").forEach(b =>
-    b.addEventListener("click", () => {
-      $("targetSelect").value = b.dataset.plan;
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const s = sharkById(b.dataset.plan);
+      if (!s || (REGIONS[s.combo.region] && REGIONS[s.combo.region].locked)) return;
+      $("regionSelect").value = s.combo.region;
+      $("baitSelect").value = Array.isArray(s.combo.bait) ? s.combo.bait[0] : s.combo.bait;
       goTab("expedition");
     })
   );
@@ -648,51 +932,59 @@ function fillRegions() {
   Object.entries(REGIONS).forEach(([id, v]) => {
     const o = document.createElement("option");
     o.value = id;
-    if (v.teaser) {
-      o.textContent = `🗺️ ${v.name} — research surveys coming soon`;
-      o.disabled = true;
-    } else if (v.locked) {
-      o.textContent = `🔒 ${v.name} — tag all ${SHARKS.length} sharks to unlock`;
+    if (v.locked) {
+      o.textContent = `🔒 ${v.name} — unlocks after six successful tags`;
       o.disabled = true;
     } else {
       o.textContent = v.name;
     }
     el.appendChild(o);
   });
-  if (current && REGIONS[current] && !REGIONS[current].locked && !REGIONS[current].teaser) el.value = current;
+  if (current && REGIONS[current] && !REGIONS[current].locked) el.value = current;
 }
 
-/* v0.6.0: after the win, the two new regions become honest teasers —
-   on the horizon, not on the planner. */
-function applyWinRegions() {
-  if (!state.won) return;
-  for (const id of ["galapagos", "south-africa"]) {
-    REGIONS[id].locked = false;
-    REGIONS[id].teaser = true;
+/* v0.7.0: regions unlock in two stages now.
+   - Tagging the first six (the original roster) unlocks the Galápagos and
+     South Africa as real, selectable waters.
+   - Tagging all twelve wins the game (Master Shark Tagger). */
+function applyRegions() {
+  if (!state.regionsUnlocked) return;
+  for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+}
+
+/* v0.7.0 migration: v0.6.0 winners had tyi-won=1 at 6/6, but the win is
+   now 12/12. They keep their tags and earn the regions; the win resets
+   until all twelve are tagged. */
+function migrateWinV07() {
+  const taggedCount = Object.keys(state.tagged).length;
+  if (state.won && taggedCount < SHARKS.length) {
+    state.won = false;
+    try { localStorage.removeItem("tyi-won"); } catch {}
   }
+  if (ORIGINAL_SIX.every(id => state.tagged[id])) {
+    state.regionsUnlocked = true;
+    try { localStorage.setItem("tyi-regions", "1"); } catch {}
+  } else {
+    try { state.regionsUnlocked = localStorage.getItem("tyi-regions") === "1"; } catch {}
+  }
+  applyRegions();
 }
 
+/* ---------- Planner ----------
+   v0.7.0: no target species. The planner is conditions only — region,
+   depth, bait. Your research is your targeting: the right combination
+   brings the right sharks. The sea decides who shows up. */
 function renderPlanner() {
-  const t = $("targetSelect");
-  const current = t.value;
-  t.innerHTML = "";
-  untagged().forEach(s => {
-    const o = document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.name;
-    t.appendChild(o);
-  });
-  if (untagged().some(s => s.id === current)) t.value = current;
-  if (!untagged().length) {
-    $("planner").innerHTML = `<p class="research-text" style="text-align:center">All six sharks tagged! Check your collection book. 🎉</p>`;
-  }
+  /* Selects are static; fillRegions() preserves the current region.
+     Trips stay available after the win — there's always more to see. */
+  fillRegions();
 }
 
 $("launchBtn").addEventListener("click", () => {
-  if (!untagged().length) return;
+  const region = $("regionSelect").value;
+  if (!region || !REGIONS[region] || REGIONS[region].locked) return;
   runExpedition({
-    target: $("targetSelect").value,
-    region: $("regionSelect").value,
+    region,
     depth: $("depthSelect").value,
     bait: $("baitSelect").value
   });
@@ -747,11 +1039,86 @@ async function showSighting(depth) {
   }
 }
 
-/* v0.6.0: depth sets the dive. Shallow water is bright, lively and short;
-   deep water is dark, strange and long. The beats are staged: descent,
-   settling in, wildlife, anticipation, reveal. */
+/* ---------- Expedition: a full day out ----------
+   v0.7.0: no target species. Each shark declares where it can appear
+   (region + bait + depth range) — that declaration IS the encounter
+   table. A combination resolves to every species whose declaration
+   matches. New sharks slot in by adding their own declaration. */
+function resolveEncounters(plan) {
+  return SHARKS.filter(s => {
+    const baitOk = Array.isArray(s.combo.bait)
+      ? s.combo.bait.includes(plan.bait)
+      : s.combo.bait === plan.bait;
+    return s.combo.region === plan.region &&
+      s.depths.includes(plan.depth) &&
+      baitOk;
+  });
+}
+
+/* Pick one species for an encounter slot: prefer untagged species the
+   player hasn't already seen today, then familiar faces for watching. */
+function pickEncounter(appeared, shown) {
+  const fresh = appeared.filter(s => !shown.has(s.id));
+  if (!fresh.length) return null;
+  const newToPlayer = fresh.filter(s => !state.tagged[s.id]);
+  return pick(newToPlayer.length ? newToPlayer : fresh);
+}
+
+/* One encounter: the shark appears, and the player chooses to WATCH
+   (a sighting, logged) or TAG (if untagged — opportunistic tagging is
+   always allowed). Either way the day goes on. */
+function doEncounter(species, plan) {
+  return new Promise(resolve => {
+    const rec = state.tagged[species.id];
+    const sharkEl = $("diveShark");
+    sharkEl.innerHTML = ART[species.id];
+    sharkEl.classList.remove("hidden");
+    logLine(`🦈 <span class="found">Shark! A ${species.name}!</span>`, "found");
+    const actions = $("diveActions");
+    actions.classList.remove("hidden");
+    actions.innerHTML = "";
+    const finish = () => {
+      actions.classList.add("hidden");
+      actions.innerHTML = "";
+      resolve();
+    };
+    const watchBtn = document.createElement("button");
+    watchBtn.className = "secondary-button";
+    watchBtn.type = "button";
+    watchBtn.textContent = "👁️ Just watch";
+    watchBtn.addEventListener("click", () => {
+      const entry = recordSighting(species, plan);
+      logLine(`👁️ You watch the ${species.name} ${entry.doing}. A good sighting, logged.`);
+      finish();
+    });
+    actions.appendChild(watchBtn);
+    if (!rec) {
+      const tagBtn = document.createElement("button");
+      tagBtn.className = "primary-button";
+      tagBtn.type = "button";
+      tagBtn.textContent = `🏷️ Tag the ${species.name}`;
+      tagBtn.addEventListener("click", () => {
+        actions.classList.add("hidden");
+        actions.innerHTML = "";
+        openTagging(species, finish);
+      });
+      actions.appendChild(tagBtn);
+    } else {
+      const note = document.createElement("p");
+      note.className = "latin";
+      note.style.cssText = "width:100%;text-align:center;margin:4px 0 0";
+      note.textContent = `Already in your book${rec.name ? ` as “${rec.name}”` : ""} — enjoy the visit.`;
+      actions.appendChild(note);
+    }
+  });
+}
+
+/* v0.7.0: a trip is a full day out — descent, wildlife, then 2–4
+   encounter slots paced through the day, then day's end. The shark is
+   a moment in the day, never the end of it. */
 async function runExpedition(plan) {
-  const target = sharkById(plan.target);
+  state.currentPlan = plan;
+  state.pendingWin = false;
   $("launchBtn").disabled = true;
   $("diveView").classList.remove("hidden");
   $("diveActions").classList.add("hidden");
@@ -777,74 +1144,52 @@ async function runExpedition(plan) {
   }
   logLine(`🌊 ${pick(DEPTH_FLAVOUR[plan.depth])}`);
   await wait(2000);
-  // The scene must feel alive before the shark: sightings always land.
+  // The scene must feel alive before anything else: sightings always land.
   await showSighting(plan.depth);
   await wait(2100);
-  if (deep) {
-    logLine(`🌊 ${pick(DEPTH_FLAVOUR[plan.depth])}`);
-    await wait(2100);
-    logLine(`🐟 Life is sparse down here — but it is here. Something pale flickers at the edge of the lights.`);
-    await wait(2100);
-  } else {
-    // The shallows are lively: a second sighting before things go quiet.
-    await showSighting(plan.depth);
-    await wait(2000);
-    logLine(`🐟 Small fish gather, curious, flashing silver as they turn.`);
-    await wait(1900);
-  }
   logLine(`👀 ${REGIONS[plan.region].note}`);
   await wait(2000);
-  if (deep) {
-    logLine(`⏳ The hours slip by. The deep does not hurry, so neither do you.`);
-    await wait(2300);
-  } else {
-    logLine(`⏳ The hours slip by…`);
-    await wait(1900);
-  }
-  logLine(`🌊 The light shifts. The water goes still. Something moves below…`);
-  await wait(2200);
 
-  // Who shows up? Any species whose region + bait match and whose depth
-  // range includes the chosen depth. There's no single "right" depth.
-  // (Tiger sharks aren't picky eaters: their bait entry is a list.)
-  const appeared = SHARKS.filter(s => {
-    const baitOk = Array.isArray(s.combo.bait)
-      ? s.combo.bait.includes(plan.bait)
-      : s.combo.bait === plan.bait;
-    return s.combo.region === plan.region &&
-      s.depths.includes(plan.depth) &&
-      baitOk;
-  });
-  const taggable = appeared.filter(s => !state.tagged[s.id]);
-  const alreadyTagged = appeared.filter(s => state.tagged[s.id]);
+  const appeared = resolveEncounters(plan);
+  const shown = new Set();
+  const slots = 2 + Math.floor(Math.random() * 3); // 2–4 encounters
+  let sawShark = false;
+  for (let i = 0; i < slots; i++) {
+    $("diveShark").classList.add("hidden");
+    if (i > 0) {
+      logLine(deep
+        ? `⏳ The hours slip by. The deep does not hurry, so neither do you.`
+        : `⏳ The morning wears on…`);
+      await wait(2000);
+    }
+    await showSighting(plan.depth);
+    await wait(1900);
+    const s = pickEncounter(appeared, shown);
+    if (s) {
+      shown.add(s.id);
+      sawShark = true;
+      await doEncounter(s, plan);
+      await wait(1200);
+    } else {
+      logLine(`👀 ${pick(WAITING_LINES)}`);
+      await wait(1800);
+    }
+  }
+
+  // Day's end — the trip closes naturally, never on a tag.
+  $("diveShark").classList.add("hidden");
+  logLine(`🌅 The light changes. Time to head in — the day is done.`);
+  await wait(1800);
+  if (!sawShark) {
+    state.failures += 1;
+    logLine(`<span class="miss">No sharks today. The sea keeps its counsel.</span>`, "miss");
+  } else {
+    state.failures = 0;
+  }
 
   const actions = $("diveActions");
   actions.classList.remove("hidden");
-
-  if (taggable.length) {
-    const s = taggable[0];
-    $("diveShark").innerHTML = ART[s.id];
-    $("diveShark").classList.remove("hidden");
-    logLine(`🦈 <span class="found">SHARKS! A ${s.name}!</span>`, "found");
-    state.failures = 0;
-    const tagBtn = document.createElement("button");
-    tagBtn.className = "primary-button";
-    tagBtn.type = "button";
-    tagBtn.textContent = `🏷️ Tag the ${s.name}`;
-    tagBtn.addEventListener("click", () => openTagging(s));
-    actions.appendChild(tagBtn);
-  } else if (alreadyTagged.length) {
-    const s = alreadyTagged[0];
-    const rec = state.tagged[s.id];
-    $("diveShark").innerHTML = ART[s.id];
-    $("diveShark").classList.remove("hidden");
-    logLine(`🦈 <span class="found">Look who it is — ${rec.name ? `“${esc(rec.name)}”` : esc(rec.researchId)}, already in your book!</span>`, "found");
-    state.failures = 0;
-  } else {
-    logLine(`<span class="miss">The water stays empty. Time to head back.</span>`, "miss");
-    state.failures += 1;
-  }
-
+  actions.innerHTML = "";
   const backBtn = document.createElement("button");
   backBtn.className = "secondary-button";
   backBtn.type = "button";
@@ -852,12 +1197,52 @@ async function runExpedition(plan) {
   backBtn.addEventListener("click", () => {
     $("diveView").classList.add("hidden");
     $("launchBtn").disabled = false;
-    renderPlanner();
-    renderCollection();
-    renderResearch();
-    afterExpedition(plan.target);
+    renderAll();
+    if (state.pendingWin) {
+      state.pendingWin = false;
+      doWin();
+    } else {
+      afterExpedition(plan);
+    }
   });
   actions.appendChild(backBtn);
+}
+
+/* ---------- Sightings log: watched, not tagged ----------
+   v0.7.0: choosing "just watch" records a sighting — species, what it
+   was doing, where and when. Spotted-but-not-tagged. Pure value, no
+   progression mechanics attached. */
+function recordSighting(species, plan) {
+  const entry = {
+    speciesId: species.id,
+    name: species.name,
+    doing: pick(SIGHTING_DOINES),
+    location: REGIONS[plan.region].name,
+    date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
+    ts: Date.now()
+  };
+  state.sightings.unshift(entry);
+  sightStore.save(state.sightings);
+  renderSightings();
+  return entry;
+}
+
+function renderSightings() {
+  const list = $("sightingsList");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!state.sightings.length) {
+    list.innerHTML = `<div class="empty-note">No sightings yet.<br>Watch a shark without tagging it and it'll be logged here. 👁️</div>`;
+    return;
+  }
+  state.sightings.forEach(e => {
+    const div = document.createElement("div");
+    div.className = "sighting-entry";
+    div.innerHTML = `
+      <div class="sighting-name">👁️ ${esc(e.name)}</div>
+      <div class="sighting-detail">${esc(e.doing)} — ${esc(e.location)}, ${esc(e.date)}</div>`;
+    list.appendChild(div);
+  });
 }
 
 /* ---------- Sarah's texts (optional — badge notifies, you open when you want) ---------- */
@@ -893,14 +1278,18 @@ function renderMessages() {
   });
 }
 
-function afterExpedition(targetId) {
+/* v0.7.0: no target species anymore, so the nudge picks an untagged
+   shark to point at — a useful direction, not a correction. */
+function afterExpedition(plan) {
   let thread;
   if (state.failures >= 3) {
     // gentle nudge, genuine-conversation style
+    const candidates = untagged();
+    const s = candidates.length ? pick(candidates) : pick(SHARKS);
     thread = [
       { who: "them", text: "how's the shark hunting going??" },
-      { who: "me", text: "Honestly? Struck out a few times. This one's tricky." },
-      { who: "them", text: COUSIN_NUDGES[targetId] || "you'll get the next one!! i believe in you" },
+      { who: "me", text: "Honestly? Struck out a few times. The water's been empty." },
+      { who: "them", text: COUSIN_NUDGES[s.id] || "you'll get the next one!! i believe in you" },
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
     ];
     state.failures = 0;
@@ -920,18 +1309,25 @@ function afterExpedition(targetId) {
 const rand = (a, b) => Math.round((a + Math.random() * (b - a)) * 10) / 10;
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-function openTagging(species) {
+/* ---------- Tagging: tag -> health check -> release ----------
+   v0.7.0: tagging happens mid-trip and the day goes on. After the tag is
+   saved, a health-check beat runs (tag seated, vitals noted), then the
+   shark is released and the expedition resumes — doneCb continues the trip. */
+function openTagging(species, doneCb) {
   state.pendingTag = species;
+  state.encounterDone = doneCb || null;
   const length = rand(species.sizeRange[0], species.sizeRange[1]);
   const sex = Math.random() < 0.5 ? "female" : "male";
   const researchId = mintResearchId(species);
   state.pendingTag._gen = { length, sex, researchId };
+  $("tagForm").classList.remove("hidden");
+  $("healthView").classList.add("hidden");
   $("tagSharkArt").innerHTML = ART[species.id];
   $("tagInfo").innerHTML = `
     <strong>${species.name}</strong> <em>(${species.latin})</em><br>
     🔬 Research ID: <strong>${researchId}</strong> (assigned automatically)<br>
     📏 ${length} m &nbsp;·&nbsp; ${sex === "female" ? "♀ female" : "♂ male"}<br>
-    📍 Tagged at: ${REGIONS[$("regionSelect").value].name}<br>
+    📍 Tagged at: ${REGIONS[state.currentPlan.region].name}<br>
     📅 ${new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
   `;
   $("sharkName").value = "";
@@ -943,63 +1339,113 @@ function openTagging(species) {
 function confirmTag(name) {
   const s = state.pendingTag;
   if (!s) return;
+  const regionName = REGIONS[state.currentPlan.region].name;
+  const dateStr = new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   const rec = {
     name: name || "",
     researchId: s._gen.researchId,
     length: s._gen.length,
     sex: s._gen.sex,
-    location: REGIONS[$("regionSelect").value].name,
-    date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
-    track: genTrack(s, {
-      location: REGIONS[$("regionSelect").value].name,
-      date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
-    })
+    location: regionName,
+    date: dateStr,
+    track: genTrack(s, { location: regionName, date: dateStr })
   };
   state.tagged[s.id] = rec;
   store.save(state.tagged);
-  $("tagOverlay").classList.add("hidden");
-  $("diveView").classList.add("hidden");
-  const lb = $("launchBtn");
-  if (lb) lb.disabled = false;
   state.pendingTag = null;
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
   // v0.6.0: the opener varies per species (draft openers — Avery to revise).
   pushThread([
     { who: "them", text: s.opener },
-    { who: "me", text: `A ${s.name} — ${rec.length} metres, ${rec.sex}. Research ID ${rec.researchId}. Released healthy. 🦈` },
+    { who: "me", text: `A ${s.name} — ${rec.length} metres, ${rec.sex}. Research ID ${rec.researchId}.` },
     { who: "them", text: s.cheer }
   ]);
   maybeSarahEgg(s.id, rec);
+  checkMilestones();
   renderAll();
-  // Win state: all six tagged.
-  if (Object.keys(state.tagged).length >= SHARKS.length && !state.won) {
-    doWin();
-  } else {
-    goTab("collection");
+  showHealthCheck(s, rec);
+}
+
+function showHealthCheck(s, rec) {
+  state.healthSpecies = s;
+  $("tagForm").classList.add("hidden");
+  $("healthView").classList.remove("hidden");
+  $("healthArt").innerHTML = ART[s.id];
+  $("healthInfo").innerHTML = `
+    <strong>${s.name}</strong> — ${esc(rec.researchId)}<br>
+    🩺 Health check: ${rec.sex === "female" ? "♀ female" : "♂ male"}, ${rec.length} m.<br>
+    Tag seated well, swimming strongly, good body condition.<br>
+    <em>Every shark released healthy. 🦈</em>
+  `;
+}
+
+$("releaseBtn").addEventListener("click", () => {
+  const done = state.encounterDone;
+  const s = state.healthSpecies;
+  state.encounterDone = null;
+  state.healthSpecies = null;
+  $("tagOverlay").classList.add("hidden");
+  if (s) {
+    logLine(`🌊 The ${s.name} kicks once and is gone — back to its life, carrying your tag.`);
+  }
+  renderAll();
+  if (done) done();
+});
+
+/* ---------- Milestones & win state ----------
+   v0.7.0: two stages.
+   - Tagging the first six (the original roster) unlocks the Galápagos and
+     South Africa as real, selectable waters.
+   - Tagging all twelve wins the game: Master Shark Tagger. */
+function checkMilestones() {
+  const taggedIds = Object.keys(state.tagged);
+  if (!state.regionsUnlocked && ORIGINAL_SIX.every(id => taggedIds.includes(id))) {
+    state.regionsUnlocked = true;
+    try { localStorage.setItem("tyi-regions", "1"); } catch {}
+    for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+    fillRegions();
+    pushThread(REGION_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlock();
+  }
+  if (taggedIds.length >= SHARKS.length && !state.won) {
+    /* The ceremony waits for day's end — the trip always finishes first. */
+    state.pendingWin = true;
   }
 }
 
-/* ---------- Win state ---------- */
+function showRegionUnlock() {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  ov.innerHTML = `<div class="phone">
+    <div class="phone-head">🗺️ New waters surveyed</div>
+    <div class="cert-body">
+      <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
+      <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
+      <p class="latin">Six successful tags. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+    </div>
+    <button id="winNext" class="primary-button" type="button">Back to the water</button>
+  </div>`;
+  $("winNext").addEventListener("click", () => {
+    ov.classList.add("hidden");
+  });
+}
 
 const WIN_THREAD = [
   { who: "them", text: "you did it. you tagged ALL of them." },
-  { who: "me", text: "Six for six. Couldn't have done it without my research assistant." },
+  { who: "me", text: "Twelve for twelve. Couldn't have done it without my research assistant." },
   { who: "them", text: "i'm going to tell EVERYONE at school that my cousin is a REAL shark scientist. this is the best day of my whole life" },
   { who: "me", text: "Best day of mine too, kiddo. 🦈" }
 ];
 
-/* ---------- Win state: a ceremony in four beats ----------
+/* ---------- Win state: a ceremony in three beats ----------
    (a) certificate, (b) the phone buzzes with Sarah's text,
-   (c) the acknowledgement, (d) the new-region teasers. Each lands
-   separately — a moment, not a checklist. */
+   (c) the acknowledgement. Each lands separately — a moment, not a checklist. */
 function doWin() {
   state.won = true;
   try { localStorage.setItem("tyi-won", "1"); } catch {}
-  applyWinRegions();
-  fillRegions();
-  renderPlanner();
   renderCollection();
   renderResearch();
+  renderSightings();
   winStep(1);
 }
 
@@ -1013,9 +1459,9 @@ function winStep(n) {
     box(`
       <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
       <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
-      <p class="latin" style="text-align:center">All six sharks tagged — officially.</p>
+      <p class="latin" style="text-align:center">All ${SHARKS.length} sharks tagged — officially.</p>
       <div class="cert-body">
-        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of six successful tags and six healthy releases.</p>
+        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
       </div>
       <button id="winNext" class="primary-button" type="button">Continue</button>`);
     $("winNext").addEventListener("click", () => winStep(2));
@@ -1037,25 +1483,13 @@ function winStep(n) {
     });
     $("winNext").addEventListener("click", () => winStep(3));
 
-  } else if (n === 3) {
+  } else {
     /* Beat 3: the acknowledgement — it lives here now, not on the Research tab. */
     box(`
       <div class="ack-card" style="margin-top:0">
         <p class="eyebrow">ACKNOWLEDGEMENTS</p>
         <p class="ack-name">For <span>Sarah</span></p>
         <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
-      </div>
-      <button id="winNext" class="primary-button" type="button">Continue</button>`);
-    $("winNext").addEventListener("click", () => winStep(4));
-
-  } else {
-    /* Beat 4: new waters on the horizon — honest teasers, not empty regions. */
-    box(`
-      <div class="phone-head">🗺️ New waters on the horizon</div>
-      <div class="cert-body">
-        <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
-        <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
-        <p class="latin">Our research vessel hasn't surveyed these waters yet — check back next season. New species await.</p>
       </div>
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
     $("winNext").addEventListener("click", () => {
@@ -1256,17 +1690,38 @@ $("detailOverlay").addEventListener("click", (e) => {
   if (e.target === $("detailOverlay")) $("detailOverlay").classList.add("hidden");
 });
 
+/* ---------- Hard progress reset ----------
+   v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
+   just a clean restart. Two explicit steps so it can't be hit by accident. */
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-idseq", "tyi-sightings", "tyi-regions"];
+$("resetBtn").addEventListener("click", () => {
+  $("resetOverlay").classList.remove("hidden");
+});
+$("resetCancel").addEventListener("click", () => {
+  $("resetOverlay").classList.add("hidden");
+});
+$("resetOverlay").addEventListener("click", (e) => {
+  if (e.target === $("resetOverlay")) $("resetOverlay").classList.add("hidden");
+});
+$("resetConfirm").addEventListener("click", () => {
+  RESET_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+  location.reload();
+});
+
 /* ---------- Boot ---------- */
 
 function renderAll() {
   renderResearch();
   renderPlanner();
   renderCollection();
+  renderSightings();
   renderMessages();
   updateMsgBadge();
 }
 
-applyWinRegions();
+migrateIds();
+migrateTracks();
+migrateWinV07();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
