@@ -11,6 +11,10 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.7.1 changes
+
+- Removed the "Suggest waters for this shark" button from the field guide. Reading the field notes *is* the targeting — a button that fills in the answer defeats the purpose.
+
 ## v0.7.0 changes
 
 - Six new sharks join the roster — Galápagos shark, great white shark,
