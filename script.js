@@ -1,10 +1,10 @@
-/* Tag, You're It — prototype v0.5.0
+/* Tag, You're It — prototype v0.6.0
    Research -> plan (region/depth/bait) -> dive -> tag -> collection book. */
 
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.5.0";
+const VERSION = "v0.6.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -119,7 +119,10 @@ const REGIONS = {
   "japan":        { name: "Sagami Bay, Japan",    note: "A lanternfish flickers in the dark." },
   "mediterranean":{ name: "Mediterranean Sea",    note: "A pod of dolphins crosses the bow." },
   "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
-  /* Win-state reward: these unlock once all six sharks are tagged. */
+  /* Win-state reward: these unlock once all six sharks are tagged.
+     v0.6.0: no shark lives here yet, so they are honest "surveys coming soon"
+     teasers — visible but never selectable. Real species for these waters
+     will arrive in a future version. */
   "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
   "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true }
 };
@@ -140,7 +143,11 @@ const BAITS = {
 
 /* Field notes: short, dense, real. Everything the planner needs is in
    here — region, depth range, food — but nothing is handed to you.
-   Read like a scientist, not a checklist. */
+   Read like a scientist, not a checklist.
+   NOTE (v0.6.0): each shark's `opener` is a DRAFT success-text opener for
+   Sarah, written to match her established voice. Avery is the game's writer
+   and will revise or replace these freely — they are placeholders for his
+   pass, not final copy. */
 const SHARKS = [
   {
     id: "nurse",
@@ -153,6 +160,8 @@ const SHARKS = [
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor.",
     bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
     cheer: "nurse sharks are the CUDDLIEST!!! they nap in piles of FORTY. forty sharks. just vibing. i'm SO jealous",
+    opener: "YOU TAGGED A NURSE SHARK?!?! was it in the cuddle heap?!?! TELL ME EVERYTHING",
+    sketchCap: "barbels (the 'whiskers')",
     nameIdeas: ["Puddles", "Biscuit", "Sandy", "Nugget"]
   },
   {
@@ -166,6 +175,8 @@ const SHARKS = [
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Threshers have been seen hunting in pairs, herding schools of fish into a tight ball before taking turns striking with their tails.",
     cheer: "THRESHERS!!! their tail is HALF THEIR BODY. they hunt by WHIPPING it. that's the coolest thing any animal does and i will not be taking questions",
+    opener: "A THRESHER?!?! DID IT WHIP ITS TAIL?!?! tell me EVERYTHING",
+    sketchCap: "the tail (half the body!)",
     nameIdeas: ["Whip", "Nervous Nigel", "Swoosh", "Comet"]
   },
   {
@@ -179,6 +190,8 @@ const SHARKS = [
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
     bonus: "Whale sharks can dive deeper than 1,900 metres — among the deepest dives ever recorded for any fish — then cruise back up to the surface to feed.",
     cheer: "A WHALE SHARK!!! the biggest fish in the WHOLE OCEAN and you TAGGED one!!! did you see the spots?? every one is different like a fingerprint!!",
+    opener: "A WHALE SHARK?!?! THE BIGGEST FISH IN THE OCEAN!!! did you count its spots?!?! TELL ME EVERYTHING",
+    sketchCap: "spot pattern (like a fingerprint)",
     nameIdeas: ["Dot", "Bus", "Domino", "Galaxy"]
   },
   {
@@ -192,6 +205,8 @@ const SHARKS = [
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
     bonus: "A goblin shark's pink colour comes from blood vessels showing through its thin, almost translucent skin.",
     cheer: "A GOBLIN SHARK?!?! the pink deep-sea weirdo!!! 125 million years old!!! did it look as weird in real life as in pictures",
+    opener: "A GOBLIN SHARK?!?! THE PINK DEEP-SEA WEIRDO!!! was its nose as pointy as the pictures?!?! tell me EVERYTHING",
+    sketchCap: "the snout (a living fossil)",
     nameIdeas: ["Nosey", "Fossil", "Blush", "Slingshot"]
   },
   {
@@ -207,6 +222,8 @@ const SHARKS = [
     hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
     bonus: "Tiger sharks cross entire ocean basins. One tagged individual travelled more than 7,500 kilometres.",
     cheer: "TIGER SHARK!!! the garbage can of the sea!!! they eat ANYTHING. license plates!!! i love them so much",
+    opener: "A TIGER SHARK?!?! did it try to eat the boat?!?! TELL ME EVERYTHING",
+    sketchCap: "stripes (they fade with age)",
     nameIdeas: ["Stripes", "Tigger", "Marbles", "Scout"]
   },
   {
@@ -220,6 +237,8 @@ const SHARKS = [
     hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
     bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
     cheer: "sand tiger!!! they look SO scary but they're actually big softies. they gulp air to FLOAT. like a weird balloon shark. tell it i said hi",
+    opener: "A SAND TIGER?!?! the smiley balloon shark!!! did it do the floaty thing?!?! tell me EVERYTHING",
+    sketchCap: "the grin (all teeth, no bite)",
     nameIdeas: ["Toothy", "Grin", "Smiley", "Baja"]
   }
 ];
@@ -240,6 +259,70 @@ const COUSIN_NUDGES = {
   thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish. reefs or twilight + fish bait??",
   whale:   "whale sharks don't eat bait!! they eat PLANKTON!! find the bloom at the surface. they're usually right at the top where the water looks green, sometimes a bit deeper over reefs",
   goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!"
+};
+
+/* Field-guide sketches: rough pencil-style drawings of one distinctive
+   feature per shark. Deliberately NOT the real shark art — the true
+   appearance is revealed only when a shark is caught and tagged.
+   (The real ART above is never shown in Research.) */
+const SKETCH = {
+  nurse: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: nurse shark barbels">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <line x1="52" y1="56" x2="46" y2="76"/>
+      <line x1="62" y1="57" x2="60" y2="77"/>
+      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>`,
+  thresher: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: thresher shark tail">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="70" cy="62" rx="42" ry="14"/>
+      <path d="M110,58 Q150,50 168,18 Q176,8 186,6"/>
+      <path d="M110,66 Q140,64 158,50" stroke-dasharray="7 5"/>
+      <circle cx="42" cy="58" r="2.5" fill="#9fb8cc" stroke="none"/>
+    </g>
+  </svg>`,
+  whale: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: whale shark spot pattern">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="55" rx="80" ry="26"/>
+      <path d="M188,55 L210,40 M188,55 L210,70"/>
+    </g>
+    <g fill="#9fb8cc" opacity="0.7">
+      <circle cx="80" cy="45" r="3"/><circle cx="105" cy="42" r="3"/><circle cx="130" cy="46" r="3"/>
+      <circle cx="92" cy="58" r="3"/><circle cx="118" cy="60" r="3"/><circle cx="143" cy="57" r="3"/>
+      <circle cx="70" cy="62" r="2.5"/><circle cx="155" cy="64" r="2.5"/>
+    </g>
+  </svg>`,
+  goblin: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: goblin shark snout">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M80,50 L18,44 L18,58 Z"/>
+      <ellipse cx="130" cy="55" rx="55" ry="15"/>
+      <path d="M183,52 Q200,48 208,44" stroke-dasharray="7 5"/>
+    </g>
+  </svg>`,
+  tiger: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: tiger shark stripes">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="55" rx="70" ry="20"/>
+      <path d="M173,50 L205,34 M173,60 L205,76"/>
+      <line x1="90" y1="37" x2="88" y2="73"/>
+      <line x1="110" y1="35" x2="110" y2="75"/>
+      <line x1="130" y1="37" x2="132" y2="73"/>
+    </g>
+  </svg>`,
+  sandtiger: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: sand tiger teeth">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M30,55 Q70,38 120,42 Q170,46 200,40"/>
+      <path d="M30,55 Q70,68 120,66 Q170,64 200,60" stroke-dasharray="7 5"/>
+      <path d="M44,52 l5,8 l5,-8 l5,8 l5,-8 l5,8 l5,-8"/>
+    </g>
+  </svg>`
 };
 
 /* If you name a shark "Sarah", she finds out. Sweet, not progression. */
@@ -285,27 +368,34 @@ const CREATURE_ART = {
   </svg>`
 };
 
-/* Flavour: the dive log describes the place, not just the mechanics. */
+/* Flavour: the dive log describes the place, not just the mechanics.
+   v0.6.0: depth sets the atmosphere — shallow flavour is bright and busy,
+   deep flavour is dark and strange. */
 const DEPTH_FLAVOUR = {
   surface: [
     "Sunlight shatters across the surface in moving panes. The water is warm and impossibly clear.",
     "The surface chop rocks the boat gently. Below, everything glows blue-green.",
-    "You can see the boat's shadow drifting above you, a dark shape on the bright ceiling of the sea."
+    "You can see the boat's shadow drifting above you, a dark shape on the bright ceiling of the sea.",
+    "A breeze ruffles the surface into glitter. Gulls cry somewhere far above."
   ],
   reef: [
     "Coral heads rise like a drowned city. Small bright fish dart between the branches.",
     "The reef hums — not with sound, but with movement. Everything here is busy.",
-    "A cleaning station bustles below: tiny fish picking parasites off a patient grouper."
+    "A cleaning station bustles below: tiny fish picking parasites off a patient grouper.",
+    "An octopus oozes from one crevice to another, changing colour as it goes."
   ],
   twilight: [
     "The light thins to a deep indigo. Your eyes adjust slowly to the dim.",
     "Particles drift past like snow falling upward. It is very quiet down here.",
-    "The slope falls away into darkness to one side. You feel the depth more than see it."
+    "The slope falls away into darkness to one side. You feel the depth more than see it.",
+    "Your depth gauge ticks past 200 metres. The last of the blue fades to black-blue."
   ],
   deep: [
     "There is no light left to speak of — only the glow of the submersible and the dark pressing in.",
     "The seafloor, when the lights catch it, is soft grey mud, undisturbed for longer than you've been alive.",
-    "Every movement down here feels deliberate. Nothing wastes energy in the deep."
+    "Every movement down here feels deliberate. Nothing wastes energy in the deep.",
+    "The submersible's lights catch marine snow — a slow, endless snowfall of tiny white specks.",
+    "Somewhere out in the black, something flashes blue-green, once. Bioluminescence — the deep's own language."
   ]
 };
 
@@ -328,12 +418,15 @@ const SIGHTINGS = {
   ]
 };
 
-/* Rare, quiet easter eggs in the flavour. Real phenomena, mentioned in passing. */
+/* Rare, quiet easter eggs in the flavour. Real phenomena, mentioned in passing.
+   v0.6.0: the secrets live in the deep — the shallows are too bright for secrets. */
 const EASTER_EGGS = [
-  { depths: ["surface", "twilight"],
+  { depths: ["twilight", "deep"],
     text: "For a moment the water sparkles — bioluminescent algae, disturbed by the current, flashing like wet stars." },
   { depths: ["twilight", "deep"],
     text: "A vast dark shape looms to one side — the silhouette of a scuttled ship, long since given back to the sea." },
+  { depths: ["deep"],
+    text: "Something below pulses once with cold blue light, then goes dark. You decide not to investigate." },
   { depths: ["surface"],
     text: "The water is so clear it looks color-corrected, like the establishing shot of a nature documentary." },
   { depths: ["twilight"],
@@ -400,17 +493,35 @@ const msgStore = {
 };
 const _savedMsgs = msgStore.load();
 
+/* v0.6.0: threads are {ts, msgs}. Migrate legacy bare-array threads. */
+function normThread(t) {
+  if (Array.isArray(t)) return { ts: 0, msgs: t };
+  return t;
+}
+
 const state = {
   tagged: store.load(),   // id -> {name, researchId, length, sex, location, date, sarahEgg, track}
   failures: 0,
   chatIdx: _savedMsgs.chatIdx || 0,
-  messages: _savedMsgs.messages || [],
+  messages: (_savedMsgs.messages || []).map(normThread),
   unread: _savedMsgs.unread || 0,
   pendingTag: null,       // species object awaiting naming
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx });
+}
+/* Every new thread gets a timestamp for the Phone tab. */
+function pushThread(msgs) {
+  state.messages.push({ ts: Date.now(), msgs });
+  state.unread += 1;
+  saveMsgs();
+  updateMsgBadge();
+  renderMessages();
+}
+function fmtTime(ts) {
+  return new Date(ts).toLocaleString(undefined,
+    { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
 /* Research IDs: every tagged shark always gets one, like real field science.
@@ -471,7 +582,7 @@ document.querySelectorAll(".tab").forEach(btn => {
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
-    if (btn.dataset.tab === "messages" && state.unread > 0) {
+    if (btn.dataset.tab === "phone" && state.unread > 0) {
       state.unread = 0;
       saveMsgs();
       updateMsgBadge();
@@ -482,26 +593,33 @@ function goTab(name) {
   document.querySelector(`.tab[data-tab="${name}"]`).click();
 }
 
-/* ---------- Research ---------- */
-
+/* ---------- Research: a true field guide ----------
+   v0.6.0: entries read like a field guide, not a card scroll. The written
+   notes are unchanged (every clue preserved) — but there are NO pictures
+   of the actual shark here. Each entry carries a rough field sketch of one
+   distinctive feature instead. The real face is earned at tagging. */
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
   SHARKS.forEach(s => {
     const done = !!state.tagged[s.id];
-    const card = document.createElement("div");
-    card.className = "species-card";
-    card.innerHTML = `
-      <div class="shark-art">${ART[s.id]}</div>
-      <h3>${s.name} ${done ? "✅" : ""}</h3>
-      <p class="latin">${s.latin}</p>
-      <span class="status-pill">IUCN: ${s.status}</span>
+    const entry = document.createElement("div");
+    entry.className = "guide-entry";
+    entry.innerHTML = `
+      <div class="guide-head">
+        <div class="guide-title">
+          <h3>${s.name} ${done ? "✅" : ""}</h3>
+          <p class="latin">${s.latin}</p>
+          <span class="status-pill">IUCN: ${s.status}</span>
+        </div>
+        <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
+      </div>
       <p class="research-text">${s.research}</p>
       ${done
         ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
         : `<button class="secondary-button" data-plan="${s.id}" type="button">Plan an expedition for this shark</button>`}
     `;
-    list.appendChild(card);
+    list.appendChild(entry);
   });
   list.querySelectorAll("[data-plan]").forEach(b =>
     b.addEventListener("click", () => {
@@ -530,7 +648,10 @@ function fillRegions() {
   Object.entries(REGIONS).forEach(([id, v]) => {
     const o = document.createElement("option");
     o.value = id;
-    if (v.locked) {
+    if (v.teaser) {
+      o.textContent = `🗺️ ${v.name} — research surveys coming soon`;
+      o.disabled = true;
+    } else if (v.locked) {
       o.textContent = `🔒 ${v.name} — tag all ${SHARKS.length} sharks to unlock`;
       o.disabled = true;
     } else {
@@ -538,7 +659,17 @@ function fillRegions() {
     }
     el.appendChild(o);
   });
-  if (current && REGIONS[current] && !REGIONS[current].locked) el.value = current;
+  if (current && REGIONS[current] && !REGIONS[current].locked && !REGIONS[current].teaser) el.value = current;
+}
+
+/* v0.6.0: after the win, the two new regions become honest teasers —
+   on the horizon, not on the planner. */
+function applyWinRegions() {
+  if (!state.won) return;
+  for (const id of ["galapagos", "south-africa"]) {
+    REGIONS[id].locked = false;
+    REGIONS[id].teaser = true;
+  }
 }
 
 function renderPlanner() {
@@ -596,24 +727,29 @@ function spawnCreature(type) {
 }
 
 /* Guaranteed ambient life before the shark reveal: the scene must feel
-   alive first. One sighting always lands; a rare easter egg may join it. */
+   alive first. At least one sighting always lands; a rare easter egg may
+   join it. v0.6.0: eggs are likelier in the deep, where secrets live. */
 async function showSighting(depth) {
   // Rare, quiet easter eggs: real phenomena, mentioned in passing.
-  if (Math.random() < 0.22) {
+  const eggChance = (depth === "twilight" || depth === "deep") ? 0.35 : 0.12;
+  if (Math.random() < eggChance) {
     const eggs = EASTER_EGGS.filter(e => e.depths.includes(depth));
     if (eggs.length) {
-      logLine(`✨ ${pick(eggs).text}`, "flavour");
-      await wait(1500);
+      logLine(`✨ ${pick(eggs).text}`);
+      await wait(1600);
     }
   }
   const options = SIGHTINGS[depth] || [];
   if (options.length) {
     const s = pick(options);
-    logLine(`👁️ ${s.text}`, "flavour");
+    logLine(`👁️ ${s.text}`);
     spawnCreature(s.creature);
   }
 }
 
+/* v0.6.0: depth sets the dive. Shallow water is bright, lively and short;
+   deep water is dark, strange and long. The beats are staged: descent,
+   settling in, wildlife, anticipation, reveal. */
 async function runExpedition(plan) {
   const target = sharkById(plan.target);
   $("launchBtn").disabled = true;
@@ -625,6 +761,7 @@ async function runExpedition(plan) {
 
   const scene = $("diveScene");
   scene.className = "dive-scene " + DEPTHS[plan.depth].scene;
+  const deep = plan.depth === "twilight" || plan.depth === "deep";
 
   const baitText = plan.bait === "plankton"
     ? "No bait — scanning the water for a plankton bloom…"
@@ -634,20 +771,38 @@ async function runExpedition(plan) {
   await wait(1700);
   logLine(`🪝 ${baitText}`);
   await wait(1700);
-  logLine(`🐟 First fish appear in the blue…`);
-  await wait(1800);
-  logLine(`👀 ${REGIONS[plan.region].note}`);
-  await wait(1900);
-  logLine(`🌊 ${pick(DEPTH_FLAVOUR[plan.depth])}`, "flavour");
-  await wait(1900);
-  // The scene must feel alive before the shark: at least one sighting,
-  // always, plus a rare quiet easter egg.
-  await showSighting(plan.depth);
+  if (deep) {
+    logLine(`⬇️ The water darkens as you descend. The surface light thins, then lets go.`);
+    await wait(2000);
+  }
+  logLine(`🌊 ${pick(DEPTH_FLAVOUR[plan.depth])}`);
   await wait(2000);
-  logLine(`⏳ The hours slip by…`);
-  await wait(1900);
-  logLine(`🌊 The light shifts. The water goes still. Something moves below…`);
+  // The scene must feel alive before the shark: sightings always land.
+  await showSighting(plan.depth);
   await wait(2100);
+  if (deep) {
+    logLine(`🌊 ${pick(DEPTH_FLAVOUR[plan.depth])}`);
+    await wait(2100);
+    logLine(`🐟 Life is sparse down here — but it is here. Something pale flickers at the edge of the lights.`);
+    await wait(2100);
+  } else {
+    // The shallows are lively: a second sighting before things go quiet.
+    await showSighting(plan.depth);
+    await wait(2000);
+    logLine(`🐟 Small fish gather, curious, flashing silver as they turn.`);
+    await wait(1900);
+  }
+  logLine(`👀 ${REGIONS[plan.region].note}`);
+  await wait(2000);
+  if (deep) {
+    logLine(`⏳ The hours slip by. The deep does not hurry, so neither do you.`);
+    await wait(2300);
+  } else {
+    logLine(`⏳ The hours slip by…`);
+    await wait(1900);
+  }
+  logLine(`🌊 The light shifts. The water goes still. Something moves below…`);
+  await wait(2200);
 
   // Who shows up? Any species whose region + bait match and whose depth
   // range includes the chosen depth. There's no single "right" depth.
@@ -721,17 +876,20 @@ function renderMessages() {
     return;
   }
   [...state.messages].reverse().forEach(thread => {
-    const card = document.createElement("div");
-    card.className = "species-card";
-    card.innerHTML = `<div class="phone-head">📱 Texts with Sarah</div><div class="phone-thread"></div>`;
-    const th = card.querySelector(".phone-thread");
-    thread.forEach(m => {
+    const wrap = document.createElement("div");
+    wrap.className = "thread";
+    const stamp = thread.ts
+      ? `<div class="thread-stamp">${esc(fmtTime(thread.ts))}</div>`
+      : "";
+    wrap.innerHTML = `${stamp}<div class="phone-thread"></div>`;
+    const th = wrap.querySelector(".phone-thread");
+    thread.msgs.forEach(m => {
       const b = document.createElement("div");
       b.className = "bubble " + m.who;
       b.textContent = m.text;
       th.appendChild(b);
     });
-    list.appendChild(card);
+    list.appendChild(wrap);
   });
 }
 
@@ -754,11 +912,7 @@ function afterExpedition(targetId) {
       { who: "me", text: chat.me }
     ];
   }
-  state.messages.push(thread);
-  state.unread += 1;
-  saveMsgs();
-  updateMsgBadge();
-  renderMessages();
+  pushThread(thread);
 }
 
 /* ---------- Tagging ---------- */
@@ -809,15 +963,12 @@ function confirmTag(name) {
   if (lb) lb.disabled = false;
   state.pendingTag = null;
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
-  state.messages.push([
-    { who: "them", text: `YOU TAGGED ONE?!?! tell me EVERYTHING` },
+  // v0.6.0: the opener varies per species (draft openers — Avery to revise).
+  pushThread([
+    { who: "them", text: s.opener },
     { who: "me", text: `A ${s.name} — ${rec.length} metres, ${rec.sex}. Research ID ${rec.researchId}. Released healthy. 🦈` },
     { who: "them", text: s.cheer }
   ]);
-  state.unread += 1;
-  saveMsgs();
-  updateMsgBadge();
-  renderMessages();
   maybeSarahEgg(s.id, rec);
   renderAll();
   // Win state: all six tagged.
@@ -837,29 +988,82 @@ const WIN_THREAD = [
   { who: "me", text: "Best day of mine too, kiddo. 🦈" }
 ];
 
+/* ---------- Win state: a ceremony in four beats ----------
+   (a) certificate, (b) the phone buzzes with Sarah's text,
+   (c) the acknowledgement, (d) the new-region teasers. Each lands
+   separately — a moment, not a checklist. */
 function doWin() {
   state.won = true;
   try { localStorage.setItem("tyi-won", "1"); } catch {}
-  // Usable reward: two new regions open up.
-  REGIONS.galapagos.locked = false;
-  REGIONS["south-africa"].locked = false;
+  applyWinRegions();
   fillRegions();
   renderPlanner();
-  // Sarah's heartfelt text.
-  state.messages.push(WIN_THREAD);
-  state.unread += 1;
-  saveMsgs();
-  updateMsgBadge();
-  renderMessages();
   renderCollection();
   renderResearch();
-  $("winOverlay").classList.remove("hidden");
+  winStep(1);
 }
 
-$("winContinue").addEventListener("click", () => {
-  $("winOverlay").classList.add("hidden");
-  goTab("collection");
-});
+function winStep(n) {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  const box = (inner) => { ov.innerHTML = `<div class="phone">${inner}</div>`; };
+
+  if (n === 1) {
+    /* Beat 1: the certificate. */
+    box(`
+      <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
+      <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
+      <p class="latin" style="text-align:center">All six sharks tagged — officially.</p>
+      <div class="cert-body">
+        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of six successful tags and six healthy releases.</p>
+      </div>
+      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+    $("winNext").addEventListener("click", () => winStep(2));
+
+  } else if (n === 2) {
+    /* Beat 2: the phone buzzes — Sarah's heartfelt text arrives. */
+    pushThread(WIN_THREAD.map(m => ({ ...m })));
+    box(`
+      <div class="phone-head buzz-phone">📱 Your phone buzzes…</div>
+      <div class="phone-thread win-thread"></div>
+      <p class="latin" style="text-align:center; margin:0">Saved in 📱 Phone.</p>
+      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+    const th = ov.querySelector(".win-thread");
+    WIN_THREAD.forEach(m => {
+      const b = document.createElement("div");
+      b.className = "bubble " + m.who;
+      b.textContent = m.text;
+      th.appendChild(b);
+    });
+    $("winNext").addEventListener("click", () => winStep(3));
+
+  } else if (n === 3) {
+    /* Beat 3: the acknowledgement — it lives here now, not on the Research tab. */
+    box(`
+      <div class="ack-card" style="margin-top:0">
+        <p class="eyebrow">ACKNOWLEDGEMENTS</p>
+        <p class="ack-name">For <span>Sarah</span></p>
+        <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
+      </div>
+      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+    $("winNext").addEventListener("click", () => winStep(4));
+
+  } else {
+    /* Beat 4: new waters on the horizon — honest teasers, not empty regions. */
+    box(`
+      <div class="phone-head">🗺️ New waters on the horizon</div>
+      <div class="cert-body">
+        <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
+        <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
+        <p class="latin">Our research vessel hasn't surveyed these waters yet — check back next season. New species await.</p>
+      </div>
+      <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
+    $("winNext").addEventListener("click", () => {
+      ov.classList.add("hidden");
+      goTab("collection");
+    });
+  }
+}
 
 /* Easter egg: name a shark "Sarah" and the cousin finds out. */
 function maybeSarahEgg(speciesId, rec) {
@@ -867,11 +1071,7 @@ function maybeSarahEgg(speciesId, rec) {
   if ((rec.name || "").trim().toLowerCase() === "sarah") {
     rec.sarahEgg = true;
     store.save(state.tagged);
-    state.messages.push(SARAH_EGG_THREAD);
-    state.unread += 1;
-    saveMsgs();
-    updateMsgBadge();
-    renderMessages();
+    pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
   }
 }
 
@@ -889,26 +1089,29 @@ function idLine(t) {
 function renderCollection() {
   const list = $("collectionList");
   list.innerHTML = "";
+  const shelf = $("trophyShelf");
+  shelf.innerHTML = "";
   const ids = Object.keys(state.tagged);
   $("collectionCount").textContent = `${ids.length}/${SHARKS.length}`;
-  $("completeBanner").classList.toggle("hidden", ids.length < SHARKS.length);
+
+  /* v0.6.0: the trophy sits ABOVE the grid on its own distinguished shelf —
+     never as a grid slot that reads like "one more shark to catch". */
+  if (state.won) {
+    const t = document.createElement("button");
+    t.type = "button";
+    t.className = "trophy-shelf";
+    t.setAttribute("aria-label", "Open your Master Shark Tagger certificate");
+    t.innerHTML = `
+      <div class="cert-trophy">🏆</div>
+      <h3>Master Shark Tagger</h3>
+      <p class="latin">Official certificate — tap to view</p>`;
+    t.addEventListener("click", openCertificate);
+    shelf.appendChild(t);
+  }
 
   if (!ids.length && !state.won) {
     list.innerHTML = `<div class="empty-note">No sharks tagged yet.<br>Do your research, then get out there. 🦈</div>`;
     return;
-  }
-  // Ceremonial win reward: the Master Shark Tagger certificate lives here.
-  if (state.won) {
-    const cert = document.createElement("button");
-    cert.type = "button";
-    cert.className = "grid-cell cert-cell";
-    cert.setAttribute("aria-label", "Open your Master Shark Tagger certificate");
-    cert.innerHTML = `
-      <div class="cert-trophy">🏆</div>
-      <h3>Master Shark Tagger</h3>
-      <p class="latin">Official certificate</p>`;
-    cert.addEventListener("click", openCertificate);
-    list.appendChild(cert);
   }
   SHARKS.filter(s => state.tagged[s.id]).forEach(s => {
     const t = state.tagged[s.id];
@@ -1063,8 +1266,11 @@ function renderAll() {
   updateMsgBadge();
 }
 
+applyWinRegions();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
 $("buildTag").textContent = VERSION;
+$("phoneTime").textContent =
+  new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 renderAll();
