@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.6.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.7.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,31 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.7.0 changes
+
+- Six new sharks join the roster — Galápagos shark, great white shark,
+  great hammerhead, shortfin mako, basking shark, and epaulette shark —
+  twelve total. The Galápagos Islands and South Africa are real, selectable
+  waters now: tagging your first six earns the institute's trust and opens
+  them up. (Sarah's success-text openers for the new six are drafts in her
+  voice for Avery — the game's writer — to revise.)
+- The expedition is redesigned around a full day out. No more target
+  species picker: you choose the water — region, depth, bait — and your
+  research is your targeting. Each trip brings 2–4 encounters; when a shark
+  appears you choose to watch it (logged in a new field sightings list —
+  spotted, not tagged) or tag it. Tagging is now tag → health check →
+  release, and the day plays on afterward. Nothing ends the trip early.
+- Trips stay available after the win — there's always more to see out there.
+- The field guide is now a proper database: a compact roster list, each
+  row expanding into the full entry (sketch, notes, research text).
+- New hard progress reset in the footer — a full wipe for replay and
+  testing, with confirmation. Not prestige, just a clean restart.
+- Win state is now twelve for twelve, in two stages: six tags opens new
+  waters, twelve earns the Master Shark Tagger ceremony.
+- Removed the Mediterranean as a region — no shark lived there, so every
+  trip was empty water. (Also fixed: tiger and sand tiger sharks were
+  missing Sarah's nudge texts.)
 
 ## v0.6.0 changes
 

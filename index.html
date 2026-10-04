@@ -37,14 +37,10 @@
       <section id="tab-expedition" class="panel">
         <div class="section-head">
           <h2>Plan an expedition</h2>
-          <p>Pick your target, then choose region, depth, and bait. Each shark roams a range of depths — region and bait narrow it down.</p>
+          <p>Choose the water — region, depth, bait. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
         </div>
 
         <div id="planner" class="planner-card">
-          <label class="field">
-            <span>Target species</span>
-            <select id="targetSelect"></select>
-          </label>
           <label class="field">
             <span>Region</span>
             <select id="regionSelect"></select>
@@ -78,6 +74,11 @@
         </div>
         <div id="trophyShelf"></div>
         <div id="collectionList" class="collection-grid"></div>
+        <div class="section-head" style="margin-top:18px">
+          <h2>👁️ Field sightings</h2>
+          <p>Sharks you watched but didn't tag — spotted, not caught. Pure field notes.</p>
+        </div>
+        <div id="sightingsList" class="sightings-list"></div>
       </section>
 
       <!-- PHONE -->
@@ -98,20 +99,42 @@
 
     <footer class="foot">
       <p>Tag responsibly — every shark released healthy. 🦈</p>
+      <p><button id="resetBtn" class="link-button" type="button">Reset all progress</button></p>
     </footer>
+  </div>
+
+  <!-- Reset confirmation -->
+  <div id="resetOverlay" class="overlay hidden">
+    <div class="phone">
+      <div class="phone-head">⚠️ Reset all progress?</div>
+      <div class="cert-body">
+        <p>This erases <strong>everything</strong>: tagged sharks, sightings, messages, tracks, and the win state. A clean slate — no bonuses, no prestige, just a restart.</p>
+        <p class="latin">This cannot be undone.</p>
+      </div>
+      <button id="resetConfirm" class="primary-button" type="button" style="background:#c0392b;color:#fff">Yes, erase everything</button>
+      <button id="resetCancel" class="secondary-button" type="button">Cancel</button>
+    </div>
   </div>
 
   <!-- Tagging modal -->
   <div id="tagOverlay" class="overlay hidden">
     <div class="phone">
-      <div class="phone-head">🏷️ tag your shark</div>
-      <div id="tagSharkArt" class="tag-art"></div>
-      <div id="tagInfo" class="tag-info"></div>
-      <label class="field">
-        <span>Nickname <em class="opt">(optional — the research ID below stays either way)</em></span>
-        <input id="sharkName" type="text" maxlength="24" placeholder="Name your shark…" />
-      </label>
-      <button id="tagConfirm" class="primary-button" type="button">Add to collection book</button>
+      <div id="tagForm">
+        <div class="phone-head">🏷️ tag your shark</div>
+        <div id="tagSharkArt" class="tag-art"></div>
+        <div id="tagInfo" class="tag-info"></div>
+        <label class="field">
+          <span>Nickname <em class="opt">(optional — the research ID below stays either way)</em></span>
+          <input id="sharkName" type="text" maxlength="24" placeholder="Name your shark…" />
+        </label>
+        <button id="tagConfirm" class="primary-button" type="button">Add to collection book</button>
+      </div>
+      <div id="healthView" class="hidden">
+        <div class="phone-head">✅ Tag secure</div>
+        <div id="healthArt" class="tag-art"></div>
+        <div id="healthInfo" class="tag-info"></div>
+        <button id="releaseBtn" class="primary-button" type="button">🌊 Release & keep diving</button>
+      </div>
     </div>
   </div>
 

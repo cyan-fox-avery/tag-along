@@ -335,4 +335,46 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
 .ambient svg { height: 100%; width: auto; display: block; }
 @keyframes drift { from { left: -30%; } to { left: 112%; } }
 
+/* v0.7.0: field-guide database — compact roster rows, expandable entries */
+.guide-row {
+  background: var(--bg-card); border-radius: var(--radius);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25); overflow: hidden;
+}
+.guide-row-head {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  background: transparent; border: none; color: var(--ink);
+  font-family: inherit; text-align: left; cursor: pointer;
+  padding: 13px 14px; font-size: 15px;
+}
+.guide-row-head:active { background: rgba(255,255,255,0.04); }
+.guide-row-name { font-weight: 800; flex: none; }
+.guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.guide-row-head .status-pill { margin-bottom: 0; flex: none; }
+.guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
+.guide-row.open .guide-caret { transform: rotate(180deg); }
+.guide-row-body { padding: 0 14px 14px; border-top: 1px solid #2c5364; }
+.guide-row-body .guide-sketch { margin: 12px auto; }
+.guide-row-body .research-text { margin-top: 4px; }
+
+/* v0.7.0: sightings log */
+.sightings-list { display: grid; gap: 8px; }
+.sighting-entry {
+  background: var(--bg-soft); border-radius: 12px; padding: 10px 12px;
+  border-left: 3px solid var(--teal);
+}
+.sighting-name { font-weight: 800; font-size: 14px; }
+.sighting-detail { font-size: 13px; color: var(--ink-dim); margin-top: 2px; }
+.empty-note {
+  text-align: center; color: var(--ink-dim); font-size: 14px;
+  padding: 18px 12px; line-height: 1.6;
+}
+
+/* v0.7.0: discreet reset link in the footer */
+.link-button {
+  background: none; border: none; padding: 2px 4px; cursor: pointer;
+  color: var(--ink-dim); font-size: 12px; font-family: inherit;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.link-button:active { color: var(--ink); }
+
 .hidden { display: none !important; }

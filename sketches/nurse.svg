@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: nurse shark barbels">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <line x1="52" y1="56" x2="46" y2="76"/>
+      <line x1="62" y1="57" x2="60" y2="77"/>
+      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>
