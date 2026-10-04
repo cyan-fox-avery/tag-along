@@ -20,23 +20,17 @@
       <button class="tab active" data-tab="research" type="button">📖 Research</button>
       <button class="tab" data-tab="expedition" type="button">🛥️ Expedition</button>
       <button class="tab" data-tab="collection" type="button">🗂️ Collection <span id="collectionCount" class="count-badge">0/6</span></button>
-      <button class="tab" data-tab="messages" type="button">💬 Messages <span id="msgBadge" class="count-badge hidden">0</span></button>
+      <button class="tab" data-tab="phone" type="button">📱 Phone <span id="msgBadge" class="count-badge hidden">0</span></button>
     </nav>
 
     <main>
-      <!-- RESEARCH -->
+      <!-- RESEARCH — a true field guide -->
       <section id="tab-research" class="panel active">
         <div class="section-head">
-          <h2>Field notes</h2>
-          <p>Short, dense, and true. Read up, then go find them.</p>
+          <h2>Field guide</h2>
+          <p>Study the notes and sketches. You'll see the real thing when you tag one.</p>
         </div>
-        <div id="researchList" class="card-list"></div>
-
-        <div class="ack-card">
-          <p class="eyebrow">ACKNOWLEDGEMENTS</p>
-          <p class="ack-name">For <span>Sarah</span></p>
-          <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
-        </div>
+        <div id="researchList" class="guide-list"></div>
       </section>
 
       <!-- EXPEDITION -->
@@ -82,19 +76,23 @@
           <h2>Official collection book</h2>
           <p>Tap a shark to open its full card — there's more in the book than in the field notes.</p>
         </div>
-        <div id="completeBanner" class="complete-banner hidden">
-          🎉 You tagged all six! Master Shark Tagger. 🦈
-        </div>
+        <div id="trophyShelf"></div>
         <div id="collectionList" class="collection-grid"></div>
       </section>
 
-      <!-- MESSAGES -->
-      <section id="tab-messages" class="panel">
-        <div class="section-head">
-          <h2>Texts with Sarah</h2>
-          <p>Your little cousin. Their special interest is sharks, and you're the coolest cousin in the world.</p>
+      <!-- PHONE -->
+      <section id="tab-phone" class="panel">
+        <div class="phone-screen">
+          <div class="phone-statusbar"><span id="phoneTime">--:--</span><span>📶 🔋</span></div>
+          <div class="phone-contact">
+            <div class="contact-avatar">🦈</div>
+            <div class="contact-meta">
+              <div class="contact-name">Sarah</div>
+              <div class="contact-sub">cousin · resident shark expert</div>
+            </div>
+          </div>
+          <div id="messagesList" class="phone-convo"></div>
         </div>
-        <div id="messagesList" class="card-list"></div>
       </section>
     </main>
 
@@ -133,24 +131,8 @@
     </div>
   </div>
 
-  <!-- Win state modal -->
-  <div id="winOverlay" class="overlay hidden">
-    <div class="phone">
-      <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
-      <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
-      <p class="latin" style="text-align:center">All six sharks tagged — officially.</p>
-      <div class="cert-body">
-        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of six successful tags and six healthy releases.</p>
-      </div>
-      <div class="reward-list">
-        <p>🎖️ <strong>Rewards unlocked:</strong></p>
-        <p>📜 Certificate added to your collection book</p>
-        <p>🗺️ Two new regions: Galápagos Islands &amp; South Africa</p>
-        <p>💬 Sarah texted you — go read it</p>
-      </div>
-      <button id="winContinue" class="primary-button" type="button">Continue</button>
-    </div>
-  </div>
+  <!-- Win state overlay: content is staged by winStep() in script.js -->
+  <div id="winOverlay" class="overlay hidden"></div>
 
   <script src="script.js"></script>
 </body>

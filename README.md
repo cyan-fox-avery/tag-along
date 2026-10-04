@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.5.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.6.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,44 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.6.0 changes
+
+- Research is now a true field guide, not a scrolling tab of cards. Each
+  entry pairs the (unchanged) field notes with a rough pencil-style field
+  sketch of one distinctive feature — barbels, the tail, the spot pattern.
+  There are deliberately no pictures of the actual shark here: the real
+  face is revealed only when you tag one.
+- The "For Sarah" acknowledgement no longer sits at the bottom of the
+  Research tab. Like Rockhound, it now appears as part of the
+  game-completion moment instead.
+- The win is now a ceremony in four beats, not a single dump: the Master
+  Shark Tagger certificate first, then your phone buzzes with Sarah's
+  heartfelt text, then the acknowledgement, then the two new regions on
+  the horizon.
+- Messages is now just "Phone": no explanatory header, no tutorial copy.
+  It's a genuine texting UI — contact header, timestamps, bubbles — that
+  feels like opening your real phone.
+- Sarah's success texts vary per species now. (The opener was hard-coded
+  identical on every tag; the cheer already varied.) The six new openers
+  are drafts in her voice for Avery — the game's writer — to revise or
+  rewrite freely.
+- The trophy sits on its own shelf above the collection grid now, never
+  as a grid slot that reads like "one more shark to catch".
+- Expeditions are richer and depth now sets the dive: shallow water is
+  bright, lively, and shorter; deep water is dark, strange, and longer,
+  staged as descent, settling in, wildlife, anticipation, reveal. The
+  location secrets (bioluminescent algae, scuttled ships) live in the
+  deep, where they belong.
+- Fixed the invisible-fish bug: ambient silhouettes were dark fills at
+  low opacity on near-black deep water, so they never showed. Silhouettes
+  are now pale and reflective at depth, dark in the bright shallows.
+- The dive log speaks in one voice now — the separate italic "flavour"
+  styling is gone.
+- Galápagos and South Africa are honest "surveys coming soon" teasers
+  after the win: visible on the horizon, never selectable. No shark lives
+  there yet, so no more guaranteed-failure expeditions into empty water.
+  New species for those waters will headline a future version.
 
 ## v0.5.0 changes
 
