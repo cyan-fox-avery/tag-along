@@ -11,6 +11,12 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.7.2 changes
+
+- Expeditions no longer lock you into the full day: after each encounter you can keep diving or head back to the ship. Found what you came for? Your call.
+- The Phone tab now reads like a real chat — oldest at top, newest at the bottom, pinned to the latest message.
+- The expedition viewing window stays put: it sticks to the top of the screen while the dive log scrolls inside its own box on long days.
+
 ## v0.7.1 changes
 
 - Removed the "Suggest waters for this shark" button from the field guide. Reading the field notes *is* the targeting — a button that fills in the answer defeats the purpose.
