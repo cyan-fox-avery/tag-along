@@ -109,7 +109,8 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
 /* Dive view */
 .dive-view { margin-top: 14px; }
 .dive-scene {
-  position: relative; height: 190px; border-radius: var(--radius); overflow: hidden;
+  position: sticky; top: 68px; z-index: 4;
+  height: 190px; border-radius: var(--radius); overflow: hidden;
   border: 2px solid #2c5364;
 }
 .dive-scene .rays {
@@ -133,13 +134,14 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
 
 .dive-log {
   background: rgba(0,0,0,0.35); border-radius: var(--radius);
-  margin-top: 10px; padding: 12px 14px; min-height: 150px; font-size: 14px;
+  margin-top: 10px; padding: 12px 14px; min-height: 150px; max-height: 300px;
+  overflow-y: auto; font-size: 14px;
 }
 .dive-log p { margin: 7px 0; animation: fadein 0.4s ease; }
 .dive-log .found { color: var(--accent); font-weight: 800; font-size: 17px; }
 .dive-log .miss { color: var(--ink-dim); }
 
-.dive-actions { display: flex; gap: 8px; margin-top: 10px; }
+.dive-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .dive-actions .primary-button, .dive-actions .secondary-button { margin-top: 0; }
 
 /* Collection book */
