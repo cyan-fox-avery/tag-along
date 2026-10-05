@@ -792,7 +792,7 @@ const TRACK_ENVELOPES = {
        shark barely leaves its home reef. Map coords cluster tightly
        around the Caribbean Sea tag point — honest, not empty. */
     areas: ["Tag-site reef", "Adjacent sand flats", "Seagrass beds", "Reef-edge drop-off", "Mating aggregation flat", "Nearby patch reefs"],
-    hop: [1, 15], dayStep: [7, 30], nPoints: [5, 6], kind: "satellite",
+    hop: [1, 15], dayStep: [7, 30], nPoints: [5, 6], kind: "acoustic",
     corridor: "extremely resident — mean dispersal 7.7 km (Glover's Reef, Belize); strong site fidelity; biennial returns to mating flats"
   },
   thresher: {
@@ -1175,6 +1175,8 @@ function showMapPopup(sid) {
     ? "Archival track — goblin sharks have never carried satellite tags; this route is reconstructed from capture records."
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
+      : t.track.kind === "acoustic"
+        ? "Illustrative track based on acoustic-tag detections from reef receiver arrays — a different way of following sharks than satellite tags."
       : null;
   const pop = $("mapPopup");
   pop.innerHTML = `
