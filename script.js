@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.9.1";
+const VERSION = "v0.10.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -778,20 +778,90 @@ function mapPoints(t) {
   return pts;
 }
 
+/* ---------- Tracking map: satellite view (v0.10.0) ----------
+   Blue Marble background, viewBox zoom, toggleable currents overlay.
+   Track/tag geometry is unchanged — the equirectangular projection
+   already matched, so every coordinate keeps working as before. */
+let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
+let mapCurrentsOn = true;
+const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
+
+function mapViewBox() {
+  const w = MAP_W / mapZoom, h = MAP_H / mapZoom;
+  const x = Math.min(Math.max(mapCX - w / 2, 0), MAP_W - w);
+  const y = Math.min(Math.max(mapCY - h / 2, 0), MAP_H - h);
+  return { x, y, w, h };
+}
+
+/* Split a waypoint list wherever it jumps the antimeridian, so a path
+   never streaks across the whole map. */
+function splitAntimeridian(pts) {
+  const segs = [[pts[0]]];
+  for (let i = 1; i < pts.length; i++) {
+    if (Math.abs(pts[i][1] - pts[i - 1][1]) > 180) segs.push([]);
+    segs[segs.length - 1].push(pts[i]);
+  }
+  return segs.filter(s => s.length > 1);
+}
+
+/* Catmull-Rom -> cubic Bezier smoothing, so currents curve instead of kinking. */
+function smoothPath(p) {
+  const f = q => q[0].toFixed(1) + "," + q[1].toFixed(1);
+  if (p.length < 3) return "M" + p.map(f).join(" L");
+  let d = "M" + f(p[0]);
+  for (let i = 0; i < p.length - 1; i++) {
+    const p0 = p[Math.max(0, i - 1)], p1 = p[i], p2 = p[i + 1], p3 = p[Math.min(p.length - 1, i + 2)];
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += " C" + c1x.toFixed(1) + "," + c1y.toFixed(1) + " " + c2x.toFixed(1) + "," + c2y.toFixed(1) + " " + f(p2);
+  }
+  return d;
+}
+
+/* Ocean currents overlay. Warm/cold hues are real oceanography, not decoration.
+   Arrowheads only on the final subpath — a current running off the map edge
+   gets no arrowhead mid-ocean. Famous-current labels fade in past 1.75x zoom. */
+function renderCurrents(z) {
+  const list = (typeof CURRENTS === "undefined") ? [] : CURRENTS;
+  if (!mapCurrentsOn || !list.length) return "";
+  const sw = (2.4 / z).toFixed(2);
+  let s = '<defs>'
+    + '<marker id="curWarm" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ff9e5e"/></marker>'
+    + '<marker id="curCold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6ecff5"/></marker></defs>';
+  list.forEach(c => {
+    const cls = c.warm ? "warm" : "cold", mid = c.warm ? "curWarm" : "curCold";
+    const segs = splitAntimeridian(c.pts);
+    segs.forEach((seg, i) => {
+      const d = smoothPath(seg.map(pt => mapProj(pt[0], pt[1])));
+      s += '<path d="' + d + '" class="current ' + cls + '" stroke-width="' + sw + '"'
+        + (i === segs.length - 1 ? ' marker-end="url(#' + mid + ')"' : "") + "/>";
+    });
+    if (c.label && z >= 1.75) {
+      const mid2 = c.pts[Math.floor(c.pts.length / 2)];
+      const lp = mapProj(mid2[0], mid2[1]);
+      s += '<text x="' + lp[0].toFixed(1) + '" y="' + (lp[1] - 8).toFixed(1) + '" class="current-label" text-anchor="middle">' + esc(c.name) + "</text>";
+    }
+  });
+  return s;
+}
+
 function renderMap() {
   const wrap = $("worldMapWrap");
   const pop = $("mapPopup");
   const legend = $("mapLegend");
   const ids = Object.keys(state.tagged);
   pop.classList.add("hidden");
-  if (!ids.length) {
-    wrap.innerHTML = `<div class="map-empty"><span class="big">🗺️</span>No tagged sharks yet — tag one and it will appear here, swimming its real waters.</div>`;
-    legend.innerHTML = "";
-    return;
-  }
-  let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of tagged sharks">`;
-  svg += `<rect width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`;
-  LAND_PATHS.forEach(d => { svg += `<path class="map-land" d="${d}"/>`; });
+  const z = mapZoom, vb = mapViewBox();
+  /* Blue Marble background (dark rect behind it in case the hotlink fails;
+     the URL guard keeps the map working if map-data.js ever fails to load). */
+  const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
+  let svg = `<svg id="worldMapSvg" viewBox="${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}" role="img" aria-label="World map of tagged sharks">`
+    + `<rect x="0" y="0" width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`
+    + `<image href="${bmUrl}" x="0" y="0" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>`;
+  svg += renderCurrents(z);
+  /* Track strokes and marker sizes are divided by zoom so they stay
+     readable instead of going gigantic. */
+  const tsw = (2 / z).toFixed(2);
   ids.forEach(sid => {
     const t = state.tagged[sid];
     if (!t.track) t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
@@ -804,10 +874,12 @@ function renderMap() {
     if (path.length >= 2) {
       const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
       const archival = t.track.kind === "archival";
-      svg += `<path class="map-track${archival ? " archival" : ""}" d="${d}" stroke="${color}"/>`;
+      svg += `<path class="map-track" d="${d}" stroke="${color}" stroke-width="${tsw}"`
+        + (archival ? ` stroke-dasharray="${(5 / z).toFixed(1)} ${(4 / z).toFixed(1)}"` : "") + "/>";
     }
   });
-  /* Markers: hollow pin = tag site, filled dot = latest position. */
+  /* Markers: hollow pin = tag site, filled dot = latest position.
+     Sizes are divided by zoom so they stay readable, not gigantic. */
   ids.forEach(sid => {
     const t = state.tagged[sid];
     const s = sharkById(sid);
@@ -817,23 +889,31 @@ function renderMap() {
     const label = esc(t.name ? `“${t.name}”` : t.researchId) + " — " + esc(s.name);
     const tag = pts[0];
     svg += `<g class="map-marker" data-sid="${sid}"><title>${label} (tag site)</title>`
-      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>`
-      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="1.8" fill="${color}"/></g>`;
+      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="${(6 / z).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${(2.5 / z).toFixed(2)}"/>`
+      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="${(1.8 / z).toFixed(1)}" fill="${color}"/></g>`;
     if (pts.length > 1) {
       const last = pts[pts.length - 1];
       svg += `<g class="map-marker latest" data-sid="${sid}"><title>${label} (latest)</title>`
-        + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="8" fill="${color}" stroke="#fff" stroke-width="2"/></g>`;
+        + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="${(8 / z).toFixed(1)}" fill="${color}" stroke="#fff" stroke-width="${(2 / z).toFixed(2)}"/></g>`;
     }
   });
   svg += `</svg>`;
-  wrap.innerHTML = svg;
+  if (!ids.length) {
+    /* Warm empty state over the satellite map — the ocean is there waiting. */
+    wrap.innerHTML = svg + `<div class="map-empty"><span class="big">🗺️</span>No tagged sharks yet — tag one and it will appear here, swimming its real waters.</div>`;
+    legend.innerHTML = "";
+  } else {
+    wrap.innerHTML = svg;
+    legend.innerHTML = ids.map(sid => {
+      const s = sharkById(sid), t = state.tagged[sid];
+      return `<span class="map-chip"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
+    }).join("");
+  }
   wrap.querySelectorAll(".map-marker").forEach(m => {
     m.addEventListener("click", () => showMapPopup(m.dataset.sid));
   });
-  legend.innerHTML = ids.map(sid => {
-    const s = sharkById(sid), t = state.tagged[sid];
-    return `<span class="map-chip"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
-  }).join("");
+  const tg = $("mapCurrentsToggle");
+  if (tg) tg.setAttribute("aria-pressed", mapCurrentsOn ? "true" : "false");
 }
 
 function showMapPopup(sid) {
@@ -2202,6 +2282,32 @@ function updateAllVisuals() {
   fillOpts();
   updateAllVisuals();
 })();
+/* v0.10.0: map toolbar — zoom controls + currents toggle (static HTML).
+   Guarded lookups: if this script ever loads against older HTML, the game
+   boots fine and the map simply renders without the toolbar. */
+const onMapBtn = (id, fn) => { const b = $(id); if (b) b.addEventListener("click", fn); };
+onMapBtn("mapZoomIn", () => { mapZoom = Math.min(MAP_ZOOM_MAX, mapZoom * 1.5); renderMap(); });
+onMapBtn("mapZoomOut", () => {
+  mapZoom = Math.max(MAP_ZOOM_MIN, mapZoom / 1.5);
+  if (mapZoom === MAP_ZOOM_MIN) { mapCX = MAP_W / 2; mapCY = MAP_H / 2; }
+  renderMap();
+});
+onMapBtn("mapZoomReset", () => { mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
+onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
+/* Mouse-wheel zoom, centered on the pointer. preventDefault stops the page
+   scrolling while the pointer is over the map (standard map-widget behavior). */
+const mapWrapEl = $("worldMapWrap");
+if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
+  e.preventDefault();
+  const svgEl = $("worldMapSvg");
+  if (!svgEl) return;
+  const r = svgEl.getBoundingClientRect(), vb = mapViewBox();
+  mapCX = vb.x + (e.clientX - r.left) / r.width * vb.w;
+  mapCY = vb.y + (e.clientY - r.top) / r.height * vb.h;
+  mapZoom = Math.min(MAP_ZOOM_MAX, Math.max(MAP_ZOOM_MIN, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3)));
+  if (mapZoom === MAP_ZOOM_MIN) { mapCX = MAP_W / 2; mapCY = MAP_H / 2; }
+  renderMap();
+}, { passive: false });
 $("buildTag").textContent = VERSION;
 $("phoneTime").textContent =
   new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
