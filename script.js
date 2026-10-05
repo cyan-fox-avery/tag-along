@@ -1,11 +1,11 @@
-/* Tag, You're It — prototype v0.8.0
-   Research -> plan (region/depth/bait/scent) -> dive -> watch/tag/resight
+/* Tag, You're It — prototype v0.9.0
+   Research -> plan (region/depth/bait/method) -> dive -> watch/tag/resight
    -> collection book + logbook. */
 
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.8.0";
+const VERSION = "v0.9.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -183,7 +183,18 @@ const ART = {
 
 const REGIONS = {
   "caribbean":    { name: "Caribbean Sea",        note: "A green sea turtle glides past the reef." },
-  "baja":         { name: "Baja California",      note: "A school of sardines shimmers below." },
+  /* v0.9.0: sand tiger moved here from Baja California. WHY (for reviewers):
+     FishBase gives Carcharias taurus as "Circumtropical: Except perhaps
+     the eastern Pacific," so the old Baja placement was an outright error.
+     The Outer Banks' WWII-era wrecks host the most famous sand tiger
+     aggregation in the world — Paxton et al. 2019 (Ecology) documented
+     female site fidelity to individual NC wrecks, backed by the Spot A
+     Shark USA citizen-science photo-ID program. Bonus: the wrecks
+     synergize with the game's scuttled-ship easter eggs — here, wrecks
+     are documented habitat, not scenery. South Africa and E. Australia
+     were considered but South Africa is a locked region and the sand
+     tiger is an original-six start-region species. */
+  "north-carolina": { name: "Outer Banks, North Carolina", note: "Below, the dark shapes of old wrecks rise from the sand — the Graveyard of the Atlantic." },
   "philippines":  { name: "Philippines",          note: "A manta ray loops lazily overhead." },
   "maldives":     { name: "Maldives",             note: "Dolphins click and whistle in the distance." },
   "japan":        { name: "Sagami Bay, Japan",    note: "A lanternfish flickers in the dark." },
@@ -217,16 +228,52 @@ const BAITS = {
   "urchins":       "Urchins & shellfish"
 };
 
-/* v0.8.0: scent in the water — its OWN planner dimension, separate from
-   the hook bait. Species-specific BOOSTS only: the right lure raises a
-   species' encounter weight; a wrong lure or no lure is neutral and
-   never gates an encounter out. */
-const LURES = {
-  "none":  "No lure",
-  "chum":  "Fish-oil chum",
-  "seal":  "Seal scent",
-  "krill": "Krill scent"
+/* v0.9.0: "Method" replaces the v0.8.0 scent-lure row. The planner asks HOW
+   you'll try to meet the shark, and each top-level approach opens its own
+   sub-menu of real field practices. A species only boosts on methods that
+   are real for that animal — a whale shark never sees chum.
+   Boost-only semantics kept from v0.8.0: the right method raises a
+   species' encounter weight ~3x; a wrong method is neutral, never a gate.
+   WHY this shape (for reviewers): ChatGPT's v0.8.0 review argued that
+   forcing every shark through identical planner rows teaches something
+   more general than the evidence supports — e.g. "krill scent" for whale
+   sharks implied scenting the water works on filter feeders, when real
+   practice is locating a feeding aggregation. So the planner is now
+   asymmetric on purpose: hunters get attractants, filter feeders get
+   aggregation-finding. The asymmetry teaches the animal.
+   EXTENSION POINT for future versions: new top-level methods (deep
+   deployment, seal decoy, BRUV, ...) slot in here with their own `opts`;
+   add the method key to each species' `methods` map it genuinely fits. */
+const METHODS = {
+  "attract": {
+    name: "Attract — scent in the water",
+    subLabel: "Attractant",
+    opts: {
+      "none": "No attractant",
+      "chum": "Fish-oil chum",
+      "seal": "Seal scent"
+    }
+  },
+  "aggregation": {
+    name: "Find the aggregation",
+    subLabel: "Approach",
+    /* WHY these three (for reviewers): real whale/basking-shark field
+       practice per 2026 research — see research notes below. Boat surveys
+       at seasonal sites, aerial spotter surveys, and local sightings
+       networks are the three genuinely distinct ways researchers locate
+       feeding aggregations. All three boost equally: they are all real,
+       so the choice is about fieldcraft flavor, recorded in the logbook. */
+    opts: {
+      "boat": "Boat survey of the bloom",
+      "plane": "Spotter-plane survey",
+      "network": "Local sightings network"
+    }
+  }
 };
+
+/* Legacy labels for pre-v0.9.0 logbook entries, so old trips still read
+   sensibly after the scent-row removal. */
+const LEGACY_LURES = { "none": "No lure", "chum": "Fish-oil chum", "seal": "Seal scent", "krill": "Krill scent" };
 
 /* Field notes: short, dense, real. Everything the planner needs is in
    here — region, depth range, food — but nothing is handed to you.
@@ -242,9 +289,9 @@ const SHARKS = [
     code: "NS",
     combo: { region: "caribbean", bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.0],
-    research: "A bottom-dweller of the warm, shallow tropical Atlantic. In the Caribbean Sea, nurse sharks spend their days piled together under reef ledges — sometimes in heaps of forty. After dark they head out alone, sweeping the sandy shallows with the whisker-like barbels on their snouts, vacuuming up crabs, lobster and shellfish. They rarely leave water shallower than about 75 metres.",
+    research: "A bottom-dweller of the warm, shallow tropical Atlantic. In the Caribbean Sea, nurse sharks spend their days piled together under reef ledges — sometimes in heaps of forty. After dark they head out alone, sweeping the sandy shallows with the whisker-like barbels on their snouts, vacuuming up crabs, lobster and shellfish. They rarely leave water shallower than about 75 metres. They hunt as much by smell as by sight — a slick of fish-oil chum drifting on the current can pull them in from well down-current.",
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor.",
     bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
     cheer: "nurse sharks are the CUDDLIEST!!! they nap in piles of FORTY. forty sharks. just vibing. i'm SO jealous",
@@ -258,9 +305,9 @@ const SHARKS = [
     code: "TS",
     combo: { region: "open-atlantic", bait: ["schooling-fish", "squid"] },
     depths: ["reef", "twilight"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [3.0, 4.6],
-    research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel — squid too, when they cross paths — then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down.",
+    research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel — squid too, when they cross paths — then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down. A chum slick is the classic way to draw one within tagging range — out here, scent travels farther than any bait.",
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Threshers have been seen hunting in pairs, herding schools of fish into a tight ball before taking turns striking with their tails.",
     cheer: "THRESHERS!!! their tail is HALF THEIR BODY. they hunt by WHIPPING it. that's the coolest thing any animal does and i will not be taking questions",
@@ -274,9 +321,9 @@ const SHARKS = [
     code: "WS",
     combo: { region: "philippines", bait: "plankton" },
     depths: ["surface", "reef"],
-    lures: ["krill"],
+    methods: { aggregation: ["boat", "plane", "network"] },
     sizeRange: [5.5, 12.0],
-    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the bloom. But a faint krill scent drifting on the current can smell like the bloom they're already following.",
+    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the aggregation. Researchers work the green water by boat, scan from the air with spotter planes that radio the boat onto a shark, and phone round the local network of fishermen and dive boats for sightings. Find the aggregation, and the sharks are already there.",
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
     bonus: "Whale sharks can dive deeper than 1,900 metres — among the deepest dives ever recorded for any fish — then cruise back up to the surface to feed.",
     cheer: "A WHALE SHARK!!! the biggest fish in the WHOLE OCEAN and you TAGGED one!!! did you see the spots?? every one is different like a fingerprint!!",
@@ -290,9 +337,9 @@ const SHARKS = [
     code: "GS",
     combo: { region: "japan", bait: "squid" },
     depths: ["twilight", "deep"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [2.5, 4.0],
-    research: "A living fossil from the deep continental slopes — most records come from Sagami Bay in Japan. Goblin sharks live in total darkness between about 270 and 960 metres, drifting over the seafloor and ambushing deep-sea squid and fish. Their jaws shoot forward like a slingshot, and they find prey by sensing the faint electricity of living things.",
+    research: "A living fossil from the deep continental slopes — most records come from Sagami Bay in Japan. Goblin sharks live in total darkness between about 270 and 960 metres, drifting over the seafloor and ambushing deep-sea squid and fish. Their jaws shoot forward like a slingshot, and they find prey by sensing the faint electricity of living things. A drifting chum slick can lift one off the bottom — in the deep dark, scent is one of the few things that travels.",
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
     bonus: "A goblin shark's pink colour comes from blood vessels showing through its thin, almost translucent skin.",
     cheer: "A GOBLIN SHARK?!?! the pink deep-sea weirdo!!! 125 million years old!!! did it look as weird in real life as in pictures",
@@ -309,7 +356,7 @@ const SHARKS = [
        easier than others. */
     combo: { region: "maldives", bait: ["schooling-fish", "squid", "crustaceans", "tuna"] },
     depths: ["surface", "reef"],
-    lures: ["chum", "seal"],
+    methods: { attract: ["chum", "seal"] },
     sizeRange: [3.0, 5.5],
     research: "Tiger sharks patrol tropical and subtropical waters worldwide — everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, rarely straying deeper than a few hundred metres. They'll eat almost anything that crosses their path: schooling fish, squid, crabs, turtles, seabirds, tuna — even seals, and the occasional floating oddity. Researchers have found license plates in their stomachs.",
     hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
@@ -323,17 +370,17 @@ const SHARKS = [
     id: "sandtiger",
     name: "Sand Tiger Shark", latin: "Carcharias taurus", status: "Critically Endangered",
     code: "ST",
-    combo: { region: "baja", bait: ["squid", "schooling-fish", "ray"] },
+    combo: { region: "north-carolina", bait: ["squid", "schooling-fish", "ray"] },
     depths: ["surface", "reef"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.2],
-    research: "Sand tiger sharks haunt subtropical and temperate shores on both sides of the Americas, including the rocky reefs and kelp edges off Baja California. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing schools of fish, squid and skates. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks.",
+    research: "Sand tiger sharks haunt subtropical and temperate shores — everywhere except the eastern Pacific. Off North Carolina's Outer Banks, the Graveyard of the Atlantic, they gather around old shipwrecks in summer, and individual females return to the same wrecks year after year. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing schools of fish, squid and skates. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks. They're scent-hunters first: a fish-oil slick on the current speaks their language.",
     hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
     bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
     cheer: "sand tiger!!! they look SO scary but they're actually big softies. they gulp air to FLOAT. like a weird balloon shark. tell it i said hi",
     opener: "A SAND TIGER?!?! the smiley balloon shark!!! did it do the floaty thing?!?! tell me EVERYTHING",
     sketchCap: "the grin (all teeth, no bite)",
-    nameIdeas: ["Toothy", "Grin", "Smiley", "Baja"]
+    nameIdeas: ["Toothy", "Grin", "Smiley", "Wreck"]
   },
   {
     id: "galapagos",
@@ -341,9 +388,9 @@ const SHARKS = [
     code: "GA",
     combo: { region: "galapagos", bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [2.4, 3.7],
-    research: "A reef shark of remote oceanic islands — and the one place it truly lives up to its name is the Galápagos. There, Galápagos sharks patrol the rocky reefs and island slopes, often in the clear shallows where schools of reef fish gather. They are bold and curious, sometimes circling divers for a closer look. They hunt jacks, groupers, squid and other reef fish, mostly in water shallower than about 80 metres, rarely venturing into the deep.",
+    research: "A reef shark of remote oceanic islands — and the one place it truly lives up to its name is the Galápagos. There, Galápagos sharks patrol the rocky reefs and island slopes, often in the clear shallows where schools of reef fish gather. They are bold and curious, sometimes circling divers for a closer look. They hunt jacks, groupers, squid and other reef fish, mostly in water shallower than about 80 metres, rarely venturing into the deep. A chum slick off the reef edge is how researchers bring these bold sharks into tagging range.",
     hook: "Bold island shark — known to circle divers just to check them out.",
     bonus: "Galápagos sharks use nursery areas: pups grow up in sheltered island bays before heading out to the reefs.",
     cheer: "GALÁPAGOS SHARK!!! the island shark!!! they're so curious they come right up to divers. did it check YOU out?!",
@@ -357,7 +404,7 @@ const SHARKS = [
     code: "GW",
     combo: { region: "south-africa", bait: ["tuna", "schooling-fish"] },
     depths: ["surface", "reef"],
-    lures: ["seal", "chum"],
+    methods: { attract: ["seal", "chum"] },
     sizeRange: [3.5, 6.0],
     research: "The ocean's most famous hunter cruises temperate coasts worldwide — and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water. They eat seals, big oily fish like tuna, and the occasional drifting carcass, hunting mostly in the sunlit upper layers.",
     hook: "Warm-bodied hunter; can breach fully out of the water.",
@@ -373,9 +420,9 @@ const SHARKS = [
     code: "HH",
     combo: { region: "caribbean", bait: ["ray", "schooling-fish"] },
     depths: ["surface", "reef"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [2.5, 5.0],
-    research: "The largest of the hammerheads roams tropical seas, and the Caribbean's reefs are prime hunting ground. That wide hammer isn't just for show — it's packed with sensors that pick up the faint electricity of stingrays buried in the sand, their favourite food — though a passing school of reef fish works too. Great hammerheads cruise the shallows and reef flats, rarely deeper than about 80 metres, sweeping their heads side to side like metal detectors.",
+    research: "The largest of the hammerheads roams tropical seas, and the Caribbean's reefs are prime hunting ground. That wide hammer isn't just for show — it's packed with sensors that pick up the faint electricity of stingrays buried in the sand, their favourite food — though a passing school of reef fish works too. Great hammerheads cruise the shallows and reef flats, rarely deeper than about 80 metres, sweeping their heads side to side like metal detectors. A chum slick gives all those sensors something to follow.",
     hook: "The hammer is a sensory array — it 'sees' stingrays hidden in sand.",
     bonus: "Hammerhead pups are born with a soft, folded hammer that straightens out as they grow.",
     cheer: "A HAMMERHEAD!!! their eyes are on the ENDS of the hammer!! 360 vision!!! nature said 'what if binoculars but shark'",
@@ -389,9 +436,9 @@ const SHARKS = [
     code: "MK",
     combo: { region: "open-atlantic", bait: ["tuna", "squid"] },
     depths: ["surface", "reef"],
-    lures: ["chum"],
+    methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.8],
-    research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They hunt in the sunlit surface waters, rarely diving below about 150 metres, where the light is good and the prey is quick. If something out here is moving at 70 kilometres an hour, it's a mako.",
+    research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They hunt in the sunlit surface waters, rarely diving below about 150 metres, where the light is good and the prey is quick. If something out here is moving at 70 kilometres an hour, it's a mako. Chum works on them — makos pick up the scent of fish oil from far down-current.",
     hook: "Clocks ~70 km/h — the fastest shark alive.",
     bonus: "Makos are warm-bodied like great whites — their swimming muscles run several degrees warmer than the water.",
     cheer: "A MAKO!!! the fastest shark in the OCEAN!!! 70 kmh!!! that's faster than my bike!!!",
@@ -405,9 +452,9 @@ const SHARKS = [
     code: "BS",
     combo: { region: "cornwall", bait: "plankton" },
     depths: ["surface", "reef"],
-    lures: ["krill"],
+    methods: { aggregation: ["boat", "network"] },
     sizeRange: [6.0, 9.0],
-    research: "The second-biggest fish in the ocean feeds like the biggest — by swimming slowly through plankton with its enormous mouth wide open. Basking sharks visit temperate coasts in summer, and the plankton-rich waters off Cornwall are a favourite. Look for the tall dorsal fin cutting the surface, the huge mouth agape. They feed right at the top where the water turns green, sometimes dipping a little deeper over the reefs. Like whale sharks, they're following the bloom — and a faint krill scent on the current can smell like dinner.",
+    research: "The second-biggest fish in the ocean feeds like the biggest — by swimming slowly through plankton with its enormous mouth wide open. Basking sharks visit temperate coasts in summer, and the plankton-rich waters off Cornwall are a favourite. Look for the tall dorsal fin cutting the surface, the huge mouth agape. They feed right at the top where the water turns green, sometimes dipping a little deeper over the reefs. Like whale sharks, they're following the bloom — nobody scents the water for a basking shark. Summer researchers find them by working the green surface water by boat, and by the sightings network: divers, fishermen and sailors phoning in every tall dorsal fin they see. Find the aggregation, and the sharks are already there.",
     hook: "Second-largest fish on Earth; feeds with a mouth up to a metre wide.",
     bonus: "A basking shark filters the equivalent of an Olympic swimming pool of water every hour.",
     cheer: "A BASKING SHARK!!! the second-biggest fish!!! just vibing with its mouth open!!! the gentle giant's gentle giant",
@@ -422,8 +469,8 @@ const SHARKS = [
     combo: { region: "papua-new-guinea", bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
     /* The honest neutral: a tiny reef worm-hunter. Scent plumes aren't
-       how you'd target it, so every lure does nothing — no penalty. */
-    lures: [],
+       how you'd target it, so no method boosts it — no penalty. */
+    methods: {},
     sizeRange: [0.6, 1.0],
     research: "A small reef shark with an extraordinary trick: it can walk. Epaulette sharks live on the shallow reef flats of Papua New Guinea, where the tide sometimes strands them in ankle-deep pools. Instead of panicking, they clamber from pool to pool on their paddle-like fins, hunting crabs, shellfish and worms. They rarely leave water shallower than a few metres — the intertidal zone is their whole world.",
     hook: "Walks between tide pools on its fins when the reef drains.",
@@ -449,15 +496,15 @@ const COUSIN_CHATS = [
 const COUSIN_NUDGES = {
   nurse:   "nurse sharks are SHALLOW!! like surface-to-reef shallow, 0 to 75 metres. they nap under reef ledges during the day and vacuum crabs and shellfish off the sand at night. caribbean + shallow + crabs or shellfish!!",
   thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish (and squid!!). reefs or twilight + fish bait??",
-  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! find the bloom at the surface. they're usually right at the top where the water looks green, sometimes a bit deeper over reefs. a little krill scent can smell like the bloom!!",
+  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! you gotta FIND the aggregation — look for the bloom at the surface where the water looks green!! scientists work it by boat, or use spotter planes, or just phone the local fishermen for sightings!!",
   goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!",
   tiger:    "tiger sharks aren't picky AT ALL!!! they'll eat fish, squid, crabs, even tuna!! try the maldives!! shallow lagoons!! the real question is WHERE not what!!",
-  sandtiger:"sand tigers look scary but they're softies!! baja california!! they hover in the shallows eating squid and fish!! the floaty balloon sharks!!",
+  sandtiger:"sand tigers look scary but they're softies!! they gather around the old SHIPWRECKS off north carolina — the graveyard of the atlantic!! the same sharks come back to the same wrecks every year!! they hover in the shallows eating squid and fish!! the floaty balloon sharks!!",
   galapagos: "galápagos sharks!! they're reef sharks that LOVE oceanic islands. the galápagos obviously!! shallow reefs, and they eat reef fish and squid!!",
   greatwhite: "great whites!!! south africa!! they follow the SEALS — a seal scent in the water helps!! shallow water, and they eat FISH (big oily ones like tuna!!). they're warm-blooded-ish which is WILD for a shark",
   hammerhead: "hammerheads!!! the caribbean has great hammerheads!! they hunt STINGRAYS on the reef — ray bait!! (fish works too). shallow water + their heads are basically metal detectors",
   mako: "makos are the FASTEST sharks!!! open atlantic, and they love squid and tuna!! they hunt up near the surface. they're basically underwater race cars",
-  basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!! a little krill scent can smell like the bloom!!",
+  basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!! researchers find them by boat or through the sightings network — fishermen and divers phoning in every big dorsal fin!!",
   epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs and shellfish!!"
 };
 
@@ -711,51 +758,435 @@ const REGION_UNLOCK_THREAD = [
   { who: "me", text: "I have a feeling I'm going to. 🦈" }
 ];
 
-/* ---------- Shark tracking: simulated satellite-tag data ---------- */
-
-const TRACK_POOLS = {
-  nurse:     { spots: ["Coral Gardens", "Mangrove Channel", "Seagrass Flats", "The Ledge", "Turtle Cove"], hop: [4, 38] },
-  thresher:  { spots: ["Continental Slope", "Seamount X", "Upwelling Zone", "Open Atlantic Drift", "Deep Scattering Layer"], hop: [120, 480] },
-  whale:     { spots: ["Tubbataha Reefs", "Sulu Sea", "Coral Triangle", "Bird's Head Seascape", "Western Pacific"], hop: [300, 1400] },
-  goblin:    { spots: ["Tokyo Canyon", "Izu Ridge", "Suruga Slope", "Deep Terrace", "Canyon Mouth"], hop: [40, 220] },
-  tiger:     { spots: ["Rasdhoo Atoll", "Chagos Archipelago", "Open Indian Ocean", "Seychelles Bank", "Saya de Malha"], hop: [150, 700] },
-  sandtiger: { spots: ["Kelp Edge", "Rocky Point", "Sandy Flats", "Canyon Mouth", "Wreck Reef"], hop: [20, 120] },
-  galapagos:  { spots: ["Darwin Arch", "Wolf Volcano Reef", "Cabo Douglas", "Punta Vicente Roca", "Isabela Channel"], hop: [30, 200] },
-  greatwhite: { spots: ["Seal Island", "Dyer Island", "Mossel Bay", "False Bay", "Gansbaai"], hop: [100, 600] },
-  hammerhead: { spots: ["Bimini Flats", "Tiger Beach", "Andros Reef", "Exuma Sound", "Cay Sal Bank"], hop: [50, 300] },
-  mako:       { spots: ["Azores Front", "Gulf Stream Edge", "Sargasso Sea", "Shelf Break", "Open Atlantic Drift"], hop: [200, 800] },
-  basking:    { spots: ["Isle of Man", "Cornish Coast", "The Hebrides", "Donegal Bay", "Clyde Waters"], hop: [80, 400] },
-  epaulette:  { spots: ["Milne Bay Reef", "Kimbe Bay Flats", "Bootless Bay", "Tufi Reefs", "Rabaul Lagoon"], hop: [2, 15] }
+/* ---------- Shark tracking: movement envelopes ----------
+   v0.9.0: rebuilt on REAL geography. Each species gets a biologically
+   defensible envelope — a verified tagging/aggregation anchor, realistic
+   areas in plausible corridor order, honest hop distances and ping
+   intervals. Randomness lives INSIDE the envelope; the envelope itself
+   is real. Research: primary literature + tagging programs (OCEARCH,
+   Guy Harvey RI, ICCAT, Marine Megafauna Foundation), Oct 2026.
+   WHY this matters (for reviewers): the old pools picked waypoints and
+   hop distances semi-randomly, which could imply migration routes,
+   timings, or distances nobody validated — a story that sounds scientific
+   without being it. Per ChatGPT's v0.8.0 review: "randomness is fine
+   inside a biologically defensible envelope."
+   Honesty rules baked in: goblin sharks have NEVER carried satellite
+   tags (tracks marked archival); epaulettes are mark-recapture only
+   (tracks marked as reef survey re-sightings); great white flavor avoids
+   presenting Seal Island/False Bay as a current hotspot (whites largely
+   vanished there ~2017, orcas Port & Starboard) — the areas list keeps
+   historically real sites without "right now" claims. */
+const TRACK_ENVELOPES = {
+  nurse: {
+    start: "Caribbean reef lagoon (tag site)", // game region is the generic Caribbean Sea; envelope stays local by design
+    /* v0.9.0 consistency pass (for reviewers): the old envelope used the
+       superbly documented Dry Tortugas (Florida) program, but the game
+       tags nurse sharks in the Caribbean Sea — Florida waypoints for a
+       Caribbean shark. Rebuilt Caribbean-local on Caribbean acoustic
+       work: Glover's Reef, Belize (mean dispersal 7.7 km — Chapman et
+       al.) and the Buck Island, St. Croix array (11 nurse sharks,
+       2013–2017, high residency). The BEHAVIOUR (extreme residency,
+       <10 km typical, biennial mating aggregations) is informed by both
+       Florida and Caribbean studies; the PLACES are deliberately generic
+       reef-habitat labels clustered at the tag site, because a nurse
+       shark barely leaves its home reef. Map coords cluster tightly
+       around the Caribbean Sea tag point — honest, not empty. */
+    areas: ["Tag-site reef", "Adjacent sand flats", "Seagrass beds", "Reef-edge drop-off", "Mating aggregation flat", "Nearby patch reefs"],
+    hop: [1, 15], dayStep: [7, 30], nPoints: [5, 6], kind: "acoustic",
+    corridor: "extremely resident — mean dispersal 7.7 km (Glover's Reef, Belize); strong site fidelity; biennial returns to mating flats"
+  },
+  thresher: {
+    start: "Offshore North Carolina", // Anderson et al.: 61 PSAT tags, 48 individuals tracked WNA; Kneebone/NEAq tagged NC→Grand Banks 2016–2023
+    /* v0.9.0 consistency pass (for reviewers): the old envelope was built
+       on Southern California acoustic/satellite work, but the game tags
+       threshers in the Open Atlantic — a textbook case of the mismatch
+       ChatGPT flagged ("an individual shark's displayed track must be
+       geographically compatible with where that individual was tagged").
+       Rebuilt on western North Atlantic PSAT telemetry instead: seasonal
+       "snowbird" migration, Florida↔Grand Banks. */
+    areas: ["Offshore North Carolina", "Mid-Atlantic Bight shelf edge", "Georges Bank", "Gulf of Maine", "Grand Banks", "Offshore Florida (wintering)"],
+    hop: [80, 600], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "seasonal 'snowbird' migration — north to the Grand Banks in summer, south toward Florida in winter; daily vertical migration matters more than horizontal (Anderson et al.; Kneebone/NEAq)"
+  },
+  whale: {
+    start: "Tubbataha Reefs Natural Park, Philippines", // Araujo et al. 2018 (PeerJ): 17 juvenile SPOT5 tags, Sulu & Bohol Seas
+    /* v0.9.0 consistency pass (for reviewers): the old envelope was built
+       on the Ningaloo (W. Australia) satellite study, but the game tags
+       whale sharks in the Philippines. Rebuilt on Araujo et al. 2018 —
+       the location-matched telemetry ChatGPT pointed to: all 17 tagged
+       sharks stayed in Philippine waters (6–126 days, 86–2,580 km,
+       ~15.5 km/day), moving between the Bohol and Sulu Seas, through
+       Surigao Strait, and out to the Pacific coast of Mindanao. */
+    areas: ["Tubbataha Reefs Natural Park", "Sulu Sea", "Northern Palawan", "Bohol Sea", "Surigao Strait", "Eastern Leyte", "Eastern Mindanao (Pacific)"],
+    hop: [50, 500], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "juveniles highly mobile but stay in Philippine waters — Bohol↔Sulu connectivity, Surigao Strait crossings (Araujo et al. 2018, PeerJ)"
+  },
+  goblin: {
+    start: "Sagami Bay, Japan", // described 1898 from a Sagami Bay specimen; most records here (Yano et al. 2007)
+    areas: ["Sagami Bay", "Tokyo Bay", "Suruga Bay", "Offshore Izu Islands", "Kuroshio Current edge", "Japanese upper continental slope"],
+    hop: [20, 150], dayStep: [14, 45], nPoints: [4, 5], kind: "archival",
+    corridor: "deep-slope resident — presumed sedentary 270–960 m; NO migratory behaviour documented, NO satellite tracks exist"
+  },
+  tiger: {
+    start: "Fuvahmulah, Maldives", // world's largest documented tiger aggregation; strong site fidelity (Sci Rep mark-recapture)
+    areas: ["Fuvahmulah", "Addu Atoll", "Chagos Archipelago", "Seychelles Bank", "Saya de Malha", "Open Indian Ocean (westward leg)"],
+    hop: [150, 800], dayStep: [7, 30], nPoints: [6, 7], kind: "satellite",
+    corridor: "atoll-associated with long offshore excursions; trans-Indian-Ocean moves documented — 'Sereia' Mozambique→Indonesia >6,400 km (OCEARCH)"
+  },
+  sandtiger: {
+    start: "Delaware Bay, USA", // Teter et al. 2014: 13 sharks satellite+acoustic tagged, late Aug/early Sep
+    areas: ["Delaware Bay", "New Jersey coast", "Virginia Capes", "Cape Hatteras", "Cape Lookout", "Offshore North Carolina shelf edge"],
+    hop: [50, 400], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "seasonal coastal north–south along the shelf edge; autumn run to the Carolinas (Teter et al. 2014; Haulsee et al.)"
+  },
+  galapagos: {
+    start: "Darwin Island, Galápagos", // satellite-tagging work at Darwin Island, GMR acoustic networks
+    areas: ["Darwin Island", "Wolf Island", "Isabela Island", "Fernandina Island", "Galápagos platform edge", "Open water between islands"],
+    hop: [20, 150], dayStep: [7, 21], nPoints: [4, 6], kind: "satellite",
+    corridor: "highly resident — 30–50 km home ranges; >2,000 km moves documented but rare (MDPI Diversity 2026)"
+  },
+  greatwhite: {
+    start: "Gansbaai, South Africa", // OCEARCH tagging ("Alisha", May 2012)
+    areas: ["Gansbaai", "Dyer Island", "Seal Island (False Bay)", "Mossel Bay", "Cape Agulhas", "Open Indian Ocean (offshore leg)"],
+    hop: [200, 1500], dayStep: [7, 21], nPoints: [6, 7], kind: "satellite",
+    corridor: "coastal aggregation → offshore trans-oceanic; 'Nicole' SA→Australia→back >20,000 km / 9 mo (Bonfil et al., Science 2005)"
+  },
+  hammerhead: {
+    start: "Bimini, Bahamas", // Guttridge et al. long-term Bimini tagging program
+    /* v0.9.0 consistency pass (for reviewers): the old areas list leaned on
+       Florida-tagged studies (Florida Keys, Jupiter, offshore Virginia) —
+       ChatGPT's "Caribbean tag feeding a Florida-specific envelope"
+       example. Rebuilt Caribbean-centered on Bahamas work: Bimini
+       philopatry + seasonal residency (Guttridge et al. 2017) and the
+       Andros Island year-round residency study (Frontiers 2025: site
+       fidelity within 400 km², some individuals <1 km over 4 years).
+       The partial-migration behaviour is kept honest in the corridor
+       note (some do run north in summer), but no Florida waypoints are
+       imported into a Caribbean shark's pings. */
+    areas: ["Bimini", "Andros Island", "Eleuthera", "Exuma Sound", "Tongue of the Ocean", "Cay Sal Bank"],
+    hop: [50, 400], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "partial migration — many resident in the Bahamas year-round; some summer excursions north, return for winter (Guttridge et al. 2017; Andros 2025)"
+  },
+  mako: {
+    start: "Azores", // ICCAT satellite study, NE Atlantic
+    areas: ["Azores", "Canary Islands", "Madeira", "West African coast (Senegal/Cape Verde)", "Mid-Atlantic ridge", "Gulf Stream edge"],
+    hop: [300, 1500], dayStep: [7, 30], nPoints: [6, 7], kind: "satellite",
+    corridor: "open-ocean nomad — 24,213 km / 551 days documented; >8,900 km along West Africa (Abascal et al., ICCAT 2018)"
+  },
+  basking: {
+    start: "Cornwall, UK", // Sims et al. tagging off Plymouth/SW England
+    areas: ["Cornwall (Lizard/Land's End)", "Isle of Man", "Hebrides (Coll/Tiree)", "Irish Sea", "Celtic Sea", "Donegal Bay", "Bay of Biscay / Iberian coast (winter leg)"],
+    hop: [200, 1000], dayStep: [7, 21], nPoints: [6, 8], kind: "satellite",
+    corridor: "seasonal basin migration — UK summer feeding → Biscay/Iberia winter → return (Doherty et al., Sci Rep 2017)"
+  },
+  epaulette: {
+    start: "Papua New Guinea reef flat (tag site)", // game tags in PNG; no PNG telemetry exists — see note
+    /* v0.9.0 consistency pass (for reviewers): the old envelope named
+       Heron Island (Great Barrier Reef) waypoints for a shark tagged in
+       Papua New Guinea — exactly the mismatch ChatGPT flagged. Per the
+       canon rule, the Heron Island mark-recapture work (Heupel &
+       Bennett — best epaulette movement evidence anywhere) now informs
+       BEHAVIOUR and SCALE only: "extremely resident, metre-scale
+       movements." No Australian waypoints are imported; the areas are
+       generic PNG reef-flat labels, and the kind stays "resightings"
+       (never satellite-tagged). Greatest net displacement on record:
+       475 m. */
+    areas: ["Tag-site reef flat", "Adjacent coral-head pools", "PNG reef crest", "Lagoon patch", "North beach pools", "Reef-flat edge"],
+    hop: [0.1, 2], dayStep: [1, 7], nPoints: [6, 8], kind: "resightings",
+    corridor: "extreme residency — greatest net displacement on record 475 m; scale inferred from Heron Island mark-recapture (no PNG telemetry exists)"
+  }
 };
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+/* How each track kind is framed to the player — honesty first. */
+const TRACK_KIND_NOTES = {
+  satellite: "Illustrative track — real satellite tags ping just like this. 🛰️",
+  archival: "Sparse illustrative track — goblin sharks have never carried satellite tags; reconstructed from capture records.",
+  resightings: "Illustrative track — built from reef survey re-sightings, not a satellite tag. This shark barely leaves its reef flat."
+};
 
-/* Simulated tag track: starts at the tag site, then plausible waypoints.
-   Distances fit the species — nurse sharks stay local, whale sharks roam. */
+/* Simulated tag track: starts at the tag site, then walks the species'
+   corridor in plausible order. Distances, ping intervals, and point
+   counts all come from the envelope — nurse sharks scribble locally,
+   whale sharks cross basins. v0.9.0: the areas list runs in corridor
+   order, so legs are walked forward (never shuffled into nonsense);
+   the start index varies so tracks differ. */
 function genTrack(species, rec) {
-  const pool = TRACK_POOLS[species.id] || TRACK_POOLS.nurse;
-  const n = 4 + Math.floor(Math.random() * 3); // 4–6 waypoints after tagging
+  const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
+  const n = env.nPoints[0] + Math.floor(Math.random() * (env.nPoints[1] - env.nPoints[0] + 1));
   const points = [{ label: rec.location, day: 0, km: 0 }];
   let day = 0, totalKm = 0;
-  shuffle([...pool.spots]).slice(0, n - 1).forEach(sp => {
-    day += 3 + Math.floor(Math.random() * 12);
-    const km = Math.round(pool.hop[0] + Math.random() * (pool.hop[1] - pool.hop[0]));
-    totalKm += km;
-    points.push({ label: sp, day, km });
+  const maxStart = Math.max(0, env.areas.length - (n - 1));
+  const startIdx = Math.floor(Math.random() * (maxStart + 1));
+  const legs = env.areas.slice(startIdx, startIdx + n - 1);
+  legs.forEach(area => {
+    day += env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
+    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    totalKm = Math.round((totalKm + km) * 10) / 10;
+    points.push({ label: area, day, km });
   });
-  return { points, totalKm, days: day };
+  return { points, totalKm, days: day, kind: env.kind || "satellite" };
 }
 
 function hashStr(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return h;
+}
+
+/* ================= The tracking map tab (v0.9.0) =================
+   Display-only: it visualizes track data the game already has. The
+   science (envelopes, regions, methods) is frozen — nothing here changes
+   it. Coordinates below are APPROXIMATE plotting positions for named
+   places so tracks can be drawn on a stylized map; they are not
+   scientific claims, and the map is labeled illustrative. */
+
+const SPECIES_COLORS = {
+  nurse: "#ffd166", thresher: "#ef476f", whale: "#06d6a0", goblin: "#9b5de5",
+  tiger: "#f78c6b", sandtiger: "#4cc9f0", galapagos: "#80ed99",
+  greatwhite: "#f4f1de", hammerhead: "#f3722c", mako: "#00bbf9",
+  basking: "#b8c0ff", epaulette: "#ff8fab"
+};
+
+/* Every label a track point can carry: region names (tag sites and
+   re-sighting pings) + envelope areas. "Baja California" is a legacy
+   v0.8.0 region label — kept so old tracks still plot. Unknown labels
+   are skipped, never guessed. */
+const MAP_COORDS = {
+  "Caribbean Sea": [15.0, -70.0],
+  "Outer Banks, North Carolina": [35.2, -75.5],
+  "Philippines": [12.0, 122.0],
+  "Maldives": [3.2, 73.2],
+  "Sagami Bay, Japan": [35.1, 139.4],
+  "Open Atlantic": [30.0, -40.0],
+  "Cornwall, UK": [50.1, -5.5],
+  "Papua New Guinea": [-6.0, 147.0],
+  "Galápagos Islands": [-0.5, -90.8],
+  "South Africa": [-34.0, 20.0],
+  "Baja California": [28.0, -113.0],
+  "Dry Tortugas mating ground": [24.6, -82.9],
+  "Marquesas Keys": [24.6, -82.1],
+  "Key West reefs": [24.5, -81.8],
+  "Florida Bay": [25.0, -80.9],
+  "Everglades backcountry": [25.3, -81.0],
+  "Biscayne Bay": [25.6, -80.2],
+  "La Jolla Canyon": [32.85, -117.3],
+  "Carlsbad Canyon": [33.15, -117.4],
+  "Southern California Bight shelf edge": [33.5, -118.5],
+  "Santa Catalina Island": [33.4, -118.4],
+  "San Nicolas Basin": [33.2, -119.5],
+  "Offshore Baja California waters": [31.0, -117.0],
+  "Ningaloo Reef": [-22.7, 113.6],
+  "Shark Bay": [-25.5, 113.5],
+  "Montebello Islands": [-20.4, 115.5],
+  "Java Trench approaches": [-10.5, 110.0],
+  "Banda Sea": [-6.0, 130.0],
+  "Timor Sea": [-11.0, 128.0],
+  "Sagami Bay": [35.1, 139.4],
+  "Tokyo Bay": [35.4, 139.8],
+  "Suruga Bay": [34.7, 138.6],
+  "Offshore Izu Islands": [34.2, 139.4],
+  "Kuroshio Current edge": [34.0, 140.0],
+  "Japanese upper continental slope": [34.8, 139.0],
+  "Fuvahmulah": [-0.3, 73.4],
+  "Addu Atoll": [-0.7, 73.2],
+  "Chagos Archipelago": [-6.3, 71.8],
+  "Seychelles Bank": [-5.0, 55.5],
+  "Saya de Malha": [-11.0, 62.0],
+  "Open Indian Ocean (westward leg)": [-8.0, 65.0],
+  "Delaware Bay": [39.0, -75.1],
+  "New Jersey coast": [39.5, -74.0],
+  "Virginia Capes": [37.0, -75.8],
+  "Cape Hatteras": [35.2, -75.5],
+  "Cape Lookout": [34.6, -76.5],
+  "Offshore North Carolina shelf edge": [34.0, -75.8],
+  "Darwin Island": [1.68, -92.0],
+  "Wolf Island": [1.38, -91.82],
+  "Isabela Island": [-0.7, -91.0],
+  "Fernandina Island": [-0.37, -91.55],
+  "Galápagos platform edge": [0.0, -91.5],
+  "Open water between islands": [0.5, -91.8],
+  "Gansbaai": [-34.6, 19.35],
+  "Dyer Island": [-34.68, 19.4],
+  "Seal Island (False Bay)": [-34.13, 18.58],
+  "Mossel Bay": [-34.15, 22.1],
+  "Cape Agulhas": [-34.83, 20.0],
+  "Open Indian Ocean (offshore leg)": [-38.0, 25.0],
+  "Bimini": [25.7, -79.25],
+  "Andros Island": [24.4, -77.9],
+  "Eleuthera": [25.0, -76.8],
+  "Florida Keys": [24.6, -81.5],
+  "Jupiter, Florida": [26.9, -80.05],
+  "Offshore Virginia / Gulf Stream": [36.5, -74.5],
+  "Azores": [38.7, -27.2],
+  "Canary Islands": [28.3, -15.8],
+  "Madeira": [32.7, -17.0],
+  "West African coast (Senegal/Cape Verde)": [15.0, -20.0],
+  "Mid-Atlantic ridge": [30.0, -42.0],
+  "Gulf Stream edge": [35.0, -70.0],
+  "Cornwall (Lizard/Land's End)": [50.0, -5.7],
+  "Isle of Man": [54.2, -4.6],
+  "Hebrides (Coll/Tiree)": [56.6, -6.6],
+  "Irish Sea": [53.8, -5.3],
+  "Celtic Sea": [50.5, -7.5],
+  "Donegal Bay": [54.55, -8.3],
+  "Bay of Biscay / Iberian coast (winter leg)": [44.5, -4.5],
+  "Heron Island reef flat": [-23.44, 151.91],
+  "Heron lagoon": [-23.445, 151.915],
+  "Shark Bay (Heron Island)": [-23.438, 151.908],
+  "Reef crest": [-23.442, 151.918],
+  "Coral-head pools": [-23.441, 151.912],
+  "Heron Island north beach pools": [-23.437, 151.914],
+  "Wistari Reef edge": [-23.45, 151.92],
+  /* v0.9.0 consistency pass: new envelope labels. Thresher (WNA),
+     whale (Philippines), hammerhead (Bahamas) get real coordinates;
+     nurse and epaulette generic reef labels cluster tightly at their
+     tag sites — honest local scribbles, not false precision. Older
+     labels above are kept so pre-fix tracks still plot. */
+  "Offshore North Carolina": [35.5, -74.5],
+  "Mid-Atlantic Bight shelf edge": [38.5, -72.0],
+  "Georges Bank": [41.5, -67.5],
+  "Gulf of Maine": [43.0, -69.0],
+  "Grand Banks": [45.5, -50.0],
+  "Offshore Florida (wintering)": [28.0, -79.0],
+  "Tubbataha Reefs Natural Park": [8.9, 119.9],
+  "Sulu Sea": [9.5, 121.0],
+  "Northern Palawan": [11.0, 119.0],
+  "Bohol Sea": [9.8, 123.5],
+  "Surigao Strait": [10.2, 125.4],
+  "Eastern Leyte": [10.8, 125.0],
+  "Eastern Mindanao (Pacific)": [8.5, 126.5],
+  "Exuma Sound": [24.0, -76.0],
+  "Tongue of the Ocean": [24.2, -77.5],
+  "Cay Sal Bank": [23.8, -80.3],
+  "Tag-site reef": [15.0, -70.0],
+  "Adjacent sand flats": [15.03, -70.01],
+  "Seagrass beds": [14.98, -70.03],
+  "Reef-edge drop-off": [15.02, -69.98],
+  "Mating aggregation flat": [15.01, -70.04],
+  "Nearby patch reefs": [14.99, -69.99],
+  "Tag-site reef flat": [-6.0, 147.0],
+  "Adjacent coral-head pools": [-5.998, 147.002],
+  "PNG reef crest": [-6.002, 147.001],
+  "Lagoon patch": [-6.002, 146.998],
+  "North beach pools": [-5.999, 147.003],
+  "Reef-flat edge": [-6.001, 146.997]
+};
+
+/* Stylized continents — recognizable, not cartographic. Equirectangular
+   layout on a 1000x500 viewBox; deliberately simple shapes. */
+const MAP_W = 1000, MAP_H = 500;
+const LAND_PATHS = [
+  "M40,70 L130,80 L210,65 L270,95 L335,95 L350,115 L320,130 L295,145 L275,180 L250,170 L220,182 L195,188 L210,200 L225,215 L265,218 L282,226 L268,234 L235,225 L205,205 L165,155 L155,140 L105,110 L60,85 Z",
+  "M358,32 L408,38 L412,68 L385,82 L358,70 Z",
+  "M282,235 L335,230 L365,252 L405,275 L385,315 L355,350 L320,350 L305,392 L292,405 L282,360 L272,300 L275,262 Z",
+  "M470,148 L492,132 L498,118 L526,82 L552,54 L562,70 L546,102 L562,112 L544,140 L518,146 Z",
+  "M486,110 L494,90 L499,100 L492,114 Z",
+  "M470,152 L526,146 L582,163 L608,190 L640,220 L622,252 L612,280 L584,334 L556,348 L528,328 L498,278 L456,208 Z",
+  "M624,296 L638,302 L634,322 L624,316 Z",
+  "M582,163 L624,166 L652,180 L700,184 L716,193 L722,228 L748,236 L776,222 L790,194 L818,180 L832,152 L846,138 L898,118 L948,88 L998,68 L1000,100 L940,140 L900,170 L860,195 L820,210 L790,235 L760,252 L728,246 L698,220 L648,200 L608,190 Z",
+  "M872,168 L886,150 L892,162 L880,180 Z",
+  "M838,210 L848,200 L852,218 L842,228 Z",
+  "M760,268 L800,262 L832,270 L810,283 L768,280 Z M845,274 L872,270 L870,286 L844,286 Z",
+  "M795,330 L865,318 L905,340 L895,375 L850,395 L800,385 L785,355 Z",
+  "M935,395 L948,390 L945,415 L935,418 Z"
+];
+
+function mapProj(lat, lon) {
+  return [(lon + 180) / 360 * MAP_W, (90 - lat) / 180 * MAP_H];
+}
+
+/* Track points -> plottable xy. The first point is the tag site (the
+   player's fact); the rest is the illustrative envelope walk. They are
+   drawn separately so a tag site far from the documented range doesn't
+   imply a migration nobody recorded. */
+function mapPoints(t) {
+  const pts = (t.track && t.track.points || []).map(p => {
+    const c = MAP_COORDS[p.label];
+    if (!c) return null;
+    const [x, y] = mapProj(c[0], c[1]);
+    return { x, y, label: p.label, day: p.day };
+  }).filter(Boolean);
+  return pts;
+}
+
+function renderMap() {
+  const wrap = $("worldMapWrap");
+  const pop = $("mapPopup");
+  const legend = $("mapLegend");
+  const ids = Object.keys(state.tagged);
+  pop.classList.add("hidden");
+  if (!ids.length) {
+    wrap.innerHTML = `<div class="map-empty"><span class="big">🗺️</span>No tagged sharks yet — tag one and it will appear here, swimming its real waters.</div>`;
+    legend.innerHTML = "";
+    return;
+  }
+  let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of tagged sharks">`;
+  svg += `<rect width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`;
+  LAND_PATHS.forEach(d => { svg += `<path class="map-land" d="${d}"/>`; });
+  ids.forEach(sid => {
+    const t = state.tagged[sid];
+    if (!t.track) t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+    const color = SPECIES_COLORS[sid] || "#ffffff";
+    const pts = mapPoints(t);
+    if (pts.length < 2) return;
+    /* Illustrative track: envelope walk only (points[1..]). The tag site
+       gets its own pin below — no line implying a migration between them. */
+    const path = pts.slice(1);
+    if (path.length >= 2) {
+      const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+      const archival = t.track.kind === "archival";
+      svg += `<path class="map-track${archival ? " archival" : ""}" d="${d}" stroke="${color}"/>`;
+    }
+  });
+  /* Markers: hollow pin = tag site, filled dot = latest position. */
+  ids.forEach(sid => {
+    const t = state.tagged[sid];
+    const s = sharkById(sid);
+    const color = SPECIES_COLORS[sid] || "#ffffff";
+    const pts = mapPoints(t);
+    if (!pts.length) return;
+    const label = esc(t.name ? `“${t.name}”` : t.researchId) + " — " + esc(s.name);
+    const tag = pts[0];
+    svg += `<g class="map-marker" data-sid="${sid}"><title>${label} (tag site)</title>`
+      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>`
+      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="1.8" fill="${color}"/></g>`;
+    if (pts.length > 1) {
+      const last = pts[pts.length - 1];
+      svg += `<g class="map-marker latest" data-sid="${sid}"><title>${label} (latest)</title>`
+        + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="8" fill="${color}" stroke="#fff" stroke-width="2"/></g>`;
+    }
+  });
+  svg += `</svg>`;
+  wrap.innerHTML = svg;
+  wrap.querySelectorAll(".map-marker").forEach(m => {
+    m.addEventListener("click", () => showMapPopup(m.dataset.sid));
+  });
+  legend.innerHTML = ids.map(sid => {
+    const s = sharkById(sid), t = state.tagged[sid];
+    return `<span class="map-chip"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
+  }).join("");
+}
+
+function showMapPopup(sid) {
+  const s = sharkById(sid), t = state.tagged[sid];
+  const pts = mapPoints(t);
+  const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
+  const kindNote = t.track.kind === "archival"
+    ? "Archival track — goblin sharks have never carried satellite tags; this route is reconstructed from capture records."
+    : t.track.kind === "resightings"
+      ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
+      : t.track.kind === "acoustic"
+        ? "Illustrative track based on acoustic-tag detections from reef receiver arrays — a different way of following sharks than satellite tags."
+      : null;
+  const pop = $("mapPopup");
+  pop.innerHTML = `
+    <h4>${t.name ? `“${esc(t.name)}”` : esc(t.researchId)}</h4>
+    <p class="latin">${esc(s.name)} · ${esc(t.researchId)}</p>
+    <p class="map-meta">📍 Tagged at ${esc(t.location)} · ${esc(t.date)}<br>📡 Latest ping: ${last ? esc(last.label) : "—"}${t.resightings && t.resightings.length ? `<br>🔁 Re-sighted ${t.resightings.length}×` : ""}</p>
+    ${kindNote ? `<p class="map-kind-note">${kindNote}</p>` : ""}
+    <button class="secondary-button" type="button" id="mapCardBtn">🗂️ Open collection card</button>`;
+  pop.classList.remove("hidden");
+  $("mapCardBtn").addEventListener("click", () => openDetail(sid));
 }
 
 /* ---------- State ---------- */
@@ -787,7 +1218,7 @@ const sightStore = {
 };
 
 /* v0.8.0: the expedition logbook — a scientist's notebook. Every trip:
-   date, the plan (region/depth/bait/lure), encounters and outcome. */
+   date, the plan (region/depth/bait/method), encounters and outcome. */
 const logStore = {
   load() {
     try { return JSON.parse(localStorage.getItem("tyi-logbook") || "[]"); }
@@ -817,7 +1248,7 @@ const state = {
   logbook: logStore.load(),   // v0.8.0: expedition logbook
   regionsUnlocked: false, // v0.7.0: first six tagged -> Galápagos + South Africa
   pendingWin: false,      // v0.7.0: final shark tagged mid-trip; ceremony at day's end
-  currentPlan: null,      // v0.7.0: the trip's region/depth/bait (+lure in v0.8.0)
+  currentPlan: null,      // the trip's region/depth/bait/method (method added v0.8.0 as scent, reworked v0.9.0)
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
@@ -895,6 +1326,7 @@ document.querySelectorAll(".tab").forEach(btn => {
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
     if (btn.dataset.tab === "phone" && state.unread > 0) {
       state.unread = 0;
@@ -1022,7 +1454,8 @@ $("launchBtn").addEventListener("click", () => {
     region,
     depth: $("depthSelect").value,
     bait: $("baitSelect").value,
-    lure: $("lureSelect").value
+    method: $("methodSelect").value,
+    methodOpt: $("methodOptSelect").value
   });
 });
 
@@ -1098,10 +1531,14 @@ function resolveEncounters(plan) {
 /* Pick one species for an encounter slot: prefer untagged species the
    player hasn't already seen today, then familiar faces for watching.
    v0.8.0: the scent lure BOOSTS — a species the lure is right for gets
-   triple weight. A wrong lure or no lure changes nothing (never a gate). */
-function lureWeight(plan, species) {
-  const lure = (plan && plan.lure) || "none";
-  return (species.lures || []).includes(lure) ? 3 : 1;
+   triple weight. A wrong lure or no lure changes nothing (never a gate).
+   v0.9.0: same boost-only semantics, now keyed on the Method dimension —
+   a species boosts only on (method, sub-option) pairs that are real for
+   that animal. */
+function methodWeight(plan, species) {
+  const m = (plan && plan.method) || "attract";
+  const opt = (plan && plan.methodOpt) || "none";
+  return ((species.methods || {})[m] || []).includes(opt) ? 3 : 1;
 }
 function pickEncounter(appeared, shown, plan) {
   const fresh = appeared.filter(s => !shown.has(s.id));
@@ -1109,7 +1546,7 @@ function pickEncounter(appeared, shown, plan) {
   const newToPlayer = fresh.filter(s => !state.tagged[s.id]);
   const pool = newToPlayer.length ? newToPlayer : fresh;
   let total = 0;
-  const weights = pool.map(s => { const w = lureWeight(plan, s); total += w; return w; });
+  const weights = pool.map(s => { const w = methodWeight(plan, s); total += w; return w; });
   let r = Math.random() * total;
   for (let i = 0; i < pool.length; i++) {
     r -= weights[i];
@@ -1219,7 +1656,8 @@ async function runExpedition(plan) {
     region: plan.region,
     depth: plan.depth,
     bait: plan.bait,
-    lure: plan.lure || "none",
+    method: plan.method || "attract",
+    methodOpt: plan.methodOpt || "none",
     encounters: []
   };
   $("launchBtn").disabled = true;
@@ -1241,11 +1679,15 @@ async function runExpedition(plan) {
   await wait(1700);
   logLine(`🪝 ${baitText}`);
   await wait(1700);
-  /* v0.8.0: scent in the water, if any. Neutral wording — no promises. */
-  const lureText = !plan.lure || plan.lure === "none"
-    ? "No scent in the water — just the bait doing the talking."
-    : `Scent in the water: ${LURES[plan.lure]}.`;
-  logLine(`🌊 ${lureText}`);
+  /* v0.9.0: the method in the water, if any. Neutral wording — no promises. */
+  const methodText = (!plan.method || (plan.method === "attract" && (!plan.methodOpt || plan.methodOpt === "none")))
+    ? "No attractant in the water — just the bait doing the talking."
+    : plan.method === "aggregation"
+      ? (plan.methodOpt === "network"
+        ? "Tapping the local sightings network — fishermen, divers, and sailors phoning in every fin they see."
+        : `Running a ${METHODS.aggregation.opts[plan.methodOpt].toLowerCase()} to find the feeding aggregation.`)
+      : `${METHODS.attract.opts[plan.methodOpt]} in the water.`;
+  logLine(`🌊 ${methodText}`);
   await wait(1700);
   if (deep) {
     logLine(`⬇️ The water darkens as you descend. The surface light thins, then lets go.`);
@@ -1394,14 +1836,18 @@ function recordResighting(species, plan) {
   };
   t.resightings = t.resightings || [];
   t.resightings.push(entry);
-  /* The tracking story grows: a new ping on the map. */
+  /* The tracking story grows: a new ping on the map. v0.9.0: the hop
+     distance and ping interval come from the species' real envelope,
+     not generic ranges — a re-sighted epaulette moves metres, a mako
+     moves hundreds of kilometres. */
   if (t.track && t.track.points.length) {
+    const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
     const last = t.track.points[t.track.points.length - 1];
-    const day = last.day + 5 + Math.floor(Math.random() * 15);
-    const km = 2 + Math.floor(Math.random() * 30);
+    const day = last.day + env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
+    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
     t.track.points.push({ label: entry.location, day, km });
     t.track.days = day;
-    t.track.totalKm += km;
+    t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
   }
   store.save(state.tagged);
   renderCollection();
@@ -1450,7 +1896,7 @@ function maybeCheckinThread() {
 }
 
 /* ---------- Expedition logbook: the scientist's notebook ----------
-   v0.8.0: every trip lands here — plan (region/depth/bait/lure),
+   v0.9.0: every trip lands here — plan (region/depth/bait/method),
    encounters and outcome. Compare attempts; the pattern is the answer. */
 function renderLogbook() {
   const list = $("logbookList");
@@ -1467,7 +1913,11 @@ function renderLogbook() {
       REGIONS[t.region] ? REGIONS[t.region].name : t.region,
       DEPTHS[t.depth] ? DEPTHS[t.depth].name : t.depth,
       BAITS[t.bait] || t.bait,
-      (t.lure && t.lure !== "none") ? (LURES[t.lure] || t.lure) : "No lure"
+      /* v0.9.0: method; pre-v0.9.0 entries stored `lure` — render those
+         with the legacy labels so old trips still read sensibly. */
+      t.method
+        ? `${METHODS[t.method].name} — ${METHODS[t.method].opts[t.methodOpt] || t.methodOpt}`
+        : (t.lure && t.lure !== "none" ? LEGACY_LURES[t.lure] || t.lure : "No lure")
     ];
     const enc = t.encounters.length
       ? t.encounters.map(e => {
@@ -1952,7 +2402,7 @@ function openTrack(id) {
     </div>
     <ul class="track-stops">${stops}</ul>
     <p class="track-note">Last ping: <strong>${esc(last.label)}</strong> · day ${last.day}<br>
-    <span class="dim">Illustrative track — real satellite tags ping just like this. 🛰️</span></p>
+    <span class="dim">${esc(TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite)}</span></p>
   `;
   $("trackOverlay").classList.remove("hidden");
 }
@@ -2007,7 +2457,29 @@ migrateWinV07();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
-fillSelect($("lureSelect"), LURES);
+/* v0.9.0: Method is two selects — the top-level approach, then its
+   sub-menu of real field practices. */
+(function initMethodSelects() {
+  const mSel = $("methodSelect"), oSel = $("methodOptSelect");
+  mSel.innerHTML = "";
+  Object.entries(METHODS).forEach(([id, m]) => {
+    const o = document.createElement("option");
+    o.value = id; o.textContent = m.name;
+    mSel.appendChild(o);
+  });
+  const fillOpts = () => {
+    const m = METHODS[mSel.value];
+    $("methodOptLabel").textContent = m.subLabel;
+    oSel.innerHTML = "";
+    Object.entries(m.opts).forEach(([id, label]) => {
+      const o = document.createElement("option");
+      o.value = id; o.textContent = label;
+      oSel.appendChild(o);
+    });
+  };
+  mSel.addEventListener("change", fillOpts);
+  fillOpts();
+})();
 $("buildTag").textContent = VERSION;
 $("phoneTime").textContent =
   new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });

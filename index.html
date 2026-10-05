@@ -20,6 +20,7 @@
       <button class="tab active" data-tab="research" type="button">📖 Research</button>
       <button class="tab" data-tab="expedition" type="button">🛥️ Expedition</button>
       <button class="tab" data-tab="collection" type="button">🗂️ Collection <span id="collectionCount" class="count-badge">0/6</span></button>
+      <button class="tab" data-tab="map" type="button">🗺️ Map</button>
       <button class="tab" data-tab="logbook" type="button">📓 Logbook</button>
       <button class="tab" data-tab="phone" type="button">📱 Phone <span id="msgBadge" class="count-badge hidden">0</span></button>
     </nav>
@@ -38,7 +39,7 @@
       <section id="tab-expedition" class="panel">
         <div class="section-head">
           <h2>Plan an expedition</h2>
-          <p>Choose the water — region, depth, bait, and a scent in the water. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
+          <p>Choose the water — region, depth, bait, and method. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
         </div>
 
         <div id="planner" class="planner-card">
@@ -55,8 +56,12 @@
             <select id="baitSelect"></select>
           </label>
           <label class="field">
-            <span>Scent in the water</span>
-            <select id="lureSelect"></select>
+            <span>Method</span>
+            <select id="methodSelect"></select>
+          </label>
+          <label class="field">
+            <span id="methodOptLabel">Attractant</span>
+            <select id="methodOptSelect"></select>
           </label>
           <button id="launchBtn" class="primary-button" type="button">🚀 Launch expedition</button>
         </div>
@@ -84,6 +89,18 @@
           <p>Sharks you watched but didn't tag — spotted, not caught. Pure field notes.</p>
         </div>
         <div id="sightingsList" class="sightings-list"></div>
+      </section>
+
+      <!-- MAP — the whole tagged fleet on one globe -->
+      <section id="tab-map" class="panel">
+        <div class="section-head">
+          <h2>Tracking map</h2>
+          <p>Every shark you've tagged, out there somewhere. Tap a marker to see who's who.</p>
+        </div>
+        <div id="worldMapWrap" class="map-wrap"></div>
+        <div id="mapPopup" class="map-popup hidden"></div>
+        <div id="mapLegend" class="map-legend"></div>
+        <p class="map-honesty">Illustrative map — positions are approximate and tracks are simplified from the tagging data, not live satellite fixes. The science behind each track lives on the shark's collection card.</p>
       </section>
 
       <!-- LOGBOOK -->

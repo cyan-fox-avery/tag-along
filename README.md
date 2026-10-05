@@ -11,6 +11,38 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.9.0 changes — the science package
+
+- The planner's scent row is gone, replaced by **Method**: one row where
+  the top-level approach opens its own sub-menu. Hunters get *Attract*
+  (fish-oil chum, seal scent, or nothing — same boost-only rules as
+  before), while whale and basking sharks get *Find the aggregation*
+  (boat survey of the bloom, spotter-plane survey, local sightings
+  network). A whale shark never sees chum. The asymmetry is on purpose:
+  the method teaches the animal.
+- The sand tiger moves out of Baja California — the eastern Pacific
+  isn't really its ocean — to the Outer Banks, North Carolina, whose
+  wrecks host its most famous aggregation. Every other region×species
+  pairing got audited against real range references too.
+- Satellite tracks are rebuilt on real geography: verified tagging
+  sites, plausible corridors, honest distances and timescales. The
+  envelope is real; the randomness stays inside it.
+- Science reasoning now lives in the code comments, so every range,
+  method, and migration choice shows its work.
+- New 🗺️ Map tab: every tagged shark on one stylized globe — its
+  illustrative track as a line, its latest ping as a marker. Tap a
+  marker for the shark's name and a jump to its collection card. The
+  honesty framing holds here too: goblin tracks are marked archival,
+  and the epaulette's whole life fits inside one reef-flat dot.
+- Track/tag consistency pass: an individual's displayed track must be
+  geographically compatible with where it was tagged. The thresher's
+  track moved from Southern California research to western North
+  Atlantic telemetry, the whale shark's from Ningaloo to the
+  Philippines, the hammerhead's from Florida-heavy waypoints to the
+  Bahamas, the nurse's to Caribbean-reef-local, and the epaulette's
+  Heron Island waypoints became PNG reef-flat labels (the Australian
+  research now informs scale only, not place).
+
 ## v0.8.0 changes
 
 - The bait box gets bigger: three new hook baits join the four originals —
