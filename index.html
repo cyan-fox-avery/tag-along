@@ -46,22 +46,27 @@
           <label class="field">
             <span>Region</span>
             <select id="regionSelect"></select>
+            <div class="pick-visual" id="regionVisual" aria-hidden="true"></div>
           </label>
           <label class="field">
             <span>Depth</span>
             <select id="depthSelect"></select>
+            <div class="pick-visual" id="depthVisual" aria-hidden="true"></div>
           </label>
           <label class="field">
             <span>Bait</span>
             <select id="baitSelect"></select>
+            <div class="pick-visual" id="baitVisual" aria-hidden="true"></div>
           </label>
           <label class="field">
             <span>Method</span>
             <select id="methodSelect"></select>
+            <div class="pick-visual" id="methodVisual" aria-hidden="true"></div>
           </label>
-          <label class="field">
+          <label class="field hidden" id="methodOptField">
             <span id="methodOptLabel">Attractant</span>
             <select id="methodOptSelect"></select>
+            <div class="pick-visual" id="methodOptVisual" aria-hidden="true"></div>
           </label>
           <button id="launchBtn" class="primary-button" type="button">🚀 Launch expedition</button>
         </div>
@@ -188,6 +193,7 @@
   <!-- Win state overlay: content is staged by winStep() in script.js -->
   <div id="winOverlay" class="overlay hidden"></div>
 
+  <script src="map-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
