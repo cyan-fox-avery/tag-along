@@ -34,6 +34,14 @@ Built for sarah, who loves sharks. 🦈
   marker for the shark's name and a jump to its collection card. The
   honesty framing holds here too: goblin tracks are marked archival,
   and the epaulette's whole life fits inside one reef-flat dot.
+- Track/tag consistency pass: an individual's displayed track must be
+  geographically compatible with where it was tagged. The thresher's
+  track moved from Southern California research to western North
+  Atlantic telemetry, the whale shark's from Ningaloo to the
+  Philippines, the hammerhead's from Florida-heavy waypoints to the
+  Bahamas, the nurse's to Caribbean-reef-local, and the epaulette's
+  Heron Island waypoints became PNG reef-flat labels (the Australian
+  research now informs scale only, not place).
 
 ## v0.8.0 changes
 
