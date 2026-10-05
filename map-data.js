@@ -316,21 +316,45 @@ const MAP_COORDS = {
   "Reef-flat edge": [-6.001, 146.997]
 };
 
-/* Stylized continents — recognizable, not cartographic. Equirectangular
-   layout on a 1000x500 viewBox; deliberately simple shapes. */
 const MAP_W = 1000, MAP_H = 500;
-const LAND_PATHS = [
-  "M40,70 L130,80 L210,65 L270,95 L335,95 L350,115 L320,130 L295,145 L275,180 L250,170 L220,182 L195,188 L210,200 L225,215 L265,218 L282,226 L268,234 L235,225 L205,205 L165,155 L155,140 L105,110 L60,85 Z",
-  "M358,32 L408,38 L412,68 L385,82 L358,70 Z",
-  "M282,235 L335,230 L365,252 L405,275 L385,315 L355,350 L320,350 L305,392 L292,405 L282,360 L272,300 L275,262 Z",
-  "M470,148 L492,132 L498,118 L526,82 L552,54 L562,70 L546,102 L562,112 L544,140 L518,146 Z",
-  "M486,110 L494,90 L499,100 L492,114 Z",
-  "M470,152 L526,146 L582,163 L608,190 L640,220 L622,252 L612,280 L584,334 L556,348 L528,328 L498,278 L456,208 Z",
-  "M624,296 L638,302 L634,322 L624,316 Z",
-  "M582,163 L624,166 L652,180 L700,184 L716,193 L722,228 L748,236 L776,222 L790,194 L818,180 L832,152 L846,138 L898,118 L948,88 L998,68 L1000,100 L940,140 L900,170 L860,195 L820,210 L790,235 L760,252 L728,246 L698,220 L648,200 L608,190 Z",
-  "M872,168 L886,150 L892,162 L880,180 Z",
-  "M838,210 L848,200 L852,218 L842,228 Z",
-  "M760,268 L800,262 L832,270 L810,283 L768,280 Z M845,274 L872,270 L870,286 L844,286 Z",
-  "M795,330 L865,318 L905,340 L895,375 L850,395 L800,385 L785,355 Z",
-  "M935,395 L948,390 L945,415 L935,418 Z"
+
+/* NASA Blue Marble Next Generation, full-globe equirectangular (2:1),
+   hotlinked as the map background. v0.10.0 replaces the stylized
+   LAND_PATHS continents (retired). CC BY-SA 3.0 — credit lives in the
+   map tab and the README. */
+const BLUE_MARBLE_URL = "https://upload.wikimedia.org/wikipedia/commons/c/cd/Land_ocean_ice_2048.jpg";
+
+/* Major ocean currents — schematic but geographically honest. Waypoints are
+   [lat, lon]; the renderer smooths them and splits paths at the antimeridian.
+   Warm vs cold is real oceanography (and a real driver of where sharks go),
+   hence the two hues. v0.10.0: drawn as a toggleable overlay. */
+const CURRENTS = [
+  { name: "Gulf Stream", warm: true, label: true,
+    pts: [[25,-80],[29,-77],[33,-73],[37,-68],[40,-60],[43,-52]] },
+  { name: "North Atlantic Drift", warm: true,
+    pts: [[43,-52],[47,-42],[51,-30],[54,-18],[57,-8]] },
+  { name: "Canary Current", warm: false,
+    pts: [[36,-9],[32,-12],[28,-15],[24,-18],[20,-20]] },
+  { name: "North Equatorial Current", warm: true,
+    pts: [[17,-22],[16,-35],[15,-48],[14,-58]] },
+  { name: "South Equatorial Current", warm: true,
+    pts: [[-2,-10],[-3,-20],[-5,-30],[-8,-37]] },
+  { name: "Brazil Current", warm: true,
+    pts: [[-9,-34],[-16,-37],[-24,-42],[-32,-50],[-39,-57]] },
+  { name: "Antarctic Circumpolar Current", warm: false, label: true,
+    pts: [[-56,-180],[-59,-135],[-56,-90],[-59,-45],[-56,0],[-59,45],[-56,90],[-59,135],[-56,180]] },
+  { name: "Agulhas Current", warm: true, label: true,
+    pts: [[-25,36],[-30,33],[-35,28],[-39,23],[-41,20],[-40,32],[-38,42]] },
+  { name: "Kuroshio Current", warm: true, label: true,
+    pts: [[21,122],[25,125],[29,129],[32,133],[35,139],[37,145],[40,155],[41,165]] },
+  { name: "North Pacific Current", warm: true,
+    pts: [[41,165],[43,180],[44,-165],[45,-150],[46,-138]] },
+  { name: "California Current", warm: false,
+    pts: [[46,-130],[41,-126],[36,-122],[31,-119],[26,-116],[23,-113]] },
+  { name: "Humboldt Current", warm: false, label: true,
+    pts: [[-42,-74],[-36,-73],[-30,-72],[-24,-71],[-18,-74],[-12,-78],[-6,-83]] },
+  { name: "East Australian Current", warm: true,
+    pts: [[-23,154],[-27,154],[-31,152],[-35,151],[-38,150]] },
+  { name: "Pacific Equatorial Countercurrent", warm: true,
+    pts: [[6,135],[6,155],[6,175],[6,-175],[6,-155],[6,-135],[6,-115],[6,-100]] }
 ];

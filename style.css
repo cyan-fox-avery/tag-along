@@ -395,14 +395,35 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
   border: 1px solid #2c5364; position: relative;
 }
 .map-wrap svg { display: block; width: 100%; height: auto; }
-.map-land { fill: #2a6b5e; stroke: #3d8a78; stroke-width: 1; opacity: 0.9; }
-.map-track { fill: none; stroke-width: 2; opacity: 0.55; }
-.map-track.archival { stroke-dasharray: 5 4; }
+/* v0.10.0: map toolbar (zoom + currents toggle) */
+.map-toolbar { display: flex; gap: 8px; margin: 0 0 10px; align-items: center; }
+.map-toolbar button {
+  font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1;
+  min-width: 40px; padding: 8px 10px; border-radius: 999px; cursor: pointer;
+  background: var(--bg-soft); color: var(--ink); border: 1px solid #2c5364;
+}
+.map-toolbar button:hover { border-color: var(--accent); }
+#mapCurrentsToggle { font-size: 13px; font-weight: 600; }
+#mapCurrentsToggle[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+}
+/* v0.10.0: currents overlay — warm/cold hues are real oceanography */
+.current { fill: none; opacity: 0.8; }
+.current.warm { stroke: #ff9e5e; }
+.current.cold { stroke: #6ecff5; }
+.current-label {
+  fill: rgba(255,255,255,0.9); font-style: italic; font-size: 14px;
+  paint-order: stroke; stroke: rgba(4,38,59,0.7); stroke-width: 3;
+}
+.map-track { fill: none; opacity: 0.55; }
 .map-marker { cursor: pointer; stroke: #fff; stroke-width: 1.5; }
 .map-marker:hover { stroke-width: 3; }
 .map-marker.latest { stroke-width: 2.5; }
 .map-empty {
-  padding: 40px 20px; text-align: center; color: var(--ink-dim); font-size: 15px; line-height: 1.8;
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  color: #d7e8f5; font-size: 15px; line-height: 1.8; padding: 20px;
+  background: rgba(6,20,35,0.55);
 }
 .map-empty .big { font-size: 40px; display: block; margin-bottom: 8px; }
 .map-popup {

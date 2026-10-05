@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.8.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.10.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,24 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.10.0 changes — satellite tracking map
+
+- The tracking map now sits on NASA's Blue Marble Next Generation —
+  real satellite imagery instead of the stylized continents. (The old
+  LAND_PATHS shapes are retired.) Map imagery: NASA Blue Marble Next
+  Generation (CC BY-SA 3.0).
+- Zoom: +/− buttons, mouse-wheel zoom centered on the pointer, and a
+  reset-view button. Tracks, pins, and popups all keep working zoomed in;
+  markers stay readable at any level.
+- Major ocean currents are drawn as a toggleable overlay — 14 named
+  currents with approximately real paths, warm ones in soft orange and
+  cold ones in soft cyan (that's real oceanography, and it drives where
+  sharks go). The 🌊 Currents toggle starts ON; famous-current labels
+  fade in as you zoom past ~1.75x.
+- Under the hood the map data already lived in `map-data.js` (split out
+  in v0.9.1); the current paths join it there, keeping the main script
+  lean.
 
 ## v0.9.1 changes — expedition planner polish
 
