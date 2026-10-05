@@ -145,7 +145,8 @@ const TRACK_ENVELOPES = {
 const TRACK_KIND_NOTES = {
   satellite: "Illustrative track — real satellite tags ping just like this. 🛰️",
   archival: "Sparse illustrative track — goblin sharks have never carried satellite tags; reconstructed from capture records.",
-  resightings: "Illustrative track — built from reef survey re-sightings, not a satellite tag. This shark barely leaves its reef flat."
+  resightings: "Illustrative track — built from reef survey re-sightings, not a satellite tag. This shark barely leaves its reef flat.",
+  acoustic: "Illustrative track based on acoustic-tag detections from reef receiver arrays."
 };
 
 /* Simulated tag track: starts at the tag site, then walks the species'

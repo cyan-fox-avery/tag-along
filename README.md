@@ -11,6 +11,13 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.10.1 changes — tracking-note consistency
+
+- The nurse shark's collection-card track view now correctly describes
+  acoustic-tag detections from reef receiver arrays, instead of falling
+  back to the satellite wording. (Thanks to ChatGPT's review for
+  catching the leftover path.)
+
 ## v0.10.0 changes — satellite tracking map
 
 - The tracking map now sits on NASA's Blue Marble Next Generation —
