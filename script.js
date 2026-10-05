@@ -887,6 +887,227 @@ function hashStr(s) {
   return h;
 }
 
+/* ================= The tracking map tab (v0.9.0) =================
+   Display-only: it visualizes track data the game already has. The
+   science (envelopes, regions, methods) is frozen — nothing here changes
+   it. Coordinates below are APPROXIMATE plotting positions for named
+   places so tracks can be drawn on a stylized map; they are not
+   scientific claims, and the map is labeled illustrative. */
+
+const SPECIES_COLORS = {
+  nurse: "#ffd166", thresher: "#ef476f", whale: "#06d6a0", goblin: "#9b5de5",
+  tiger: "#f78c6b", sandtiger: "#4cc9f0", galapagos: "#80ed99",
+  greatwhite: "#f4f1de", hammerhead: "#f3722c", mako: "#00bbf9",
+  basking: "#b8c0ff", epaulette: "#ff8fab"
+};
+
+/* Every label a track point can carry: region names (tag sites and
+   re-sighting pings) + envelope areas. "Baja California" is a legacy
+   v0.8.0 region label — kept so old tracks still plot. Unknown labels
+   are skipped, never guessed. */
+const MAP_COORDS = {
+  "Caribbean Sea": [15.0, -70.0],
+  "Outer Banks, North Carolina": [35.2, -75.5],
+  "Philippines": [12.0, 122.0],
+  "Maldives": [3.2, 73.2],
+  "Sagami Bay, Japan": [35.1, 139.4],
+  "Open Atlantic": [30.0, -40.0],
+  "Cornwall, UK": [50.1, -5.5],
+  "Papua New Guinea": [-6.0, 147.0],
+  "Galápagos Islands": [-0.5, -90.8],
+  "South Africa": [-34.0, 20.0],
+  "Baja California": [28.0, -113.0],
+  "Dry Tortugas mating ground": [24.6, -82.9],
+  "Marquesas Keys": [24.6, -82.1],
+  "Key West reefs": [24.5, -81.8],
+  "Florida Bay": [25.0, -80.9],
+  "Everglades backcountry": [25.3, -81.0],
+  "Biscayne Bay": [25.6, -80.2],
+  "La Jolla Canyon": [32.85, -117.3],
+  "Carlsbad Canyon": [33.15, -117.4],
+  "Southern California Bight shelf edge": [33.5, -118.5],
+  "Santa Catalina Island": [33.4, -118.4],
+  "San Nicolas Basin": [33.2, -119.5],
+  "Offshore Baja California waters": [31.0, -117.0],
+  "Ningaloo Reef": [-22.7, 113.6],
+  "Shark Bay": [-25.5, 113.5],
+  "Montebello Islands": [-20.4, 115.5],
+  "Java Trench approaches": [-10.5, 110.0],
+  "Banda Sea": [-6.0, 130.0],
+  "Timor Sea": [-11.0, 128.0],
+  "Sagami Bay": [35.1, 139.4],
+  "Tokyo Bay": [35.4, 139.8],
+  "Suruga Bay": [34.7, 138.6],
+  "Offshore Izu Islands": [34.2, 139.4],
+  "Kuroshio Current edge": [34.0, 140.0],
+  "Japanese upper continental slope": [34.8, 139.0],
+  "Fuvahmulah": [-0.3, 73.4],
+  "Addu Atoll": [-0.7, 73.2],
+  "Chagos Archipelago": [-6.3, 71.8],
+  "Seychelles Bank": [-5.0, 55.5],
+  "Saya de Malha": [-11.0, 62.0],
+  "Open Indian Ocean (westward leg)": [-8.0, 65.0],
+  "Delaware Bay": [39.0, -75.1],
+  "New Jersey coast": [39.5, -74.0],
+  "Virginia Capes": [37.0, -75.8],
+  "Cape Hatteras": [35.2, -75.5],
+  "Cape Lookout": [34.6, -76.5],
+  "Offshore North Carolina shelf edge": [34.0, -75.8],
+  "Darwin Island": [1.68, -92.0],
+  "Wolf Island": [1.38, -91.82],
+  "Isabela Island": [-0.7, -91.0],
+  "Fernandina Island": [-0.37, -91.55],
+  "Galápagos platform edge": [0.0, -91.5],
+  "Open water between islands": [0.5, -91.8],
+  "Gansbaai": [-34.6, 19.35],
+  "Dyer Island": [-34.68, 19.4],
+  "Seal Island (False Bay)": [-34.13, 18.58],
+  "Mossel Bay": [-34.15, 22.1],
+  "Cape Agulhas": [-34.83, 20.0],
+  "Open Indian Ocean (offshore leg)": [-38.0, 25.0],
+  "Bimini": [25.7, -79.25],
+  "Andros Island": [24.4, -77.9],
+  "Eleuthera": [25.0, -76.8],
+  "Florida Keys": [24.6, -81.5],
+  "Jupiter, Florida": [26.9, -80.05],
+  "Offshore Virginia / Gulf Stream": [36.5, -74.5],
+  "Azores": [38.7, -27.2],
+  "Canary Islands": [28.3, -15.8],
+  "Madeira": [32.7, -17.0],
+  "West African coast (Senegal/Cape Verde)": [15.0, -20.0],
+  "Mid-Atlantic ridge": [30.0, -42.0],
+  "Gulf Stream edge": [35.0, -70.0],
+  "Cornwall (Lizard/Land's End)": [50.0, -5.7],
+  "Isle of Man": [54.2, -4.6],
+  "Hebrides (Coll/Tiree)": [56.6, -6.6],
+  "Irish Sea": [53.8, -5.3],
+  "Celtic Sea": [50.5, -7.5],
+  "Donegal Bay": [54.55, -8.3],
+  "Bay of Biscay / Iberian coast (winter leg)": [44.5, -4.5],
+  "Heron Island reef flat": [-23.44, 151.91],
+  "Heron lagoon": [-23.445, 151.915],
+  "Shark Bay (Heron Island)": [-23.438, 151.908],
+  "Reef crest": [-23.442, 151.918],
+  "Coral-head pools": [-23.441, 151.912],
+  "Heron Island north beach pools": [-23.437, 151.914],
+  "Wistari Reef edge": [-23.45, 151.92]
+};
+
+/* Stylized continents — recognizable, not cartographic. Equirectangular
+   layout on a 1000x500 viewBox; deliberately simple shapes. */
+const MAP_W = 1000, MAP_H = 500;
+const LAND_PATHS = [
+  "M40,70 L130,80 L210,65 L270,95 L335,95 L350,115 L320,130 L295,145 L275,180 L250,170 L220,182 L195,188 L210,200 L225,215 L265,218 L282,226 L268,234 L235,225 L205,205 L165,155 L155,140 L105,110 L60,85 Z",
+  "M358,32 L408,38 L412,68 L385,82 L358,70 Z",
+  "M282,235 L335,230 L365,252 L405,275 L385,315 L355,350 L320,350 L305,392 L292,405 L282,360 L272,300 L275,262 Z",
+  "M470,148 L492,132 L498,118 L526,82 L552,54 L562,70 L546,102 L562,112 L544,140 L518,146 Z",
+  "M486,110 L494,90 L499,100 L492,114 Z",
+  "M470,152 L526,146 L582,163 L608,190 L640,220 L622,252 L612,280 L584,334 L556,348 L528,328 L498,278 L456,208 Z",
+  "M624,296 L638,302 L634,322 L624,316 Z",
+  "M582,163 L624,166 L652,180 L700,184 L716,193 L722,228 L748,236 L776,222 L790,194 L818,180 L832,152 L846,138 L898,118 L948,88 L998,68 L1000,100 L940,140 L900,170 L860,195 L820,210 L790,235 L760,252 L728,246 L698,220 L648,200 L608,190 Z",
+  "M872,168 L886,150 L892,162 L880,180 Z",
+  "M838,210 L848,200 L852,218 L842,228 Z",
+  "M760,268 L800,262 L832,270 L810,283 L768,280 Z M845,274 L872,270 L870,286 L844,286 Z",
+  "M795,330 L865,318 L905,340 L895,375 L850,395 L800,385 L785,355 Z",
+  "M935,395 L948,390 L945,415 L935,418 Z"
+];
+
+function mapProj(lat, lon) {
+  return [(lon + 180) / 360 * MAP_W, (90 - lat) / 180 * MAP_H];
+}
+
+/* Track points -> plottable xy. The first point is the tag site (the
+   player's fact); the rest is the illustrative envelope walk. They are
+   drawn separately so a tag site far from the documented range doesn't
+   imply a migration nobody recorded. */
+function mapPoints(t) {
+  const pts = (t.track && t.track.points || []).map(p => {
+    const c = MAP_COORDS[p.label];
+    if (!c) return null;
+    const [x, y] = mapProj(c[0], c[1]);
+    return { x, y, label: p.label, day: p.day };
+  }).filter(Boolean);
+  return pts;
+}
+
+function renderMap() {
+  const wrap = $("worldMapWrap");
+  const pop = $("mapPopup");
+  const legend = $("mapLegend");
+  const ids = Object.keys(state.tagged);
+  pop.classList.add("hidden");
+  if (!ids.length) {
+    wrap.innerHTML = `<div class="map-empty"><span class="big">🗺️</span>No tagged sharks yet — tag one and it will appear here, swimming its real waters.</div>`;
+    legend.innerHTML = "";
+    return;
+  }
+  let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of tagged sharks">`;
+  svg += `<rect width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`;
+  LAND_PATHS.forEach(d => { svg += `<path class="map-land" d="${d}"/>`; });
+  ids.forEach(sid => {
+    const t = state.tagged[sid];
+    if (!t.track) t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+    const color = SPECIES_COLORS[sid] || "#ffffff";
+    const pts = mapPoints(t);
+    if (pts.length < 2) return;
+    /* Illustrative track: envelope walk only (points[1..]). The tag site
+       gets its own pin below — no line implying a migration between them. */
+    const path = pts.slice(1);
+    if (path.length >= 2) {
+      const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+      const archival = t.track.kind === "archival";
+      svg += `<path class="map-track${archival ? " archival" : ""}" d="${d}" stroke="${color}"/>`;
+    }
+  });
+  /* Markers: hollow pin = tag site, filled dot = latest position. */
+  ids.forEach(sid => {
+    const t = state.tagged[sid];
+    const s = sharkById(sid);
+    const color = SPECIES_COLORS[sid] || "#ffffff";
+    const pts = mapPoints(t);
+    if (!pts.length) return;
+    const label = esc(t.name ? `“${t.name}”` : t.researchId) + " — " + esc(s.name);
+    const tag = pts[0];
+    svg += `<g class="map-marker" data-sid="${sid}"><title>${label} (tag site)</title>`
+      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>`
+      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="1.8" fill="${color}"/></g>`;
+    if (pts.length > 1) {
+      const last = pts[pts.length - 1];
+      svg += `<g class="map-marker latest" data-sid="${sid}"><title>${label} (latest)</title>`
+        + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="8" fill="${color}" stroke="#fff" stroke-width="2"/></g>`;
+    }
+  });
+  svg += `</svg>`;
+  wrap.innerHTML = svg;
+  wrap.querySelectorAll(".map-marker").forEach(m => {
+    m.addEventListener("click", () => showMapPopup(m.dataset.sid));
+  });
+  legend.innerHTML = ids.map(sid => {
+    const s = sharkById(sid), t = state.tagged[sid];
+    return `<span class="map-chip"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
+  }).join("");
+}
+
+function showMapPopup(sid) {
+  const s = sharkById(sid), t = state.tagged[sid];
+  const pts = mapPoints(t);
+  const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
+  const kindNote = t.track.kind === "archival"
+    ? "Archival track — goblin sharks have never carried satellite tags; this route is reconstructed from capture records."
+    : t.track.kind === "resightings"
+      ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
+      : null;
+  const pop = $("mapPopup");
+  pop.innerHTML = `
+    <h4>${t.name ? `“${esc(t.name)}”` : esc(t.researchId)}</h4>
+    <p class="latin">${esc(s.name)} · ${esc(t.researchId)}</p>
+    <p class="map-meta">📍 Tagged at ${esc(t.location)} · ${esc(t.date)}<br>📡 Latest ping: ${last ? esc(last.label) : "—"}${t.resightings && t.resightings.length ? `<br>🔁 Re-sighted ${t.resightings.length}×` : ""}</p>
+    ${kindNote ? `<p class="map-kind-note">${kindNote}</p>` : ""}
+    <button class="secondary-button" type="button" id="mapCardBtn">🗂️ Open collection card</button>`;
+  pop.classList.remove("hidden");
+  $("mapCardBtn").addEventListener("click", () => openDetail(sid));
+}
+
 /* ---------- State ---------- */
 
 const store = {
@@ -1024,6 +1245,7 @@ document.querySelectorAll(".tab").forEach(btn => {
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
     if (btn.dataset.tab === "phone" && state.unread > 0) {
       state.unread = 0;
