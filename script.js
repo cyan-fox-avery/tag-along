@@ -778,22 +778,48 @@ const REGION_UNLOCK_THREAD = [
    historically real sites without "right now" claims. */
 const TRACK_ENVELOPES = {
   nurse: {
-    start: "Dry Tortugas, Florida", // Pratt et al. 2022: 30-yr, 137-shark program — best-documented nurse tagging site
-    areas: ["Dry Tortugas mating ground", "Marquesas Keys", "Key West reefs", "Florida Bay", "Everglades backcountry", "Biscayne Bay"],
-    hop: [5, 120], dayStep: [7, 30], nPoints: [5, 6], kind: "satellite",
-    corridor: "highly resident — strong site fidelity (<10 km typical); biennial returns to mating site (Bond et al., PLoS ONE)"
+    start: "Caribbean reef lagoon (tag site)", // game region is the generic Caribbean Sea; envelope stays local by design
+    /* v0.9.0 consistency pass (for reviewers): the old envelope used the
+       superbly documented Dry Tortugas (Florida) program, but the game
+       tags nurse sharks in the Caribbean Sea — Florida waypoints for a
+       Caribbean shark. Rebuilt Caribbean-local on Caribbean acoustic
+       work: Glover's Reef, Belize (mean dispersal 7.7 km — Chapman et
+       al.) and the Buck Island, St. Croix array (11 nurse sharks,
+       2013–2017, high residency). The BEHAVIOUR (extreme residency,
+       <10 km typical, biennial mating aggregations) is informed by both
+       Florida and Caribbean studies; the PLACES are deliberately generic
+       reef-habitat labels clustered at the tag site, because a nurse
+       shark barely leaves its home reef. Map coords cluster tightly
+       around the Caribbean Sea tag point — honest, not empty. */
+    areas: ["Tag-site reef", "Adjacent sand flats", "Seagrass beds", "Reef-edge drop-off", "Mating aggregation flat", "Nearby patch reefs"],
+    hop: [1, 15], dayStep: [7, 30], nPoints: [5, 6], kind: "satellite",
+    corridor: "extremely resident — mean dispersal 7.7 km (Glover's Reef, Belize); strong site fidelity; biennial returns to mating flats"
   },
   thresher: {
-    start: "Southern California Bight", // Cartamil et al.: acoustic/satellite work off San Diego County
-    areas: ["La Jolla Canyon", "Carlsbad Canyon", "Southern California Bight shelf edge", "Santa Catalina Island", "San Nicolas Basin", "Offshore Baja California waters"],
+    start: "Offshore North Carolina", // Anderson et al.: 61 PSAT tags, 48 individuals tracked WNA; Kneebone/NEAq tagged NC→Grand Banks 2016–2023
+    /* v0.9.0 consistency pass (for reviewers): the old envelope was built
+       on Southern California acoustic/satellite work, but the game tags
+       threshers in the Open Atlantic — a textbook case of the mismatch
+       ChatGPT flagged ("an individual shark's displayed track must be
+       geographically compatible with where that individual was tagged").
+       Rebuilt on western North Atlantic PSAT telemetry instead: seasonal
+       "snowbird" migration, Florida↔Grand Banks. */
+    areas: ["Offshore North Carolina", "Mid-Atlantic Bight shelf edge", "Georges Bank", "Gulf of Maine", "Grand Banks", "Offshore Florida (wintering)"],
     hop: [80, 600], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
-    corridor: "regional pelagic wanderer; daily vertical migration matters more than horizontal (Cartamil; Aalbers et al. 2021)"
+    corridor: "seasonal 'snowbird' migration — north to the Grand Banks in summer, south toward Florida in winter; daily vertical migration matters more than horizontal (Anderson et al.; Kneebone/NEAq)"
   },
   whale: {
-    start: "Ningaloo Reef, Western Australia", // 39-shark satellite study (Springer 2025)
-    areas: ["Ningaloo Reef", "Shark Bay", "Montebello Islands", "Java Trench approaches", "Banda Sea", "Timor Sea"],
-    hop: [300, 1500], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
-    corridor: "trans-oceanic — 'Rio Lady' ~43,000 km / 4 yrs; 'Milo' >55,000 km / 9 yrs (Guy Harvey Foundation)"
+    start: "Tubbataha Reefs Natural Park, Philippines", // Araujo et al. 2018 (PeerJ): 17 juvenile SPOT5 tags, Sulu & Bohol Seas
+    /* v0.9.0 consistency pass (for reviewers): the old envelope was built
+       on the Ningaloo (W. Australia) satellite study, but the game tags
+       whale sharks in the Philippines. Rebuilt on Araujo et al. 2018 —
+       the location-matched telemetry ChatGPT pointed to: all 17 tagged
+       sharks stayed in Philippine waters (6–126 days, 86–2,580 km,
+       ~15.5 km/day), moving between the Bohol and Sulu Seas, through
+       Surigao Strait, and out to the Pacific coast of Mindanao. */
+    areas: ["Tubbataha Reefs Natural Park", "Sulu Sea", "Northern Palawan", "Bohol Sea", "Surigao Strait", "Eastern Leyte", "Eastern Mindanao (Pacific)"],
+    hop: [50, 500], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "juveniles highly mobile but stay in Philippine waters — Bohol↔Sulu connectivity, Surigao Strait crossings (Araujo et al. 2018, PeerJ)"
   },
   goblin: {
     start: "Sagami Bay, Japan", // described 1898 from a Sagami Bay specimen; most records here (Yano et al. 2007)
@@ -827,9 +853,19 @@ const TRACK_ENVELOPES = {
   },
   hammerhead: {
     start: "Bimini, Bahamas", // Guttridge et al. long-term Bimini tagging program
-    areas: ["Bimini", "Andros Island", "Eleuthera", "Florida Keys", "Jupiter, Florida", "Offshore Virginia / Gulf Stream"],
-    hop: [100, 800], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
-    corridor: "partial seasonal migration — some round-trip Florida Keys ↔ north, others resident (Guttridge et al. 2017; Casselberry et al. 2025)"
+    /* v0.9.0 consistency pass (for reviewers): the old areas list leaned on
+       Florida-tagged studies (Florida Keys, Jupiter, offshore Virginia) —
+       ChatGPT's "Caribbean tag feeding a Florida-specific envelope"
+       example. Rebuilt Caribbean-centered on Bahamas work: Bimini
+       philopatry + seasonal residency (Guttridge et al. 2017) and the
+       Andros Island year-round residency study (Frontiers 2025: site
+       fidelity within 400 km², some individuals <1 km over 4 years).
+       The partial-migration behaviour is kept honest in the corridor
+       note (some do run north in summer), but no Florida waypoints are
+       imported into a Caribbean shark's pings. */
+    areas: ["Bimini", "Andros Island", "Eleuthera", "Exuma Sound", "Tongue of the Ocean", "Cay Sal Bank"],
+    hop: [50, 400], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "partial migration — many resident in the Bahamas year-round; some summer excursions north, return for winter (Guttridge et al. 2017; Andros 2025)"
   },
   mako: {
     start: "Azores", // ICCAT satellite study, NE Atlantic
@@ -844,10 +880,20 @@ const TRACK_ENVELOPES = {
     corridor: "seasonal basin migration — UK summer feeding → Biscay/Iberia winter → return (Doherty et al., Sci Rep 2017)"
   },
   epaulette: {
-    start: "Heron Island, Great Barrier Reef", // Heupel & Bennett movement study site
-    areas: ["Heron Island reef flat", "Heron lagoon", "Shark Bay (Heron Island)", "Reef crest", "Coral-head pools", "Heron Island north beach pools", "Wistari Reef edge"],
+    start: "Papua New Guinea reef flat (tag site)", // game tags in PNG; no PNG telemetry exists — see note
+    /* v0.9.0 consistency pass (for reviewers): the old envelope named
+       Heron Island (Great Barrier Reef) waypoints for a shark tagged in
+       Papua New Guinea — exactly the mismatch ChatGPT flagged. Per the
+       canon rule, the Heron Island mark-recapture work (Heupel &
+       Bennett — best epaulette movement evidence anywhere) now informs
+       BEHAVIOUR and SCALE only: "extremely resident, metre-scale
+       movements." No Australian waypoints are imported; the areas are
+       generic PNG reef-flat labels, and the kind stays "resightings"
+       (never satellite-tagged). Greatest net displacement on record:
+       475 m. */
+    areas: ["Tag-site reef flat", "Adjacent coral-head pools", "PNG reef crest", "Lagoon patch", "North beach pools", "Reef-flat edge"],
     hop: [0.1, 2], dayStep: [1, 7], nPoints: [6, 8], kind: "resightings",
-    corridor: "extreme residency — greatest net displacement on record 475 m (Raja Ampat 2026); mark-recapture only, never satellite-tagged"
+    corridor: "extreme residency — greatest net displacement on record 475 m; scale inferred from Heron Island mark-recapture (no PNG telemetry exists)"
   }
 };
 
@@ -990,7 +1036,40 @@ const MAP_COORDS = {
   "Reef crest": [-23.442, 151.918],
   "Coral-head pools": [-23.441, 151.912],
   "Heron Island north beach pools": [-23.437, 151.914],
-  "Wistari Reef edge": [-23.45, 151.92]
+  "Wistari Reef edge": [-23.45, 151.92],
+  /* v0.9.0 consistency pass: new envelope labels. Thresher (WNA),
+     whale (Philippines), hammerhead (Bahamas) get real coordinates;
+     nurse and epaulette generic reef labels cluster tightly at their
+     tag sites — honest local scribbles, not false precision. Older
+     labels above are kept so pre-fix tracks still plot. */
+  "Offshore North Carolina": [35.5, -74.5],
+  "Mid-Atlantic Bight shelf edge": [38.5, -72.0],
+  "Georges Bank": [41.5, -67.5],
+  "Gulf of Maine": [43.0, -69.0],
+  "Grand Banks": [45.5, -50.0],
+  "Offshore Florida (wintering)": [28.0, -79.0],
+  "Tubbataha Reefs Natural Park": [8.9, 119.9],
+  "Sulu Sea": [9.5, 121.0],
+  "Northern Palawan": [11.0, 119.0],
+  "Bohol Sea": [9.8, 123.5],
+  "Surigao Strait": [10.2, 125.4],
+  "Eastern Leyte": [10.8, 125.0],
+  "Eastern Mindanao (Pacific)": [8.5, 126.5],
+  "Exuma Sound": [24.0, -76.0],
+  "Tongue of the Ocean": [24.2, -77.5],
+  "Cay Sal Bank": [23.8, -80.3],
+  "Tag-site reef": [15.0, -70.0],
+  "Adjacent sand flats": [15.03, -70.01],
+  "Seagrass beds": [14.98, -70.03],
+  "Reef-edge drop-off": [15.02, -69.98],
+  "Mating aggregation flat": [15.01, -70.04],
+  "Nearby patch reefs": [14.99, -69.99],
+  "Tag-site reef flat": [-6.0, 147.0],
+  "Adjacent coral-head pools": [-5.998, 147.002],
+  "PNG reef crest": [-6.002, 147.001],
+  "Lagoon patch": [-6.002, 146.998],
+  "North beach pools": [-5.999, 147.003],
+  "Reef-flat edge": [-6.001, 146.997]
 };
 
 /* Stylized continents — recognizable, not cartographic. Equirectangular
