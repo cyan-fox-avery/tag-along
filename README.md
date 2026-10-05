@@ -1,15 +1,35 @@
 # Tag, You're It
 
-**v0.7.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.8.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
 You are a conservation scientist. Research each shark's habits, plan an
-expedition (region, depth, bait), head out to sea, and tag one of every
+expedition (region, depth, bait, scent), head out to sea, and tag one of every
 species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.8.0 changes
+
+- The bait box gets bigger: three new hook baits join the four originals —
+  tuna / large oily fish, ray, and urchins & shellfish — seven in all.
+  Every shark's diet is updated to match (the hammerhead finally gets its
+  stingrays), and every old combination still works.
+- Scent in the water is now its own planner row, on trial: no lure,
+  fish-oil chum, seal scent, or krill scent. Lures are species-specific
+  boosts, never gates — the right scent raises a shark's encounter odds,
+  a wrong one changes nothing. (The epaulette, a tiny reef worm-hunter,
+  honestly ignores all of them.)
+- Tagged sharks can resurface on later dives. Log the re-sighting and it
+  lands on the shark's collection card — date, location, a field note —
+  and extends its tracking story on the map.
+- New 📓 Logbook tab: a scientist's notebook recording every trip — the
+  plan, the encounters, the outcome. Compare your attempts; the pattern
+  is the answer.
+- Sarah remembers your sharks by name now. Between trips she sometimes
+  checks in ("how's Bruce doing??"), and she celebrates re-sightings.
 
 ## v0.7.3 changes
 
