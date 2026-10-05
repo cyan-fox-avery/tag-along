@@ -85,6 +85,13 @@ body {
 
 .field { display: block; margin: 10px 0; }
 .field span { display: block; font-size: 13px; font-weight: 700; color: var(--ink-dim); margin-bottom: 5px; }
+/* v0.9.1: live icon strip under each planner row — a small visual echo of
+   the current pick. Pure decoration; the selects stay the source of truth. */
+.pick-visual { font-size: 26px; line-height: 1.2; margin-top: 6px; min-height: 32px; }
+.pick-visual .pick-dot {
+  display: inline-block; width: 26px; height: 15px; border-radius: 50%;
+  background: #5b7a99; transform: rotate(-14deg); vertical-align: middle;
+}
 select, input[type="text"] {
   width: 100%; padding: 11px 12px; font-size: 15px; border-radius: 12px;
   border: 2px solid #2c5364; background: var(--bg-soft); color: var(--ink);

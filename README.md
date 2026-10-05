@@ -11,6 +11,19 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.9.1 changes — expedition planner polish
+
+- The Method row now opens progressively: the sub-menu (Attractant /
+  survey approach) stays hidden until you actually pick a method, instead
+  of sitting there pre-filled. Pick a method, the right sub-menu appears.
+- Every planner row grew a small live icon strip under it — region,
+  depth, bait, method, and the sub-menu each show a little visual echo
+  of your current pick (⚓ for the Outer Banks wrecks, 🪣 for chum, ✈️
+  for the spotter plane…). Pure decoration; the sea still decides.
+- Under the hood: the world-map/tracking data moved into its own file
+  (`map-data.js`), so the main script stays shippable. Nothing plays
+  differently.
+
 ## v0.9.0 changes — the science package
 
 - The planner's scent row is gone, replaced by **Method**: one row where
