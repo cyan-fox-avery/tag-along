@@ -29,6 +29,11 @@ Built for sarah, who loves sharks. 🦈
   envelope is real; the randomness stays inside it.
 - Science reasoning now lives in the code comments, so every range,
   method, and migration choice shows its work.
+- New 🗺️ Map tab: every tagged shark on one stylized globe — its
+  illustrative track as a line, its latest ping as a marker. Tap a
+  marker for the shark's name and a jump to its collection card. The
+  honesty framing holds here too: goblin tracks are marked archival,
+  and the epaulette's whole life fits inside one reef-flat dot.
 
 ## v0.8.0 changes
 
