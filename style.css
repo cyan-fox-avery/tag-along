@@ -371,17 +371,6 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
   padding: 18px 12px; line-height: 1.6;
 }
 
-/* v0.8.0: expedition logbook + re-sighting blocks */
-.logbook-list { display: grid; gap: 8px; }
-.logbook-entry {
-  background: var(--bg-soft); border-radius: 12px; padding: 10px 12px;
-  border-left: 3px solid #ffd166;
-}
-.logbook-date { font-weight: 800; font-size: 14px; }
-.logbook-plan { font-size: 13px; color: var(--ink-dim); margin-top: 2px; }
-.logbook-enc { font-size: 13px; margin-top: 4px; line-height: 1.7; }
-.resight-block h4 { font-size: 14px; margin: 10px 0 4px; }
-
 /* v0.7.0: discreet reset link in the footer */
 .link-button {
   background: none; border: none; padding: 2px 4px; cursor: pointer;
