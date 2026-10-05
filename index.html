@@ -20,6 +20,7 @@
       <button class="tab active" data-tab="research" type="button">📖 Research</button>
       <button class="tab" data-tab="expedition" type="button">🛥️ Expedition</button>
       <button class="tab" data-tab="collection" type="button">🗂️ Collection <span id="collectionCount" class="count-badge">0/6</span></button>
+      <button class="tab" data-tab="logbook" type="button">📓 Logbook</button>
       <button class="tab" data-tab="phone" type="button">📱 Phone <span id="msgBadge" class="count-badge hidden">0</span></button>
     </nav>
 
@@ -37,7 +38,7 @@
       <section id="tab-expedition" class="panel">
         <div class="section-head">
           <h2>Plan an expedition</h2>
-          <p>Choose the water — region, depth, bait. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
+          <p>Choose the water — region, depth, bait, and a scent in the water. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
         </div>
 
         <div id="planner" class="planner-card">
@@ -52,6 +53,10 @@
           <label class="field">
             <span>Bait</span>
             <select id="baitSelect"></select>
+          </label>
+          <label class="field">
+            <span>Scent in the water</span>
+            <select id="lureSelect"></select>
           </label>
           <button id="launchBtn" class="primary-button" type="button">🚀 Launch expedition</button>
         </div>
@@ -81,6 +86,15 @@
         <div id="sightingsList" class="sightings-list"></div>
       </section>
 
+      <!-- LOGBOOK -->
+      <section id="tab-logbook" class="panel">
+        <div class="section-head">
+          <h2>Expedition logbook</h2>
+          <p>A scientist's notebook — every trip, plan and outcome. Compare your attempts; the pattern is the answer.</p>
+        </div>
+        <div id="logbookList" class="logbook-list"></div>
+      </section>
+
       <!-- PHONE -->
       <section id="tab-phone" class="panel">
         <div class="phone-screen">
@@ -108,7 +122,7 @@
     <div class="phone">
       <div class="phone-head">⚠️ Reset all progress?</div>
       <div class="cert-body">
-        <p>This erases <strong>everything</strong>: tagged sharks, sightings, messages, tracks, and the win state. A clean slate — no bonuses, no prestige, just a restart.</p>
+        <p>This erases <strong>everything</strong>: tagged sharks, sightings, the logbook, messages, tracks, and the win state. A clean slate — no bonuses, no prestige, just a restart.</p>
         <p class="latin">This cannot be undone.</p>
       </div>
       <button id="resetConfirm" class="primary-button" type="button" style="background:#c0392b;color:#fff">Yes, erase everything</button>
