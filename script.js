@@ -1,10 +1,11 @@
-/* Tag, You're It — prototype v0.7.0
-   Research -> plan (region/depth/bait) -> dive -> watch/tag -> collection book. */
+/* Tag, You're It — prototype v0.8.0
+   Research -> plan (region/depth/bait/scent) -> dive -> watch/tag/resight
+   -> collection book + logbook. */
 
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.7.3";
+const VERSION = "v0.8.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -207,7 +208,24 @@ const BAITS = {
   "crustaceans":   "Crabs & lobster",
   "squid":         "Squid",
   "schooling-fish":"Schooling fish (mackerel)",
-  "plankton":      "Plankton bloom — no bait, follow the bloom"
+  "plankton":      "Plankton bloom — no bait, follow the bloom",
+  /* v0.8.0: three new hook baits. Sardines fold into schooling fish —
+     a separate row would add planner complexity without a real
+     biological distinction. */
+  "tuna":          "Tuna / large oily fish",
+  "ray":           "Ray",
+  "urchins":       "Urchins & shellfish"
+};
+
+/* v0.8.0: scent in the water — its OWN planner dimension, separate from
+   the hook bait. Species-specific BOOSTS only: the right lure raises a
+   species' encounter weight; a wrong lure or no lure is neutral and
+   never gates an encounter out. */
+const LURES = {
+  "none":  "No lure",
+  "chum":  "Fish-oil chum",
+  "seal":  "Seal scent",
+  "krill": "Krill scent"
 };
 
 /* Field notes: short, dense, real. Everything the planner needs is in
@@ -222,10 +240,11 @@ const SHARKS = [
     id: "nurse",
     name: "Nurse Shark", latin: "Ginglymostoma cirratum", status: "Vulnerable",
     code: "NS",
-    combo: { region: "caribbean", bait: "crustaceans" },
+    combo: { region: "caribbean", bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
+    lures: ["chum"],
     sizeRange: [2.0, 3.0],
-    research: "A bottom-dweller of the warm, shallow tropical Atlantic. In the Caribbean Sea, nurse sharks spend their days piled together under reef ledges — sometimes in heaps of forty. After dark they head out alone, sweeping the sandy shallows with the whisker-like barbels on their snouts, vacuuming up crabs and lobster. They rarely leave water shallower than about 75 metres.",
+    research: "A bottom-dweller of the warm, shallow tropical Atlantic. In the Caribbean Sea, nurse sharks spend their days piled together under reef ledges — sometimes in heaps of forty. After dark they head out alone, sweeping the sandy shallows with the whisker-like barbels on their snouts, vacuuming up crabs, lobster and shellfish. They rarely leave water shallower than about 75 metres.",
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor.",
     bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
     cheer: "nurse sharks are the CUDDLIEST!!! they nap in piles of FORTY. forty sharks. just vibing. i'm SO jealous",
@@ -237,10 +256,11 @@ const SHARKS = [
     id: "thresher",
     name: "Thresher Shark", latin: "Alopias vulpinus", status: "Vulnerable",
     code: "TS",
-    combo: { region: "open-atlantic", bait: "schooling-fish" },
+    combo: { region: "open-atlantic", bait: ["schooling-fish", "squid"] },
     depths: ["reef", "twilight"],
+    lures: ["chum"],
     sizeRange: [3.0, 4.6],
-    research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel, then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down.",
+    research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel — squid too, when they cross paths — then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down.",
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Threshers have been seen hunting in pairs, herding schools of fish into a tight ball before taking turns striking with their tails.",
     cheer: "THRESHERS!!! their tail is HALF THEIR BODY. they hunt by WHIPPING it. that's the coolest thing any animal does and i will not be taking questions",
@@ -254,8 +274,9 @@ const SHARKS = [
     code: "WS",
     combo: { region: "philippines", bait: "plankton" },
     depths: ["surface", "reef"],
+    lures: ["krill"],
     sizeRange: [5.5, 12.0],
-    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs.",
+    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the bloom. But a faint krill scent drifting on the current can smell like the bloom they're already following.",
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
     bonus: "Whale sharks can dive deeper than 1,900 metres — among the deepest dives ever recorded for any fish — then cruise back up to the surface to feed.",
     cheer: "A WHALE SHARK!!! the biggest fish in the WHOLE OCEAN and you TAGGED one!!! did you see the spots?? every one is different like a fingerprint!!",
@@ -269,6 +290,7 @@ const SHARKS = [
     code: "GS",
     combo: { region: "japan", bait: "squid" },
     depths: ["twilight", "deep"],
+    lures: ["chum"],
     sizeRange: [2.5, 4.0],
     research: "A living fossil from the deep continental slopes — most records come from Sagami Bay in Japan. Goblin sharks live in total darkness between about 270 and 960 metres, drifting over the seafloor and ambushing deep-sea squid and fish. Their jaws shoot forward like a slingshot, and they find prey by sensing the faint electricity of living things.",
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
@@ -283,11 +305,13 @@ const SHARKS = [
     name: "Tiger Shark", latin: "Galeocerdo cuvier", status: "Near Threatened",
     code: "TI",
     /* The garbage can of the sea: bait is forgiving (any meaty bait),
-       so the real puzzle is WHERE. */
-    combo: { region: "maldives", bait: ["schooling-fish", "squid", "crustaceans"] },
+       so the real puzzle is WHERE. Honesty first — some sharks are
+       easier than others. */
+    combo: { region: "maldives", bait: ["schooling-fish", "squid", "crustaceans", "tuna"] },
     depths: ["surface", "reef"],
+    lures: ["chum", "seal"],
     sizeRange: [3.0, 5.5],
-    research: "Tiger sharks patrol tropical and subtropical waters worldwide — everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, rarely straying deeper than a few hundred metres. They'll eat almost anything that crosses their path: fish, turtles, seabirds, even the occasional floating oddity. Researchers have found license plates in their stomachs.",
+    research: "Tiger sharks patrol tropical and subtropical waters worldwide — everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, rarely straying deeper than a few hundred metres. They'll eat almost anything that crosses their path: schooling fish, squid, crabs, turtles, seabirds, tuna — even seals, and the occasional floating oddity. Researchers have found license plates in their stomachs.",
     hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
     bonus: "Tiger sharks cross entire ocean basins. One tagged individual travelled more than 7,500 kilometres.",
     cheer: "TIGER SHARK!!! the garbage can of the sea!!! they eat ANYTHING. license plates!!! i love them so much",
@@ -299,10 +323,11 @@ const SHARKS = [
     id: "sandtiger",
     name: "Sand Tiger Shark", latin: "Carcharias taurus", status: "Critically Endangered",
     code: "ST",
-    combo: { region: "baja", bait: "squid" },
+    combo: { region: "baja", bait: ["squid", "schooling-fish", "ray"] },
     depths: ["surface", "reef"],
+    lures: ["chum"],
     sizeRange: [2.0, 3.2],
-    research: "Sand tiger sharks haunt subtropical and temperate shores on both sides of the Americas, including the rocky reefs and kelp edges off Baja California. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing fish and squid. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks.",
+    research: "Sand tiger sharks haunt subtropical and temperate shores on both sides of the Americas, including the rocky reefs and kelp edges off Baja California. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing schools of fish, squid and skates. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks.",
     hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
     bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
     cheer: "sand tiger!!! they look SO scary but they're actually big softies. they gulp air to FLOAT. like a weird balloon shark. tell it i said hi",
@@ -314,10 +339,11 @@ const SHARKS = [
     id: "galapagos",
     name: "Galápagos Shark", latin: "Carcharhinus galapagensis", status: "Least Concern",
     code: "GA",
-    combo: { region: "galapagos", bait: "schooling-fish" },
+    combo: { region: "galapagos", bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
+    lures: ["chum"],
     sizeRange: [2.4, 3.7],
-    research: "A reef shark of remote oceanic islands — and the one place it truly lives up to its name is the Galápagos. There, Galápagos sharks patrol the rocky reefs and island slopes, often in the clear shallows where schools of reef fish gather. They are bold and curious, sometimes circling divers for a closer look. They hunt jacks, groupers and other reef fish, mostly in water shallower than about 80 metres, rarely venturing into the deep.",
+    research: "A reef shark of remote oceanic islands — and the one place it truly lives up to its name is the Galápagos. There, Galápagos sharks patrol the rocky reefs and island slopes, often in the clear shallows where schools of reef fish gather. They are bold and curious, sometimes circling divers for a closer look. They hunt jacks, groupers, squid and other reef fish, mostly in water shallower than about 80 metres, rarely venturing into the deep.",
     hook: "Bold island shark — known to circle divers just to check them out.",
     bonus: "Galápagos sharks use nursery areas: pups grow up in sheltered island bays before heading out to the reefs.",
     cheer: "GALÁPAGOS SHARK!!! the island shark!!! they're so curious they come right up to divers. did it check YOU out?!",
@@ -329,10 +355,11 @@ const SHARKS = [
     id: "greatwhite",
     name: "Great White Shark", latin: "Carcharodon carcharias", status: "Vulnerable",
     code: "GW",
-    combo: { region: "south-africa", bait: "schooling-fish" },
+    combo: { region: "south-africa", bait: ["tuna", "schooling-fish"] },
     depths: ["surface", "reef"],
+    lures: ["seal", "chum"],
     sizeRange: [3.5, 6.0],
-    research: "The ocean's most famous hunter cruises temperate coasts worldwide — and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water. They eat seals, fish and the occasional drifting carcass, hunting mostly in the sunlit upper layers.",
+    research: "The ocean's most famous hunter cruises temperate coasts worldwide — and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water. They eat seals, big oily fish like tuna, and the occasional drifting carcass, hunting mostly in the sunlit upper layers.",
     hook: "Warm-bodied hunter; can breach fully out of the water.",
     bonus: "A great white's bite is investigative — most encounters are a single test bite, then it lets go and moves on.",
     cheer: "A GREAT WHITE!!! THE great white!!! did it breach?!?! they're warm-blooded which is SO weird for a fish",
@@ -344,10 +371,11 @@ const SHARKS = [
     id: "hammerhead",
     name: "Great Hammerhead", latin: "Sphyrna mokarran", status: "Critically Endangered",
     code: "HH",
-    combo: { region: "caribbean", bait: "schooling-fish" },
+    combo: { region: "caribbean", bait: ["ray", "schooling-fish"] },
     depths: ["surface", "reef"],
+    lures: ["chum"],
     sizeRange: [2.5, 5.0],
-    research: "The largest of the hammerheads roams tropical seas, and the Caribbean's reefs are prime hunting ground. That wide hammer isn't just for show — it's packed with sensors that pick up the faint electricity of stingrays buried in the sand, their favourite food. Great hammerheads cruise the shallows and reef flats, rarely deeper than about 80 metres, sweeping their heads side to side like metal detectors.",
+    research: "The largest of the hammerheads roams tropical seas, and the Caribbean's reefs are prime hunting ground. That wide hammer isn't just for show — it's packed with sensors that pick up the faint electricity of stingrays buried in the sand, their favourite food — though a passing school of reef fish works too. Great hammerheads cruise the shallows and reef flats, rarely deeper than about 80 metres, sweeping their heads side to side like metal detectors.",
     hook: "The hammer is a sensory array — it 'sees' stingrays hidden in sand.",
     bonus: "Hammerhead pups are born with a soft, folded hammer that straightens out as they grow.",
     cheer: "A HAMMERHEAD!!! their eyes are on the ENDS of the hammer!! 360 vision!!! nature said 'what if binoculars but shark'",
@@ -359,8 +387,9 @@ const SHARKS = [
     id: "mako",
     name: "Shortfin Mako", latin: "Isurus oxyrinchus", status: "Endangered",
     code: "MK",
-    combo: { region: "open-atlantic", bait: "squid" },
+    combo: { region: "open-atlantic", bait: ["tuna", "squid"] },
     depths: ["surface", "reef"],
+    lures: ["chum"],
     sizeRange: [2.0, 3.8],
     research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They hunt in the sunlit surface waters, rarely diving below about 150 metres, where the light is good and the prey is quick. If something out here is moving at 70 kilometres an hour, it's a mako.",
     hook: "Clocks ~70 km/h — the fastest shark alive.",
@@ -376,8 +405,9 @@ const SHARKS = [
     code: "BS",
     combo: { region: "cornwall", bait: "plankton" },
     depths: ["surface", "reef"],
+    lures: ["krill"],
     sizeRange: [6.0, 9.0],
-    research: "The second-biggest fish in the ocean feeds like the biggest — by swimming slowly through plankton with its enormous mouth wide open. Basking sharks visit temperate coasts in summer, and the plankton-rich waters off Cornwall are a favourite. Look for the tall dorsal fin cutting the surface, the huge mouth agape. They feed right at the top where the water turns green, sometimes dipping a little deeper over the reefs.",
+    research: "The second-biggest fish in the ocean feeds like the biggest — by swimming slowly through plankton with its enormous mouth wide open. Basking sharks visit temperate coasts in summer, and the plankton-rich waters off Cornwall are a favourite. Look for the tall dorsal fin cutting the surface, the huge mouth agape. They feed right at the top where the water turns green, sometimes dipping a little deeper over the reefs. Like whale sharks, they're following the bloom — and a faint krill scent on the current can smell like dinner.",
     hook: "Second-largest fish on Earth; feeds with a mouth up to a metre wide.",
     bonus: "A basking shark filters the equivalent of an Olympic swimming pool of water every hour.",
     cheer: "A BASKING SHARK!!! the second-biggest fish!!! just vibing with its mouth open!!! the gentle giant's gentle giant",
@@ -389,10 +419,13 @@ const SHARKS = [
     id: "epaulette",
     name: "Epaulette Shark", latin: "Hemiscyllium ocellatum", status: "Least Concern",
     code: "EP",
-    combo: { region: "papua-new-guinea", bait: "crustaceans" },
+    combo: { region: "papua-new-guinea", bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
+    /* The honest neutral: a tiny reef worm-hunter. Scent plumes aren't
+       how you'd target it, so every lure does nothing — no penalty. */
+    lures: [],
     sizeRange: [0.6, 1.0],
-    research: "A small reef shark with an extraordinary trick: it can walk. Epaulette sharks live on the shallow reef flats of Papua New Guinea, where the tide sometimes strands them in ankle-deep pools. Instead of panicking, they clamber from pool to pool on their paddle-like fins, hunting crabs and worms. They rarely leave water shallower than a few metres — the intertidal zone is their whole world.",
+    research: "A small reef shark with an extraordinary trick: it can walk. Epaulette sharks live on the shallow reef flats of Papua New Guinea, where the tide sometimes strands them in ankle-deep pools. Instead of panicking, they clamber from pool to pool on their paddle-like fins, hunting crabs, shellfish and worms. They rarely leave water shallower than a few metres — the intertidal zone is their whole world.",
     hook: "Walks between tide pools on its fins when the reef drains.",
     bonus: "Epaulettes can survive over an hour out of water by slowing their bodies right down — the ultimate low-tide specialist.",
     cheer: "AN EPAULETTE SHARK!!! IT WALKS!!! ON ITS FINS!!! like a little puppy walking on the reef!!! i can't cope",
@@ -414,18 +447,18 @@ const COUSIN_CHATS = [
 ];
 
 const COUSIN_NUDGES = {
-  nurse:   "nurse sharks are SHALLOW!! like surface-to-reef shallow, 0 to 75 metres. they nap under reef ledges during the day and vacuum crabs off the sand at night. caribbean + shallow + crabs!!",
-  thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish. reefs or twilight + fish bait??",
-  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! find the bloom at the surface. they're usually right at the top where the water looks green, sometimes a bit deeper over reefs",
+  nurse:   "nurse sharks are SHALLOW!! like surface-to-reef shallow, 0 to 75 metres. they nap under reef ledges during the day and vacuum crabs and shellfish off the sand at night. caribbean + shallow + crabs or shellfish!!",
+  thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish (and squid!!). reefs or twilight + fish bait??",
+  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! find the bloom at the surface. they're usually right at the top where the water looks green, sometimes a bit deeper over reefs. a little krill scent can smell like the bloom!!",
   goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!",
-  tiger:    "tiger sharks aren't picky AT ALL!!! they'll eat fish, squid, even crabs!! try the maldives!! shallow lagoons!! the real question is WHERE not what!!",
-  sandtiger:"sand tigers look scary but they're softies!! baja california!! they hover in the shallows eating squid!! the floaty balloon sharks!!",
-  galapagos: "galápagos sharks!! they're reef sharks that LOVE oceanic islands. the galápagos obviously!! shallow reefs, and they eat reef fish!!",
-  greatwhite: "great whites!!! south africa!! they follow the seals. shallow water, and they eat FISH. they're warm-blooded-ish which is WILD for a shark",
-  hammerhead: "hammerheads!!! the caribbean has great hammerheads!! they hunt STINGRAYS on the reef. shallow water + fish bait!! their heads are basically metal detectors",
-  mako: "makos are the FASTEST sharks!!! open atlantic, and they love squid!! they hunt up near the surface. they're basically underwater race cars",
-  basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!!",
-  epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs!!"
+  tiger:    "tiger sharks aren't picky AT ALL!!! they'll eat fish, squid, crabs, even tuna!! try the maldives!! shallow lagoons!! the real question is WHERE not what!!",
+  sandtiger:"sand tigers look scary but they're softies!! baja california!! they hover in the shallows eating squid and fish!! the floaty balloon sharks!!",
+  galapagos: "galápagos sharks!! they're reef sharks that LOVE oceanic islands. the galápagos obviously!! shallow reefs, and they eat reef fish and squid!!",
+  greatwhite: "great whites!!! south africa!! they follow the SEALS — a seal scent in the water helps!! shallow water, and they eat FISH (big oily ones like tuna!!). they're warm-blooded-ish which is WILD for a shark",
+  hammerhead: "hammerheads!!! the caribbean has great hammerheads!! they hunt STINGRAYS on the reef — ray bait!! (fish works too). shallow water + their heads are basically metal detectors",
+  mako: "makos are the FASTEST sharks!!! open atlantic, and they love squid and tuna!! they hunt up near the surface. they're basically underwater race cars",
+  basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!! a little krill scent can smell like the bloom!!",
+  epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs and shellfish!!"
 };
 
 /* Field-guide sketches: rough pencil-style drawings of one distinctive
@@ -753,6 +786,16 @@ const sightStore = {
   save(d) { localStorage.setItem("tyi-sightings", JSON.stringify(d)); }
 };
 
+/* v0.8.0: the expedition logbook — a scientist's notebook. Every trip:
+   date, the plan (region/depth/bait/lure), encounters and outcome. */
+const logStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-logbook") || "[]"); }
+    catch { return []; }
+  },
+  save(d) { localStorage.setItem("tyi-logbook", JSON.stringify(d)); }
+};
+
 /* v0.7.0: the first six sharks (the original roster). Tagging all six
    unlocks the Galápagos and South Africa — new waters earned, not given. */
 const ORIGINAL_SIX = ["nurse", "thresher", "whale", "goblin", "tiger", "sandtiger"];
@@ -771,9 +814,12 @@ const state = {
   unread: _savedMsgs.unread || 0,
   pendingTag: null,       // species object awaiting naming
   sightings: sightStore.load(), // v0.7.0: watched-but-not-tagged log
+  logbook: logStore.load(),   // v0.8.0: expedition logbook
   regionsUnlocked: false, // v0.7.0: first six tagged -> Galápagos + South Africa
   pendingWin: false,      // v0.7.0: final shark tagged mid-trip; ceremony at day's end
-  currentPlan: null,      // v0.7.0: the trip's region/depth/bait
+  currentPlan: null,      // v0.7.0: the trip's region/depth/bait (+lure in v0.8.0)
+  taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
+  resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
 };
@@ -960,7 +1006,8 @@ function migrateWinV07() {
 
 /* ---------- Planner ----------
    v0.7.0: no target species. The planner is conditions only — region,
-   depth, bait. Your research is your targeting: the right combination
+   depth, bait. v0.8.0 adds scent in the water as its own row.
+   Your research is your targeting: the right combination
    brings the right sharks. The sea decides who shows up. */
 function renderPlanner() {
   /* Selects are static; fillRegions() preserves the current region.
@@ -974,7 +1021,8 @@ $("launchBtn").addEventListener("click", () => {
   runExpedition({
     region,
     depth: $("depthSelect").value,
-    bait: $("baitSelect").value
+    bait: $("baitSelect").value,
+    lure: $("lureSelect").value
   });
 });
 
@@ -1048,12 +1096,26 @@ function resolveEncounters(plan) {
 }
 
 /* Pick one species for an encounter slot: prefer untagged species the
-   player hasn't already seen today, then familiar faces for watching. */
-function pickEncounter(appeared, shown) {
+   player hasn't already seen today, then familiar faces for watching.
+   v0.8.0: the scent lure BOOSTS — a species the lure is right for gets
+   triple weight. A wrong lure or no lure changes nothing (never a gate). */
+function lureWeight(plan, species) {
+  const lure = (plan && plan.lure) || "none";
+  return (species.lures || []).includes(lure) ? 3 : 1;
+}
+function pickEncounter(appeared, shown, plan) {
   const fresh = appeared.filter(s => !shown.has(s.id));
   if (!fresh.length) return null;
   const newToPlayer = fresh.filter(s => !state.tagged[s.id]);
-  return pick(newToPlayer.length ? newToPlayer : fresh);
+  const pool = newToPlayer.length ? newToPlayer : fresh;
+  let total = 0;
+  const weights = pool.map(s => { const w = lureWeight(plan, s); total += w; return w; });
+  let r = Math.random() * total;
+  for (let i = 0; i < pool.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
 }
 
 /* One encounter: the shark appears, and the player chooses to WATCH
@@ -1101,6 +1163,7 @@ function doEncounter(species, plan) {
     watchBtn.textContent = "👁️ Just watch";
     watchBtn.addEventListener("click", () => {
       const entry = recordSighting(species, plan);
+      logTripEncounter(species, "watched");
       logLine(`👁️ You watch the ${species.name} ${entry.doing}. A good sighting, logged.`);
       finish();
     });
@@ -1117,6 +1180,20 @@ function doEncounter(species, plan) {
       });
       actions.appendChild(tagBtn);
     } else {
+      /* v0.8.0: it's one of yours — log the re-sighting. */
+      const resightBtn = document.createElement("button");
+      resightBtn.className = "secondary-button";
+      resightBtn.type = "button";
+      resightBtn.textContent = "📝 Log re-sighting";
+      resightBtn.addEventListener("click", () => {
+        const entry = recordResighting(species, plan);
+        logTripEncounter(species, "resighted");
+        logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
+        pushThread(resightThread(species, rec));
+        state.resightedThisTrip = true;
+        finish();
+      });
+      actions.appendChild(resightBtn);
       const note = document.createElement("p");
       note.className = "latin";
       note.style.cssText = "width:100%;text-align:center;margin:4px 0 0";
@@ -1133,7 +1210,18 @@ async function runExpedition(plan) {
   state.currentPlan = plan;
   state.pendingWin = false;
   state.taggedThisTrip = false;
+  state.resightedThisTrip = false;
   tripDecks = { waiting: shuffled(WAITING_LINES), doing: shuffled(SIGHTING_DOINES) };
+  /* v0.8.0: open a fresh logbook page for this trip. */
+  tripLog = {
+    ts: Date.now(),
+    date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
+    region: plan.region,
+    depth: plan.depth,
+    bait: plan.bait,
+    lure: plan.lure || "none",
+    encounters: []
+  };
   $("launchBtn").disabled = true;
   $("diveView").classList.remove("hidden");
   $("diveActions").classList.add("hidden");
@@ -1152,6 +1240,12 @@ async function runExpedition(plan) {
   logLine(`🛥️ <strong>Expedition begun</strong> — the research vessel leaves the harbor.`);
   await wait(1700);
   logLine(`🪝 ${baitText}`);
+  await wait(1700);
+  /* v0.8.0: scent in the water, if any. Neutral wording — no promises. */
+  const lureText = !plan.lure || plan.lure === "none"
+    ? "No scent in the water — just the bait doing the talking."
+    : `Scent in the water: ${LURES[plan.lure]}.`;
+  logLine(`🌊 ${lureText}`);
   await wait(1700);
   if (deep) {
     logLine(`⬇️ The water darkens as you descend. The surface light thins, then lets go.`);
@@ -1180,7 +1274,7 @@ async function runExpedition(plan) {
     }
     await showSighting(plan.depth);
     await wait(1900);
-    const s = pickEncounter(appeared, shown);
+    const s = pickEncounter(appeared, shown, plan);
     if (s) {
       shown.add(s.id);
       sawShark = true;
@@ -1206,6 +1300,14 @@ async function runExpedition(plan) {
     logLine(`<span class="miss">No sharks today. The sea keeps its counsel.</span>`, "miss");
   } else {
     state.failures = 0;
+  }
+
+  /* v0.8.0: close the logbook page for this trip. */
+  if (tripLog) {
+    state.logbook.unshift(tripLog);
+    logStore.save(state.logbook);
+    tripLog = null;
+    renderLogbook();
   }
 
   const actions = $("diveActions");
@@ -1266,7 +1368,120 @@ function renderSightings() {
   });
 }
 
-/* ---------- Sarah's texts (optional — badge notifies, you open when you want) ---------- */
+/* ---------- Re-sightings: your tagged sharks, seen again ----------
+   v0.8.0: a tagged shark can reappear on a later dive in the right
+   waters. Logging the re-sighting adds a field entry to the shark's
+   collection card and extends its tracking story — warm, not a
+   progression track. */
+const RESIGHT_NOTES = [
+  "Looking healthy and unhurried.",
+  "A fresh scar on the dorsal fin — a story there.",
+  "A little bigger than at tagging, if the eye can be trusted.",
+  "Cruising with a companion this time.",
+  "Same calm circuit as ever — this one knows these waters.",
+  "Bold as brass, came in close to look at the boat.",
+  "Feeding well; good body condition.",
+  "The tag is still seated perfectly. Good work, past us."
+];
+
+function recordResighting(species, plan) {
+  const t = state.tagged[species.id];
+  const entry = {
+    date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
+    location: REGIONS[plan.region].name,
+    note: pick(RESIGHT_NOTES),
+    ts: Date.now()
+  };
+  t.resightings = t.resightings || [];
+  t.resightings.push(entry);
+  /* The tracking story grows: a new ping on the map. */
+  if (t.track && t.track.points.length) {
+    const last = t.track.points[t.track.points.length - 1];
+    const day = last.day + 5 + Math.floor(Math.random() * 15);
+    const km = 2 + Math.floor(Math.random() * 30);
+    t.track.points.push({ label: entry.location, day, km });
+    t.track.days = day;
+    t.track.totalKm += km;
+  }
+  store.save(state.tagged);
+  renderCollection();
+  return entry;
+}
+
+/* A re-sighting gets its own little celebration — species-relevant,
+   like every other Sarah moment after a tag. */
+function resightThread(species, rec) {
+  const label = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
+  const last = rec.resightings[rec.resightings.length - 1];
+  return [
+    { who: "them", text: `WAIT. you saw ${label} AGAIN?!?! the ${species.name.toLowerCase()}!!!` },
+    { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
+    { who: "them", text: "that's the BEST part of tagging!!! you get to know it's THEM. do you think it recognized you??" }
+  ];
+}
+
+/* ---------- Sarah remembers sharks by name ----------
+   v0.8.0: between expeditions she sometimes checks in about one of
+   your NAMED sharks. Genuine family conversation — the fact stays
+   with the species she asked about. */
+const NAMED_CHECKINS = [
+  { them: "hey!! how's {name} doing?? i was just thinking about your {species}!!",
+    me: "Still out there pinging away. {hook}" },
+  { them: "do you think {name} remembers you??",
+    me: "If sharks hold grudges about boats, I'm in trouble. {hook}" },
+  { them: "{name} update?? {name} update?? i need a {species} update",
+    me: "No new pings since yesterday. Probably busy being a shark. {hook}" }
+];
+
+function maybeCheckinThread() {
+  const named = SHARKS.filter(s => state.tagged[s.id] && state.tagged[s.id].name);
+  if (!named.length || Math.random() > 0.4) return null;
+  const s = pick(named);
+  const rec = state.tagged[s.id];
+  const t = pick(NAMED_CHECKINS);
+  const fill = (str) => str
+    .replaceAll("{name}", rec.name)
+    .replaceAll("{species}", s.name.toLowerCase())
+    .replaceAll("{hook}", s.hook);
+  return [
+    { who: "them", text: fill(t.them) },
+    { who: "me", text: fill(t.me) }
+  ];
+}
+
+/* ---------- Expedition logbook: the scientist's notebook ----------
+   v0.8.0: every trip lands here — plan (region/depth/bait/lure),
+   encounters and outcome. Compare attempts; the pattern is the answer. */
+function renderLogbook() {
+  const list = $("logbookList");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!state.logbook.length) {
+    list.innerHTML = `<div class="empty-note">No expeditions logged yet.<br>Every trip lands here — plan, encounters, outcome. 📓</div>`;
+    return;
+  }
+  state.logbook.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "logbook-entry";
+    const planBits = [
+      REGIONS[t.region] ? REGIONS[t.region].name : t.region,
+      DEPTHS[t.depth] ? DEPTHS[t.depth].name : t.depth,
+      BAITS[t.bait] || t.bait,
+      (t.lure && t.lure !== "none") ? (LURES[t.lure] || t.lure) : "No lure"
+    ];
+    const enc = t.encounters.length
+      ? t.encounters.map(e => {
+          const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : "👁️";
+          return `${icon} ${esc(e.name)} <span class="dim">(${e.result})</span>`;
+        }).join("<br>")
+      : `<span class="dim">No sharks today.</span>`;
+    div.innerHTML = `
+      <div class="logbook-date">🛥️ ${esc(t.date)}</div>
+      <div class="logbook-plan">${planBits.map(esc).join(" · ")}</div>
+      <div class="logbook-enc">${enc}</div>`;
+    list.appendChild(div);
+  });
+}
 
 function updateMsgBadge() {
   const b = $("msgBadge");
@@ -1305,9 +1520,9 @@ function renderMessages() {
    shark to point at — a useful direction, not a correction. */
 function afterExpedition(plan) {
   /* A trip with a successful tag already got its Sarah moment — the
-     species-relevant celebration thread. Don't follow it minutes later
-     with an unrelated random fact. */
-  if (state.taggedThisTrip) return;
+     species-relevant celebration thread. Same for a re-sighting. Don't
+     follow it minutes later with an unrelated random fact. */
+  if (state.taggedThisTrip || state.resightedThisTrip) return;
   let thread;
   if (state.failures >= 3) {
     // gentle nudge, genuine-conversation style
@@ -1321,12 +1536,19 @@ function afterExpedition(plan) {
     ];
     state.failures = 0;
   } else {
-    const chat = COUSIN_CHATS[state.chatIdx % COUSIN_CHATS.length];
-    state.chatIdx += 1;
-    thread = [
-      { who: "them", text: chat.them },
-      { who: "me", text: chat.me }
-    ];
+    /* v0.8.0: sometimes she just checks in about one of your named
+       sharks — the cousin who remembers. */
+    const checkin = maybeCheckinThread();
+    if (checkin) {
+      thread = checkin;
+    } else {
+      const chat = COUSIN_CHATS[state.chatIdx % COUSIN_CHATS.length];
+      state.chatIdx += 1;
+      thread = [
+        { who: "them", text: chat.them },
+        { who: "me", text: chat.me }
+      ];
+    }
   }
   pushThread(thread);
 }
@@ -1350,6 +1572,13 @@ let tripDecks = null;
 function deal(deck, pool) {
   if (!deck.length) deck.push(...shuffled(pool));
   return deck.pop();
+}
+
+/* v0.8.0: the trip currently being logged for the logbook. */
+let tripLog = null;
+function logTripEncounter(species, result) {
+  if (!tripLog) return;
+  tripLog.encounters.push({ speciesId: species.id, name: species.name, result });
 }
 
 /* ---------- Tagging: tag -> health check -> release ----------
@@ -1395,6 +1624,7 @@ function confirmTag(name) {
   };
   state.tagged[s.id] = rec;
   state.taggedThisTrip = true;
+  logTripEncounter(s, "tagged");
   store.save(state.tagged);
   state.pendingTag = null;
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
@@ -1648,6 +1878,13 @@ function openDetail(id) {
       📅 ${esc(t.date)}
     </p>
     <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px">📍 Track this shark</button>
+    ${t.resightings && t.resightings.length ? `
+    <div class="resight-block">
+      <h4>🔁 Re-sightings (${t.resightings.length})</h4>
+      <ul class="track-stops">
+        ${t.resightings.map(r => `<li>📍 ${esc(r.date)} — ${esc(r.location)}<br><span class="dim">${esc(r.note)}</span></li>`).join("")}
+      </ul>
+    </div>` : ""}
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
   `;
@@ -1737,7 +1974,7 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-idseq", "tyi-sightings", "tyi-regions"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -1759,6 +1996,7 @@ function renderAll() {
   renderPlanner();
   renderCollection();
   renderSightings();
+  renderLogbook();
   renderMessages();
   updateMsgBadge();
 }
@@ -1769,6 +2007,7 @@ migrateWinV07();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
+fillSelect($("lureSelect"), LURES);
 $("buildTag").textContent = VERSION;
 $("phoneTime").textContent =
   new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
