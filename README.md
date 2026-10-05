@@ -11,6 +11,25 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.9.0 changes — the science package
+
+- The planner's scent row is gone, replaced by **Method**: one row where
+  the top-level approach opens its own sub-menu. Hunters get *Attract*
+  (fish-oil chum, seal scent, or nothing — same boost-only rules as
+  before), while whale and basking sharks get *Find the aggregation*
+  (boat survey of the bloom, spotter-plane survey, local sightings
+  network). A whale shark never sees chum. The asymmetry is on purpose:
+  the method teaches the animal.
+- The sand tiger moves out of Baja California — the eastern Pacific
+  isn't really its ocean — to the Outer Banks, North Carolina, whose
+  wrecks host its most famous aggregation. Every other region×species
+  pairing got audited against real range references too.
+- Satellite tracks are rebuilt on real geography: verified tagging
+  sites, plausible corridors, honest distances and timescales. The
+  envelope is real; the randomness stays inside it.
+- Science reasoning now lives in the code comments, so every range,
+  method, and migration choice shows its work.
+
 ## v0.8.0 changes
 
 - The bait box gets bigger: three new hook baits join the four originals —
