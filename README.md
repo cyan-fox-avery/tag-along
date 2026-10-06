@@ -1,15 +1,26 @@
 # Tag, You're It
 
-**v0.10.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.10.2** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
 You are a conservation scientist. Research each shark's habits, plan an
-expedition (region, depth, bait, scent), head out to sea, and tag one of every
+expedition (region, depth, bait, method), head out to sea, and tag one of every
 species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.10.2 changes — touchscreen map support
+
+- The world map finally works on phones: pinch to zoom (1×–4×, centered
+  between your fingers), drag to pan when zoomed in, and taps still open
+  the shark popups — a drag won't trigger one by accident. At normal zoom
+  a vertical swipe scrolls the page like always; the map only takes over
+  your finger once you're zoomed in. The zoom and currents buttons are
+  proper finger-sized targets now too.
+- Review fix (thanks ChatGPT): zooming now keeps the map point under your
+  fingers exactly where it was, instead of jumping it to the center.
 
 ## v0.10.1 changes — tracking-note consistency
 
