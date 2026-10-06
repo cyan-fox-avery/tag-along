@@ -1,4 +1,4 @@
-/* Tag, You're It — prototype v0.9.0
+/* Tag Along — v0.15.0
    Research -> plan (region/depth/bait/method) -> dive -> watch/tag/resight
    -> collection book + logbook. */
 
@@ -1722,7 +1722,7 @@ function openCertificate() {
   c.innerHTML = `
     <div class="cert-trophy" style="font-size:44px">🏆</div>
     <h3 style="margin:6px 0 0">Master Shark Tagger</h3>
-    <p class="latin">Tag, You're It — field program</p>
+    <p class="latin">Tag Along — field program</p>
     <div class="cert-body">
       <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
       <p class="cert-sig">Awarded with salt on it. 🦈</p>
@@ -2107,7 +2107,17 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
+    if (pts.size === 0) {
+      if (movedMax > 10) suppressMarkerClick = true;
+    } else if (pts.size === 1) {
+      // A lifted finger during an (unsupported) two-finger touch collapses
+      // back into a normal one-finger pan: re-anchor the remaining finger
+      // so the map doesn't jump from its older position.
+      const p = [...pts.values()][0];
+      downX = panX = p.x;
+      downY = panY = p.y;
+      movedMax = 0;
+    }
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
