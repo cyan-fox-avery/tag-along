@@ -328,6 +328,46 @@ const ART = {
       <line x1="78" y1="51" x2="76" y2="67"/>
       <line x1="84" y1="51" x2="82" y2="67"/>
     </g>
+  </svg>`,
+  frilled: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Frilled shark">
+    <polygon points="170,58 204,46 202,80" fill="#4a3f35"/>
+    <ellipse cx="102" cy="62" rx="70" ry="14" fill="#5c4f41"/>
+    <ellipse cx="102" cy="68" rx="62" ry="8" fill="#c9bfae" opacity="0.7"/>
+    <ellipse cx="42" cy="60" rx="14" ry="10" fill="#5c4f41"/>
+    <polygon points="104,49 112,34 120,49" fill="#4a3f35"/>
+    <polygon points="88,72 80,92 98,73" fill="#4a3f35"/>
+    <circle cx="38" cy="58" r="2.8" fill="#1c2733"/>
+    <g stroke="#6e5f4d" stroke-width="2" stroke-linecap="round" fill="none">
+      <path d="M56,52 q3,4 0,8 q-3,4 0,8"/>
+      <path d="M62,52 q3,4 0,8 q-3,4 0,8"/>
+      <path d="M68,52 q3,4 0,8 q-3,4 0,8"/>
+      <path d="M74,52 q3,4 0,8 q-3,4 0,8"/>
+      <path d="M80,52 q3,4 0,8 q-3,4 0,8"/>
+      <path d="M86,52 q3,4 0,8 q-3,4 0,8"/>
+    </g>
+  </svg>`,
+  zebra: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Zebra shark">
+    <polygon points="162,56 200,40 198,84" fill="#8a6f3d"/>
+    <ellipse cx="100" cy="62" rx="64" ry="18" fill="#a5854a"/>
+    <ellipse cx="100" cy="70" rx="56" ry="10" fill="#e8d9a8" opacity="0.8"/>
+    <polygon points="102,45 112,27 122,45" fill="#8a6f3d"/>
+    <polygon points="88,76 78,96 100,77" fill="#8a6f3d"/>
+    <polygon points="50,62 62,56 62,68" fill="#a5854a"/>
+    <path d="M36,66 q4,3 8,0" stroke="#6e5630" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="52" cy="58" r="3.2" fill="#1c2733"/>
+    <circle cx="53.2" cy="56.8" r="1.1" fill="#ffffff"/>
+    <g fill="#6e5630" opacity="0.85">
+      <circle cx="80" cy="56" r="2.6"/><circle cx="96" cy="60" r="2.6"/><circle cx="112" cy="57" r="2.6"/>
+      <circle cx="128" cy="60" r="2.4"/><circle cx="88" cy="66" r="2.4"/><circle cx="104" cy="68" r="2.4"/>
+      <circle cx="120" cy="67" r="2.2"/><circle cx="72" cy="62" r="2.2"/><circle cx="136" cy="64" r="2"/>
+    </g>
+    <g stroke="#6e5630" stroke-width="1.5" stroke-linecap="round">
+      <line x1="70" y1="54" x2="68" y2="68"/>
+      <line x1="76" y1="53" x2="74" y2="69"/>
+      <line x1="82" y1="53" x2="80" y2="69"/>
+    </g>
   </svg>`
 
 };
@@ -522,6 +562,29 @@ const SKETCH = {
       <ellipse cx="105" cy="62" rx="70" ry="18"/>
       <path d="M40,58 Q105,52 170,58" stroke="#c9a86a" opacity="0.9"/>
       <path d="M96,46 L106,22 L116,46 Z"/>
+    </g>
+  </svg>`,
+  frilled: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: frilled shark frilly gills">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="64" rx="72" ry="14"/>
+      <g stroke-width="2">
+        <path d="M56,54 q3,4 0,8 q-3,4 0,8"/>
+        <path d="M63,54 q3,4 0,8 q-3,4 0,8"/>
+        <path d="M70,54 q3,4 0,8 q-3,4 0,8"/>
+      </g>
+      <path d="M96,50 L104,32 L112,50 Z"/>
+    </g>
+  </svg>`,
+  zebra: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: zebra shark spots">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M96,46 L106,26 L116,46 Z"/>
+    </g>
+    <g fill="#9fb8cc" opacity="0.9">
+      <circle cx="85" cy="58" r="2.4"/><circle cx="100" cy="62" r="2.4"/><circle cx="115" cy="59" r="2.4"/>
+      <circle cx="130" cy="62" r="2.2"/><circle cx="92" cy="68" r="2.2"/><circle cx="108" cy="69" r="2.2"/>
     </g>
   </svg>`
 
