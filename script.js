@@ -112,9 +112,9 @@ const LEGACY_LURES = { "none": "No lure", "chum": "Fish-oil chum", "seal": "Seal
 
 /* If you name a shark "Sarah", she finds out. Sweet, not progression. */
 const SARAH_EGG_THREAD = [
-  { who: "them", text: "WAIT. you named a shark SARAH?!?! like ME?!?!" },
+  { who: "them", text: "Wait. You named a shark Sarah? Like me?" },
   { who: "me",   text: "Well... yeah. You're the reason I know half of this stuff." },
-  { who: "them", text: "i'm telling EVERYONE at school. sarah the shark!!! do you think she knows?? can sharks know things" },
+  { who: "them", text: "A shark with my name, out there somewhere carrying a tag. I don't think I'll ever get over that." },
   { who: "me",   text: "She's got your name now. I think she knows." }
 ];
 
@@ -264,9 +264,9 @@ const SIGHTING_DOINES = [
 
 /* v0.7.0: tagging the first six earns new waters. */
 const REGION_UNLOCK_THREAD = [
-  { who: "them", text: "SIX SHARKS?!?! you're officially a REAL shark scientist now!!" },
+  { who: "them", text: "Six sharks. You're officially a real shark scientist now, you know." },
   { who: "me", text: "Six for six. The institute just cleared two new survey regions for us." },
-  { who: "them", text: "THE GALÁPAGOS?!?! and SOUTH AFRICA?!?! i know EVERYTHING about those waters. ask me anything. ANYTHING" },
+  { who: "them", text: "The Galápagos and South Africa. I've read everything about those waters. Ask me anything — I mean it." },
   { who: "me", text: "I have a feeling I'm going to. 🦈" }
 ];
 
@@ -889,7 +889,10 @@ async function showSighting(depth) {
   }
   const options = SIGHTINGS[depth] || [];
   if (options.length) {
-    /* v0.13.0: dealt from the trip deck — no repeats within a trip. */
+    /* v0.13.0: dealt from the trip deck — each sighting once per trip.
+       v0.13.0 review fix: the deck does NOT refill. A long trip simply
+       runs out of new sightings instead of repeating them. */
+    if (tripDecks && !tripDecks.sightings.deck.length) return;
     const s = tripDecks ? deal(tripDecks.sightings.deck, tripDecks.sightings.pool) : pick(options);
     logLine(`👁️ ${s.text}`);
     spawnCreature(s.creature);
@@ -1258,9 +1261,9 @@ function resightThread(species, rec) {
   const label = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
   const last = rec.resightings[rec.resightings.length - 1];
   return [
-    { who: "them", text: `WAIT. you saw ${label} AGAIN?!?! the ${species.name.toLowerCase()}!!!` },
+    { who: "them", text: `You saw ${label} again? The ${species.name.toLowerCase()}?` },
     { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
-    { who: "them", text: "that's the BEST part of tagging!!! you get to know it's THEM. do you think it recognized you??" }
+    { who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" }
   ];
 }
 
@@ -1577,12 +1580,16 @@ function showRegionUnlock() {
   });
 }
 
-const WIN_THREAD = [
-  { who: "them", text: "you did it. you tagged ALL of them." },
-  { who: "me", text: "Twelve for twelve. Couldn't have done it without my research assistant." },
-  { who: "them", text: "i'm going to tell EVERYONE at school that my cousin is a REAL shark scientist. this is the best day of my whole life" },
-  { who: "me", text: "Best day of mine too, kiddo. 🦈" }
-];
+/* v0.13.0: built dynamically so the count can never go stale again. */
+function winThread() {
+  const n = SHARKS.length;
+  return [
+    { who: "them", text: "You did it. You tagged all of them." },
+    { who: "me", text: `${n} for ${n}. Couldn't have done it without my research assistant.` },
+    { who: "them", text: "I'm going to tell everyone I know that my cousin is a real shark scientist. This is the best day." },
+    { who: "me", text: "Best day of mine too. 🦈" }
+  ];
+}
 
 /* ---------- Win state: a ceremony in three beats ----------
    (a) certificate, (b) the phone buzzes with Sarah's text,
@@ -1615,14 +1622,14 @@ function winStep(n) {
 
   } else if (n === 2) {
     /* Beat 2: the phone buzzes — Sarah's heartfelt text arrives. */
-    pushThread(WIN_THREAD.map(m => ({ ...m })));
+    pushThread(winThread().map(m => ({ ...m })));
     box(`
       <div class="phone-head buzz-phone">📱 Your phone buzzes…</div>
       <div class="phone-thread win-thread"></div>
       <p class="latin" style="text-align:center; margin:0">Saved in 📱 Phone.</p>
       <button id="winNext" class="primary-button" type="button">Continue</button>`);
     const th = ov.querySelector(".win-thread");
-    WIN_THREAD.forEach(m => {
+    winThread().forEach(m => {
       const b = document.createElement("div");
       b.className = "bubble " + m.who;
       b.textContent = m.text;
