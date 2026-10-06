@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.14.0";
+const VERSION = "v0.16.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -295,10 +295,10 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
-/* v0.10.3: explore mode — the user explicitly hands gestures to the map.
-   touch-action is decided BEFORE any touch begins, so pinch/pan are fully
-   ours with no mid-gesture race against page scroll. */
-let mapExplore = false;
+/* v0.15.0: no explore mode, no pinch — zoom is buttons/wheel only.
+   touch-action follows the zoom level, decided before any touch begins:
+   at 1x the page owns one-finger drags (the page scrolls); zoomed in,
+   the map owns them (one finger pans). No mid-gesture races, no modes. */
 let mapCurrentsOn = true;
 const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
 
@@ -372,11 +372,10 @@ function renderMap() {
      any later render, exactly as before. */
   if (!mapGlide) pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
-  /* v0.10.3: literal gesture ownership (review fix) — explore mode owns
-     gestures ("none", set before any touch begins); normal mode always
-     hands them to the page ("pan-y"), even when zoomed via +/- buttons. */
-  wrap.style.touchAction = mapExplore ? "none" : "pan-y";
-  wrap.classList.toggle("exploring", mapExplore);
+  /* v0.15.0: zoom-driven gesture ownership — 1x scrolls the page,
+     zoomed pans the map. Set before any touch begins. */
+  wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
+  wrap.classList.toggle("exploring", mapZoom > 1);
   /* Blue Marble background (dark rect behind it in case the hotlink fails;
      the URL guard keeps the map working if map-data.js ever fails to load). */
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
@@ -543,7 +542,8 @@ const state = {
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
-  won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
+  won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
+  archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
@@ -1591,9 +1591,36 @@ function winThread() {
   ];
 }
 
-/* ---------- Win state: a ceremony in three beats ----------
-   (a) certificate, (b) the phone buzzes with Sarah's text,
-   (c) the acknowledgement. Each lands separately — a moment, not a checklist. */
+/* v0.16.0: Sarah's celebration — the emotional core of the ending. Calm adult
+   voice (v0.12.0): proud and emotional, never a wall of caps. Uses the
+   player's ACTUAL first-tagged shark so it lands personally. */
+function sarahWinThread() {
+  const ids = Object.keys(state.tagged);
+  const byDate = ids
+    .map(sid => ({ sid, t: state.tagged[sid] }))
+    .sort((a, b) => (a.t.date || "") < (b.t.date || "") ? -1 : 1);
+  const first = byDate[0] || { sid: "nurse", t: { researchId: "??" } };
+  const s = sharkById(first.sid) || { name: "shark" };
+  const firstName = first.t.name ? `“${first.t.name}”` : first.t.researchId;
+  const n = ids.length;
+  return [
+    { who: "them", text: "Hey. Can we sit with this for a minute?" },
+    { who: "me", text: "Of course." },
+    { who: "them", text: "When you started, these were species on a list. Do you remember your first one?" },
+    { who: "me", text: `${firstName} — the ${s.name.toLowerCase()}. I'll never forget.` },
+    { who: "them", text: `And now you know ${n} individual sharks. Not species — individuals. With names, and tracks, and lives they're still living right now.` },
+    { who: "me", text: "They're all still out there." },
+    { who: "them", text: "They are. You found every one, and then you let every one go. That's the whole thing, isn't it? That's the job." },
+    { who: "me", text: "Best job in the world." },
+    { who: "them", text: "I'm so proud of you. Don't tell anyone I'm being sentimental — I have a reputation to maintain." },
+    { who: "me", text: "Your secret's safe with me. 🦈" }
+  ];
+}
+
+/* ---------- Win state: a ceremony in four beats (v0.16.0) ----------
+   (a) institute recognition, (b) Sarah's celebration, (c) the map finale —
+   "they're all still out there" — (d) the acknowledgement.
+   Each lands separately — a moment, not a checklist. */
 function doWin() {
   state.won = true;
   try { localStorage.setItem("tyi-won", "1"); } catch {}
@@ -1609,11 +1636,11 @@ function winStep(n) {
   const box = (inner) => { ov.innerHTML = `<div class="phone">${inner}</div>`; };
 
   if (n === 1) {
-    /* Beat 1: the certificate. */
+    /* Beat 1: institute recognition — the formal part. */
     box(`
       <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
       <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
-      <p class="latin" style="text-align:center">All ${SHARKS.length} sharks tagged — officially.</p>
+      <p class="latin" style="text-align:center">Global survey complete — all ${SHARKS.length} species tagged.</p>
       <div class="cert-body">
         <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
       </div>
@@ -1621,15 +1648,15 @@ function winStep(n) {
     $("winNext").addEventListener("click", () => winStep(2));
 
   } else if (n === 2) {
-    /* Beat 2: the phone buzzes — Sarah's heartfelt text arrives. */
-    pushThread(winThread().map(m => ({ ...m })));
+    /* Beat 2: the phone buzzes — Sarah has something to say. */
+    pushThread(sarahWinThread().map(m => ({ ...m })));
     box(`
       <div class="phone-head buzz-phone">📱 Your phone buzzes…</div>
       <div class="phone-thread win-thread"></div>
       <p class="latin" style="text-align:center; margin:0">Saved in 📱 Phone.</p>
       <button id="winNext" class="primary-button" type="button">Continue</button>`);
     const th = ov.querySelector(".win-thread");
-    winThread().forEach(m => {
+    sarahWinThread().forEach(m => {
       const b = document.createElement("div");
       b.className = "bubble " + m.who;
       b.textContent = m.text;
@@ -1637,8 +1664,15 @@ function winStep(n) {
     });
     $("winNext").addEventListener("click", () => winStep(3));
 
+  } else if (n === 3) {
+    /* Beat 3: the map finale — "they're all still out there." */
+    winMapFinale();
+
   } else {
-    /* Beat 3: the acknowledgement — it lives here now, not on the Research tab. */
+    /* Beat 4: the acknowledgement — it lives here now, not on the Research tab.
+       Also unlocks the Wild Archive for the postgame. */
+    state.archiveUnlocked = true;
+    try { localStorage.setItem("tyi-archive", "1"); } catch {}
     box(`
       <div class="ack-card" style="margin-top:0">
         <p class="eyebrow">ACKNOWLEDGEMENTS</p>
@@ -1651,6 +1685,85 @@ function winStep(n) {
       goTab("collection");
     });
   }
+}
+
+/* v0.16.0: the map finale. The world map, and one by one, every shark the
+   player tagged — track, marker, name — until the ocean is full of them.
+   The message isn't "you collected every shark." It's "they're all still
+   out there." */
+function winMapFinale() {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  const ordered = Object.keys(state.tagged)
+    .map(sid => ({ sid, t: state.tagged[sid] }))
+    .sort((a, b) => (a.t.date || "") < (b.t.date || "") ? -1 : 1);
+  const n = ordered.length;
+  const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
+
+  ov.innerHTML = `
+    <div class="finale">
+      <h2 style="text-align:center; margin:6px 0 2px">They're all still out there.</h2>
+      <p class="latin" style="text-align:center; margin:0 0 8px" id="finaleCaption"></p>
+      <div class="finale-map" id="finaleMap"></div>
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:10px">
+        <button id="finaleSkip" class="secondary-button" type="button">Skip</button>
+        <button id="finaleNext" class="primary-button hidden" type="button">Continue</button>
+      </div>
+    </div>`;
+
+  const renderRevealed = (count) => {
+    let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of all tagged sharks">`
+      + `<rect x="0" y="0" width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`
+      + (bmUrl ? `<image href="${bmUrl}" x="0" y="0" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : ``);
+    ordered.slice(0, count).forEach(({ sid, t }, idx) => {
+      if (!t.track) t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+      const color = SPECIES_COLORS[sid] || "#ffffff";
+      const pts = mapPoints(t);
+      if (pts.length > 1) {
+        const path = pts.slice(1);
+        const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+        const archival = t.track.kind === "archival";
+        svg += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" opacity="0.85"`
+          + (archival ? ` stroke-dasharray="5 4"` : "") + `/>`;
+      }
+      const last = pts[pts.length - 1];
+      if (last) {
+        svg += `<g class="finale-marker" style="animation: finalePop 0.5s ease">`
+          + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="7" fill="${color}" stroke="#fff" stroke-width="2"/>`
+          + `</g>`;
+      }
+    });
+    svg += `</svg>`;
+    $("finaleMap").innerHTML = svg;
+    const cap = $("finaleCaption");
+    if (count < n) {
+      const { sid, t } = ordered[count];
+      const s = sharkById(sid);
+      const nm = t.name ? `\u201c${t.name}\u201d` : t.researchId;
+      cap.textContent = `${nm} — ${s ? s.name : sid}  (${count + 1} / ${n})`;
+    } else {
+      cap.textContent = `${n} sharks. ${n} releases. All still swimming.`;
+    }
+  };
+
+  let revealed = 0, done = false;
+  renderRevealed(0);
+  const finish = () => {
+    if (done) return;
+    done = true;
+    clearInterval(timer);
+    revealed = n;
+    renderRevealed(n);
+    $("finaleSkip").classList.add("hidden");
+    $("finaleNext").classList.remove("hidden");
+  };
+  const timer = setInterval(() => {
+    revealed++;
+    renderRevealed(revealed);
+    if (revealed >= n) finish();
+  }, 650);
+  $("finaleSkip").addEventListener("click", finish);
+  $("finaleNext").addEventListener("click", () => winStep(4));
 }
 
 /* Easter egg: name a shark "Sarah" and the cousin finds out. */
@@ -1973,17 +2086,9 @@ onMapBtn("mapZoomOut", () => {
 });
 onMapBtn("mapZoomReset", () => { mapFocusClear(); mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
-function setMapExplore(on) {
-  mapExplore = on;
-  const b = $("mapExploreBtn"), d = $("mapExploreDone");
-  if (b) b.classList.toggle("hidden", on);
-  if (d) d.classList.toggle("hidden", !on);
-  renderMap();
-}
-onMapBtn("mapExploreBtn", () => setMapExplore(true));
-onMapBtn("mapExploreDone", () => setMapExplore(false));
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
-   then applies the new zoom (clamped). Used by wheel AND pinch. */
+   then applies the new zoom (clamped). Used by wheel; buttons use the
+   fixed-step zoom below. (v0.15.0: pinch removed.) */
 let suppressMarkerClick = false;
 let mapRenderQueued = false;
 function requestMapRender() {
@@ -2074,49 +2179,33 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
   mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
-/* v0.10.2: touchscreen gestures — pinch-to-zoom + one-finger pan.
+/* v0.15.0: touchscreen gestures — one-finger pan when zoomed, nothing else.
    Pointer Events give one code path for mouse and touch. Move/up/cancel
    listen on window so a finger sliding off the map can't strand a pointer.
-   Panning only engages for touch/pen pointers while zoomed in; at 1x the
-   browser owns the gesture (touch-action: pan-y, so the page scrolls). */
+   Pinch-to-zoom and explore mode are gone: zoom is +/- buttons (and wheel
+   on desktop) only. At 1x the browser owns one-finger drags (touch-action:
+   pan-y, so the page scrolls); zoomed in, the map takes them (touch-action:
+   none, set by renderMap before any touch begins). */
 (function initMapGestures() {
   const wrap = $("worldMapWrap");
   if (!wrap || typeof window === "undefined") return;
   const pts = new Map(); // pointerId -> {x, y}
-  let pinchD0 = 0, pinchZ0 = 1, pinched = false;
   let panX = 0, panY = 0, downX = 0, downY = 0, movedMax = 0;
-  const spread = () => {
-    const p = [...pts.values()];
-    return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
-  };
   wrap.addEventListener("pointerdown", e => {
     suppressMarkerClick = false; // a stale flag never eats a real tap
     mapGlideCancel(); // grabbing the map mid-glide hands control to the hand
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pts.size === 1) {
       downX = panX = e.clientX; downY = panY = e.clientY;
-      movedMax = 0; pinched = false;
-    } else if (mapExplore && pts.size === 2) {
-      /* v0.10.3: pinch only exists in explore mode — normal mode never
-         enters the custom pinch path (page owns gestures there). */
-      pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
+      movedMax = 0;
     }
   });
   window.addEventListener("pointermove", e => {
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (mapExplore && pts.size === 2) {
-      const d = spread();
-      if (pinchD0 > 0 && d > 0) {
-        const p = [...pts.values()];
-        e.preventDefault();
-        mapZoomAt((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, pinchZ0 * d / pinchD0);
-      }
-      return;
-    }
     if (e.pointerType !== "mouse" && pts.size === 1) {
       movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
-      if (mapExplore && mapZoom > 1 && movedMax > 10) {
+      if (mapZoom > 1 && movedMax > 10) {
         e.preventDefault();
         mapFocusClear(); // a real pan breaks the tap-focus toggle contract
         const svgEl = $("worldMapSvg");
@@ -2132,14 +2221,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0) {
-      if (movedMax > 10 || pinched) suppressMarkerClick = true;
-      pinched = false;
-    } else if (pts.size === 1) {
-      /* Pinch lifted to one finger: re-anchor so it can't jump into a pan. */
-      const p = [...pts.values()][0];
-      downX = panX = p.x; downY = panY = p.y; movedMax = 0; pinchD0 = 0;
-    }
+    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
