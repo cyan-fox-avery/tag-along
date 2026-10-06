@@ -1,6 +1,6 @@
-# Tag, You're It
+# Tag Along
 
-**v0.14.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.15.0** — *a shark research game* (working title "Tag, You're It" retired 2026-10-06)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,18 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.15.0 changes — simpler map, new name
+
+- **The game is now TAG ALONG** — *a shark research game*. "Tag, You're It"
+  retires as the prototype title. The page title, header, and README carry
+  the new name; the in-game title flourishes ("Tag along with Biscuit →")
+  from the beta roadmap are still queued, not built.
+- **Map gestures simplified.** Pinch-to-zoom and the Explore-map mode are
+  gone — they were fighting the page for one-finger drags. Zoom is now
+  + / − buttons (and mouse wheel) only. One-finger drags scroll the page at
+  1x and pan the map when zoomed in, with a subtle outline showing which
+  mode the map is in. No modes, no mid-gesture races.
 
 ## v0.14.0 changes — two more sharks + clearer research
 
