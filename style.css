@@ -420,6 +420,8 @@ select option:disabled { color: #7a8a9e; }
 }
 .guide-row-head:active { background: rgba(255,255,255,0.04); }
 .guide-row-name { font-weight: 800; flex: none; }
+/* v0.18.0: locked achievements — dimmed, breadcrumb visible. */
+.guide-row.locked { opacity: 0.55; }
 .guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .guide-row-head .status-pill { margin-bottom: 0; flex: none; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
