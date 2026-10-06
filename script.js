@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.14.0";
+const VERSION = "v0.15.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -295,10 +295,10 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
-/* v0.10.3: explore mode — the user explicitly hands gestures to the map.
-   touch-action is decided BEFORE any touch begins, so pinch/pan are fully
-   ours with no mid-gesture race against page scroll. */
-let mapExplore = false;
+/* v0.15.0: no explore mode, no pinch — zoom is buttons/wheel only.
+   touch-action follows the zoom level, decided before any touch begins:
+   at 1x the page owns one-finger drags (the page scrolls); zoomed in,
+   the map owns them (one finger pans). No mid-gesture races, no modes. */
 let mapCurrentsOn = true;
 const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
 
@@ -372,11 +372,10 @@ function renderMap() {
      any later render, exactly as before. */
   if (!mapGlide) pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
-  /* v0.10.3: literal gesture ownership (review fix) — explore mode owns
-     gestures ("none", set before any touch begins); normal mode always
-     hands them to the page ("pan-y"), even when zoomed via +/- buttons. */
-  wrap.style.touchAction = mapExplore ? "none" : "pan-y";
-  wrap.classList.toggle("exploring", mapExplore);
+  /* v0.15.0: zoom-driven gesture ownership — 1x scrolls the page,
+     zoomed pans the map. Set before any touch begins. */
+  wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
+  wrap.classList.toggle("exploring", mapZoom > 1);
   /* Blue Marble background (dark rect behind it in case the hotlink fails;
      the URL guard keeps the map working if map-data.js ever fails to load). */
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
@@ -1973,17 +1972,9 @@ onMapBtn("mapZoomOut", () => {
 });
 onMapBtn("mapZoomReset", () => { mapFocusClear(); mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
-function setMapExplore(on) {
-  mapExplore = on;
-  const b = $("mapExploreBtn"), d = $("mapExploreDone");
-  if (b) b.classList.toggle("hidden", on);
-  if (d) d.classList.toggle("hidden", !on);
-  renderMap();
-}
-onMapBtn("mapExploreBtn", () => setMapExplore(true));
-onMapBtn("mapExploreDone", () => setMapExplore(false));
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
-   then applies the new zoom (clamped). Used by wheel AND pinch. */
+   then applies the new zoom (clamped). Used by wheel; buttons use the
+   fixed-step zoom below. (v0.15.0: pinch removed.) */
 let suppressMarkerClick = false;
 let mapRenderQueued = false;
 function requestMapRender() {
@@ -2074,49 +2065,33 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
   mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
-/* v0.10.2: touchscreen gestures — pinch-to-zoom + one-finger pan.
+/* v0.15.0: touchscreen gestures — one-finger pan when zoomed, nothing else.
    Pointer Events give one code path for mouse and touch. Move/up/cancel
    listen on window so a finger sliding off the map can't strand a pointer.
-   Panning only engages for touch/pen pointers while zoomed in; at 1x the
-   browser owns the gesture (touch-action: pan-y, so the page scrolls). */
+   Pinch-to-zoom and explore mode are gone: zoom is +/- buttons (and wheel
+   on desktop) only. At 1x the browser owns one-finger drags (touch-action:
+   pan-y, so the page scrolls); zoomed in, the map takes them (touch-action:
+   none, set by renderMap before any touch begins). */
 (function initMapGestures() {
   const wrap = $("worldMapWrap");
   if (!wrap || typeof window === "undefined") return;
   const pts = new Map(); // pointerId -> {x, y}
-  let pinchD0 = 0, pinchZ0 = 1, pinched = false;
   let panX = 0, panY = 0, downX = 0, downY = 0, movedMax = 0;
-  const spread = () => {
-    const p = [...pts.values()];
-    return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
-  };
   wrap.addEventListener("pointerdown", e => {
     suppressMarkerClick = false; // a stale flag never eats a real tap
     mapGlideCancel(); // grabbing the map mid-glide hands control to the hand
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pts.size === 1) {
       downX = panX = e.clientX; downY = panY = e.clientY;
-      movedMax = 0; pinched = false;
-    } else if (mapExplore && pts.size === 2) {
-      /* v0.10.3: pinch only exists in explore mode — normal mode never
-         enters the custom pinch path (page owns gestures there). */
-      pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
+      movedMax = 0;
     }
   });
   window.addEventListener("pointermove", e => {
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (mapExplore && pts.size === 2) {
-      const d = spread();
-      if (pinchD0 > 0 && d > 0) {
-        const p = [...pts.values()];
-        e.preventDefault();
-        mapZoomAt((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, pinchZ0 * d / pinchD0);
-      }
-      return;
-    }
     if (e.pointerType !== "mouse" && pts.size === 1) {
       movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
-      if (mapExplore && mapZoom > 1 && movedMax > 10) {
+      if (mapZoom > 1 && movedMax > 10) {
         e.preventDefault();
         mapFocusClear(); // a real pan breaks the tap-focus toggle contract
         const svgEl = $("worldMapSvg");
@@ -2132,14 +2107,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0) {
-      if (movedMax > 10 || pinched) suppressMarkerClick = true;
-      pinched = false;
-    } else if (pts.size === 1) {
-      /* Pinch lifted to one finger: re-anchor so it can't jump into a pan. */
-      const p = [...pts.values()][0];
-      downX = panX = p.x; downY = panY = p.y; movedMax = 0; pinchD0 = 0;
-    }
+    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
