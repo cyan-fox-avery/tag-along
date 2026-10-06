@@ -177,7 +177,61 @@ const TRACK_ENVELOPES = {
     areas: ["Tag-site reef cave", "Tag-site cave ledge", "Tag-site reef crevice", "Night-hunt reef", "Shelter ledge"],
     hop: [1, 20], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
     corridor: "strong reef fidelity — same daytime cave shelter for months/years; nocturnal, reef-local (Indo-Pacific acoustic work)"
+  },
+  blue: {
+    start: "Open Atlantic (tag site)",
+    areas: ["Tag-site open water", "Gulf Stream meander", "Mid-Atlantic Ridge approaches", "Azores Current", "Canary Current edge"],
+    hop: [100, 800], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "among the longest migrants of any shark \u2014 New England to South America runs are classic; Irish-tagged sharks recaptured off West Africa (~6,840 km); movements strongly seasonal with water temperature (Atlantic tagging programs, ICCAT)"
+  },
+  porbeagle: {
+    start: "Cornwall, UK (tag site)",
+    /* v0.13.0 review fix (ChatGPT): Bay of Biscay -> Mid-Atlantic Ridge is
+       ~1,460 km, far beyond the old hop max of 600. Porbeagles genuinely
+       make these transits (up to 2,000 km documented), so the hop range
+       widens to match the animal instead of shrinking the map to fit the
+       old range. 2,000 km over the 21-day max step ~= 95 km/day, inside
+       the documented transit bursts of up to 100 km/day. "Norwegian Sea
+       approaches" became "Iberian coast" — the documented wintering
+       ground, and reachable on the same hop budget. */
+    areas: ["Tag-site Cornish waters", "Celtic Sea", "Bay of Biscay", "Mid-Atlantic Ridge", "Iberian coast"],
+    hop: [100, 2000], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "strong seasonal return migrations \u2014 Bay of Biscay taggings travelled up to 2,000 km (Arctic Circle, Madeira, mid-Atlantic Ridge) and returned the following spring; 5,000\u201313,000 km annual loops with clear site fidelity; transit bursts up to 100 km/day"
+  },
+  silky: {
+    start: "Open Atlantic (tag site)",
+    areas: ["Tag-site open water", "Tuna school grounds", "FAD drift line", "Shelf-edge front", "Seamount approaches"],
+    hop: [80, 500], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "highly migratory \u2014 juveniles tracked thousands of kilometres; follows tuna schools and fish aggregating devices; genetics suggest female site fidelity to pupping areas even as individuals range widely"
+  },
+  oceanic: {
+    start: "Open Atlantic (tag site)",
+    /* Deliberately modest: movement data are still thin across much of
+       the oceanic whitetip's range, so the envelope stays close and the
+       corridor says so. */
+    areas: ["Tag-site open water", "Seamount", "Oceanic island approaches", "Equatorial front"],
+    hop: [50, 400], dayStep: [7, 21], nPoints: [5, 6], kind: "satellite",
+    corridor: "highly migratory but movement data still thin across much of its range; philopatric migrations documented in the northern Atlantic; site fidelity off northeast Brazil"
+  },
+  sevengill: {
+    start: "South African bay (tag site)",
+    areas: ["Tag-site kelp forest", "Bay channel", "Estuary mouth", "Offshore reef", "Seal colony approaches"],
+    hop: [2, 60], dayStep: [7, 30], nPoints: [5, 6], kind: "acoustic",
+    corridor: "seasonal inshore\u2013offshore movement \u2014 into bays and estuaries, then out to deeper water; site-resident clusters documented over years; strong fidelity to seasonal aggregations (IUCN 2020)"
+  },
+  bronze: {
+    start: "South African coast (tag site)",
+    /* v0.13.0 review fix (ChatGPT): the old hop max of 300 km could not
+       cover the documented 1,000+ km coastal migration, so the range
+       widens to [30, 1200] (1,200 km over 21 days ~= 57 km/day, plausible
+       for a coastal migrant). Areas run in migration order up the coast;
+       the offshore reef gets its own label ("Wild Coast offshore reef")
+       so it doesn't collide with the sevengill's False Bay "Offshore reef". */
+    areas: ["Tag-site coastal bay", "Nursery bay", "Wild Coast offshore reef", "Sardine run grounds", "Mozambique coast approaches"],
+    hop: [30, 1200], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "seasonal coastwise migration \u2014 South African tagging shows 1,000+ km along the SA and Mozambique coasts in a single cycle; females move between coastal nursery bays and offshore waters"
   }
+
 };
 
 /* How each track kind is framed to the player — honesty first. */
@@ -229,7 +283,9 @@ const SPECIES_COLORS = {
   tiger: "#f78c6b", sandtiger: "#4cc9f0", galapagos: "#80ed99",
   greatwhite: "#f4f1de", hammerhead: "#f3722c", mako: "#00bbf9",
   basking: "#b8c0ff", epaulette: "#ff8fab",
-  lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da"
+  lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da",
+  blue: "#3b6ea5", porbeagle: "#8fa8bf", silky: "#a08b62",
+  oceanic: "#c9b458", sevengill: "#8a7f70", bronze: "#c98a3d"
 };
 
 /* Every label a track point can carry: region names (tag sites and
@@ -373,7 +429,38 @@ const MAP_COORDS = {
   "Tag-site cave ledge": [12.03, 122.02],
   "Tag-site reef crevice": [11.98, 121.99],
   "Night-hunt reef": [12.04, 122.05],
-  "Shelter ledge": [11.97, 122.03]
+  "Shelter ledge": [11.97, 122.03],
+
+  /* v0.13.0: coordinates for the six-shark wave envelopes. Approximate
+     plotting positions (see header note); consecutive legs audited
+     against each envelope's hop range. */
+  "Tag-site open water": [30.0, -40.0],
+  "Gulf Stream meander": [33.0, -45.0],
+  "Mid-Atlantic Ridge approaches": [31.5, -42.0],
+  "Azores Current": [34.5, -38.0],
+  "Canary Current edge": [31.0, -35.0],
+  "Tag-site Cornish waters": [50.1, -5.5],
+  "Bay of Biscay": [45.5, -5.5],
+  "Mid-Atlantic Ridge": [44.0, -24.0],
+  "Iberian coast": [40.0, -9.5],
+  "Tuna school grounds": [28.0, -43.0],
+  "FAD drift line": [26.5, -46.0],
+  "Shelf-edge front": [25.0, -49.0],
+  "Seamount approaches": [23.5, -46.5],
+  "Seamount": [28.5, -42.5],
+  "Oceanic island approaches": [27.0, -40.0],
+  "Equatorial front": [25.5, -42.0],
+  "Tag-site kelp forest": [-34.20, 18.35],
+  "Bay channel": [-34.10, 18.50],
+  "Estuary mouth": [-34.05, 18.60],
+  "Offshore reef": [-34.25, 18.30],
+  "Seal colony approaches": [-34.13, 18.58],
+  "Tag-site coastal bay": [-34.0, 18.5],
+  "Nursery bay": [-33.5, 26.0],
+  "Wild Coast offshore reef": [-32.0, 28.5],
+  "Sardine run grounds": [-30.5, 30.5],
+  "Mozambique coast approaches": [-27.5, 32.5]
+
 };
 
 const MAP_W = 1000, MAP_H = 500;

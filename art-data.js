@@ -220,7 +220,116 @@ const ART = {
       <line x1="78" y1="51" x2="76" y2="67"/>
       <line x1="84" y1="51" x2="82" y2="67"/>
     </g>
+  </svg>`,
+  blue: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Blue shark">
+    <polygon points="162,52 202,34 200,82" fill="#2c537e"/>
+    <ellipse cx="98" cy="58" rx="66" ry="17" fill="#3b6ea5"/>
+    <ellipse cx="98" cy="66" rx="58" ry="10" fill="#eef3f8" opacity="0.9"/>
+    <polygon points="52,58 66,52 64,64" fill="#3b6ea5"/>
+    <polygon points="100,42 110,24 120,42" fill="#2c537e"/>
+    <polygon points="86,72 30,96 88,73" fill="#2c537e"/>
+    <circle cx="46" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="47.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <g stroke="#274a70" stroke-width="1.6" stroke-linecap="round">
+      <line x1="68" y1="50" x2="66" y2="64"/>
+      <line x1="74" y1="49" x2="72" y2="65"/>
+      <line x1="80" y1="49" x2="78" y2="65"/>
+    </g>
+  </svg>`,
+  porbeagle: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Porbeagle shark">
+    <polygon points="158,54 186,30 190,60 186,90 158,66" fill="#4a5f73"/>
+    <ellipse cx="100" cy="60" rx="60" ry="21" fill="#5d7488"/>
+    <ellipse cx="100" cy="69" rx="52" ry="12" fill="#dfe5ea" opacity="0.85"/>
+    <polygon points="104,40 114,20 124,40" fill="#4a5f73"/>
+    <polygon points="114,26 119,20 122,28" fill="#f2f5f7"/>
+    <polygon points="90,78 80,98 102,79" fill="#4a5f73"/>
+    <polygon points="52,60 64,54 64,66" fill="#5d7488"/>
+    <circle cx="54" cy="56" r="3.4" fill="#1c2733"/>
+    <circle cx="55.2" cy="54.8" r="1.1" fill="#ffffff"/>
+    <g stroke="#3d4f61" stroke-width="1.8" stroke-linecap="round">
+      <line x1="72" y1="52" x2="70" y2="68"/>
+      <line x1="79" y1="51" x2="77" y2="69"/>
+      <line x1="86" y1="51" x2="84" y2="69"/>
+    </g>
+  </svg>`,
+  silky: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Silky shark">
+    <polygon points="164,54 204,36 202,84" fill="#6e5f43"/>
+    <ellipse cx="100" cy="60" rx="68" ry="16" fill="#8a7a5e"/>
+    <ellipse cx="100" cy="67" rx="60" ry="9" fill="#e6ddc8" opacity="0.8"/>
+    <polygon points="40,60 58,53 58,67" fill="#8a7a5e"/>
+    <polygon points="102,45 112,27 122,45" fill="#6e5f43"/>
+    <polygon points="138,46 143,34 148,46" fill="#6e5f43"/>
+    <polygon points="88,74 80,94 100,75" fill="#6e5f43"/>
+    <circle cx="44" cy="56" r="3" fill="#1c2733"/>
+    <circle cx="45.2" cy="54.8" r="1" fill="#ffffff"/>
+    <g stroke="#5c4f36" stroke-width="1.5" stroke-linecap="round">
+      <line x1="64" y1="52" x2="62" y2="66"/>
+      <line x1="70" y1="51" x2="68" y2="67"/>
+      <line x1="76" y1="51" x2="74" y2="67"/>
+    </g>
+  </svg>`,
+  oceanic: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Oceanic whitetip shark">
+    <polygon points="160,54 200,36 198,84" fill="#66583f"/>
+    <ellipse cx="100" cy="60" rx="62" ry="20" fill="#7d6f5c"/>
+    <ellipse cx="100" cy="68" rx="54" ry="11" fill="#e3dccb" opacity="0.8"/>
+    <polygon points="104,41 116,18 128,41" fill="#66583f"/>
+    <polygon points="112,24 116,18 121,25" fill="#f4f1e8"/>
+    <polygon points="88,76 40,100 90,77" fill="#66583f"/>
+    <polygon points="46,94 40,100 54,95" fill="#f4f1e8"/>
+    <polygon points="50,60 62,54 62,66" fill="#7d6f5c"/>
+    <circle cx="52" cy="56" r="3.2" fill="#1c2733"/>
+    <circle cx="53.2" cy="54.8" r="1.1" fill="#ffffff"/>
+    <g stroke="#544832" stroke-width="1.6" stroke-linecap="round">
+      <line x1="72" y1="52" x2="70" y2="66"/>
+      <line x1="78" y1="51" x2="76" y2="67"/>
+      <line x1="84" y1="51" x2="82" y2="67"/>
+    </g>
+  </svg>`,
+  sevengill: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Broadnose sevengill shark">
+    <polygon points="170,56 206,40 204,84" fill="#5a5148"/>
+    <ellipse cx="104" cy="62" rx="62" ry="19" fill="#6e655a"/>
+    <ellipse cx="104" cy="70" rx="54" ry="10" fill="#d8d2c4" opacity="0.75"/>
+    <polygon points="140,44 148,30 154,44" fill="#5a5148"/>
+    <polygon points="86,78 76,98 98,79" fill="#5a5148"/>
+    <ellipse cx="52" cy="60" rx="16" ry="13" fill="#6e655a"/>
+    <circle cx="48" cy="57" r="3" fill="#1c2733"/>
+    <circle cx="49.2" cy="55.8" r="1" fill="#ffffff"/>
+    <g stroke="#463f35" stroke-width="1.5" stroke-linecap="round">
+      <line x1="66" y1="50" x2="64" y2="68"/>
+      <line x1="71" y1="50" x2="69" y2="68"/>
+      <line x1="76" y1="50" x2="74" y2="68"/>
+      <line x1="81" y1="50" x2="79" y2="68"/>
+      <line x1="86" y1="50" x2="84" y2="68"/>
+      <line x1="91" y1="50" x2="89" y2="68"/>
+      <line x1="96" y1="50" x2="94" y2="68"/>
+    </g>
+    <g fill="#4a4238" opacity="0.8">
+      <circle cx="110" cy="56" r="2"/><circle cx="124" cy="60" r="2"/><circle cx="96" cy="58" r="2"/>
+      <circle cx="136" cy="58" r="1.8"/><circle cx="84" cy="60" r="1.8"/>
+    </g>
+  </svg>`,
+  bronze: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Bronze whaler shark">
+    <polygon points="162,54 202,36 200,84" fill="#8a6535"/>
+    <ellipse cx="100" cy="60" rx="64" ry="18" fill="#a67c3f"/>
+    <ellipse cx="100" cy="68" rx="56" ry="10" fill="#ecd9ac" opacity="0.85"/>
+    <polygon points="102,42 114,20 126,42" fill="#8a6535"/>
+    <polygon points="88,76 78,96 100,77" fill="#8a6535"/>
+    <polygon points="50,60 62,54 62,66" fill="#a67c3f"/>
+    <circle cx="52" cy="56" r="3.2" fill="#1c2733"/>
+    <circle cx="53.2" cy="54.8" r="1.1" fill="#ffffff"/>
+    <g stroke="#6e4f28" stroke-width="1.6" stroke-linecap="round">
+      <line x1="72" y1="52" x2="70" y2="66"/>
+      <line x1="78" y1="51" x2="76" y2="67"/>
+      <line x1="84" y1="51" x2="82" y2="67"/>
+    </g>
   </svg>`
+
 };
 
 /* Field-guide sketches: rough pencil-style drawings of one distinctive
@@ -357,5 +466,63 @@ const SKETCH = {
       <path d="M96,46 L104,22 L114,46 Z"/>
       <path d="M100,32 L104,22 L109,31" stroke="#e8edf2" stroke-width="3"/>
     </g>
+  </svg>`,
+  blue: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: blue shark indigo countershading">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M40,62 Q105,80 170,62" opacity="0.7"/>
+      <path d="M88,78 L30,102 L90,79 Z"/>
+    </g>
+  </svg>`,
+  porbeagle: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: porbeagle white dorsal-fin patch">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="66" ry="20"/>
+      <path d="M96,44 L106,22 L116,44 Z"/>
+      <path d="M106,30 L110,22 L113,30" stroke="#e8edf2" stroke-width="3"/>
+    </g>
+  </svg>`,
+  silky: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: silky shark smooth skin">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="72" ry="16"/>
+      <path d="M40,62 Q105,70 170,62" stroke-dasharray="2 5" opacity="0.8"/>
+      <path d="M96,48 L104,28 L112,48 Z"/>
+    </g>
+  </svg>`,
+  oceanic: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: oceanic whitetip paddle fins">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="66" ry="20"/>
+      <path d="M96,44 L108,20 L120,44 Z"/>
+      <path d="M88,80 L44,104 L90,81 Z"/>
+      <path d="M52,98 L44,104 L56,100" stroke="#e8edf2" stroke-width="3"/>
+    </g>
+  </svg>`,
+  sevengill: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: sevengill seven gill slits">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="108" cy="62" rx="66" ry="18"/>
+      <path d="M138,46 L146,30 L152,46 Z"/>
+      <g stroke-width="1.8">
+        <line x1="66" y1="52" x2="64" y2="70"/>
+        <line x1="71" y1="52" x2="69" y2="70"/>
+        <line x1="76" y1="52" x2="74" y2="70"/>
+        <line x1="81" y1="52" x2="79" y2="70"/>
+        <line x1="86" y1="52" x2="84" y2="70"/>
+        <line x1="91" y1="52" x2="89" y2="70"/>
+        <line x1="96" y1="52" x2="94" y2="70"/>
+      </g>
+    </g>
+  </svg>`,
+  bronze: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: bronze whaler bronze flanks">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M40,58 Q105,52 170,58" stroke="#c9a86a" opacity="0.9"/>
+      <path d="M96,46 L106,22 L116,46 Z"/>
+    </g>
   </svg>`
+
 };
