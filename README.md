@@ -15,6 +15,7 @@ Built for sarah, who loves sharks. 🦈
 
 - **Achievements are here.** A new 🏆 tab lists 13 achievements, visible upfront — but each shows a breadcrumb hint instead of the real requirement until you earn it. ("Name a shark the most popular shark name"... you'll figure it out.)
 - **Basking shark archive cleanup.** The dossier had two near-identical filter-feeding photos; the duplicate is gone.
+- **Future Archive batch staged.** Seven future-roster species (scalloped hammerhead, smooth hammerhead, bonnethead, bull, grey reef, Caribbean reef, sandbar) have their Wild Archive media pre-curated and verified — hidden as `future: true` until they join the playable roster.
 - *(More sharks joining the roster — media curation in progress.)*
 
 ## v0.17.1 changes — the sanity-check batch
