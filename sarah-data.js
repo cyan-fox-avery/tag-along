@@ -17,7 +17,7 @@ const COUSIN_CHATS = {
   ],
   thresher: [
     { them: "A thresher's tail is half its entire body. They whip it so fast the shockwave stuns the fish first. A sword made of shark.", me: "Half the body. Nature keeps outdoing itself." },
-    { them: "Threshers sometimes hunt in pairs \u2014 they take turns herding the school into a ball, then strike. Cooperative tail-whipping. Teamwork.", me: "Coordinated swordplay. Remarkable." },
+    { them: "More than one thresher has been seen circling the same bait ball — whether that's real teamwork or just sharks agreeing the fishing is good, nobody's proven yet. The tail-slap itself is well documented though.", me: "Teamwork: unconfirmed. Tail-slap: undeniable." },
     { them: "A thresher's tail is so long that for a while scientists weren't sure how they ate with it. Turns out the tail IS how they eat.", me: "The confusion was understandable." }
   ],
   whale: [
@@ -47,7 +47,7 @@ const COUSIN_CHATS = {
   ],
   greatwhite: [
     { them: "Great whites keep their swimming muscles warm \u2014 regional endothermy. A warm-bodied shark that can breach clear out of the water. Jaws undersold them, honestly.", me: "Warm muscles on a fish. Evolution showing off." },
-    { them: "A great white's bite is estimated around 1.8 tonnes, but they often bite and release \u2014 investigating, not committing. Most encounters are a single curious bite.", me: "A curious bite from a tonne of force. Yikes." },
+    { them: "A great white's maximum bite force has been estimated around 1.8 tonnes. Humans are often released after the first bite, but scientists still debate why those bites happen.", me: "A tonne of force, then released. The debate continues." },
     { them: "The White Shark Caf\u00e9 \u2014 every winter, California white sharks swim to the middle of the Pacific and hang around for months. Nobody fully knows why.", me: "A mysterious mid-ocean gathering." }
   ],
   hammerhead: [
