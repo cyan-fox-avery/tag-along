@@ -783,6 +783,10 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
+/* v0.10.3: explore mode — the user explicitly hands gestures to the map.
+   touch-action is decided BEFORE any touch begins, so pinch/pan are fully
+   ours with no mid-gesture race against page scroll. */
+let mapExplore = false;
 let mapCurrentsOn = true;
 const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
 
@@ -852,9 +856,12 @@ function renderMap() {
   const ids = Object.keys(state.tagged);
   pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
-  /* v0.10.2: touch-action follows zoom — "pan-y" at 1x so a vertical swipe
-     scrolls the page normally; "none" when zoomed so drags pan the map. */
-  wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
+  /* v0.10.3: touch-action follows the mode — "none" in explore mode (set
+     before any touch begins, so the browser never arbitrates), "pan-y" in
+     normal mode so a vertical swipe scrolls the page. Zoomed-in drags in
+     normal mode still pan via the v0.10.2 rule below. */
+  wrap.style.touchAction = (mapExplore || mapZoom > 1) ? "none" : "pan-y";
+  wrap.classList.toggle("exploring", mapExplore);
   /* Blue Marble background (dark rect behind it in case the hotlink fails;
      the URL guard keeps the map working if map-data.js ever fails to load). */
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
@@ -2302,6 +2309,15 @@ onMapBtn("mapZoomOut", () => {
 });
 onMapBtn("mapZoomReset", () => { mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
+function setMapExplore(on) {
+  mapExplore = on;
+  const b = $("mapExploreBtn"), d = $("mapExploreDone");
+  if (b) b.classList.toggle("hidden", on);
+  if (d) d.classList.toggle("hidden", !on);
+  renderMap();
+}
+onMapBtn("mapExploreBtn", () => setMapExplore(true));
+onMapBtn("mapExploreDone", () => setMapExplore(false));
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
    then applies the new zoom (clamped). Used by wheel AND pinch. */
 let suppressMarkerClick = false;
@@ -2368,11 +2384,6 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
       movedMax = 0; pinched = false;
     } else if (pts.size === 2) {
       pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
-      /* v0.10.3: claim the gesture the moment the second finger lands — with
-         touch-action: pan-y the browser can otherwise steal a two-finger move
-         for page scroll mid-pinch (pointercancel). renderMap restores the
-         zoom-based value when the gesture ends. */
-      wrap.style.touchAction = "none";
     }
   });
   window.addEventListener("pointermove", e => {
@@ -2407,8 +2418,6 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     if (pts.size === 0) {
       if (movedMax > 10 || pinched) suppressMarkerClick = true;
       pinched = false;
-      /* v0.10.3: gesture over — hand page scroll back if we're at 1x. */
-      wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
     } else if (pts.size === 1) {
       /* Pinch lifted to one finger: re-anchor so it can't jump into a pan. */
       const p = [...pts.values()][0];
