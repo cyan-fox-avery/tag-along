@@ -588,6 +588,19 @@ const state = {
   let resights = 0;
   Object.values(state.tagged || {}).forEach(t => { resights += (t.resightings || []).length; });
   if (!(s.resights > 0) && resights > 0) { s.resights = resights; changed = true; }
+  /* v0.18.0 review 2nd pass: backfill "Something in the Water" — a log entry
+     with attract+chum and a tagged encounter of a chum-valid species counts. */
+  if (!(s.chumTags > 0)) {
+    const chumEarned = log.some(t =>
+      t.method === "attract" && t.methodOpt === "chum" &&
+      (t.encounters || []).some(e => {
+        if (e.result !== "tagged") return false;
+        const sp = SHARKS.find(x => x.id === e.speciesId);
+        return sp && sp.methods && sp.methods.attract && sp.methods.attract.includes("chum");
+      })
+    );
+    if (chumEarned) { s.chumTags = 1; changed = true; }
+  }
   if (changed) saveStats();
 })();
 function saveMsgs() {
