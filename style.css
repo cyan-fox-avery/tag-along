@@ -49,13 +49,6 @@ body { overflow-x: clip; }
   background: rgba(11, 34, 55, 0.92); padding: 8px 0;
   backdrop-filter: blur(4px);
 }
-/* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
-   so they used to overflow the page and leave a dead strip on the right.
-   Two rows of three keeps every tab visible and tappable with no overflow. */
-@media (max-width: 559px) {
-  .tabs { flex-wrap: wrap; gap: 6px; }
-  .tab { flex: 1 1 30%; font-size: 13px; padding: 10px 2px; }
-}
 .tab {
   flex: 1; border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
@@ -67,6 +60,15 @@ body { overflow-x: clip; }
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
 }
 .tab.active .count-badge { background: rgba(0,0,0,0.15); color: var(--accent-ink); }
+/* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
+   so they used to overflow the page and leave a dead strip on the right.
+   Two rows of three keeps every tab visible and tappable with no overflow.
+   (Review fix: this block sits AFTER the general .tab rule — equal
+   specificity, so source order decides.) */
+@media (max-width: 559px) {
+  .tabs { flex-wrap: wrap; gap: 6px; }
+  .tab { flex: 1 1 30%; font-size: 13px; padding: 10px 2px; }
+}
 
 .panel { display: none; }
 .panel.active { display: block; animation: fadein 0.25s ease; }
