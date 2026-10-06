@@ -2034,12 +2034,34 @@ function updateArchiveTab() {
   const btn = document.querySelector('.tab[data-tab="archive"]');
   if (btn) btn.classList.toggle("hidden", !state.archiveUnlocked);
 }
+/* v0.17.0 review fix: canonical license URLs so the Archive's credit line
+   links the license itself, not just names it. Public-domain assets get no
+   CC link (and no copyright symbol — "Credit:" instead of "©"). */
+const LICENSE_URLS = {
+  "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
+  "CC BY 3.0": "https://creativecommons.org/licenses/by/3.0/",
+  "CC BY 2.0": "https://creativecommons.org/licenses/by/2.0/",
+  "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
+  "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "CC0": "https://creativecommons.org/publicdomain/zero/1.0/"
+};
 function archiveAssetHtml(a, isPrimary) {
   const label = a.label ? `<span class="archive-label">${esc(a.label)}</span>` : "";
-  const credit = `<p class="archive-credit">\u00a9 ${esc(a.credit)} \u00b7 ${esc(a.license)} \u00b7 <a href="${esc(a.page)}" target="_blank" rel="noopener">Wikimedia Commons \u2197</a></p>`;
+  const isPD = /public domain/i.test(a.license || "");
+  const licUrl = LICENSE_URLS[a.license];
+  const licHtml = licUrl
+    ? `<a href="${licUrl}" target="_blank" rel="noopener">${esc(a.license)}</a>`
+    : esc(a.license);
+  const trimNote = a.trimmed ? " · trimmed from original" : "";
+  const credit = `<p class="archive-credit">${isPD ? "Credit" : "©"} ${esc(a.credit)} · ${licHtml}${trimNote} · <a href="${esc(a.page)}" target="_blank" rel="noopener">Wikimedia Commons ↗</a></p>`;
   let mediaHtml;
   if (a.type === "video" && a.play) {
-    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="metadata" src="${esc(a.play)}"></video>`;
+    // v0.17.0 review fix: curated clip boundaries. Media fragments (#t=start,end)
+    // are honored by modern browsers incl. iOS Safari, so the Archive presents
+    // the excerpt Avery chose instead of the whole source video.
+    const clip = (a.clipStart != null && a.clipEnd != null) ? `#t=${a.clipStart},${a.clipEnd}` : "";
+    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="metadata" src="${esc(a.play + clip)}"></video>`;
   } else {
     mediaHtml = `<a href="${esc(a.full || a.image)}" target="_blank" rel="noopener"><img class="archive-media${isPrimary ? " primary" : ""}" src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></a>`;
   }
@@ -2052,6 +2074,11 @@ function renderArchive() {
   SHARKS.forEach(s => {
     const media = ARCHIVE_MEDIA[s.id];
     if (!media || media.future) return;
+    /* v0.17.0 review fix: the archive promise is "the real animals you tagged."
+       A species dossier requires an actual tag, so a future roster expansion
+       (e.g. salmon) can't leak into a returning player's Archive before they
+       tag one. */
+    if (!state.tagged[s.id]) return;
     const t = state.tagged[s.id] || {};
     const yourShark = t.researchId
       ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
