@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.10.2";
+const VERSION = "v0.10.3";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -2368,6 +2368,11 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
       movedMax = 0; pinched = false;
     } else if (pts.size === 2) {
       pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
+      /* v0.10.3: claim the gesture the moment the second finger lands — with
+         touch-action: pan-y the browser can otherwise steal a two-finger move
+         for page scroll mid-pinch (pointercancel). renderMap restores the
+         zoom-based value when the gesture ends. */
+      wrap.style.touchAction = "none";
     }
   });
   window.addEventListener("pointermove", e => {
@@ -2402,6 +2407,8 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     if (pts.size === 0) {
       if (movedMax > 10 || pinched) suppressMarkerClick = true;
       pinched = false;
+      /* v0.10.3: gesture over — hand page scroll back if we're at 1x. */
+      wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
     } else if (pts.size === 1) {
       /* Pinch lifted to one finger: re-anchor so it can't jump into a pan. */
       const p = [...pts.values()][0];
