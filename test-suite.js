@@ -191,6 +191,17 @@ code += `
   while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
   ok('23 species openers present', openers.length === 23);
   ok('no shared verbatim closer', new Set(openers).size === openers.length);
+  ok('the old repeated closer is gone', !openers.some(function(o) { return /tell me everything/i.test(o); }));
+  // v0.17.1 review fix: the advice offer must survive a reload, and a used
+  // offer must not resurrect.
+  state.sarahAdviceOffered = true;
+  saveMsgs();
+  ok('advice offer persists across reload',
+    JSON.parse(localStorage.getItem('tyi-messages')).sarahAdviceOffered === true);
+  state.sarahAdviceOffered = false;
+  saveMsgs();
+  ok('used offer stays used across reload',
+    JSON.parse(localStorage.getItem('tyi-messages')).sarahAdviceOffered === false);
   ok('release offers both destinations',
     htmlCode.includes('id="releaseShipBtn"') && /releaseShipBtn/.test(fileCode));
   ok('doRelease resolves the encounter directly', /function doRelease\\(headBack\\)/.test(fileCode));

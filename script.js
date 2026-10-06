@@ -542,13 +542,16 @@ const state = {
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
-  sarahAdviceOffered: false, // v0.17.1: player can ask Sarah for advice after struggling (session-only)
+  /* v0.17.1: Ask Sarah offer persists in the message store — Sarah's saved
+     thread promises "pick one below", so the panel must survive a reload. */
+  sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
-    lastRegion: state.lastRegion, chatSeen: state.chatSeen });
+    lastRegion: state.lastRegion, chatSeen: state.chatSeen,
+    sarahAdviceOffered: state.sarahAdviceOffered });
 }
 /* Every new thread gets a timestamp for the Phone tab. */
 function pushThread(msgs) {
@@ -1430,6 +1433,7 @@ function afterExpedition(plan) {
       { who: "them", text: "I've got notes on every shark we've studied. Pick one below and I'll tell you what I know — where to look, what they like." }
     ];
     state.sarahAdviceOffered = true;
+    saveMsgs(); // v0.17.1 review fix: the offer must survive a reload
   } else {
     /* v0.8.0: sometimes she just checks in about one of your named
        sharks — the cousin who remembers. */
@@ -1474,6 +1478,7 @@ function askSarahAdvice(sid) {
     { who: "me", text: "Thanks, kiddo. That's actually really helpful." }
   ]);
   state.sarahAdviceOffered = false;
+  saveMsgs(); // v0.17.1 review fix: a used offer stays used across reloads
   renderSarahAsk();
   goTab("phone");
 }
