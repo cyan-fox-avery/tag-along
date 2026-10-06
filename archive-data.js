@@ -276,15 +276,6 @@ const ARCHIVE_MEDIA = {
   "assets": [
    {
     "type": "photo",
-    "caption": "A basking shark filter-feeding near the surface, using its enormous mouth to move plankton-rich water across its gills.",
-    "credit": "Greg Skomal / NOAA Fisheries Service",
-    "license": "public domain (NOAA)",
-    "page": "https://commons.wikimedia.org/wiki/File%3ACetorhinus%20maximus%20by%20greg%20skomal.JPG",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Cetorhinus_maximus_by_greg_skomal.JPG/960px-Cetorhinus_maximus_by_greg_skomal.JPG",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Cetorhinus_maximus_by_greg_skomal.JPG"
-   },
-   {
-    "type": "photo",
     "caption": "A wild basking shark cruising just below the Atlantic surface.",
     "credit": "Green Fire Productions",
     "license": "CC BY 2.0",
