@@ -143,7 +143,7 @@ const COUSIN_CHATS = {
   ],
   bull: [
     { them: "Bull sharks swim up rivers — actual rivers. They've been found thousands of kilometres inland — the Amazon, the Mississippi. A shark, in a river, just vibing.", me: "Geography is a suggestion." },
-    { them: "Bull sharks can shift their osmoregulatory physiology between ocean and fresh water. Almost no other shark can do that.", me: "Two kidneys' worth of talent." },
+    { them: "Bull sharks can shift their osmoregulatory physiology between ocean and fresh water. Almost no other shark can do that.", me: "Built for both worlds." },
     { them: "Bull sharks occur in Lake Nicaragua and travel between the lake and the Caribbean through the San Juan River. A lake with sharks in it. The locals just... live with that. Iconic.", me: "The lake sharks of Nicaragua." }
   ],
   greyreef: [
@@ -157,7 +157,7 @@ const COUSIN_CHATS = {
     { them: "Caribbean reef sharks share Tiger Beach with lemons and bulls. Three big coastal species, one reef, zero drama. Mostly.", me: "A surprisingly peaceful neighborhood." }
   ],
   sandbar: [
-    { them: "The sandbar shark's dorsal fin is enormous — tall and sail-like. It's the ID feature: no similar shark carries a fin that high. You can spot one from the silhouette alone.", me: "The sail-fin shark." },
+    { them: "The sandbar shark's first dorsal is unusually tall and triangular. It's one of the quickest ways to separate it from similar coastal sharks. You can spot one from the silhouette alone.", me: "The sail-fin shark." },
     { them: "Chesapeake Bay is a giant sandbar shark nursery — pups are born there in summer. One bay, thousands of baby sharks. The cuteness is structural.", me: "A bay full of pups." },
     { them: "Sandbars migrate up and down the US east coast with the seasons. Winter in the south, summer in the north. They have a commute.", me: "Seasonal commuters." }
   ]
@@ -193,10 +193,10 @@ const COUSIN_NUDGES = {
   /* v0.18.0 wave. */
   scalloped: "Scalloped hammerheads school around oceanic islands and seamounts — the Galápagos, Cocos, Malpelo. Daytime schools, hundreds strong, in the surface shallows. Schooling fish or squid, with chum. Look for the central notch in the hammer's front edge.",
   smooth: "Smooth hammerheads like temperate water — Cornwall, the northeast Atlantic. Surface shallows, schooling fish and squid, chum to draw them in. The head is one smooth unbroken curve: no notch, no scallops. That's the ID.",
-  bonnethead: "Bonnetheads are tiny hammerheads of the Caribbean shallows — surface to reef, under 90 metres. They root in seagrass for crabs and shrimp, and eat the seagrass too. Crabs, shellfish or urchins, with chum. Look for the little rounded shovel head.",
+  bonnethead: "Bonnetheads are tiny hammerheads of the western Atlantic shallows — surface to reef, under 90 metres. They root in seagrass for crabs and shrimp, and eat the seagrass too. Crabs, shellfish or urchins, with chum. Look for the little rounded shovel head.",
   bull: "Bull sharks patrol the Caribbean coast — Playa del Carmen, estuaries, anywhere the water's warm and coastal. Big oily fish like tuna, or schooling fish, with chum. Broad flat snout, heavy build. They'll come up rivers, but you'll meet yours at sea.",
   greyreef: "Grey reef sharks hold Indo-Pacific reef drop-offs — Papua New Guinea, the channels and current-swept edges. Reef fish or squid, with chum. They patrol the same ground for years, so learn the reef and you'll learn the shark.",
   caribbean: "Caribbean reef sharks are Bahamas home-team — Tiger Beach, the reef flats. Shallow water, schooling fish or tuna, with chum. They share the reef with lemons and bulls, so check your fins: no black tips, no heavy bull build.",
-  sandbar: "Sandbar sharks work the sandy coastal shelves — the Outer Banks, shallow bays and banks. Schooling fish, squid or crabs, with chum. The ID is the dorsal fin: tall, almost sail-like. Nothing else carries one that high."
+  sandbar: "Sandbar sharks work the sandy coastal shelves — the Outer Banks, shallow bays and banks. Schooling fish, squid or crabs, with chum. Look for the unusually tall first dorsal fin — one of the species' clearest ID features."
 
 };
