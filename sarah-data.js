@@ -84,7 +84,38 @@ const COUSIN_CHATS = {
     { them: "Whitetip reef sharks are the only living species in their genus, Triaenodon. An evolutionary singleton. And they pile up in caves to nap like puppies.", me: "A genus of one. That's special." },
     { them: "Whitetips hunt in loose groups at night, but it's not a feeding frenzy \u2014 each shark hunts for itself, just nearby. Parallel play. Very relatable.", me: "Hunting together, separately. I get it." },
     { them: "They can go six weeks without eating. Six weeks. Then they wriggle into a crevice and pull out an octopus like it was nothing.", me: "Six weeks of patience, one octopus." }
+  ],
+  blue: [
+    { them: "Blue sharks are the most beautiful sharks, I think. Deep indigo on top, pure white underneath — perfect countershading. From above they're the ocean, from below they're the sky.", me: "Camouflage as poetry." },
+    { them: "A blue shark tagged in Ireland turned up off West Africa 274 days later. That's roughly 6,840 kilometres. They just... go.", me: "Casual ocean crossings." },
+    { them: "Female blue sharks have much thicker skin than males, because courtship involves biting. And they can store sperm until conditions are right. Practical.", me: "Thick-skinned in the most literal way." }
+  ],
+  porbeagle: [
+    { them: "Porbeagles have this white patch on the trailing edge of the first dorsal fin. It's the ID badge — it's how you tell them apart from makos and white sharks at a glance.", me: "A built-in name tag." },
+    { them: "A juvenile porbeagle swam over 2,400 kilometres in 122 days, Ireland to Morocco. The long migrations start young with this species.", me: "A teenager doing ocean crossings." },
+    { them: "Porbeagles are warm-bodied like makos and great whites — regional endothermy. That's how they hunt mackerel in water barely above freezing.", me: "A warm engine in cold water." }
+  ],
+  silky: [
+    { them: "Silky sharks are named for their skin — the dermal denticles are so small and smooth it actually feels like silk. Nobody else in the shark world has that texture.", me: "Named for a texture. I love that." },
+    { them: "The vast majority of sharks caught accidentally in tropical tuna purse-seine nets are silkies. They follow the tuna, and the nets follow the tuna.", me: "Guilt by association with tuna." },
+    { them: "Juvenile silky sharks tracked around the Galápagos kept leaving the marine reserve — it's 133,000 square kilometres and they spent less than half their time inside it.", me: "Too big for the map's borders." }
+  ],
+  oceanic: [
+    { them: "Oceanic whitetips are different from the whitetip reef sharks you tagged in the Philippines — different genus, different ocean, different life. Same white fin tips, total coincidence of naming.", me: "A case of mistaken identity, resolved." },
+    { them: "They're often followed by pilot fish — little striped companions swimming alongside. Nobody fully knows what the pilot fish get out of it. Company, maybe.", me: "An entourage of unknown purpose." },
+    { them: "Oceanic whitetips were once thought to be the most abundant large shark in the open ocean. Then the fin trade and longlines cut some populations by 80 to 98 percent. That's why your tag matters.", me: "From countless to critical. A hard story." }
+  ],
+  sevengill: [
+    { them: "Seven gill slits instead of five, and a single dorsal fin set way back near the tail. Sevengills belong to the Hexanchiformes — an order so old that Jurassic fossils already had seven gills.", me: "A living fossil record." },
+    { them: "Sevengills spy-hop — they lift their heads clear of the water to look around. A three-metre shark, peeking. I think about that a lot.", me: "A periscope made of shark." },
+    { them: "Their teeth are different top and bottom — jagged and cusped above, comb-shaped below. The combs saw through seal blubber and tough prey.", me: "Two toolkits in one mouth." }
+  ],
+  bronze: [
+    { them: "Bronze whaler and copper shark are the same species — the name just depends where you are. South Africa and Australia say bronze whaler, the Americas say copper shark.", me: "One shark, two passports." },
+    { them: "During the Sardine Run, bronze whalers drive baitballs up from below while dolphins and gannets attack from above. It's the most choreographed hunt in the ocean, and nobody rehearsed it.", me: "Dinner theatre, no rehearsal." },
+    { them: "Females don't mature until about twenty years old, and they pup every two to three years. For a coastal shark, that's extraordinarily slow — which is why the Vulnerable listing matters.", me: "Twenty years to adulthood. Patience as a life strategy." }
   ]
+
 };
 
 const COUSIN_NUDGES = {
@@ -104,5 +135,12 @@ const COUSIN_NUDGES = {
   epaulette: "Epaulettes walk \u2014 on their fins, across the reef flats of Papua New Guinea at low tide. Ankle-deep water, crabs and shellfish. You don't scent the water for these; you need a falling tide and sharp eyes.",
   lemon: "Lemon sharks: Caribbean shallows, surface to reef, under 90 metres. They hunt at night by electroreception \u2014 sardines after dark, with chum. Look for the twin dorsal fins, nearly equal. That's the ID.",
   blacktip: "Blacktip reef sharks: the Maldives, reef flats so shallow their fins break the surface. Timid \u2014 swimmers scare them off \u2014 but bait excites them. Reef fish or shrimp, chum slick. Look for the black-dipped fins.",
-  whitetip: "Whitetips nap in reef caves by day \u2014 the Philippines, shallow reefs. They're one of the few requiem sharks that can breathe lying still. Hunt them at night: octopus or reef-fish scraps near the caves."
+  whitetip: "Whitetips nap in reef caves by day \u2014 the Philippines, shallow reefs. They're one of the few requiem sharks that can breathe lying still. Hunt them at night: octopus or reef-fish scraps near the caves.",
+  blue: "Blue sharks roam the open Atlantic, surface down through the twilight — mostly the upper 150 metres. They hunt schooling fish and squid. Open Atlantic, schooling fish or squid, and chum to call them in. Look for the indigo back.",
+  porbeagle: "Porbeagles like it cold — Cornwall, the Celtic Sea, 5 to 12 degrees. They hunt mackerel, herring and squid from the surface down deep. Oily schooling fish or squid, with chum. Look for the white patch on the dorsal fin's trailing edge.",
+  silky: "Silky sharks shadow tuna schools in the open Atlantic — surface waters, the upper 50 metres, around fish aggregating devices. Tuna, oily schooling fish or squid, with chum. The skin feels like silk; that's the whole name.",
+  oceanic: "Oceanic whitetips patrol the open Atlantic far offshore — surface to a couple hundred metres, sometimes far deeper. Tuna, squid, anything carrion-like, with chum. Look for the long rounded fins with white blotches. Critically Endangered, so this tag matters.",
+  sevengill: "Sevengills hunt South Africa's kelp forests and bays — shallow water, under 136 metres mostly. They eat seals, fish, even other sharks. Oily fish with chum, and seal scent works too. Count the gills: seven, not five.",
+  bronze: "Bronze whalers cruise South Africa's coast chasing sardine schools — surface to about 100 metres. Sardines, schooling fish, squid, with chum. During the Sardine Run they hunt baitballs in groups. Look for the bronze sheen."
+
 };
