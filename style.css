@@ -252,6 +252,16 @@ select option:disabled { color: #7a8a9e; }
 }
 .buzz-phone { animation: buzz 0.5s ease 2; }
 .win-thread { display: grid; gap: 8px; margin: 10px 0 12px; }
+/* v0.16.0: the map finale — "they're all still out there." */
+.finale { max-width: 640px; margin: 0 auto; padding: 8px; }
+.finale-map { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.finale-map svg { display: block; width: 100%; height: auto; }
+.finale-marker { transform-box: fill-box; transform-origin: center; }
+@keyframes finalePop {
+  from { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.4); opacity: 1; }
+  to { transform: scale(1); opacity: 1; }
+}
 
 /* Overlays */
 .overlay {

@@ -1,11 +1,11 @@
-/* Tag Along — v0.15.0
+/* Tag Along — v0.16.0
    Research -> plan (region/depth/bait/method) -> dive -> watch/tag/resight
    -> collection book + logbook. */
 
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.15.0";
+const VERSION = "v0.16.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -542,7 +542,8 @@ const state = {
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
-  won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
+  won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
+  archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
@@ -1494,6 +1495,7 @@ function confirmTag(name) {
     sex: s._gen.sex,
     location: regionName,
     date: dateStr,
+    taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
     track: genTrack(s, { location: regionName, date: dateStr })
   };
   state.tagged[s.id] = rec;
@@ -1590,12 +1592,58 @@ function winThread() {
   ];
 }
 
-/* ---------- Win state: a ceremony in three beats ----------
-   (a) certificate, (b) the phone buzzes with Sarah's text,
-   (c) the acknowledgement. Each lands separately — a moment, not a checklist. */
+/* v0.16.0: Sarah's celebration — the emotional core of the ending. Calm adult
+   voice (v0.12.0): proud and emotional, never a wall of caps. Uses the
+   player's ACTUAL first-tagged shark so it lands personally. */
+/* v0.16.0 review fix: genuine chronological order for tagged sharks.
+   New records carry taggedAt (ms epoch). Old saves fall back to the
+   insertion order of state.tagged — for non-integer string keys that IS
+   the order each shark was first tagged. Both the Sarah thread and the
+   map finale use this same source. */
+function taggedChronological() {
+  return Object.keys(state.tagged)
+    .map((sid, idx) => ({ sid, t: state.tagged[sid], idx }))
+    .sort((a, b) => {
+      const ta = a.t.taggedAt, tb = b.t.taggedAt;
+      if (ta != null && tb != null && ta !== tb) return ta - tb;
+      return a.idx - b.idx;
+    });
+}
+function sarahWinThread() {
+  const byDate = taggedChronological();
+  const ids = byDate.map(e => e.sid);
+  const first = byDate[0] || { sid: "nurse", t: { researchId: "??" } };
+  const s = sharkById(first.sid) || { name: "shark" };
+  const firstName = first.t.name ? `“${first.t.name}”` : first.t.researchId;
+  const n = ids.length;
+  return [
+    { who: "them", text: "Hey. Can we sit with this for a minute?" },
+    { who: "me", text: "Of course." },
+    { who: "them", text: "When you started, these were species on a list. Do you remember your first one?" },
+    { who: "me", text: `${firstName} — the ${s.name.toLowerCase()}. I'll never forget.` },
+    { who: "them", text: `And now you know ${n} individual sharks. Not species — individuals. With names, and tracks, and lives they're still living right now.` },
+    { who: "me", text: "They're all still out there." },
+    { who: "them", text: "They are. You found every one, and then you let every one go. That's the whole thing, isn't it? That's the job." },
+    { who: "me", text: "Best job in the world." },
+    { who: "them", text: "I'm so proud of you. Don't tell anyone I'm being sentimental — I have a reputation to maintain." },
+    { who: "me", text: "Your secret's safe with me. 🦈" }
+  ];
+}
+
+/* ---------- Win state: a ceremony in four beats (v0.16.0) ----------
+   (a) institute recognition, (b) Sarah's celebration, (c) the map finale —
+   "they're all still out there" — (d) the acknowledgement.
+   Each lands separately — a moment, not a checklist. */
 function doWin() {
   state.won = true;
-  try { localStorage.setItem("tyi-won", "1"); } catch {}
+  /* v0.16.0 review fix: the archive unlock is part of the win itself, not
+     beat 4. A player who closes mid-ceremony keeps the unlock — beat 4 is
+     where they're TOLD about it. */
+  state.archiveUnlocked = true;
+  try {
+    localStorage.setItem("tyi-won", "1");
+    localStorage.setItem("tyi-archive", "1");
+  } catch {}
   renderCollection();
   renderResearch();
   renderSightings();
@@ -1608,11 +1656,11 @@ function winStep(n) {
   const box = (inner) => { ov.innerHTML = `<div class="phone">${inner}</div>`; };
 
   if (n === 1) {
-    /* Beat 1: the certificate. */
+    /* Beat 1: institute recognition — the formal part. */
     box(`
       <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
       <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
-      <p class="latin" style="text-align:center">All ${SHARKS.length} sharks tagged — officially.</p>
+      <p class="latin" style="text-align:center">Global survey complete — all ${SHARKS.length} species tagged.</p>
       <div class="cert-body">
         <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
       </div>
@@ -1620,15 +1668,15 @@ function winStep(n) {
     $("winNext").addEventListener("click", () => winStep(2));
 
   } else if (n === 2) {
-    /* Beat 2: the phone buzzes — Sarah's heartfelt text arrives. */
-    pushThread(winThread().map(m => ({ ...m })));
+    /* Beat 2: the phone buzzes — Sarah has something to say. */
+    pushThread(sarahWinThread().map(m => ({ ...m })));
     box(`
       <div class="phone-head buzz-phone">📱 Your phone buzzes…</div>
       <div class="phone-thread win-thread"></div>
       <p class="latin" style="text-align:center; margin:0">Saved in 📱 Phone.</p>
       <button id="winNext" class="primary-button" type="button">Continue</button>`);
     const th = ov.querySelector(".win-thread");
-    winThread().forEach(m => {
+    sarahWinThread().forEach(m => {
       const b = document.createElement("div");
       b.className = "bubble " + m.who;
       b.textContent = m.text;
@@ -1636,8 +1684,16 @@ function winStep(n) {
     });
     $("winNext").addEventListener("click", () => winStep(3));
 
+  } else if (n === 3) {
+    /* Beat 3: the map finale — "they're all still out there." */
+    winMapFinale();
+
   } else {
-    /* Beat 3: the acknowledgement — it lives here now, not on the Research tab. */
+    /* Beat 4: the acknowledgement — it lives here now, not on the Research tab.
+       The Wild Archive unlock was already persisted in doWin(); this beat is
+       where the player is told about it. The set below is idempotent. */
+    state.archiveUnlocked = true;
+    try { localStorage.setItem("tyi-archive", "1"); } catch {}
     box(`
       <div class="ack-card" style="margin-top:0">
         <p class="eyebrow">ACKNOWLEDGEMENTS</p>
@@ -1650,6 +1706,91 @@ function winStep(n) {
       goTab("collection");
     });
   }
+}
+
+/* v0.16.0: the map finale. The world map, and one by one, every shark the
+   player tagged — track, marker, name — until the ocean is full of them.
+   The message isn't "you collected every shark." It's "they're all still
+   out there." */
+function winMapFinale() {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  const ordered = taggedChronological();
+  const n = ordered.length;
+  const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
+
+  ov.innerHTML = `
+    <div class="finale">
+      <h2 style="text-align:center; margin:6px 0 2px">They're all still out there.</h2>
+      <p class="latin" style="text-align:center; margin:0 0 8px" id="finaleCaption"></p>
+      <div class="finale-map" id="finaleMap"></div>
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:10px">
+        <button id="finaleSkip" class="secondary-button" type="button">Skip</button>
+        <button id="finaleNext" class="primary-button hidden" type="button">Continue</button>
+      </div>
+    </div>`;
+
+  /* v0.16.0 review fix: count = sharks revealed so far. The caption names
+     the shark that was JUST revealed (ordered[count - 1]); count 0 is the
+     intro state with an empty map. Only the newest marker gets the pop
+     animation — earlier ones stay settled instead of re-popping every step. */
+  const renderRevealed = (count) => {
+    const newIdx = count - 1; // index of the just-revealed shark (-1 when none)
+    let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of all tagged sharks">`
+      + `<rect x="0" y="0" width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`
+      + (bmUrl ? `<image href="${bmUrl}" x="0" y="0" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : ``);
+    ordered.slice(0, count).forEach(({ sid, t }, idx) => {
+      if (!t.track) t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+      const color = SPECIES_COLORS[sid] || "#ffffff";
+      const pts = mapPoints(t);
+      if (pts.length > 1) {
+        const path = pts.slice(1);
+        const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+        const archival = t.track.kind === "archival";
+        svg += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" opacity="0.85"`
+          + (archival ? ` stroke-dasharray="5 4"` : "") + `/>`;
+      }
+      const last = pts[pts.length - 1];
+      if (last) {
+        const pop = idx === newIdx ? ` style="animation: finalePop 0.5s ease"` : ``;
+        svg += `<g class="finale-marker"${pop}>`
+          + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="7" fill="${color}" stroke="#fff" stroke-width="2"/>`
+          + `</g>`;
+      }
+    });
+    svg += `</svg>`;
+    $("finaleMap").innerHTML = svg;
+    const cap = $("finaleCaption");
+    if (count === 0) {
+      cap.textContent = "";
+    } else if (count < n) {
+      const { sid, t } = ordered[count - 1];
+      const s = sharkById(sid);
+      const nm = t.name ? `\u201c${t.name}\u201d` : t.researchId;
+      cap.textContent = `${nm} — ${s ? s.name : sid}  (${count} / ${n})`;
+    } else {
+      cap.textContent = `${n} sharks. ${n} releases. All still swimming.`;
+    }
+  };
+
+  let revealed = 0, done = false;
+  renderRevealed(0);
+  const finish = () => {
+    if (done) return;
+    done = true;
+    clearInterval(timer);
+    revealed = n;
+    renderRevealed(n);
+    $("finaleSkip").classList.add("hidden");
+    $("finaleNext").classList.remove("hidden");
+  };
+  const timer = setInterval(() => {
+    revealed++;
+    if (revealed >= n) { finish(); return; } // finish() renders the final state once
+    renderRevealed(revealed);
+  }, 650);
+  $("finaleSkip").addEventListener("click", finish);
+  $("finaleNext").addEventListener("click", () => winStep(4));
 }
 
 /* Easter egg: name a shark "Sarah" and the cousin finds out. */
@@ -1853,7 +1994,7 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -1880,9 +2021,22 @@ function renderAll() {
   updateMsgBadge();
 }
 
+/* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
+   completed v0.14 save boots with won=true, a full roster, and no archive
+   unlock. Backfill the unlock they already earned. */
+function migrateArchiveUnlock() {
+  try {
+    const taggedCount = Object.keys(state.tagged).length;
+    if (state.won && taggedCount >= SHARKS.length && !state.archiveUnlocked) {
+      state.archiveUnlocked = true;
+      localStorage.setItem("tyi-archive", "1");
+    }
+  } catch {}
+}
 migrateIds();
 migrateTracks();
 migrateWinV07();
+migrateArchiveUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
