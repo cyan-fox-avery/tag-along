@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.11.0";
+const VERSION = "v0.12.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -125,8 +125,8 @@ const SHARKS = [
     research: "A bottom-dweller of the warm, shallow tropical Atlantic. In the Caribbean Sea, nurse sharks spend their days piled together under reef ledges — sometimes in heaps of forty. After dark they head out alone, sweeping the sandy shallows with the whisker-like barbels on their snouts, vacuuming up crabs, lobster and shellfish. They rarely leave water shallower than about 75 metres. They hunt as much by smell as by sight — a slick of fish-oil chum drifting on the current can pull them in from well down-current.",
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor.",
     bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
-    cheer: "nurse sharks are the CUDDLIEST!!! they nap in piles of FORTY. forty sharks. just vibing. i'm SO jealous",
-    opener: "YOU TAGGED A NURSE SHARK?!?! was it in the cuddle heap?!?! TELL ME EVERYTHING",
+    cheer: "Nurse sharks are the cuddiest. Forty of them napping in a pile, just vibing. I'm so jealous.",
+    opener: "A nurse shark! Was it in the cuddle heap? Tell me everything.",
     sketchCap: "barbels (the 'whiskers')",
     nameIdeas: ["Puddles", "Biscuit", "Sandy", "Nugget"]
   },
@@ -141,8 +141,8 @@ const SHARKS = [
     research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel — squid too, when they cross paths — then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down. A chum slick is the classic way to draw one within tagging range — out here, scent travels farther than any bait.",
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Threshers have been seen hunting in pairs, herding schools of fish into a tight ball before taking turns striking with their tails.",
-    cheer: "THRESHERS!!! their tail is HALF THEIR BODY. they hunt by WHIPPING it. that's the coolest thing any animal does and i will not be taking questions",
-    opener: "A THRESHER?!?! DID IT WHIP ITS TAIL?!?! tell me EVERYTHING",
+    cheer: "Threshers hunt by whipping their tails — half their body length, fast enough to stun fish. Coolest hunting method in the ocean, no contest.",
+    opener: "A thresher! Did you see the tail whip? Tell me everything.",
     sketchCap: "the tail (half the body!)",
     nameIdeas: ["Whip", "Nervous Nigel", "Swoosh", "Comet"]
   },
@@ -157,8 +157,8 @@ const SHARKS = [
     research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the aggregation. Researchers work the green water by boat, scan from the air with spotter planes that radio the boat onto a shark, and phone round the local network of fishermen and dive boats for sightings. Find the aggregation, and the sharks are already there.",
     hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
     bonus: "Whale sharks can dive deeper than 1,900 metres — among the deepest dives ever recorded for any fish — then cruise back up to the surface to feed.",
-    cheer: "A WHALE SHARK!!! the biggest fish in the WHOLE OCEAN and you TAGGED one!!! did you see the spots?? every one is different like a fingerprint!!",
-    opener: "A WHALE SHARK?!?! THE BIGGEST FISH IN THE OCEAN!!! did you count its spots?!?! TELL ME EVERYTHING",
+    cheer: "Every whale shark's spot pattern is unique, like a fingerprint. You tagged a one-of-a-kind giant.",
+    opener: "A whale shark! The biggest fish in the ocean! Did you count the spots?",
     sketchCap: "spot pattern (like a fingerprint)",
     nameIdeas: ["Dot", "Bus", "Domino", "Galaxy"]
   },
@@ -173,8 +173,8 @@ const SHARKS = [
     research: "A living fossil from the deep continental slopes — most records come from Sagami Bay in Japan. Goblin sharks live in total darkness between about 270 and 960 metres, drifting over the seafloor and ambushing deep-sea squid and fish. Their jaws shoot forward like a slingshot, and they find prey by sensing the faint electricity of living things. A drifting chum slick can lift one off the bottom — in the deep dark, scent is one of the few things that travels.",
     hook: "The only living member of a 125-million-year-old lineage. Pink, pointy-nosed, and deeply weird.",
     bonus: "A goblin shark's pink colour comes from blood vessels showing through its thin, almost translucent skin.",
-    cheer: "A GOBLIN SHARK?!?! the pink deep-sea weirdo!!! 125 million years old!!! did it look as weird in real life as in pictures",
-    opener: "A GOBLIN SHARK?!?! THE PINK DEEP-SEA WEIRDO!!! was its nose as pointy as the pictures?!?! tell me EVERYTHING",
+    cheer: "125 million years of evolution and it looks like that. I love it so much.",
+    opener: "A goblin shark! The pink deep-sea weirdo! Was the snout as pointy as the pictures?",
     sketchCap: "the snout (a living fossil)",
     nameIdeas: ["Nosey", "Fossil", "Blush", "Slingshot"]
   },
@@ -189,11 +189,11 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum", "seal"] },
     sizeRange: [3.0, 5.5],
-    research: "Tiger sharks patrol tropical and subtropical waters worldwide — everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, rarely straying deeper than a few hundred metres. They'll eat almost anything that crosses their path: schooling fish, squid, crabs, turtles, seabirds, tuna — even seals, and the occasional floating oddity. Researchers have found license plates in their stomachs.",
+    research: "Tiger sharks patrol tropical and subtropical waters worldwide \u2014 everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, mostly in the sunlit shallows from the surface down through the reefs. They'll eat almost anything that crosses their path: schooling fish, squid, crabs, turtles, seabirds, tuna \u2014 even seals, and the occasional floating oddity. Researchers have found license plates in their stomachs.\n\nWith tigers, bait is the easy part \u2014 anything meaty will do, from schooling fish to tuna. The real question is where, not what. A fish-oil chum slick drifting through a Maldivian lagoon speaks directly to the curiosity that makes them try everything once.",
     hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
     bonus: "Tiger sharks cross entire ocean basins. One tagged individual travelled more than 7,500 kilometres.",
-    cheer: "TIGER SHARK!!! the garbage can of the sea!!! they eat ANYTHING. license plates!!! i love them so much",
-    opener: "A TIGER SHARK?!?! did it try to eat the boat?!?! TELL ME EVERYTHING",
+    cheer: "Tigers will eat anything — fish, turtles, seabirds, the occasional license plate. Glorious, indiscriminate appetite.",
+    opener: "A tiger shark! The garbage can of the sea! Tell me everything.",
     sketchCap: "stripes (they fade with age)",
     nameIdeas: ["Stripes", "Tigger", "Marbles", "Scout"]
   },
@@ -208,8 +208,8 @@ const SHARKS = [
     research: "Sand tiger sharks haunt subtropical and temperate shores — everywhere except the eastern Pacific. Off North Carolina's Outer Banks, the Graveyard of the Atlantic, they gather around old shipwrecks in summer, and individual females return to the same wrecks year after year. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing schools of fish, squid and skates. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks. They're scent-hunters first: a fish-oil slick on the current speaks their language.",
     hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
     bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
-    cheer: "sand tiger!!! they look SO scary but they're actually big softies. they gulp air to FLOAT. like a weird balloon shark. tell it i said hi",
-    opener: "A SAND TIGER?!?! the smiley balloon shark!!! did it do the floaty thing?!?! tell me EVERYTHING",
+    cheer: "They hover motionless by holding air like a balloon, then just strike. Gentle, floaty ambush predators.",
+    opener: "A sand tiger! Was it at the wrecks? Tell me everything.",
     sketchCap: "the grin (all teeth, no bite)",
     nameIdeas: ["Toothy", "Grin", "Smiley", "Wreck"]
   },
@@ -224,8 +224,8 @@ const SHARKS = [
     research: "A reef shark of remote oceanic islands — and the one place it truly lives up to its name is the Galápagos. There, Galápagos sharks patrol the rocky reefs and island slopes, often in the clear shallows where schools of reef fish gather. They are bold and curious, sometimes circling divers for a closer look. They hunt jacks, groupers, squid and other reef fish, mostly in water shallower than about 80 metres, rarely venturing into the deep. A chum slick off the reef edge is how researchers bring these bold sharks into tagging range.",
     hook: "Bold island shark — known to circle divers just to check them out.",
     bonus: "Galápagos sharks use nursery areas: pups grow up in sheltered island bays before heading out to the reefs.",
-    cheer: "GALÁPAGOS SHARK!!! the island shark!!! they're so curious they come right up to divers. did it check YOU out?!",
-    opener: "A GALÁPAGOS SHARK?!?! IN THE GALÁPAGOS!!! (where else lol) TELL ME EVERYTHING",
+    cheer: "Bold, curious island sharks. The Galápagos ones practically introduce themselves.",
+    opener: "A Galápagos shark! Did it circle you? Tell me everything.",
     sketchCap: "the curious eye",
     nameIdeas: ["Darwin", "Isla", "Booby", "Lava"]
   },
@@ -237,11 +237,11 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["seal", "chum"] },
     sizeRange: [3.5, 6.0],
-    research: "The ocean's most famous hunter cruises temperate coasts worldwide — and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water. They eat seals, big oily fish like tuna, and the occasional drifting carcass, hunting mostly in the sunlit upper layers.",
+    research: "The ocean's most famous hunter cruises temperate coasts worldwide \u2014 and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water.\n\nThey eat seals and big oily fish like tuna, hunting mostly in the sunlit upper layers. Seal scent in the water is the classic attractant here \u2014 it speaks to what they're already following \u2014 though a chum slick of tuna turns heads too.",
     hook: "Warm-bodied hunter; can breach fully out of the water.",
     bonus: "A great white's bite is investigative — most encounters are a single test bite, then it lets go and moves on.",
-    cheer: "A GREAT WHITE!!! THE great white!!! did it breach?!?! they're warm-blooded which is SO weird for a fish",
-    opener: "A GREAT WHITE SHARK?!?! THE APEX!!! was it as big as they say?!?! TELL ME EVERYTHING",
+    cheer: "The world's largest predatory fish, and you tagged one. The seal-tracking, warm-muscled legend.",
+    opener: "A great white! Did it breach? Tell me everything!",
     sketchCap: "the countershaded flank",
     nameIdeas: ["Bruce", "Chomp", "Apex", "Finley"]
   },
@@ -256,8 +256,8 @@ const SHARKS = [
     research: "The largest of the hammerheads roams tropical seas, and the Caribbean's reefs are prime hunting ground. That wide hammer isn't just for show — it's packed with sensors that pick up the faint electricity of stingrays buried in the sand, their favourite food — though a passing school of reef fish works too. Great hammerheads cruise the shallows and reef flats, rarely deeper than about 80 metres, sweeping their heads side to side like metal detectors. A chum slick gives all those sensors something to follow.",
     hook: "The hammer is a sensory array — it 'sees' stingrays hidden in sand.",
     bonus: "Hammerhead pups are born with a soft, folded hammer that straightens out as they grow.",
-    cheer: "A HAMMERHEAD!!! their eyes are on the ENDS of the hammer!! 360 vision!!! nature said 'what if binoculars but shark'",
-    opener: "A GREAT HAMMERHEAD?!?! THE HAMMERHEAD!!! did you see the hammer up close?!?! TELL ME EVERYTHING",
+    cheer: "That hammer isn't for show — it's a sensory array. Stingrays don't stand a chance.",
+    opener: "A hammerhead! Did you watch it sweep for rays? Tell me everything.",
     sketchCap: "the hammer (a sensory array)",
     nameIdeas: ["Hammer", "T-Bone", "Nail", "Mal"]
   },
@@ -272,8 +272,8 @@ const SHARKS = [
     research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They hunt in the sunlit surface waters, rarely diving below about 150 metres, where the light is good and the prey is quick. If something out here is moving at 70 kilometres an hour, it's a mako. Chum works on them — makos pick up the scent of fish oil from far down-current.",
     hook: "Clocks ~70 km/h — the fastest shark alive.",
     bonus: "Makos are warm-bodied like great whites — their swimming muscles run several degrees warmer than the water.",
-    cheer: "A MAKO!!! the fastest shark in the OCEAN!!! 70 kmh!!! that's faster than my bike!!!",
-    opener: "A MAKO?!?! THE SPEED DEMON!!! was it fast?!?! TELL ME EVERYTHING",
+    cheer: "70 km/h, warm muscles, leaps 20 feet out of the water. The ocean's race car.",
+    opener: "A mako! The fastest shark in the sea! Tell me everything!",
     sketchCap: "the torpedo body",
     nameIdeas: ["Dash", "Turbo", "Zip", "Rocket"]
   },
@@ -288,8 +288,8 @@ const SHARKS = [
     research: "The second-biggest fish in the ocean feeds like the biggest — by swimming slowly through plankton with its enormous mouth wide open. Basking sharks visit temperate coasts in summer, and the plankton-rich waters off Cornwall are a favourite. Look for the tall dorsal fin cutting the surface, the huge mouth agape. They feed right at the top where the water turns green, sometimes dipping a little deeper over the reefs. Like whale sharks, they're following the bloom — nobody scents the water for a basking shark. Summer researchers find them by working the green surface water by boat, and by the sightings network: divers, fishermen and sailors phoning in every tall dorsal fin they see. Find the aggregation, and the sharks are already there.",
     hook: "Second-largest fish on Earth; feeds with a mouth up to a metre wide.",
     bonus: "A basking shark filters the equivalent of an Olympic swimming pool of water every hour.",
-    cheer: "A BASKING SHARK!!! the second-biggest fish!!! just vibing with its mouth open!!! the gentle giant's gentle giant",
-    opener: "A BASKING SHARK?!?! THE OTHER GENTLE GIANT!!! was its mouth HUGE?!?! TELL ME EVERYTHING",
+    cheer: "Second-biggest fish in the world, eating the smallest food. Gentle giants, both of them.",
+    opener: "A basking shark! Did you see the dorsal fin cut the surface? Tell me everything!",
     sketchCap: "the gaping mouth",
     nameIdeas: ["Sunny", "Lounge", "Drifter", "Mellow"]
   },
@@ -303,11 +303,11 @@ const SHARKS = [
        how you'd target it, so no method boosts it — no penalty. */
     methods: {},
     sizeRange: [0.6, 1.0],
-    research: "A small reef shark with an extraordinary trick: it can walk. Epaulette sharks live on the shallow reef flats of Papua New Guinea, where the tide sometimes strands them in ankle-deep pools. Instead of panicking, they clamber from pool to pool on their paddle-like fins, hunting crabs, shellfish and worms. They rarely leave water shallower than a few metres — the intertidal zone is their whole world.",
+    research: "A small reef shark with an extraordinary trick: it can walk. Epaulette sharks live on the shallow reef flats of Papua New Guinea, where the tide sometimes strands them in ankle-deep pools. Instead of panicking, they clamber from pool to pool on their paddle-like fins, hunting crabs, shellfish and worms. They rarely leave water shallower than a few metres \u2014 the intertidal zone is their whole world.\n\nThere's no scenting the water for an epaulette \u2014 they're worm-hunters, not chasers, so no attractant boosts the odds. The method is timing and sharp eyes: work the reef flat at low tide, when the pools are isolated and the walking sharks are out.",
     hook: "Walks between tide pools on its fins when the reef drains.",
     bonus: "Epaulettes can survive over an hour out of water by slowing their bodies right down — the ultimate low-tide specialist.",
-    cheer: "AN EPAULETTE SHARK!!! IT WALKS!!! ON ITS FINS!!! like a little puppy walking on the reef!!! i can't cope",
-    opener: "AN EPAULETTE SHARK?!?! THE WALKING SHARK!!! DID IT WALK?!?! TELL ME EVERYTHING",
+    cheer: "It walks! On its fins! Like a puppy strolling the reef. I can't cope, in the best way.",
+    opener: "An epaulette! Did you see it walk? Tell me everything!",
     sketchCap: "the walking fin",
     nameIdeas: ["Puddles", "Waddles", "Tiptoe", "Reef"]
   },
@@ -322,11 +322,11 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.4, 3.4],
-    research: "A heavy-bodied shark of the warm, shallow western Atlantic, unmistakable for two things: a lemon-yellow wash over its flanks, and two dorsal fins of nearly equal size — the quickest ID feature in the book. The juveniles grow up in mangrove lagoons and shallow bays, and the females do something extraordinary: after years away, they return to the exact nursery where they themselves were born to give birth. Decades of tagging at Bimini have followed the same mothers home again and again. They hunt mostly at night, sensing the faint electricity of sleeping fish, rarely leaving water shallower than about 90 metres. A chum slick and a school of sardines after dark is the classic way to meet one.",
+    research: "A heavy-bodied shark of the warm, shallow western Atlantic, unmistakable for two things: a lemon-yellow wash over its flanks, and two dorsal fins of nearly equal size \u2014 the quickest ID feature in the book. In the Caribbean Sea they haunt mangrove lagoons and shallow bays, rarely leaving water shallower than about 90 metres; surface waters and reefs are their whole world.\n\nThe juveniles grow up in the mangroves, and the females do something extraordinary: after years away, they return to the exact nursery where they themselves were born to give birth \u2014 decades of tagging at Bimini have followed the same mothers home. They hunt mostly at night, sensing the faint electricity of sleeping fish. Fish the Caribbean shallows after dark: a chum slick with sardines (schooling fish) is the classic combination.",
     hook: "Females return to the exact nursery where they were born to give birth — Bimini's most faithful mothers.",
     bonus: "Lemon sharks can live 25 to 30 years, and one lived to 40 in captivity. The Bimini tagging program has followed some individuals for decades.",
-    cheer: "A LEMON SHARK!!! sarah's favourite!!! the yellow one with the twin dorsal fins!! did you know the mothers swim all the way back to where THEY were born to have their babies?? i'm crying",
-    opener: "A LEMON SHARK?!?! THE YELLOW ONE!!! did you see the two matching dorsal fins?!?! TELL ME EVERYTHING",
+    cheer: "The yellow one! My absolute favourite. The twin fins, the Bimini mothers coming home — everything about them.",
+    opener: "A lemon shark! My favourite! Did you see the twin dorsal fins? Tell me everything!",
     sketchCap: "twin dorsal fins (nearly equal!)",
     nameIdeas: ["Zest", "Sunny", "Meringue", "Custard"]
   },
@@ -340,11 +340,11 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.2, 2.0],
-    research: "The classic reef shark — the fin cutting the surface in every tropical daydream. Blacktip reef sharks patrol reef flats so shallow their dorsal fins break the water, each fin dipped in crisp black like ink. They are timid animals, often frightened away by swimmers, but bait excites them and they have been known to leap clear of the water when feeding. Individuals hold tiny home ranges for years; photo-ID work in Moorea found the same sharks choosing to hang out together, stable friendships on the reef. They rarely leave the shallows. A chum slick over a reef flat with reef fish or shrimp will bring the locals in.",
+    research: "The classic reef shark \u2014 the fin cutting the surface in every tropical daydream. In the Maldives, blacktip reef sharks patrol reef flats so shallow their dorsal fins break the water, each fin dipped in crisp black like ink. They are timid animals, often frightened away by swimmers, but bait excites them and they have been known to leap clear of the water when feeding.\n\nIndividuals hold tiny home ranges for years; photo-ID work found the same sharks choosing to hang out together, stable friendships on the reef. Work the Maldivian shallows, surface to reef: a chum slick over a reef flat with reef fish or shrimp will bring the locals in.",
     hook: "Patrols water so shallow its black-tipped dorsal fin breaks the surface.",
     bonus: "Blacktip reef sharks form stable, non-random social groups — the same individuals repeatedly choose each other's company, year after year.",
-    cheer: "A BLACKTIP REEF SHARK!!! the one with the little black-dipped fins!!! they patrol in water so shallow their fin sticks OUT. and they have FRIENDS. stable friend groups!!!",
-    opener: "A BLACKTIP?!?! DID ITS FIN BREAK THE SURFACE?!?! the knee-deep shark!!! TELL ME EVERYTHING",
+    cheer: "Knee-deep water, black-dipped fins, and a loyal friend group. The reef's socialites.",
+    opener: "A blacktip! Did its fin break the surface? Tell me everything!",
     sketchCap: "black-tipped fins",
     nameIdeas: ["Inky", "Tippy", "Reef", "Shallows"]
   },
@@ -359,181 +359,91 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 1.6],
-    research: "A slender reef shark with white tips on its dorsal and tail, and a trick few requiem sharks share: it can pump water over its gills while lying perfectly still. So by day, whitetip reef sharks pile together in reef caves and under ledges, heaped like firewood, and by night they slide out to hunt — wriggling into crevices after eels, octopus and spiny lobster. They are fiercely loyal to one reef, returning to the same daytime shelter for months or years. Find the cave, and the sharks are already home. Octopus or reef-fish scraps on a reef at night will draw them out.",
+    research: "A slender reef shark with white tips on its dorsal and tail, and a trick few requiem sharks share: it can pump water over its gills while lying perfectly still. On Philippine reefs, whitetip reef sharks pile together in caves and under ledges by day, heaped like firewood \u2014 they're fiercely loyal to one reef, returning to the same daytime shelter for months or years.\n\nBy night they slide out to hunt, wriggling into crevices after eels, octopus and spiny lobster in the shallow reefs. Find the cave and the sharks are already home: fish the Philippines at night with octopus or reef-fish scraps, and a chum slick to draw them out.",
     hook: "Naps in heaps in reef caves by day — one of the few requiem sharks that can breathe while lying still.",
     bonus: "The whitetip reef shark is the only living species in the genus Triaenodon.",
-    cheer: "A WHITETIP REEF SHARK!!! the cave-napper!!! they pile up in caves during the day like a heap of puppies and then go hunting at night!! they can breathe lying STILL — barely any other requiem shark can!!",
-    opener: "A WHITETIP?!?! WAS IT IN THE CAVE HEAP?!?! the napping shark!!! TELL ME EVERYTHING",
+    cheer: "The cave-nappers. Piled in heaps by day, hunting crevices by night. A genus all to themselves.",
+    opener: "A whitetip! Was it in the cave heap? Tell me everything!",
     sketchCap: "white-tipped fins",
     nameIdeas: ["Nappy", "Cavey", "Puddles", "Heap"]
   }
 ];
 
-/* Sarah's texts: genuine conversation, never a "hint" UI.
-   Weighted toward real shark knowledge — she can't help sharing it. */
-const COUSIN_CHATS = [
-  { them: "did you know nurse sharks can BREATHE without swimming?? most sharks have to keep moving but nurse sharks can pump water over their gills just sitting there. that's why they can nap in piles!! total sea puppies", me: "That explains the cuddle heaps. Incredible." },
-  { them: "thresher shark fact!!! their tail is HALF their whole body. they whip it so fast it stuns the fish. like a whip made of shark", me: "A sword tail. Nature is ridiculous." },
-  { them: "whale sharks are the BIGGEST fish ever but they only eat tiny stuff. they just swim around with their mouth open like a big slow vacuum. i would also do that", me: "Honestly same. Big slow vacuum is a lifestyle." },
-  { them: "goblin sharks are PINK. and their jaw shoots out like in the movies. they live deeper than any diver can go. scientists mostly find them near japan", me: "Deep, pink, and weird. The best combo." },
-  { them: "if you want a nurse shark try the caribbean!! they sleep under reef ledges during the day in the SHALLOW parts. at night they go hunting on the sand", me: "Shallow reefs by day, sandy bottoms by night. Noted." },
-  { them: "threshers go deep during the day where it's dark and come up at night to hunt. so like... twilight zone deep. or the reefs if you're lucky", me: "So mid-water by day, up higher at night. Got it." }
-];
+/* Sarah's texts: genuine conversation, never a "hints" UI.
+   v0.12.0 voice pass: dignified enthusiasm. Sarah is an autistic adult
+   whose love of sharks runs calm and deep — precise, warm, measured.
+   Exclamation marks are earned, not default: they live where excitement
+   is real (a tag, a genuinely thrilling fact), never as decoration.
+   Keyed by species so hints and chats stay specific to what the player
+   is actually searching for. */
+const COUSIN_CHATS = {
+  nurse: [
+    { them: "Nurse sharks can breathe without swimming, did you know that? Most sharks have to keep moving to push water over their gills, but nurse sharks just pump it through while sitting still. That's the whole secret behind the cuddle heaps.", me: "That explains the piles of forty. Remarkable." }
+  ],
+  thresher: [
+    { them: "A thresher's tail is half its entire body. They whip it so fast the shockwave stuns the fish first. A sword made of shark.", me: "Half the body. Nature keeps outdoing itself." }
+  ],
+  whale: [
+    { them: "Whale sharks are the biggest fish in the ocean and they eat some of the smallest food. They just swim around with their mouths open like slow vacuums. Honestly, lifestyle goals.", me: "The gentle polka-dotted bus. Hard to argue." }
+  ],
+  goblin: [
+    { them: "Goblin sharks are pink because their skin is so thin you can see the blood vessels through it. And their jaws shoot forward like a slingshot. 125 million years old and still weird.", me: "Deep, pink, and ancient. The best combination." }
+  ],
+  tiger: [
+    { them: "Tiger sharks are called the garbage cans of the sea, which is rude but accurate. Researchers have found license plates in their stomachs. License plates.", me: "Not picky is an understatement." }
+  ],
+  sandtiger: [
+    { them: "Sand tigers look terrifying but they're total softies. They gulp air at the surface and hold it to hover perfectly still. Floaty balloon sharks.", me: "The toothy grin is false advertising." }
+  ],
+  galapagos: [
+    { them: "Gal\u00e1pagos sharks are so curious they'll circle divers just to have a look. Bold reef sharks of remote islands. I'd be nervous and flattered.", me: "Curiosity in a shark that size is a lot." }
+  ],
+  greatwhite: [
+    { them: "Great whites keep their swimming muscles warm \u2014 regional endothermy. A warm-bodied shark that can breach clear out of the water. Jaws undersold them, honestly.", me: "Warm muscles on a fish. Evolution showing off." }
+  ],
+  hammerhead: [
+    { them: "A hammerhead's head is packed with electroreceptors. They sweep it side to side over the sand and can feel a stingray's heartbeat buried underneath. A metal detector made of shark.", me: "Feeling a heartbeat through sand. Astonishing." }
+  ],
+  mako: [
+    { them: "Mako is the M\u0101ori word for shark \u2014 the word. And they're warm-bodied like great whites, which is how they stay so fast in cool water.", me: "70 kilometres an hour. With teeth." }
+  ],
+  basking: [
+    { them: "Basking sharks are the second-biggest fish in the ocean and they just... bask. Slow circles through plankton with their huge mouths open. The most relaxed giant alive.", me: "Maximum size, minimum effort. Respect." }
+  ],
+  epaulette: [
+    { them: "Epaulette sharks can survive over an hour out of water by slowing their bodies right down. They just wait out the low tide in a puddle, then walk to the next one.", me: "A shark that commutes on foot. Incredible." }
+  ],
+  lemon: [
+    { them: "Lemon shark mothers return to the exact nursery where they were born to give birth. Decades of tagging at Bimini, the same mothers coming home. It's called philopatry. I think about it a lot.", me: "Swimming home to where you were born. That's profound." }
+  ],
+  blacktip: [
+    { them: "Blacktip reef sharks have stable friend groups. Photo-ID in Moorea showed the same individuals choosing to hang out together, year after year. Sharks with best friends.", me: "Social lives on the reef. Lovely." }
+  ],
+  whitetip: [
+    { them: "Whitetip reef sharks are the only living species in their genus, Triaenodon. An evolutionary singleton. And they pile up in caves to nap like puppies.", me: "A genus of one. That's special." }
+  ]
+};
 
 const COUSIN_NUDGES = {
-  nurse:   "nurse sharks are SHALLOW!! like surface-to-reef shallow, 0 to 75 metres. they nap under reef ledges during the day and vacuum crabs and shellfish off the sand at night. caribbean + shallow + crabs or shellfish!!",
-  thresher:"threshers roam!! they go from the reefs down into the twilight zone, like 30 to 550 metres. they hunt SCHOOLS of little fish (and squid!!). reefs or twilight + fish bait??",
-  whale:   "whale sharks don't eat bait!! they eat PLANKTON!! you gotta FIND the aggregation — look for the bloom at the surface where the water looks green!! scientists work it by boat, or use spotter planes, or just phone the local fishermen for sightings!!",
-  goblin:  "goblin sharks live SO deep. twilight zone to the real deep dark, like 270 to 960 metres!! there's a deep bay in japan where scientists find them. squid bait!!",
-  tiger:    "tiger sharks aren't picky AT ALL!!! they'll eat fish, squid, crabs, even tuna!! try the maldives!! shallow lagoons!! the real question is WHERE not what!!",
-  sandtiger:"sand tigers look scary but they're softies!! they gather around the old SHIPWRECKS off north carolina — the graveyard of the atlantic!! the same sharks come back to the same wrecks every year!! they hover in the shallows eating squid and fish!! the floaty balloon sharks!!",
-  galapagos: "galápagos sharks!! they're reef sharks that LOVE oceanic islands. the galápagos obviously!! shallow reefs, and they eat reef fish and squid!!",
-  greatwhite: "great whites!!! south africa!! they follow the SEALS — a seal scent in the water helps!! shallow water, and they eat FISH (big oily ones like tuna!!). they're warm-blooded-ish which is WILD for a shark",
-  hammerhead: "hammerheads!!! the caribbean has great hammerheads!! they hunt STINGRAYS on the reef — ray bait!! (fish works too). shallow water + their heads are basically metal detectors",
-  mako: "makos are the FASTEST sharks!!! open atlantic, and they love squid and tuna!! they hunt up near the surface. they're basically underwater race cars",
-  basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!! researchers find them by boat or through the sightings network — fishermen and divers phoning in every big dorsal fin!!",
-  epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs and shellfish!!",
-  lemon: "LEMON SHARKS!!! my FAVOURITE!!! they're yellow with TWO dorsal fins that are almost the SAME SIZE!! the moms swim back to where THEY were born to have their babies!! caribbean, shallow water, and they hunt at night — sardines!!",
-  blacktip: "blacktip reef sharks!!! the ones with black DIPPED fins!!! they swim in water so shallow their fin sticks out of the water!! maldives!! reef flats!! they're shy but bait makes them EXCITED — reef fish or shrimp!!",
-  whitetip: "whitetip reef sharks NAP IN CAVES!!! they pile up together during the day because they can breathe lying still (barely any other requiem shark can!!) and hunt at night!! philippines!! octopus bait!!"
+  /* v0.12.0 voice pass: same dignified register as the chats. Hints are
+     useful, not hyper — Sarah respects the player enough to be precise. */
+  nurse:   "Nurse sharks stay shallow \u2014 surface to reef, about 0 to 75 metres. They pile up under reef ledges by day and hunt crabs and shellfish on the sand at night. Caribbean shallows, crabs or urchins, and a chum slick to call them in.",
+  thresher:"Threshers roam the open water, from the reefs down into the twilight zone \u2014 roughly 30 to 550 metres. They hunt schools of small fish and squid. Open Atlantic, reef or twilight depths, schooling fish, chum to draw them in.",
+  whale:   "Whale sharks don't take bait \u2014 they eat plankton. You have to find the aggregation: look for green water at the surface, the bloom. The Philippines. Researchers work it by boat, spotter plane, or the local sightings network.",
+  goblin:  "Goblin sharks live deep \u2014 twilight zone down into the real dark, about 270 to 960 metres. Sagami Bay in Japan is where scientists find them. Squid bait, and chum; scent travels well down there.",
+  tiger:   "Tiger sharks aren't picky at all \u2014 fish, squid, crabs, tuna, they'll try anything. The Maldives, shallow lagoons. With tigers the question is never what bait, it's where.",
+  sandtiger:"Sand tigers gather around the old shipwrecks off North Carolina \u2014 the Graveyard of the Atlantic. Same sharks, same wrecks, every year. Shallow water, squid and schooling fish, and they find chum hard to resist.",
+  galapagos: "Gal\u00e1pagos sharks love oceanic islands \u2014 the Gal\u00e1pagos, obviously. Shallow rocky reefs, under 80 metres. They hunt reef fish and squid, bold enough to come check you out. Chum brings them in.",
+  greatwhite: "Great whites gather off South Africa where the seals haul out. Shallow water, big oily fish like tuna \u2014 and seal scent in the water helps, since they follow the seals. They're warm-bodied, which is wild for a fish.",
+  hammerhead: "Great hammerheads hunt stingrays on Caribbean reefs \u2014 their heads are basically metal detectors for buried rays. Ray bait if you have it; schooling fish works too. Shallow water.",
+  mako: "Makos are the fastest sharks alive \u2014 open Atlantic, surface waters. They chase squid and tuna, the quick prey. If it's moving at 70 kilometres an hour out there, it's a mako.",
+  basking: "Basking sharks are plankton feeders like whale sharks \u2014 no bait works. Cornwall in summer, right at the surface where the water's green. Boat surveys and the sightings network: fishermen phoning in every tall dorsal fin.",
+  epaulette: "Epaulettes walk \u2014 on their fins, across the reef flats of Papua New Guinea at low tide. Ankle-deep water, crabs and shellfish. You don't scent the water for these; you need a falling tide and sharp eyes.",
+  lemon: "Lemon sharks: Caribbean shallows, surface to reef, under 90 metres. They hunt at night by electroreception \u2014 sardines after dark, with chum. Look for the twin dorsal fins, nearly equal. That's the ID.",
+  blacktip: "Blacktip reef sharks: the Maldives, reef flats so shallow their fins break the surface. Timid \u2014 swimmers scare them off \u2014 but bait excites them. Reef fish or shrimp, chum slick. Look for the black-dipped fins.",
+  whitetip: "Whitetips nap in reef caves by day \u2014 the Philippines, shallow reefs. They're one of the few requiem sharks that can breathe lying still. Hunt them at night: octopus or reef-fish scraps near the caves."
 };
 
-/* Field-guide sketches: rough pencil-style drawings of one distinctive
-   feature per shark. Deliberately NOT the real shark art — the true
-   appearance is revealed only when a shark is caught and tagged.
-   (The real ART above is never shown in Research.) */
-const SKETCH = {
-  nurse: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: nurse shark barbels">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
-      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
-      <line x1="52" y1="56" x2="46" y2="76"/>
-      <line x1="62" y1="57" x2="60" y2="77"/>
-      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
-    </g>
-  </svg>`,
-  thresher: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: thresher shark tail">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="70" cy="62" rx="42" ry="14"/>
-      <path d="M110,58 Q150,50 168,18 Q176,8 186,6"/>
-      <path d="M110,66 Q140,64 158,50" stroke-dasharray="7 5"/>
-      <circle cx="42" cy="58" r="2.5" fill="#9fb8cc" stroke="none"/>
-    </g>
-  </svg>`,
-  whale: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: whale shark spot pattern">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="110" cy="55" rx="80" ry="26"/>
-      <path d="M188,55 L210,40 M188,55 L210,70"/>
-    </g>
-    <g fill="#9fb8cc" opacity="0.7">
-      <circle cx="80" cy="45" r="3"/><circle cx="105" cy="42" r="3"/><circle cx="130" cy="46" r="3"/>
-      <circle cx="92" cy="58" r="3"/><circle cx="118" cy="60" r="3"/><circle cx="143" cy="57" r="3"/>
-      <circle cx="70" cy="62" r="2.5"/><circle cx="155" cy="64" r="2.5"/>
-    </g>
-  </svg>`,
-  goblin: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: goblin shark snout">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M80,50 L18,44 L18,58 Z"/>
-      <ellipse cx="130" cy="55" rx="55" ry="15"/>
-      <path d="M183,52 Q200,48 208,44" stroke-dasharray="7 5"/>
-    </g>
-  </svg>`,
-  tiger: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: tiger shark stripes">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="105" cy="55" rx="70" ry="20"/>
-      <path d="M173,50 L205,34 M173,60 L205,76"/>
-      <line x1="90" y1="37" x2="88" y2="73"/>
-      <line x1="110" y1="35" x2="110" y2="75"/>
-      <line x1="130" y1="37" x2="132" y2="73"/>
-    </g>
-  </svg>`,
-  sandtiger: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: sand tiger teeth">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M30,55 Q70,38 120,42 Q170,46 200,40"/>
-      <path d="M30,55 Q70,68 120,66 Q170,64 200,60" stroke-dasharray="7 5"/>
-      <path d="M44,52 l5,8 l5,-8 l5,8 l5,-8 l5,8 l5,-8"/>
-    </g>
-  </svg>`,
-  galapagos: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: Galapagos shark eye">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M70,55 Q110,35 150,55 Q110,75 70,55 Z"/>
-      <circle cx="110" cy="55" r="10"/>
-      <circle cx="110" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
-    </g>
-  </svg>`,
-  greatwhite: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: great white countershading">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M20,45 Q70,35 120,42 Q170,49 200,42"/>
-      <path d="M20,65 Q70,58 120,63 Q170,68 200,62" stroke-dasharray="7 5"/>
-      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
-    </g>
-  </svg>`,
-  hammerhead: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: hammerhead cephalofoil">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <rect x="40" y="42" width="140" height="26" rx="13"/>
-      <path d="M110,68 L110,96" stroke-dasharray="7 5"/>
-      <circle cx="55" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
-      <circle cx="165" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
-    </g>
-  </svg>`,
-  mako: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: mako torpedo body">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M30,55 Q110,30 190,55 Q110,80 30,55 Z"/>
-      <path d="M190,55 L210,42 M190,55 L210,68"/>
-    </g>
-  </svg>`,
-  basking: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: basking shark mouth">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="110" cy="55" rx="75" ry="24"/>
-      <path d="M45,55 Q110,85 175,55" stroke-width="3.5"/>
-      <path d="M45,55 Q110,30 175,55" stroke-dasharray="7 5"/>
-    </g>
-  </svg>`,
-  epaulette: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: epaulette walking fin">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <path d="M60,40 Q90,55 100,85"/>
-      <path d="M100,85 L85,100 M100,85 L100,102 M100,85 L115,100"/>
-      <line x1="14" y1="104" x2="206" y2="104" stroke-dasharray="4 7" opacity="0.6"/>
-    </g>
-  </svg>`,
-  lemon: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: lemon shark twin dorsal fins">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="105" cy="62" rx="70" ry="18"/>
-      <path d="M88,46 L96,24 L106,46 Z"/>
-      <path d="M128,46 L136,24 L146,46 Z"/>
-      <line x1="96" y1="24" x2="136" y2="24" stroke-dasharray="4 4" opacity="0.7"/>
-    </g>
-  </svg>`,
-  blacktip: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: blacktip reef shark black-tipped dorsal">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="105" cy="62" rx="70" ry="18"/>
-      <path d="M96,46 L104,22 L114,46 Z"/>
-    </g>
-    <polygon points="100,32 104,22 109,31" fill="#9fb8cc"/>
-  </svg>`,
-  whitetip: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: whitetip reef shark white-tipped dorsal">
-    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
-      <ellipse cx="105" cy="62" rx="70" ry="18"/>
-      <path d="M96,46 L104,22 L114,46 Z"/>
-      <path d="M100,32 L104,22 L109,31" stroke="#e8edf2" stroke-width="3"/>
-    </g>
-  </svg>`
-};
 
 /* If you name a shark "Sarah", she finds out. Sweet, not progression. */
 const SARAH_EGG_THREAD = [
@@ -930,6 +840,11 @@ const state = {
   tagged: store.load(),   // id -> {name, researchId, length, sex, location, date, sarahEgg, track}
   failures: 0,
   chatIdx: _savedMsgs.chatIdx || 0,
+  /* v0.12.0: contextual hints — the region of the player's most recent
+     expedition, so Sarah's hints stay specific to what they're actually
+     searching for instead of spamming the whole roster. */
+  lastRegion: _savedMsgs.lastRegion || null,
+  chatSeen: _savedMsgs.chatSeen || {},
   messages: (_savedMsgs.messages || []).map(normThread),
   unread: _savedMsgs.unread || 0,
   pendingTag: null,       // species object awaiting naming
@@ -944,7 +859,8 @@ const state = {
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })()
 };
 function saveMsgs() {
-  msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx });
+  msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
+    lastRegion: state.lastRegion, chatSeen: state.chatSeen });
 }
 /* Every new thread gets a timestamp for the Phone tab. */
 function pushThread(msgs) {
@@ -1017,10 +933,19 @@ document.querySelectorAll(".tab").forEach(btn => {
     $("tab-" + btn.dataset.tab).classList.add("active");
     if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
-    if (btn.dataset.tab === "phone" && state.unread > 0) {
-      state.unread = 0;
-      saveMsgs();
-      updateMsgBadge();
+    if (btn.dataset.tab === "phone") {
+      /* v0.12.0: like a real phone — the conversation opens pinned to the
+         newest message. renderMessages' own scroll can't do this: it runs
+         while the tab is hidden (display:none), where scrollTop has no
+         effect, so the pin has to happen after the panel is visible. */
+      renderMessages();
+      const list = $("messagesList");
+      if (list) list.scrollTop = list.scrollHeight;
+      if (state.unread > 0) {
+        state.unread = 0;
+        saveMsgs();
+        updateMsgBadge();
+      }
     }
   });
 });
@@ -1563,11 +1488,12 @@ function resightThread(species, rec) {
    your NAMED sharks. Genuine family conversation — the fact stays
    with the species she asked about. */
 const NAMED_CHECKINS = [
-  { them: "hey!! how's {name} doing?? i was just thinking about your {species}!!",
+  /* v0.12.0 voice pass: the cousin who remembers, calmly. */
+  { them: "Hey — how's {name} doing? I was just thinking about your {species}.",
     me: "Still out there pinging away. {hook}" },
-  { them: "do you think {name} remembers you??",
+  { them: "Do you think {name} remembers you?",
     me: "If sharks hold grudges about boats, I'm in trouble. {hook}" },
-  { them: "{name} update?? {name} update?? i need a {species} update",
+  { them: "Any news from {name}? I need a {species} update.",
     me: "No new pings since yesterday. Probably busy being a shark. {hook}" }
 ];
 
@@ -1663,20 +1589,41 @@ function renderMessages() {
 
 /* v0.7.0: no target species anymore, so the nudge picks an untagged
    shark to point at — a useful direction, not a correction. */
+/* v0.12.0: contextual hints. Sarah pays attention to where you've been
+   searching — hints and chats prefer species from the player's most recent
+   expedition region, so she talks about the shark you're actually after
+   instead of spamming the whole roster. Falls back to the full roster when
+   there's no recent region (or nothing untagged there). */
+function regionalSpecies(onlyUntagged) {
+  const pool = onlyUntagged ? untagged() : SHARKS;
+  if (state.lastRegion) {
+    const local = pool.filter(s => s.combo.region === state.lastRegion);
+    if (local.length) return local;
+  }
+  return pool.length ? pool : SHARKS;
+}
+function pickChat() {
+  const pool = regionalSpecies(false).filter(s => COUSIN_CHATS[s.id]);
+  const s = pick(pool.length ? pool : SHARKS.filter(x => COUSIN_CHATS[x.id]));
+  const chats = COUSIN_CHATS[s.id];
+  const seen = state.chatSeen[s.id] || 0;
+  state.chatSeen[s.id] = seen + 1;
+  return chats[seen % chats.length];
+}
 function afterExpedition(plan) {
   /* A trip with a successful tag already got its Sarah moment — the
      species-relevant celebration thread. Same for a re-sighting. Don't
      follow it minutes later with an unrelated random fact. */
+  if (plan && plan.region) { state.lastRegion = plan.region; saveMsgs(); }
   if (state.taggedThisTrip || state.resightedThisTrip) return;
   let thread;
   if (state.failures >= 3) {
-    // gentle nudge, genuine-conversation style
-    const candidates = untagged();
-    const s = candidates.length ? pick(candidates) : pick(SHARKS);
+    // gentle nudge, genuine-conversation style — about YOUR waters
+    const s = pick(regionalSpecies(true));
     thread = [
-      { who: "them", text: "how's the shark hunting going??" },
+      { who: "them", text: "How's the shark hunting going?" },
       { who: "me", text: "Honestly? Struck out a few times. The water's been empty." },
-      { who: "them", text: COUSIN_NUDGES[s.id] || "you'll get the next one!! i believe in you" },
+      { who: "them", text: COUSIN_NUDGES[s.id] || "You'll get the next one. I believe in you." },
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
     ];
     state.failures = 0;
@@ -1687,8 +1634,7 @@ function afterExpedition(plan) {
     if (checkin) {
       thread = checkin;
     } else {
-      const chat = COUSIN_CHATS[state.chatIdx % COUSIN_CHATS.length];
-      state.chatIdx += 1;
+      const chat = pickChat();
       thread = [
         { who: "them", text: chat.them },
         { who: "me", text: chat.me }
