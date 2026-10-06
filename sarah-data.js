@@ -114,6 +114,16 @@ const COUSIN_CHATS = {
     { them: "Bronze whaler and copper shark are the same species — the name just depends where you are. South Africa and Australia say bronze whaler, the Americas say copper shark.", me: "One shark, two passports." },
     { them: "During the Sardine Run, bronze whalers drive baitballs up from below while dolphins and gannets attack from above. It's the most choreographed hunt in the ocean, and nobody rehearsed it.", me: "Dinner theatre, no rehearsal." },
     { them: "Females don't mature until about twenty years old, and they pup every two to three years. For a coastal shark, that's extraordinarily slow — which is why the Vulnerable listing matters.", me: "Twenty years to adulthood. Patience as a life strategy." }
+  ],
+  frilled: [
+    { them: "Frilled sharks have six pairs of gill slits, and the edges are all frilly — that's the whole name. Most sharks have five plain ones. The frill is doing something, we just don't fully know what.", me: "Named for a ruffle. Wonderful." },
+    { them: "A frilled shark's teeth are tiny three-pronged tridents, about three hundred of them in 25 rows. A mouth built for gripping slippery squid in the dark.", me: "Three hundred tiny tridents." },
+    { them: "Frilled sharks are one of the oldest shark lineages still swimming — the body plan barely changed in tens of millions of years. Sagami Bay is one of the only places they come up shallow enough to study.", me: "A living fossil in the bay." }
+  ],
+  zebra: [
+    { them: "Zebra shark babies don't look like zebra shark adults at all. The pups are dark with white stripes — actual zebra pattern — and they grow into spots. Two sharks for the price of one.", me: "A wardrobe change with age." },
+    { them: "Zebra sharks can rest on the seafloor and pump water over their gills, like the whitetip reef sharks do. Most sharks would suffocate sitting still. These two just... nap.", me: "Professional nappers." },
+    { them: "They're called zebra sharks but the adults look more like leopards — all spots. The zebra name comes from the babies. Taxonomy's little joke.", me: "Named for the children, not the adults." }
   ]
 
 };
@@ -141,6 +151,8 @@ const COUSIN_NUDGES = {
   silky: "Silky sharks shadow tuna schools in the open Atlantic — surface waters, the upper 50 metres, around fish aggregating devices. Tuna, oily schooling fish or squid, with chum. The skin feels like silk; that's the whole name.",
   oceanic: "Oceanic whitetips patrol the open Atlantic far offshore — surface to a couple hundred metres, sometimes far deeper. Tuna, squid, anything carrion-like, with chum. Look for the long rounded fins with white blotches. Critically Endangered, so this tag matters.",
   sevengill: "Sevengills hunt South Africa's kelp forests and bays — shallow water, under 136 metres mostly. They eat seals, fish, even other sharks. Oily fish with chum, and seal scent works too. Count the gills: seven, not five.",
-  bronze: "Bronze whalers cruise South Africa's coast chasing sardine schools — surface to about 100 metres. Sardines, schooling fish, squid, with chum. During the Sardine Run they hunt baitballs in groups. Look for the bronze sheen."
+  bronze: "Bronze whalers cruise South Africa's coast chasing sardine schools — surface to about 100 metres. Sardines, schooling fish, squid, with chum. During the Sardine Run they hunt baitballs in groups. Look for the bronze sheen.",
+  frilled: "Frilled sharks live deep off Japan — Sagami Bay, twilight zone down into the dark, a few hundred metres and deeper. They hunt deep-sea squid. Squid on the line, chum to lift one off the bottom. Look for the eel-like body and frilly gills.",
+  zebra: "Zebra sharks cruise Philippine reefs — shallow water, coral and sand. They vacuum up shellfish, crabs and small fish off the bottom. Crabs, lobster or shellfish, with chum. Pups wear stripes, adults wear spots."
 
 };
