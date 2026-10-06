@@ -237,12 +237,12 @@ const TRACK_ENVELOPES = {
        satellite tags in any sustained program — the track is reconstructed
        from capture records, and the kind note says so honestly. */
     areas: ["Tag-site deep slope", "Canyon wall", "Seamount flank", "Trench approaches"],
-    hop: [5, 80], dayStep: [14, 60], nPoints: [4, 6], kind: "archival",
-    corridor: "deep benthic drifter — Sagami Bay captures come from a few hundred metres down the slope; movements inferred from recaptures are local, not migratory"
+    hop: [5, 80], dayStep: [14, 60], nPoints: [4, 5], kind: "archival",
+    corridor: "deep benthic drifter — individual movement poorly known; capture records around Japan's deep slopes provide habitat context, but no telemetry track exists; this local path is illustrative only"
   },
   zebra: {
     start: "Philippine reef (tag site)",
-    areas: ["Tag-site reef", "Coral garden", "Sand flat", "Lagoon patch reef", "Reef channel"],
+    areas: ["Philippine tag-site reef", "Coral garden", "Sand flat", "Lagoon patch reef", "Reef channel"],
     hop: [1, 30], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
     corridor: "reef-resident — Indo-Pacific acoustic work shows small home ranges and strong site fidelity on coral reefs"
   }
@@ -252,7 +252,7 @@ const TRACK_ENVELOPES = {
 /* How each track kind is framed to the player — honesty first. */
 const TRACK_KIND_NOTES = {
   satellite: "Illustrative track — real satellite tags ping just like this. 🛰️",
-  archival: "Sparse illustrative track — goblin sharks have never carried satellite tags; reconstructed from capture records.",
+  archival: "Sparse illustrative track — reconstructed from capture records, not live satellite or acoustic tracking.",
   resightings: "Illustrative track — built from reef survey re-sightings, not a satellite tag. This shark barely leaves its reef flat.",
   acoustic: "Illustrative track based on acoustic-tag detections from reef receiver arrays."
 };
@@ -482,7 +482,7 @@ const MAP_COORDS = {
   "Canyon wall": [34.9, 139.9],
   "Seamount flank": [34.7, 140.2],
   "Trench approaches": [34.5, 140.5],
-  "Tag-site reef": [12.1, 122.1],
+  "Philippine tag-site reef": [12.1, 122.1],
   "Coral garden": [12.05, 122.15],
   "Sand flat": [11.95, 122.05],
   "Lagoon patch reef": [12.15, 122.0],
