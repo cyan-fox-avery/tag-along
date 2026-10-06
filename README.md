@@ -24,15 +24,6 @@ Built for sarah, who loves sharks. 🦈
   the postgame Full Field Guide will build on. (The archive UI and the
   real-media curation are coming next — Avery is hand-picking the photos.)
 
-A pro-shark conservation collection game.
-
-You are a conservation scientist. Research each shark's habits, plan an
-expedition (region, depth, bait, method), head out to sea, and tag one of every
-species for your official collection book. Less *Jaws*, more careful field
-science.
-
-Built for sarah, who loves sharks. 🦈
-
 ## v0.15.0 changes — simpler map, new name
 
 - **The game is now TAG ALONG** — *a shark research game*. "Tag, You're It"
