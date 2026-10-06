@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.11.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.12.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,28 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.12.0 changes — Sarah finds her voice
+
+- **Sarah voice pass.** The in-game Sarah now sounds like the real one: an
+  enthusiastic but calm adult, not a hype machine. Caps-lock and
+  exclamation marks are earned now — they live where excitement is real
+  (a tag, a genuinely thrilling fact). All chats, nudges, check-ins, and
+  all fifteen sharks' cheer/opener texts rewritten in the new register.
+- **Contextual hints.** Sarah pays attention to where you've been
+  searching: hints and casual texts now prefer species from your most
+  recent expedition region instead of drawing from the whole roster, so
+  she talks about the shark you're actually after. (Falls back gracefully
+  when there's no recent region.)
+- **Phone auto-scroll.** The conversation now opens pinned to the newest
+  message, like a real phone — previously the scroll ran while the tab was
+  hidden, so it never took. Threads also lost their nested mini-scrollbars:
+  one conversation, one scroll.
+- **Explicit research entries.** Six field-guide entries that left the plan
+  unclear got a second paragraph: tiger and great white now state their
+  method, epaulette explains *how* to encounter a walker, and the reef trio
+  (lemon, blacktip, whitetip) name their game region outright. Two
+  paragraphs max — still field notes, not essays.
 
 ## v0.11.0 changes — the reef trio + tap-to-focus map
 

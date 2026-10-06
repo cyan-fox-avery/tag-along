@@ -245,7 +245,10 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
   width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 .phone-head { font-weight: 800; margin-bottom: 10px; font-size: 15px; }
-.phone-thread { display: grid; gap: 8px; margin-bottom: 12px; max-height: 50vh; overflow-y: auto; }
+/* v0.12.0: one conversation scroll, like a real phone — threads no longer
+   get their own nested scrollboxes; #messagesList (.phone-convo) is the
+   single scroller, pinned to the newest message. */
+.phone-thread { display: grid; gap: 8px; margin-bottom: 12px; }
 .bubble {
   padding: 10px 13px; border-radius: 16px; font-size: 14px; line-height: 1.5;
   max-width: 92%;
