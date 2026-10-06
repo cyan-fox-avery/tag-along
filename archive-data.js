@@ -576,7 +576,7 @@ const ARCHIVE_MEDIA = {
     future: true keeps these hidden until the species enters SHARKS. */
  "scalloped": {
   "scientific": "Sphyrna lewini",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -600,7 +600,7 @@ const ARCHIVE_MEDIA = {
  },
  "smooth": {
   "scientific": "Sphyrna zygaena",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -624,7 +624,7 @@ const ARCHIVE_MEDIA = {
  },
  "bonnethead": {
   "scientific": "Sphyrna tiburo",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -648,7 +648,7 @@ const ARCHIVE_MEDIA = {
  },
  "bull": {
   "scientific": "Carcharhinus leucas",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -674,7 +674,7 @@ const ARCHIVE_MEDIA = {
  },
  "greyreef": {
   "scientific": "Carcharhinus amblyrhynchos",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -699,7 +699,7 @@ const ARCHIVE_MEDIA = {
  },
  "caribbean": {
   "scientific": "Carcharhinus perezii",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -724,7 +724,7 @@ const ARCHIVE_MEDIA = {
  },
  "sandbar": {
   "scientific": "Carcharhinus plumbeus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
