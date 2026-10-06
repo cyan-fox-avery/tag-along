@@ -140,34 +140,43 @@ const TRACK_ENVELOPES = {
     corridor: "extreme residency — greatest net displacement on record 475 m; scale inferred from Heron Island mark-recapture (no PNG telemetry exists)"
   },
   lemon: {
-    start: "Bimini lagoon (tag site)", // game tags in the Caribbean Sea; Bimini (Bahamas) is the lemon shark's most-studied nursery
-    /* Behaviour and scale from the decades-long Bimini Biological Field
-       Station program (acoustic + PIT tagging): extreme natal philopatry,
-       small juvenile home ranges in mangrove lagoons, adults moving
-       between nearby islands. Areas are real western-Atlantic sites
-       clustered at the Caribbean tag region — honest local scale. */
-    areas: ["Bimini", "Andros Island", "Eleuthera", "Florida Keys", "Bimini mangrove nursery"],
+    start: "Caribbean mangrove lagoon (tag site)",
+    /* v0.11.0 review fix (ChatGPT): the first version named real
+       western-Atlantic sites (Bimini → Andros ≈ 200 km) while the
+       envelope claims hop: [2, 40] — an individual shark visibly crossing
+       hundreds of kilometres its track data says it never swam. Per the
+       canon rule, the plotted individual stays Caribbean-local: generic
+       mangrove-lagoon labels clustered at the tag site (the nurse-shark
+       precedent). The Bimini Biological Field Station science still
+       informs BEHAVIOUR and SCALE (natal philopatry, mangrove nurseries)
+       via the corridor note and research text — it just doesn't donate
+       waypoints. (Making Bimini its own expedition region is the
+       future-proof alternative; not this version.) */
+    areas: ["Tag-site mangrove lagoon", "Nursery shallows", "Mangrove channel", "Lagoon sand flat", "Nursery patch reefs"],
     hop: [2, 40], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
-    corridor: "natal philopatry — females return to their own birthplace to pup; juveniles resident in mangrove lagoons; acoustic tagging, Bimini Biological Field Station"
+    corridor: "natal philopatry — females return to their birthplace to pup; juveniles resident in mangrove lagoons; behaviour/scale from the Bimini acoustic + PIT tagging program"
   },
   blacktip: {
-    start: "North Malé Atoll reef flat (tag site)", // game tags in the Maldives; envelope is Maldives-local by design
-    /* Behaviour from Indo-Pacific reef-shark acoustic telemetry (Moorea
-       photo-ID / acoustic work on C. melanopterus): extremely small home
-       ranges, multi-year site fidelity, stable social associations. Areas
-       are real Maldivian atolls — no imported waypoints. */
-    areas: ["North Malé Atoll", "Rasdhoo Atoll", "Baa Atoll", "Addu Atoll", "Fuvahmulah"],
+    start: "Maldivian reef flat (tag site)",
+    /* v0.11.0 review fix (ChatGPT): Baa Atoll → Addu ≈ 650 km against
+       hop: [1, 25] — same mismatch. Rebuilt reef-local: generic labels
+       clustered within ~25 km of the Maldives tag site. The Moorea
+       photo-ID / Indo-Pacific acoustic work still informs behaviour
+       (tiny home ranges, stable social associations). */
+    areas: ["Tag-site reef flat", "Tag-site reef crest", "Tag-site lagoon", "Tag-site channel", "Reef-flat coral heads"],
     hop: [1, 25], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
-    corridor: "extremely resident — among the smallest home ranges of any requiem shark; stable social associations (Moorea photo-ID)"
+    corridor: "extremely resident — among the smallest home ranges of any requiem shark; stable social associations (Moorea photo-ID; Indo-Pacific acoustic telemetry)"
   },
   whitetip: {
-    start: "Tubbataha reef cave (tag site)", // game tags in the Philippines; envelope is Philippines-local by design
-    /* Behaviour from Indo-Pacific acoustic work on T. obesus: fierce reef
-       fidelity, daytime cave-sheltering, nocturnal crevice hunting. Areas
-       are real Philippine reef sites; scale is reef-local. */
-    areas: ["Tubbataha Reefs Natural Park", "Apo Reef", "El Nido reefs", "Northern Palawan", "Sulu Sea"],
+    start: "Philippine reef cave (tag site)",
+    /* v0.11.0 review fix (ChatGPT): Tubbataha → Apo Reef ≈ 420 km
+       against hop: [1, 20] — same mismatch. Rebuilt reef-local: generic
+       cave/ledge/crevice labels clustered within ~20 km of the
+       Philippines tag site. Indo-Pacific T. obesus acoustic work still
+       informs behaviour (cave-sheltering, fierce reef fidelity). */
+    areas: ["Tag-site reef cave", "Tag-site cave ledge", "Tag-site reef crevice", "Night-hunt reef", "Shelter ledge"],
     hop: [1, 20], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
-    corridor: "strong reef fidelity — returns to the same daytime cave shelter for months/years; nocturnal, reef-local movements"
+    corridor: "strong reef fidelity — same daytime cave shelter for months/years; nocturnal, reef-local (Indo-Pacific acoustic work)"
   }
 };
 
@@ -346,15 +355,25 @@ const MAP_COORDS = {
   "Lagoon patch": [-6.002, 146.998],
   "North beach pools": [-5.999, 147.003],
   "Reef-flat edge": [-6.001, 146.997],
-  /* v0.11.0: new envelope labels — Maldives atolls (blacktip) and
-     Philippine reef sites (whitetip) are real places; Bimini's mangrove
-     nursery is the lemon shark's famous pupping ground. */
-  "Bimini mangrove nursery": [25.72, -79.28],
-  "North Malé Atoll": [4.3, 73.5],
-  "Rasdhoo Atoll": [4.27, 73.0],
-  "Baa Atoll": [5.15, 73.1],
-  "Apo Reef": [12.66, 120.42],
-  "El Nido reefs": [11.2, 119.3]
+  /* v0.11.0: reef-local envelope labels for the reef trio (review fix).
+     Generic lagoon / reef-flat / cave labels clustered tightly at each
+     tag site — the nurse-shark precedent. Species science informs
+     behaviour and scale, never waypoints. */
+  "Tag-site mangrove lagoon": [15.0, -70.0],
+  "Nursery shallows": [15.06, -69.96],
+  "Mangrove channel": [14.95, -70.07],
+  "Lagoon sand flat": [15.03, -70.1],
+  "Nursery patch reefs": [14.97, -69.93],
+  "Tag-site reef flat": [3.2, 73.2],
+  "Tag-site reef crest": [3.23, 73.21],
+  "Tag-site lagoon": [3.17, 73.18],
+  "Tag-site channel": [3.25, 73.24],
+  "Reef-flat coral heads": [3.18, 73.23],
+  "Tag-site reef cave": [12.0, 122.0],
+  "Tag-site cave ledge": [12.03, 122.02],
+  "Tag-site reef crevice": [11.98, 121.99],
+  "Night-hunt reef": [12.04, 122.05],
+  "Shelter ledge": [11.97, 122.03]
 };
 
 const MAP_W = 1000, MAP_H = 500;
