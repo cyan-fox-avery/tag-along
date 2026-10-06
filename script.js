@@ -2381,14 +2381,16 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     if (pts.size === 1) {
       downX = panX = e.clientX; downY = panY = e.clientY;
       movedMax = 0; pinched = false;
-    } else if (pts.size === 2) {
+    } else if (mapExplore && pts.size === 2) {
+      /* v0.10.3: pinch only exists in explore mode — normal mode never
+         enters the custom pinch path (page owns gestures there). */
       pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
     }
   });
   window.addEventListener("pointermove", e => {
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pts.size === 2) {
+    if (mapExplore && pts.size === 2) {
       const d = spread();
       if (pinchD0 > 0 && d > 0) {
         const p = [...pts.values()];
