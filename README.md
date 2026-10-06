@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.10.3** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.10.4** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,13 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.10.4 changes — phone layout fix
+
+- The page no longer leaves a dead strip on the right on phones: the six
+  navigation pills now wrap into two rows of three on narrow screens
+  instead of overflowing the page, and the map toolbar wraps too so the
+  Explore/Done buttons can't push anything off-screen either.
 
 ## v0.10.3 changes — explore-map mode
 
