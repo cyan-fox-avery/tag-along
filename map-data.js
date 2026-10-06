@@ -230,6 +230,21 @@ const TRACK_ENVELOPES = {
     areas: ["Tag-site coastal bay", "Nursery bay", "Wild Coast offshore reef", "Sardine run grounds", "Mozambique coast approaches"],
     hop: [30, 1200], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
     corridor: "seasonal coastwise migration \u2014 South African tagging shows 1,000+ km along the SA and Mozambique coasts in a single cycle; females move between coastal nursery bays and offshore waters"
+  },
+  frilled: {
+    start: "Sagami Bay deep slope (tag site)",
+    /* Archival, like the goblin: frilled sharks have never carried
+       satellite tags in any sustained program — the track is reconstructed
+       from capture records, and the kind note says so honestly. */
+    areas: ["Tag-site deep slope", "Canyon wall", "Seamount flank", "Trench approaches"],
+    hop: [5, 80], dayStep: [14, 60], nPoints: [4, 5], kind: "archival",
+    corridor: "deep benthic drifter — individual movement poorly known; capture records around Japan's deep slopes provide habitat context, but no telemetry track exists; this local path is illustrative only"
+  },
+  zebra: {
+    start: "Philippine reef (tag site)",
+    areas: ["Philippine tag-site reef", "Coral garden", "Sand flat", "Lagoon patch reef", "Reef channel"],
+    hop: [1, 30], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
+    corridor: "reef-resident — Indo-Pacific acoustic work shows small home ranges and strong site fidelity on coral reefs"
   }
 
 };
@@ -237,7 +252,7 @@ const TRACK_ENVELOPES = {
 /* How each track kind is framed to the player — honesty first. */
 const TRACK_KIND_NOTES = {
   satellite: "Illustrative track — real satellite tags ping just like this. 🛰️",
-  archival: "Sparse illustrative track — goblin sharks have never carried satellite tags; reconstructed from capture records.",
+  archival: "Sparse illustrative track — reconstructed from capture records, not live satellite or acoustic tracking.",
   resightings: "Illustrative track — built from reef survey re-sightings, not a satellite tag. This shark barely leaves its reef flat.",
   acoustic: "Illustrative track based on acoustic-tag detections from reef receiver arrays."
 };
@@ -285,7 +300,8 @@ const SPECIES_COLORS = {
   basking: "#b8c0ff", epaulette: "#ff8fab",
   lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da",
   blue: "#3b6ea5", porbeagle: "#8fa8bf", silky: "#a08b62",
-  oceanic: "#c9b458", sevengill: "#8a7f70", bronze: "#c98a3d"
+  oceanic: "#c9b458", sevengill: "#8a7f70", bronze: "#c98a3d",
+  frilled: "#7a6f9e", zebra: "#d9a441"
 };
 
 /* Every label a track point can carry: region names (tag sites and
@@ -459,7 +475,18 @@ const MAP_COORDS = {
   "Nursery bay": [-33.5, 26.0],
   "Wild Coast offshore reef": [-32.0, 28.5],
   "Sardine run grounds": [-30.5, 30.5],
-  "Mozambique coast approaches": [-27.5, 32.5]
+  "Mozambique coast approaches": [-27.5, 32.5],
+
+  /* v0.14.0: frilled + zebra envelope waypoints. */
+  "Tag-site deep slope": [35.0, 139.6],
+  "Canyon wall": [34.9, 139.9],
+  "Seamount flank": [34.7, 140.2],
+  "Trench approaches": [34.5, 140.5],
+  "Philippine tag-site reef": [12.1, 122.1],
+  "Coral garden": [12.05, 122.15],
+  "Sand flat": [11.95, 122.05],
+  "Lagoon patch reef": [12.15, 122.0],
+  "Reef channel": [12.0, 121.95]
 
 };
 

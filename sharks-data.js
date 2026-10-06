@@ -101,7 +101,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.2],
-    research: "Sand tiger sharks haunt subtropical and temperate shores — everywhere except the eastern Pacific. Off North Carolina's Outer Banks, the Graveyard of the Atlantic, they gather around old shipwrecks in summer, and individual females return to the same wrecks year after year. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing schools of fish, squid and skates. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks. They're scent-hunters first: a fish-oil slick on the current speaks their language.",
+    research: "Sand tiger sharks haunt subtropical and temperate shores — everywhere except the eastern Pacific. Off North Carolina's Outer Banks, the Graveyard of the Atlantic, they gather around old shipwrecks in summer, and individual females return to the same wrecks year after year. Despite the toothy grin, they're slow, docile ambush hunters — they gulp air at the surface and hold it to hover perfectly still in the water column, then strike at passing schools of fish, squid and rays. They rarely venture deeper than about 190 metres, preferring the sunlit shallows around reefs and wrecks. They're scent-hunters first: a fish-oil slick on the current speaks their language.",
     hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
     bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
     cheer: "They hover motionless by holding air like a balloon, then just strike. Gentle, floaty ambush predators.",
@@ -236,7 +236,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.2, 2.0],
-    research: "The classic reef shark \u2014 the fin cutting the surface in every tropical daydream. In the Maldives, blacktip reef sharks patrol reef flats so shallow their dorsal fins break the water, each fin dipped in crisp black like ink. They are timid animals, often frightened away by swimmers, but bait excites them and they have been known to leap clear of the water when feeding.\n\nIndividuals hold tiny home ranges for years; photo-ID work found the same sharks choosing to hang out together, stable friendships on the reef. Work the Maldivian shallows, surface to reef: a chum slick over a reef flat with reef fish or shrimp will bring the locals in.",
+    research: "The classic reef shark \u2014 the fin cutting the surface in every tropical daydream. In the Maldives, blacktip reef sharks patrol reef flats so shallow their dorsal fins break the water, each fin dipped in crisp black like ink. They are timid animals, often frightened away by swimmers, but bait excites them and they have been known to leap clear of the water when feeding.\n\nIndividuals hold tiny home ranges for years; photo-ID work found the same sharks choosing to hang out together, stable friendships on the reef. Work the Maldivian shallows, surface to reef: a chum slick over a reef flat with schooling fish (mackerel) or crabs and lobster will bring the locals in.",
     hook: "Patrols water so shallow its black-tipped dorsal fin breaks the surface.",
     bonus: "Blacktip reef sharks form stable, non-random social groups — the same individuals repeatedly choose each other's company, year after year.",
     cheer: "Knee-deep water, black-dipped fins, and a loyal friend group. The reef's socialites.",
@@ -255,7 +255,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 1.6],
-    research: "A slender reef shark with white tips on its dorsal and tail, and a trick few requiem sharks share: it can pump water over its gills while lying perfectly still. On Philippine reefs, whitetip reef sharks pile together in caves and under ledges by day, heaped like firewood \u2014 they're fiercely loyal to one reef, returning to the same daytime shelter for months or years.\n\nBy night they slide out to hunt, wriggling into crevices after eels, octopus and spiny lobster in the shallow reefs. Find the cave and the sharks are already home: fish the Philippines at night with octopus or reef-fish scraps, and a chum slick to draw them out.",
+    research: "A slender reef shark with white tips on its dorsal and tail, and a trick few requiem sharks share: it can pump water over its gills while lying perfectly still. On Philippine reefs, whitetip reef sharks pile together in caves and under ledges by day, heaped like firewood \u2014 they're fiercely loyal to one reef, returning to the same daytime shelter for months or years.\n\nBy night they slide out to hunt, wriggling into crevices after eels, squid and spiny lobster in the shallow reefs. Find the cave and the sharks are already home: fish the Philippines at night with squid or schooling-fish scraps, and a chum slick to draw them out.",
     hook: "Naps in heaps in reef caves by day — one of the few requiem sharks that can breathe while lying still.",
     bonus: "The whitetip reef shark is the only living species in the genus Triaenodon.",
     cheer: "The cave-nappers. Piled in heaps by day, hunting crevices by night. A genus all to themselves.",
@@ -346,7 +346,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum", "seal"] },
     sizeRange: [1.2, 3.0],
-    research: "The broadnose sevengill is a shark out of deep time \u2014 seven gill slits instead of five, a single dorsal fin set far back near the tail, and a lineage, the Hexanchiformes, whose Jurassic fossils already wore seven gills. In South Africa they haunt kelp forests, bays and estuary mouths, mostly shallower than 136 metres, sometimes cruising water barely a metre deep. They are aggressive, opportunistic apex predators: seals, bony fish, rays, even other sharks, plus carrion. Their teeth come in two toolkits \u2014 jagged and cusped above, comb-shaped below, built for sawing through seal blubber.\n\nFish the South African shallows with oily fish and a chum slick; seal scent in the water is honest here too, since Cape fur seals are genuine prey. One caution from the field guides: sevengills get pushy around food, so this is a careful-boat tag. They move seasonally between the bays and deeper water, and show strong fidelity to their seasonal aggregations \u2014 the same sharks returning to the same bays.",
+    research: "The broadnose sevengill is a shark out of deep time \u2014 seven gill slits instead of five, a single dorsal fin set far back near the tail, and a lineage, the Hexanchiformes, whose Jurassic fossils already wore seven gills. In South Africa they haunt kelp forests, bays and estuary mouths, mostly shallower than 136 metres, sometimes cruising water barely a metre deep. They are aggressive, opportunistic apex predators: seals, bony fish, rays, even other sharks, plus carrion. Their teeth come in two toolkits \u2014 jagged and cusped above, comb-shaped below, built for sawing through seal blubber.\n\nFish the South African shallows with oily fish or squid and a chum slick; seal scent in the water is honest here too, since Cape fur seals are genuine prey. One caution from the field guides: sevengills get pushy around food, so this is a careful-boat tag. They move seasonally between the bays and deeper water, and show strong fidelity to their seasonal aggregations \u2014 the same sharks returning to the same bays.",
     hook: "Seven gills, one far-back dorsal fin, and a lineage older than the dinosaurs' heyday \u2014 the cow shark of the kelp forests.",
     bonus: "Sevengill relatives with seven gills were already swimming in the Jurassic \u2014 fossils 200 to 145 million years old show the same layout. Females bear litters of 67 to 104 pups, among the largest of any shark.",
     cheer: "Seven gills! A single dorsal fin! It is like a shark from a museum diorama came to life. Incredible.",
@@ -371,5 +371,42 @@ const SHARKS = [
     opener: "A bronze whaler! The sardine-run hunter! Tell me everything!",
     sketchCap: "bronze flanks",
     nameIdeas: ["Bronze", "Sardine", "Runny", "Copper"]
+  },
+  {
+    id: "frilled",
+    name: "Frilled Shark", latin: "Chlamydoselachus anguineus", status: "Least Concern",
+    code: "FR",
+    /* A living fossil from the deep: eel-like, six frilly gill slits, 300
+       trident teeth. Sagami Bay is one of the only places they come up
+       shallow enough to meet. Squid + chum, fished deep. */
+    combo: { region: "japan", bait: ["squid"] },
+    depths: ["twilight", "deep"],
+    methods: { attract: ["chum"] },
+    sizeRange: [1.0, 2.0],
+    research: "The frilled shark looks like something the ocean forgot to finish evolving \u2014 an eel-long body, a head like a snake, and six pairs of gill slits whose edges flare into frills, which is the whole name. Inside the jaws sit around 300 tiny three-pronged teeth in 25 rows, built for gripping slippery squid in total darkness. They belong to one of the oldest shark lineages still swimming, a body plan barely changed in tens of millions of years. Sagami Bay in Japan is famous for them: they live between about 120 and 1,500 metres, most often a few hundred down, drifting over the deep slope after squid and deep-sea fish.\n\nNobody has ever kept a frilled shark's habits under proper observation \u2014 almost everything known comes from specimens, not tracking. Fish Sagami Bay deep: squid on the line, fished in the twilight zone and below, with a chum slick drifting down-current. In the deep dark, scent is one of the few things that travels.",
+    hook: "Six frilly gill slits, 300 trident teeth, and a lineage tens of millions of years old \u2014 the deep's own sea serpent.",
+    bonus: "Frilled sharks get their name from the frilly margins of their six gill slits \u2014 most sharks have five plain ones. Their embryos develop inside egg cases, and gestation may last over three years, among the longest of any vertebrate.",
+    cheer: "The living fossil! An eel with three hundred teeth, hauled up from the deep dark. Incredible.",
+    opener: "A frilled shark! Did you see the frilly gills? Tell me everything!",
+    sketchCap: "frilly gill slits (six pairs!)",
+    nameIdeas: ["Frill", "Serpent", "Eely", "Ruffle"]
+  },
+  {
+    id: "zebra",
+    name: "Zebra Shark", latin: "Stegostoma tigrinum", status: "Endangered",
+    code: "ZE",
+    /* Two sharks for the price of one: pups wear zebra stripes, adults
+       wear leopard spots. A docile bottom-feeder of Philippine reefs. */
+    combo: { region: "philippines", bait: ["crustaceans", "urchins"] },
+    depths: ["surface", "reef"],
+    methods: { attract: ["chum"] },
+    sizeRange: [1.5, 2.5],
+    research: "The zebra shark is named for its babies, not its adults \u2014 the pups are dark brown with bold white stripes, a true zebra pattern, and as they grow the stripes break into spots until the adult looks more like a leopard. Taxonomy's little joke. They are gentle bottom-dwellers of Indo-Pacific coral reefs, cruising the sand and coral in shallow Philippine water, rarely deeper than about 60 metres, vacuuming up molluscs, crabs and small fish. Like the whitetip reef shark, they can pump water over their gills while resting \u2014 most sharks would suffocate sitting still.\n\nFish the Philippine shallows over sand and reef: crabs, lobster or shellfish will interest a foraging zebra, with a chum slick to hold its attention. They are Endangered across much of their range, fished for fins, meat and the aquarium trade \u2014 a careful tag on a healthy adult is worth celebrating.",
+    hook: "Pups wear zebra stripes, adults wear leopard spots \u2014 two sharks for the price of one, and gentle with it.",
+    bonus: "Zebra shark pups hatch at around 20 to 36 centimetres already wearing full stripes. Adults can reach 2.5 metres and live over 25 years. They are strong swimmers despite the bottom-feeding \u2014 flexible, eel-like bodies.",
+    cheer: "The zebra \u2014 or the leopard, depending on its age! Stripes, spots, all wonderful. What a gentle giant.",
+    opener: "A zebra shark! Stripes or spots \u2014 which was it? Tell me everything!",
+    sketchCap: "pup stripes breaking into adult spots",
+    nameIdeas: ["Ziggy", "Stripes", "Domino", "Pard"]
   },
 ];
