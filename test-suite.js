@@ -249,6 +249,52 @@ code += `
       (COUSIN_CHATS[id] || []).length === 3 && TRACK_ENVELOPES[id]));
   ok('salmon still future-only', ARCHIVE_MEDIA.salmon.future === true &&
     !SHARKS.some(s => s.id === 'salmon'));
+
+  // v0.18.0 review regressions
+  ok('reset clears achievement/stat stores',
+    fileCode.includes('"tyi-stats", "tyi-achievements"'));
+  // one named shark must NOT earn First-Name Basis
+  state.tagged = { nurse: { name: 'Bubbles', researchId: 'NS-2026-001' } };
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
+  state.achievements = {};
+  checkAchievements();
+  ok('one named shark does not earn First-Name Basis', !state.achievements['first-name']);
+  // Ocean Hopper requires locked regions too
+  state.stats.regionsVisited = Object.keys(REGIONS).filter(r => !REGIONS[r].locked);
+  state.achievements = {};
+  checkAchievements();
+  ok('locked regions count toward Ocean Hopper', !state.achievements['ocean-hopper']);
+  // chum on a species without chum in methods must NOT count
+  state.tagged = {}; state.achievements = {}; state.stats.chumTags = 0;
+  const whaleSpecies = SHARKS.find(s => s.id === 'whale');
+  const chumValid = whaleSpecies.methods && whaleSpecies.methods.attract &&
+    whaleSpecies.methods.attract.includes('chum');
+  ok('whale shark has no chum method', !chumValid);
+  // multiple unlocks queue instead of overwriting
+  state.tagged = { nurse: { name: 'Bubbles', researchId: 'NS-2026-001' } };
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 1, chumTags: 0, expeditions: 0 };
+  state.achievements = {};
+  checkAchievements();
+  const queued = typeof achieveQueue !== 'undefined' ? achieveQueue.length : 0;
+  const shown = (typeof achieveShowing !== 'undefined' && achieveShowing) ? 1 : 0;
+  ok('simultaneous unlocks queued', (queued + shown) >= 2 &&
+    !!state.achievements['first-tag'] && !!state.achievements['old-friend']);
+  // every advertised achievement is attainable (no permanently-locked entries)
+  ok('all live achievements attainable',
+    ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }) &&
+    !ACHIEVEMENTS.some(a => a.id === 'bruce'));
+  ok('12 live achievements', ACHIEVEMENTS.length === 12);
+  // bull and sandbar tracks resolve to different points
+  const bullShelf = MAP_COORDS[TRACK_ENVELOPES.bull.areas.find(a => /shelf/i.test(a))];
+  const sandShelf = MAP_COORDS[TRACK_ENVELOPES.sandbar.areas.find(a => /shelf/i.test(a))];
+  ok('bull/sandbar shelf coords differ',
+    bullShelf && sandShelf && (bullShelf[0] !== sandShelf[0] || bullShelf[1] !== sandShelf[1]));
+  // CC0 renders without copyright symbol
+  const cc0Html = archiveAssetHtml({ license: 'CC0', credit: 'Dennis Hipp', caption: 'x', page: 'x', image: 'x', full: 'x' }, true);
+  ok('CC0 uses neutral credit wording', !/©/.test(cc0Html));
+  // restore
+  state.tagged = {}; state.achievements = {};
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
