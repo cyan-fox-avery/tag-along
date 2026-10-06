@@ -1,6 +1,6 @@
-# Tag, You're It
+# Tag Along
 
-**v0.14.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.16.0** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,40 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.16.0 changes — the ending
+
+- **The win is now a proper ending in four beats.** The expedition ritual
+  always finishes first (health check, release, return to ship) — then:
+  institute recognition (Master Shark Tagger), **Sarah's celebration**
+  (written in her calm adult voice, using your actual
+  first-tagged shark — and she's still here for the postgame), the **map finale** (every tagged shark's track and
+  marker fades in one by one — "They're all still out there."), and the
+  acknowledgements. Skippable, never rushed.
+- **Wild Archive unlock.** Completing the roster sets the archive flag that
+  the postgame Full Field Guide will build on. (The archive UI and the
+  real-media curation are coming next — Avery is hand-picking the photos.)
+
+A pro-shark conservation collection game.
+
+You are a conservation scientist. Research each shark's habits, plan an
+expedition (region, depth, bait, method), head out to sea, and tag one of every
+species for your official collection book. Less *Jaws*, more careful field
+science.
+
+Built for sarah, who loves sharks. 🦈
+
+## v0.15.0 changes — simpler map, new name
+
+- **The game is now TAG ALONG** — *a shark research game*. "Tag, You're It"
+  retires as the prototype title. The page title, header, and README carry
+  the new name; the in-game title flourishes ("Tag along with Biscuit →")
+  from the beta roadmap are still queued, not built.
+- **Map gestures simplified.** Pinch-to-zoom and the Explore-map mode are
+  gone — they were fighting the page for one-finger drags. Zoom is now
+  + / − buttons (and mouse wheel) only. One-finger drags scroll the page at
+  1x and pan the map when zoomed in, with a subtle outline showing which
+  mode the map is in. No modes, no mid-gesture races.
 
 ## v0.14.0 changes — two more sharks + clearer research
 
