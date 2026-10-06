@@ -1,4 +1,4 @@
-/* Tag, You're It — prototype v0.9.0
+/* Tag Along — v0.16.0
    Research -> plan (region/depth/bait/method) -> dive -> watch/tag/resight
    -> collection book + logbook. */
 
@@ -1786,8 +1786,8 @@ function winMapFinale() {
   };
   const timer = setInterval(() => {
     revealed++;
+    if (revealed >= n) { finish(); return; } // finish() renders the final state once
     renderRevealed(revealed);
-    if (revealed >= n) finish();
   }, 650);
   $("finaleSkip").addEventListener("click", finish);
   $("finaleNext").addEventListener("click", () => winStep(4));
@@ -1863,7 +1863,7 @@ function openCertificate() {
   c.innerHTML = `
     <div class="cert-trophy" style="font-size:44px">🏆</div>
     <h3 style="margin:6px 0 0">Master Shark Tagger</h3>
-    <p class="latin">Tag, You're It — field program</p>
+    <p class="latin">Tag Along — field program</p>
     <div class="cert-body">
       <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
       <p class="cert-sig">Awarded with salt on it. 🦈</p>
@@ -2021,9 +2021,22 @@ function renderAll() {
   updateMsgBadge();
 }
 
+/* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
+   completed v0.14 save boots with won=true, a full roster, and no archive
+   unlock. Backfill the unlock they already earned. */
+function migrateArchiveUnlock() {
+  try {
+    const taggedCount = Object.keys(state.tagged).length;
+    if (state.won && taggedCount >= SHARKS.length && !state.archiveUnlocked) {
+      state.archiveUnlocked = true;
+      localStorage.setItem("tyi-archive", "1");
+    }
+  } catch {}
+}
 migrateIds();
 migrateTracks();
 migrateWinV07();
+migrateArchiveUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
@@ -2248,7 +2261,14 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
+    if (pts.size === 0) {
+      if (movedMax > 10) suppressMarkerClick = true;
+    } else if (pts.size === 1) {
+      const p = [...pts.values()][0];
+      downX = panX = p.x;
+      downY = panY = p.y;
+      movedMax = 0;
+    }
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
