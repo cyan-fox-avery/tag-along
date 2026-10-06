@@ -11,9 +11,9 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
-## v0.10.3 changes — pinch-gesture fix
+## v0.10.3 changes — explore-map mode
 
-- Fixed pinch-to-zoom at normal zoom: the page could steal a two-finger gesture for scrolling mid-pinch. The map now claims the gesture the moment the second finger lands, and hands page scroll back when the gesture ends.
+- The map gets an explicit **Explore map** mode for touchscreens (thanks ChatGPT for the design steer). Tap it and the map takes full ownership of your gestures — pinch to zoom, drag to pan — with the rules set before your fingers land, so the browser can never steal a pinch for page scrolling. Tap **Done** to hand scrolling back. The mid-gesture fix from the first pass was racy by design, so it was replaced outright.
 
 ## v0.10.2 changes — touchscreen map support
 
