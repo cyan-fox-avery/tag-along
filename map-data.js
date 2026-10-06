@@ -163,7 +163,7 @@ const TRACK_ENVELOPES = {
        clustered within ~25 km of the Maldives tag site. The Moorea
        photo-ID / Indo-Pacific acoustic work still informs behaviour
        (tiny home ranges, stable social associations). */
-    areas: ["Tag-site reef flat", "Tag-site reef crest", "Tag-site lagoon", "Tag-site channel", "Reef-flat coral heads"],
+    areas: ["Maldives tag-site reef flat", "Tag-site reef crest", "Tag-site lagoon", "Tag-site channel", "Reef-flat coral heads"],
     hop: [1, 25], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
     corridor: "extremely resident — among the smallest home ranges of any requiem shark; stable social associations (Moorea photo-ID; Indo-Pacific acoustic telemetry)"
   },
@@ -364,7 +364,7 @@ const MAP_COORDS = {
   "Mangrove channel": [14.95, -70.07],
   "Lagoon sand flat": [15.03, -70.1],
   "Nursery patch reefs": [14.97, -69.93],
-  "Tag-site reef flat": [3.2, 73.2],
+  "Maldives tag-site reef flat": [3.2, 73.2],
   "Tag-site reef crest": [3.23, 73.21],
   "Tag-site lagoon": [3.17, 73.18],
   "Tag-site channel": [3.25, 73.24],
