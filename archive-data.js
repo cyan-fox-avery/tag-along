@@ -126,9 +126,12 @@ const ARCHIVE_MEDIA = {
   "assets": [
    {
     "type": "video",
-    "caption": "Wild lemon sharks at Tiger Beach in the Bahamas. Look for the clearer full-body footage after the close opening shots.",
+    "caption": "Wild lemon sharks at Tiger Beach in the Bahamas — a trimmed excerpt showing the clearest full-body footage.",
     "credit": "Diver Jackie",
     "license": "CC BY 3.0",
+    "trimmed": true,
+    "clipStart": 28,
+    "clipEnd": 58,
     "page": "https://commons.wikimedia.org/wiki/File%3ALemon_sharks_in_the_Bahamas.webm",
     "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Lemon_sharks_in_the_Bahamas.webm/960px--Lemon_sharks_in_the_Bahamas.webm.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo",
     "full": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Lemon_sharks_in_the_Bahamas.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
@@ -345,9 +348,12 @@ const ARCHIVE_MEDIA = {
   "assets": [
    {
     "type": "video",
-    "caption": "A group of wild whitetip reef sharks at Cocos Island. Whitetips often gather around reef structure and may rest together during the day.",
+    "caption": "A group of wild whitetip reef sharks at Cocos Island — a trimmed excerpt of the clearest schooling footage. Whitetips often gather around reef structure and may rest together during the day.",
     "credit": "Blane Henderson",
     "license": "CC BY 4.0",
+    "trimmed": true,
+    "clipStart": 13,
+    "clipEnd": 54,
     "page": "https://commons.wikimedia.org/wiki/File%3ASchool%20of%20whitetip%20reef%20sharks%20%28Triaenodon%20obesus%29.webm",
     "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/School_of_whitetip_reef_sharks_%28Triaenodon_obesus%29.webm/960px--School_of_whitetip_reef_sharks_%28Triaenodon_obesus%29.webm.jpg",
     "full": "https://upload.wikimedia.org/wikipedia/commons/b/b2/School_of_whitetip_reef_sharks_%28Triaenodon_obesus%29.webm",

@@ -160,6 +160,18 @@ code += `
   ok('renderArchive exists', typeof renderArchive === 'function');
   ok('updateArchiveTab exists', typeof updateArchiveTab === 'function');
   ok('archive tab hidden until unlock', /updateArchiveTab/.test(fileCode));
+  // v0.17.0 review fixes: curated clip boundaries, license URLs, tagged-only dossiers
+  const lemonVid = ARCHIVE_MEDIA.lemon.assets.find(a => a.type === 'video');
+  ok('lemon video has curated clip (28-58s)', lemonVid.trimmed === true && lemonVid.clipStart === 28 && lemonVid.clipEnd === 58);
+  const wtVid = ARCHIVE_MEDIA.whitetip.assets.find(a => a.type === 'video');
+  ok('whitetip video has curated clip (13-54s)', wtVid.trimmed === true && wtVid.clipStart === 13 && wtVid.clipEnd === 54);
+  const clipHtml = archiveAssetHtml(lemonVid, true);
+  ok('video src enforces clip via media fragment', clipHtml.includes('#t=28,58'));
+  ok('trimmed videos note the trim', clipHtml.includes('trimmed from original'));
+  ok('license links to canonical CC URL', clipHtml.includes('href="https://creativecommons.org/licenses/by/3.0/"'));
+  const pdHtml = archiveAssetHtml({ type: 'photo', caption: 'x', credit: 'NOAA', license: 'Public domain', page: 'https://example.com', image: 'https://example.com/i.jpg' }, false);
+  ok('public-domain uses neutral Credit (no \u00a9)', pdHtml.includes('Credit NOAA') && !pdHtml.includes('\u00a9 NOAA'));
+  ok('dossiers require an actual tag', fileCode.includes('if (!state.tagged[s.id]) return'));
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
