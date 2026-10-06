@@ -570,5 +570,180 @@ const ARCHIVE_MEDIA = {
     "full": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Salmon_shark_afsc.jpg"
    }
   ]
+ },
+ /* v0.18.0 future batch — pre-curated by Avery + ChatGPT. NOT on the playable
+    roster yet. All metadata independently verified against Commons 2026-10-06.
+    future: true keeps these hidden until the species enters SHARKS. */
+ "scalloped": {
+  "scientific": "Sphyrna lewini",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A wild school of scalloped hammerheads at Cocos Island, Costa Rica. Scalloped hammerheads can gather in large daytime schools around oceanic islands and seamounts.",
+    "credit": "Barry Peters",
+    "license": "CC BY 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AScalloped%20hammerhead%20cocos.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Scalloped_hammerhead_cocos.jpg/960px-Scalloped_hammerhead_cocos.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Scalloped_hammerhead_cocos.jpg"
+   },
+   {
+    "type": "photo",
+    "caption": "A wild scalloped hammerhead off Baja California. The curved leading edge of the head, with its characteristic central indentation, gives the species its “scalloped” name.",
+    "credit": "Diego Delso",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ATibur%C3%B3n%20martillo%20com%C3%BAn%20(Sphyrna%20lewini)%2C%20San%20Jos%C3%A9%20del%20Cabo%2C%20Baja%20California%2C%20M%C3%A9xico%2C%202024-12-21%2C%20DD%2002.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Tibur%C3%B3n_martillo_com%C3%BAn_%28Sphyrna_lewini%29%2C_San_Jos%C3%A9_del_Cabo%2C_Baja_California%2C_M%C3%A9xico%2C_2024-12-21%2C_DD_02.jpg/960px-Tibur%C3%B3n_martillo_com%C3%BAn_%28Sphyrna_lewini%29%2C_San_Jos%C3%A9_del_Cabo%2C_Baja_California%2C_M%C3%A9xico%2C_2024-12-21%2C_DD_02.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/5/55/Tibur%C3%B3n_martillo_com%C3%BAn_%28Sphyrna_lewini%29%2C_San_Jos%C3%A9_del_Cabo%2C_Baja_California%2C_M%C3%A9xico%2C_2024-12-21%2C_DD_02.jpg"
+   }
+  ]
+ },
+ "smooth": {
+  "scientific": "Sphyrna zygaena",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A wild smooth hammerhead near New Zealand. Unlike the scalloped hammerhead, the front edge of its broad head forms a smooth curve without a central notch.",
+    "credit": "Shaun Lee",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASphyrna%20zygaena%20253347181.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Sphyrna_zygaena_253347181.jpg/960px-Sphyrna_zygaena_253347181.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sphyrna_zygaena_253347181.jpg"
+   },
+   {
+    "type": "photo",
+    "caption": "A smooth hammerhead passes the NOAA vessel Albatross IV off New Jersey. The source description reports hundreds of hammerheads moving northeast that day, offering an unusual glimpse of the species travelling in numbers.",
+    "credit": "NOAA Corps",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHammerhead.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Hammerhead.jpg/960px-Hammerhead.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/41/Hammerhead.jpg"
+   }
+  ]
+ },
+ "bonnethead": {
+  "scientific": "Sphyrna tiburo",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A bonnethead shark showing the species’ compact, rounded shovel-shaped head. Bonnetheads are the smallest members of the hammerhead family. (Aquarium animal — wild material for this species is scarce.)",
+    "credit": "Mills Baker",
+    "license": "CC BY 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ABonnethead%20new%20orleans.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Bonnethead_new_orleans.jpg/960px-Bonnethead_new_orleans.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/5/52/Bonnethead_new_orleans.jpg"
+   },
+   {
+    "type": "photo",
+    "caption": "A bonnethead turning through the water, giving another view of the species’ unusually narrow cephalofoil. (Aquarium animal; image intentionally retained despite softness.)",
+    "credit": "Jh12",
+    "license": "public domain",
+    "page": "https://commons.wikimedia.org/wiki/File%3ABonnethead%20shark%20-%20Aquarium%20of%20the%20Americas%20July%202007.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Bonnethead_shark_-_Aquarium_of_the_Americas_July_2007.jpg/960px-Bonnethead_shark_-_Aquarium_of_the_Americas_July_2007.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Bonnethead_shark_-_Aquarium_of_the_Americas_July_2007.jpg"
+   }
+  ]
+ },
+ "bull": {
+  "scientific": "Carcharhinus leucas",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A wild bull shark off Playa del Carmen, Mexico. Bull sharks are powerfully built coastal sharks capable of moving between salt water and fresh water.",
+    "credit": "João D’Andretta",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ABull%20shark%20(Carcharhinus%20leucas).jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Bull_shark_%28Carcharhinus_leucas%29.jpg/960px-Bull_shark_%28Carcharhinus_leucas%29.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/be/Bull_shark_%28Carcharhinus_leucas%29.jpg"
+   },
+   {
+    "type": "video",
+    "caption": "Research in Action: “Granma,” an individually recognized female bull shark at Fiji’s Shark Reef Marine Reserve. Long-term observations of recognizable individuals help researchers follow how sharks use the site over time.",
+    "credit": "J. Brunnschweiler & H. Baensch (PLOS ONE)",
+    "license": "CC BY 2.5",
+    "page": "https://commons.wikimedia.org/wiki/File%3AA%20female%20Carcharhinus%20leucas%20at%20the%20Shark%20Reef%20Marine%20Reserve%2C%20Fiji%20-%20pone.0016597.s005.ogv",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/A_female_Carcharhinus_leucas_at_the_Shark_Reef_Marine_Reserve%2C_Fiji_-_pone.0016597.s005.ogv/500px--A_female_Carcharhinus_leucas_at_the_Shark_Reef_Marine_Reserve%2C_Fiji_-_pone.0016597.s005.ogv.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/f/f7/A_female_Carcharhinus_leucas_at_the_Shark_Reef_Marine_Reserve%2C_Fiji_-_pone.0016597.s005.ogv",
+    "play": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f7/A_female_Carcharhinus_leucas_at_the_Shark_Reef_Marine_Reserve%2C_Fiji_-_pone.0016597.s005.ogv/A_female_Carcharhinus_leucas_at_the_Shark_Reef_Marine_Reserve%2C_Fiji_-_pone.0016597.s005.ogv.360p.mpeg4.mov",
+    "label": "Research in Action"
+   }
+  ]
+ },
+ "greyreef": {
+  "scientific": "Carcharhinus amblyrhynchos",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A wild grey reef shark in Palau. Grey reef sharks are strongly associated with coral reefs and often patrol drop-offs, channels, and current-swept reef edges.",
+    "credit": "Ioannis Magouras",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACarcharhinus%20amblyrhynchos%20250148364.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Carcharhinus_amblyrhynchos_250148364.jpg/960px-Carcharhinus_amblyrhynchos_250148364.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Carcharhinus_amblyrhynchos_250148364.jpg"
+   },
+   {
+    "type": "video",
+    "caption": "A wild grey reef shark near Sipadan, moving through the reef environment that gives the species its name.",
+    "credit": "Emma Tolmie",
+    "license": "CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AGrey%20reef%20shark%20(Carcharhinus%20amblyrhynchos)%20near%20Sipadan.webm",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Grey_reef_shark_%28Carcharhinus_amblyrhynchos%29_near_Sipadan.webm/960px--Grey_reef_shark_%28Carcharhinus_amblyrhynchos%29_near_Sipadan.webm.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Grey_reef_shark_%28Carcharhinus_amblyrhynchos%29_near_Sipadan.webm",
+    "play": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1c/Grey_reef_shark_%28Carcharhinus_amblyrhynchos%29_near_Sipadan.webm/Grey_reef_shark_%28Carcharhinus_amblyrhynchos%29_near_Sipadan.webm.360p.mpeg4.mov"
+   }
+  ]
+ },
+ "caribbean": {
+  "scientific": "Carcharhinus perezii",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "Caribbean reef sharks at Tiger Beach in the Bahamas, sharing the water with other large coastal sharks — lemon and bull sharks are also visible in the frame. Reef communities are not single-species spaces.",
+    "credit": "Dennis Hipp",
+    "license": "CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACaribbean%20Reef%20Shark%20School%20Tiger%20Beach%20Bahamas.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Caribbean_Reef_Shark_School_Tiger_Beach_Bahamas.jpg/960px-Caribbean_Reef_Shark_School_Tiger_Beach_Bahamas.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Caribbean_Reef_Shark_School_Tiger_Beach_Bahamas.jpg"
+   },
+   {
+    "type": "video",
+    "caption": "Wild Caribbean reef sharks swimming near divers in Nassau, Bahamas, showing the species moving naturally through its reef habitat. (Source material was trimmed in length with audio removed before our use.)",
+    "credit": "Rico Singleton",
+    "license": "CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AShark%20diving.webm",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Shark_diving.webm/960px--Shark_diving.webm.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/8/84/Shark_diving.webm",
+    "play": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/84/Shark_diving.webm/Shark_diving.webm.360p.mpeg4.mov"
+   }
+  ]
+ },
+ "sandbar": {
+  "scientific": "Carcharhinus plumbeus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A sandbar shark in Hawaiian waters. The species is named for its strong association with shallow coastal shelves, bays, banks, and sandy-bottomed habitat.",
+    "credit": "Narrissa Spies",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASandbar%20shark%20hawaii.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Sandbar_shark_hawaii.jpg/960px-Sandbar_shark_hawaii.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Sandbar_shark_hawaii.jpg"
+   },
+   {
+    "type": "photo",
+    "caption": "A sandbar shark documented by NOAA. Sandbar sharks are recognizable by their notably tall first dorsal fin and heavy-bodied coastal-shark profile.",
+    "credit": "NOAA",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACarcharhinus%20plumbeus.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Carcharhinus_plumbeus.jpg/960px-Carcharhinus_plumbeus.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Carcharhinus_plumbeus.jpg"
+   }
+  ]
  }
 };
