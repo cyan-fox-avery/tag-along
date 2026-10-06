@@ -50,8 +50,12 @@ const ACHIEVEMENTS = [
     breadcrumb: "get on a first-name basis with every shark",
     description: "Gave every tagged shark a nickname. They're individuals, after all.",
     check: (st) => {
-      const ids = Object.keys(st.tagged);
-      return ids.length > 0 && ids.every(id => st.tagged[id].name && st.tagged[id].name.trim());
+      /* v0.18.0 review: naming one shark isn't a first-name basis with
+         every shark — the full roster must be tagged and every one named. */
+      return SHARKS.length > 0 && SHARKS.every(s => {
+        const t = st.tagged[s.id];
+        return t && t.name && t.name.trim();
+      });
     }
   },
   {
@@ -77,7 +81,9 @@ const ACHIEVEMENTS = [
     breadcrumb: "visit every region",
     description: "Ran expeditions in every region. The whole ocean is your office now.",
     check: (st) => {
-      const regions = Object.keys(REGIONS).filter(r => !REGIONS[r].locked);
+      /* v0.18.0 review: locked regions count too — the achievement can't
+         unlock until those waters are earned and visited. */
+      const regions = Object.keys(REGIONS);
       return regions.length > 0 && regions.every(r => (st.stats.regionsVisited || []).includes(r));
     }
   },
@@ -110,15 +116,18 @@ const ACHIEVEMENTS = [
     breadcrumb: "complete 10 expeditions",
     description: "Completed 10 expeditions. You're not a landlubber anymore.",
     check: (st) => (st.stats.expeditions || 0) >= 10
-  },
+  }
+];
+
+/* v0.18.0 review: the Bruce chain isn't built yet, so this stays out of the
+   live list until it is. Every advertised achievement must be earnable. */
+const FUTURE_ACHIEVEMENTS = [
   {
     id: "bruce",
     name: "You Named Him WHAT?",
     icon: "🎬",
     breadcrumb: "name a shark the most popular shark name",
     description: "Named a shark Bruce and followed the rabbit hole all the way down.",
-    /* The Bruce chain (Sarah's Jaws conversation) isn't built yet — this stays
-       locked until it is. The breadcrumb is visible; the check waits. */
     check: (st) => !!st.bruceChainComplete
   }
 ];
