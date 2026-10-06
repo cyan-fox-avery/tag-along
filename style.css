@@ -110,6 +110,8 @@ select, input[type="text"] {
   font-family: inherit;
 }
 select:focus, input:focus { outline: none; border-color: var(--accent); }
+/* v0.13.0: locked regions read as locked, not broken. */
+select option:disabled { color: #7a8a9e; }
 
 .primary-button {
   width: 100%; margin-top: 12px; padding: 13px; font-size: 16px; font-weight: 800;
@@ -133,10 +135,26 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
   border: 2px solid #2c5364;
 }
 .dive-scene .rays {
-  position: absolute; inset: 0; opacity: 0.35;
+  position: absolute; inset: 0; opacity: 0.35; z-index: 2;
   background: repeating-linear-gradient(115deg, transparent 0 26px, rgba(255,255,255,0.25) 26px 34px);
   animation: sway 7s ease-in-out infinite alternate;
 }
+.dive-scene .scenery {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.dive-scene .scenery svg {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 46%;
+}
+/* Marine snow in the deep. */
+.dive-scene .scenery .snow {
+  position: absolute; top: -4px; border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  animation: snowfall linear infinite;
+}
+@keyframes snowfall { from { transform: translateY(0); } to { transform: translateY(200px); } }
+/* Background fish: small, dim, clearly behind the action. */
+.dive-scene .ambient.bg-fish { opacity: 0.45; filter: blur(0.4px); z-index: 1; }
+.dive-scene .dive-shark { z-index: 3; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 .depth-shallow { background: linear-gradient(180deg, #8fd8ef 0%, #2a9db8 100%); }
 .depth-surface { background: linear-gradient(180deg, #7cc7e8 0%, #2f88b5 100%); }
