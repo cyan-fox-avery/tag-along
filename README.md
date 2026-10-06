@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.16.0** — *a shark research game*
+**v0.15.0** — *a shark research game* (working title "Tag, You're It" retired 2026-10-06)
 
 A pro-shark conservation collection game.
 
@@ -10,19 +10,6 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
-
-## v0.16.0 changes — the ending
-
-- **The win is now a proper ending in four beats.** The expedition ritual
-  always finishes first (health check, release, return to ship) — then:
-  institute recognition (Master Shark Tagger), **Sarah's celebration**
-  (written in her calm adult voice, using your actual
-  first-tagged shark — and she's still here for the postgame), the **map finale** (every tagged shark's track and
-  marker fades in one by one — "They're all still out there."), and the
-  acknowledgements. Skippable, never rushed.
-- **Wild Archive unlock.** Completing the roster sets the archive flag that
-  the postgame Full Field Guide will build on. (The archive UI and the
-  real-media curation are coming next — Avery is hand-picking the photos.)
 
 ## v0.15.0 changes — simpler map, new name
 
