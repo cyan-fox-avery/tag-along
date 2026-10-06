@@ -856,11 +856,10 @@ function renderMap() {
   const ids = Object.keys(state.tagged);
   pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
-  /* v0.10.3: touch-action follows the mode — "none" in explore mode (set
-     before any touch begins, so the browser never arbitrates), "pan-y" in
-     normal mode so a vertical swipe scrolls the page. Zoomed-in drags in
-     normal mode still pan via the v0.10.2 rule below. */
-  wrap.style.touchAction = (mapExplore || mapZoom > 1) ? "none" : "pan-y";
+  /* v0.10.3: literal gesture ownership (review fix) — explore mode owns
+     gestures ("none", set before any touch begins); normal mode always
+     hands them to the page ("pan-y"), even when zoomed via +/- buttons. */
+  wrap.style.touchAction = mapExplore ? "none" : "pan-y";
   wrap.classList.toggle("exploring", mapExplore);
   /* Blue Marble background (dark rect behind it in case the hotlink fails;
      the URL guard keeps the map working if map-data.js ever fails to load). */
@@ -2400,7 +2399,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     }
     if (e.pointerType !== "mouse" && pts.size === 1) {
       movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
-      if (mapZoom > 1 && movedMax > 10) {
+      if (mapExplore && mapZoom > 1 && movedMax > 10) {
         e.preventDefault();
         const svgEl = $("worldMapSvg");
         if (svgEl) {
