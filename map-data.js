@@ -245,6 +245,49 @@ const TRACK_ENVELOPES = {
     areas: ["Philippine tag-site reef", "Coral garden", "Sand flat", "Lagoon patch reef", "Reef channel"],
     hop: [1, 30], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
     corridor: "reef-resident — Indo-Pacific acoustic work shows small home ranges and strong site fidelity on coral reefs"
+  },
+  /* v0.18.0 wave. Envelopes stay geographically compatible with tag regions. */
+  scalloped: {
+    start: "Galápagos seamount (tag site)",
+    areas: ["Tag-site seamount", "Neighboring seamount", "Open-water corridor", "Island shelf edge", "Offshore front"],
+    hop: [80, 600], dayStep: [10, 40], nPoints: [4, 6], kind: "satellite",
+    corridor: "seamount migrant — eastern Pacific satellite work shows long moves between island groups (Galápagos–Cocos–Malpelo) and deep daytime dives; females range widest"
+  },
+  smooth: {
+    start: "Celtic Sea (tag site)",
+    areas: ["Tag-site shelf", "Shelf break", "Open Atlantic water", "Frontal zone", "Coastal bay"],
+    hop: [50, 400], dayStep: [10, 35], nPoints: [4, 6], kind: "satellite",
+    corridor: "temperate roamer — Atlantic tagging shows wide-ranging coastal-pelagic movement, following warm water masses and prey schools"
+  },
+  bonnethead: {
+    start: "Caribbean seagrass bed (tag site)",
+    areas: ["Tag-site seagrass", "Adjacent sand flat", "Mangrove fringe", "Shallow lagoon", "Patch reef"],
+    hop: [1, 40], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
+    corridor: "coastal resident — Gulf/Caribbean acoustic work shows small ranges around estuaries and seagrass, with seasonal inshore-offshore shifts"
+  },
+  bull: {
+    start: "Caribbean coast (tag site)",
+    areas: ["Tag-site estuary mouth", "Caribbean coastal shelf", "River channel", "Nearshore reef", "Bay system"],
+    hop: [10, 250], dayStep: [7, 30], nPoints: [4, 6], kind: "acoustic",
+    corridor: "estuary commuter — acoustic arrays show bulls moving between rivers, estuaries and coastal shelf; some individuals are resident, others migrate hundreds of kilometres"
+  },
+  greyreef: {
+    start: "PNG reef pass (tag site)",
+    areas: ["Tag-site reef pass", "Drop-off wall", "Channel", "Outer reef slope", "Lagoon pinnacle"],
+    hop: [1, 30], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
+    corridor: "reef-resident — Indo-Pacific telemetry shows extreme site fidelity; individuals patrol the same drop-offs and passes for years"
+  },
+  caribbean: {
+    start: "Bahamas reef (tag site)",
+    areas: ["Bahamas tag-site reef", "Reef flat", "Sand channel", "Coral head field", "Drop-off edge"],
+    hop: [1, 50], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
+    corridor: "reef-resident — Bahamas acoustic work shows strong site fidelity to home reefs, with occasional wider forays"
+  },
+  sandbar: {
+    start: "Outer Banks shelf (tag site)",
+    areas: ["Tag-site sandbank", "Outer Banks coastal shelf", "Bay mouth", "Migration corridor", "Wintering ground"],
+    hop: [80, 700], dayStep: [10, 35], nPoints: [4, 6], kind: "satellite",
+    corridor: "seasonal migrant — US east-coast satellite/acoustic work shows north-south migrations along the shelf, with Chesapeake Bay as a key nursery"
   }
 
 };
@@ -350,6 +393,42 @@ const MAP_COORDS = {
   "Seychelles Bank": [-5.0, 55.5],
   "Saya de Malha": [-11.0, 62.0],
   "Open Indian Ocean (westward leg)": [-8.0, 65.0],
+  /* v0.18.0 wave — envelope areas for the seven new species. */
+  "Tag-site seamount": [-0.7, -91.2],
+  "Neighboring seamount": [-1.2, -89.5],
+  "Open-water corridor": [-0.5, -88.0],
+  "Island shelf edge": [-0.3, -91.5],
+  "Offshore front": [0.5, -87.0],
+  "Tag-site shelf": [50.3, -5.8],
+  "Shelf break": [49.8, -7.0],
+  "Open Atlantic water": [49.0, -10.0],
+  "Frontal zone": [50.5, -8.5],
+  "Coastal bay": [50.2, -5.0],
+  "Tag-site seagrass": [15.2, -69.8],
+  "Adjacent sand flat": [15.0, -70.2],
+  "Mangrove fringe": [15.4, -69.5],
+  "Shallow lagoon": [14.8, -70.0],
+  "Patch reef": [15.1, -69.7],
+  "Tag-site estuary mouth": [15.3, -70.3],
+  "Caribbean coastal shelf": [15.5, -71.0],
+  "Outer Banks coastal shelf": [35.5, -75.0],
+  "River channel": [15.6, -70.5],
+  "Nearshore reef": [14.9, -69.9],
+  "Bay system": [15.0, -70.5],
+  "Tag-site reef pass": [-6.2, 147.2],
+  "Drop-off wall": [-6.3, 147.4],
+  "Channel": [-6.1, 147.1],
+  "Outer reef slope": [-6.4, 147.5],
+  "Lagoon pinnacle": [-6.0, 147.0],
+  "Bahamas tag-site reef": [24.1, -77.3],
+  "Reef flat": [24.0, -77.2],
+  "Sand channel": [24.2, -77.4],
+  "Coral head field": [23.9, -77.1],
+  "Drop-off edge": [24.3, -77.5],
+  "Tag-site sandbank": [35.3, -75.4],
+  "Bay mouth": [35.0, -75.8],
+  "Migration corridor": [33.0, -76.5],
+  "Wintering ground": [30.0, -79.0],
   "Delaware Bay": [39.0, -75.1],
   "New Jersey coast": [39.5, -74.0],
   "Virginia Capes": [37.0, -75.8],

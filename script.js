@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.17.1";
+const VERSION = "v0.18.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -493,6 +493,23 @@ const msgStore = {
 };
 const _savedMsgs = msgStore.load();
 
+/* v0.18.0: achievement + stats stores. Stats feed achievement checks
+   (regions visited, baits used, re-sights, chum tags, expedition count). */
+const statsStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-stats") || "{}"); }
+    catch { return {}; }
+  },
+  save(d) { localStorage.setItem("tyi-stats", JSON.stringify(d)); }
+};
+const achieveStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-achievements") || "{}"); }
+    catch { return {}; }
+  },
+  save(d) { localStorage.setItem("tyi-achievements", JSON.stringify(d)); }
+};
+
 /* v0.7.0: the sightings log — spotted but not tagged. Pure field notes. */
 const sightStore = {
   load() {
@@ -545,9 +562,47 @@ const state = {
   /* v0.17.1: Ask Sarah offer persists in the message store — Sarah's saved
      thread promises "pick one below", so the panel must survive a reload. */
   sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
+  /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
+  stats: Object.assign(
+    { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 },
+    statsStore.load()
+  ),
+  achievements: achieveStore.load(), // id -> timestamp
+  bruceChainComplete: false, // v0.18.0: the Bruce chain isn't built yet
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
 };
+/* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
+   and existing tags so established players get credit for their history. */
+(function migrateStats() {
+  const s = state.stats;
+  let changed = false;
+  const log = state.logbook || [];
+  if (!(s.expeditions > 0) && log.length > 0) {
+    s.expeditions = log.length; changed = true;
+  }
+  log.forEach(t => {
+    if (t.region && !s.regionsVisited.includes(t.region)) { s.regionsVisited.push(t.region); changed = true; }
+    if (t.bait && !s.baitsUsed.includes(t.bait)) { s.baitsUsed.push(t.bait); changed = true; }
+  });
+  let resights = 0;
+  Object.values(state.tagged || {}).forEach(t => { resights += (t.resightings || []).length; });
+  if (!(s.resights > 0) && resights > 0) { s.resights = resights; changed = true; }
+  /* v0.18.0 review 2nd pass: backfill "Something in the Water" — a log entry
+     with attract+chum and a tagged encounter of a chum-valid species counts. */
+  if (!(s.chumTags > 0)) {
+    const chumEarned = log.some(t =>
+      t.method === "attract" && t.methodOpt === "chum" &&
+      (t.encounters || []).some(e => {
+        if (e.result !== "tagged") return false;
+        const sp = SHARKS.find(x => x.id === e.speciesId);
+        return sp && sp.methods && sp.methods.attract && sp.methods.attract.includes("chum");
+      })
+    );
+    if (chumEarned) { s.chumTags = 1; changed = true; }
+  }
+  if (changed) saveStats();
+})();
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
@@ -1045,6 +1100,14 @@ async function runExpedition(plan) {
   state.pendingWin = false;
   state.taggedThisTrip = false;
   state.resightedThisTrip = false;
+  /* v0.18.0: feed achievement stats — regions visited, baits used. */
+  if (plan.region && !state.stats.regionsVisited.includes(plan.region)) {
+    state.stats.regionsVisited.push(plan.region);
+  }
+  if (plan.bait && !state.stats.baitsUsed.includes(plan.bait)) {
+    state.stats.baitsUsed.push(plan.bait);
+  }
+  saveStats();
   tripDecks = { waiting: shuffled(WAITING_LINES), doing: shuffled(SIGHTING_DOINES), sightings: buildSightingDeck(plan.depth, plan.region) };
   /* v0.8.0: open a fresh logbook page for this trip. */
   tripLog = {
@@ -1143,6 +1206,10 @@ async function runExpedition(plan) {
   } else {
     state.failures = 0;
   }
+  /* v0.18.0: expedition count feeds the "Sea Legs" achievement. */
+  state.stats.expeditions = (state.stats.expeditions || 0) + 1;
+  saveStats();
+  checkAchievements();
 
   /* v0.8.0: close the logbook page for this trip. */
   if (tripLog) {
@@ -1261,6 +1328,10 @@ function recordResighting(species, plan) {
     t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
   }
   store.save(state.tagged);
+  /* v0.18.0: re-sights feed the "Old Friend" achievement. */
+  state.stats.resights = (state.stats.resights || 0) + 1;
+  saveStats();
+  checkAchievements();
   renderCollection();
   return entry;
 }
@@ -1483,6 +1554,78 @@ function askSarahAdvice(sid) {
   goTab("phone");
 }
 
+/* ---------- Achievements (v0.18.0) ----------
+   Visible upfront with breadcrumb hints until unlocked. Checks run after
+   the actions that can earn them; unlocks persist and celebrate. */
+function saveStats() {
+  statsStore.save(state.stats);
+}
+function checkAchievements() {
+  if (typeof ACHIEVEMENTS === "undefined") return;
+  ACHIEVEMENTS.forEach(a => {
+    if (state.achievements[a.id]) return;
+    let earned = false;
+    try { earned = !!a.check(state); } catch { earned = false; }
+    if (earned) unlockAchievement(a);
+  });
+}
+function unlockAchievement(a) {
+  state.achievements[a.id] = Date.now();
+  achieveStore.save(state.achievements);
+  renderAchievements();
+  /* v0.18.0 review: queue celebrations so one action earning several
+     achievements shows each card in turn instead of overwriting. */
+  achieveQueue.push(a);
+  showNextAchievement();
+}
+const achieveQueue = [];
+let achieveShowing = false;
+function showNextAchievement() {
+  if (achieveShowing || !achieveQueue.length) return;
+  const a = achieveQueue.shift();
+  achieveShowing = true;
+  const ov = $("achieveOverlay");
+  if (!ov) { achieveShowing = false; return; }
+  ov.classList.remove("hidden");
+  ov.innerHTML = `<div class="phone">
+    <div class="cert-trophy" style="font-size:52px; text-align:center">${a.icon}</div>
+    <h2 style="text-align:center; margin:8px 0 2px">Achievement Unlocked!</h2>
+    <p style="text-align:center; font-weight:800; margin:4px 0">${esc(a.name)}</p>
+    <p class="latin" style="text-align:center">${esc(a.description)}</p>
+    <button id="achieveClose" class="primary-button" type="button">Sweet!</button>
+  </div>`;
+  $("achieveClose").addEventListener("click", () => {
+    ov.classList.add("hidden");
+    achieveShowing = false;
+    showNextAchievement();
+  });
+}
+function renderAchievements() {
+  const list = $("achieveList");
+  if (!list || typeof ACHIEVEMENTS === "undefined") return;
+  const unlockedCount = ACHIEVEMENTS.filter(a => state.achievements[a.id]).length;
+  const head = $("achieveHead");
+  if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${ACHIEVEMENTS.length} unlocked</p>`;
+  list.innerHTML = "";
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = !!state.achievements[a.id];
+    const row = document.createElement("div");
+    row.className = "guide-row" + (unlocked ? "" : " locked");
+    row.innerHTML = `
+      <div class="guide-row-head" style="cursor:default">
+        <span style="font-size:22px">${unlocked ? a.icon : "🔒"}</span>
+        <span class="guide-row-name">${unlocked ? esc(a.name) : "???"}</span>
+        <span class="latin">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
+      </div>`;
+    list.appendChild(row);
+  });
+  const badge = $("achieveBadge");
+  if (badge) {
+    badge.textContent = `${unlockedCount}/${ACHIEVEMENTS.length}`;
+    badge.classList.toggle("hidden", unlockedCount === 0);
+  }
+}
+
 /* ---------- Tagging ---------- */
 
 const rand = (a, b) => Math.round((a + Math.random() * (b - a)) * 10) / 10;
@@ -1558,6 +1701,14 @@ function confirmTag(name) {
   logTripEncounter(s, "tagged");
   store.save(state.tagged);
   state.pendingTag = null;
+  /* v0.18.0: chum tags feed the "Something in the Water" achievement —
+     v0.18.0 review: only when chum is a real method for THIS species. */
+  if (state.currentPlan && state.currentPlan.method === "attract" &&
+      state.currentPlan.methodOpt === "chum" &&
+      s.methods && s.methods.attract && s.methods.attract.includes("chum")) {
+    state.stats.chumTags = (state.stats.chumTags || 0) + 1;
+    saveStats();
+  }
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
   // v0.6.0: the opener varies per species (draft openers — Avery to revise).
   pushThread([
@@ -1567,6 +1718,7 @@ function confirmTag(name) {
   ]);
   maybeSarahEgg(s.id, rec);
   checkMilestones();
+  checkAchievements(); // v0.18.0
   renderAll();
   showHealthCheck(s, rec);
 }
@@ -2061,7 +2213,7 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -2089,6 +2241,7 @@ function renderAll() {
   updateArchiveTab();
   if (state.archiveUnlocked) renderArchive();
   renderSarahAsk();
+  renderAchievements(); // v0.18.0
 }
 
 /* ---------- Wild Archive (v0.17.0) ----------
@@ -2117,7 +2270,7 @@ const LICENSE_URLS = {
 };
 function archiveAssetHtml(a, isPrimary) {
   const label = a.label ? `<span class="archive-label">${esc(a.label)}</span>` : "";
-  const isPD = /public domain/i.test(a.license || "");
+  const isPD = /public domain/i.test(a.license || "") || a.license === "CC0";
   const licUrl = LICENSE_URLS[a.license];
   const licHtml = licUrl
     ? `<a href="${licUrl}" target="_blank" rel="noopener">${esc(a.license)}</a>`
@@ -2443,3 +2596,5 @@ tickPhoneClock();
    next to message timestamps. */
 setInterval(tickPhoneClock, 30000);
 renderAll();
+/* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
+checkAchievements();

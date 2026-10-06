@@ -24,6 +24,7 @@
       <button class="tab" data-tab="logbook" type="button">📓 Logbook</button>
       <button class="tab" data-tab="phone" type="button">📱 Phone <span id="msgBadge" class="count-badge hidden">0</span></button>
       <button class="tab hidden" data-tab="archive" type="button">📸 Archive</button>
+      <button class="tab" data-tab="achievements" type="button">🏆 <span id="achieveBadge" class="count-badge hidden">0/0</span></button>
     </nav>
 
     <main>
@@ -156,6 +157,13 @@
         </div>
         <div id="archiveList" class="guide-list"></div>
       </section>
+      <section id="tab-achievements" class="panel">
+        <div class="section-head" id="achieveHead">
+          <h2>Achievements</h2>
+          <p>0 of 0 unlocked</p>
+        </div>
+        <div id="achieveList" class="guide-list"></div>
+      </section>
     </main>
 
     <footer class="foot">
@@ -218,12 +226,14 @@
 
   <!-- Win state overlay: content is staged by winStep() in script.js -->
   <div id="winOverlay" class="overlay hidden"></div>
+  <div id="achieveOverlay" class="overlay hidden"></div>
 
   <script src="map-data.js"></script>
   <script src="art-data.js"></script>
   <script src="sarah-data.js"></script>
   <script src="sharks-data.js"></script>
   <script src="archive-data.js"></script>
+  <script src="achievements-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'achievements-data.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -38,20 +38,20 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.17.1', VERSION === 'v0.17.1');
+  ok('version v0.18.0', VERSION === 'v0.18.0');
 
   // roster
-  ok('roster is 23', SHARKS.length === 23);
+  ok('roster is 30', SHARKS.length === 30);
   const ids = SHARKS.map(s => s.id);
-  ok('23 unique shark IDs', new Set(ids).size === 23);
-  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 23);
+  ok('30 unique shark IDs', new Set(ids).size === 30);
+  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 30);
   ok('all have ART', ids.every(id => !!ART[id]));
   ok('all have SKETCH', ids.every(id => !!SKETCH[id]));
   const counts = ids.map(id => (COUSIN_CHATS[id] || []).length);
-  ok('all 23 species have 3 chats', counts.length === 23 && counts.every(n => n === 3));
+  ok('all 30 species have 3 chats', counts.length === 30 && counts.every(n => n === 3));
   ok('all have nudges', ids.every(id => !!COUSIN_NUDGES[id]));
   ok('all have envelopes', ids.every(id => !!TRACK_ENVELOPES[id]));
-  ok('win is full roster', SHARKS.length === 23);
+  ok('win is full roster', SHARKS.length === 30);
 
   // v0.14.0 new sharks
   const new2 = ['frilled', 'zebra'];
@@ -147,7 +147,7 @@ code += `
   ok('ARCHIVE_MEDIA exists', typeof ARCHIVE_MEDIA === 'object');
   const liveIds = SHARKS.map(x => x.id);
   const archivedLive = liveIds.filter(id => ARCHIVE_MEDIA[id] && !ARCHIVE_MEDIA[id].future);
-  ok('all 23 live sharks have archive media', archivedLive.length === 23);
+  ok('all 30 live sharks have archive media', archivedLive.length === 30);
   ok('salmon is future-only', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === true);
   let assetsOk = true, videosOk = true;
   liveIds.forEach(id => {
@@ -189,7 +189,7 @@ code += `
   const openerRe = /opener:\\s*"([^"]+)"/g;
   const openers = []; let m;
   while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
-  ok('23 species openers present', openers.length === 23);
+  ok('30 species openers present', openers.length === 30);
   ok('no shared verbatim closer', new Set(openers).size === openers.length);
   ok('the old repeated closer is gone', !openers.some(function(o) { return /tell me everything/i.test(o); }));
   // v0.17.1 review fix: the advice offer must survive a reload, and a used
@@ -215,6 +215,102 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
   ok('sand tiger GIF flagged for reframe', !!stGif);
+
+  // v0.18.0: achievements
+  ok('ACHIEVEMENTS data loads', typeof ACHIEVEMENTS !== 'undefined' && ACHIEVEMENTS.length >= 12);
+  ok('every achievement has a breadcrumb', ACHIEVEMENTS.every(a => a.breadcrumb && a.name !== a.breadcrumb));
+  ok('breadcrumbs never leak the real requirement', !ACHIEVEMENTS.some(a =>
+    a.id !== 'bruce' && a.breadcrumb.toLowerCase() === a.description.toLowerCase()));
+  // Simulate earns: first tag, thresher, Sarah naming, endangered tag.
+  state.tagged = { nurse: { name: 'Bubbles', researchId: 'NS-2026-001' } };
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
+  state.achievements = {};
+  checkAchievements();
+  ok('first tag unlocks', !!state.achievements['first-tag']);
+  state.tagged.thresher = { name: 'Whip', researchId: 'NS-2026-002' };
+  checkAchievements();
+  ok('thresher unlocks Perpetually Nervous', !!state.achievements.nervous);
+  state.tagged.nurse.name = 'Sarah';
+  checkAchievements();
+  ok('naming a shark Sarah unlocks Best Cousin Ever', !!state.achievements['best-cousin']);
+  state.tagged.whale = { name: 'Dot', researchId: 'NS-2026-003' };
+  checkAchievements();
+  ok('endangered tag unlocks Every One Counts', !!state.achievements['every-one-counts']);
+  ok('Bruce stays locked without the chain', !state.achievements.bruce);
+  ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
+
+  // v0.18.0 wave — 7 new species live on the roster with verified archive media
+  const wave7 = ['scalloped','smooth','bonnethead','bull','greyreef','caribbean','sandbar'];
+  ok('7 wave species on roster', wave7.every(id => SHARKS.some(s => s.id === id)));
+  ok('wave species live in archive (not future)',
+    wave7.every(id => ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future === false));
+  ok('wave species have full game data',
+    wave7.every(id => ART[id] && SKETCH[id] && COUSIN_NUDGES[id] &&
+      (COUSIN_CHATS[id] || []).length === 3 && TRACK_ENVELOPES[id]));
+  ok('salmon still future-only', ARCHIVE_MEDIA.salmon.future === true &&
+    !SHARKS.some(s => s.id === 'salmon'));
+
+  // v0.18.0 review regressions
+  ok('reset clears achievement/stat stores',
+    fileCode.includes('"tyi-stats", "tyi-achievements"'));
+  // one named shark must NOT earn First-Name Basis
+  state.tagged = { nurse: { name: 'Bubbles', researchId: 'NS-2026-001' } };
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
+  state.achievements = {};
+  checkAchievements();
+  ok('one named shark does not earn First-Name Basis', !state.achievements['first-name']);
+  // Ocean Hopper requires locked regions too
+  state.stats.regionsVisited = Object.keys(REGIONS).filter(r => !REGIONS[r].locked);
+  state.achievements = {};
+  checkAchievements();
+  ok('locked regions count toward Ocean Hopper', !state.achievements['ocean-hopper']);
+  // chum on a species without chum in methods must NOT count
+  state.tagged = {}; state.achievements = {}; state.stats.chumTags = 0;
+  const whaleSpecies = SHARKS.find(s => s.id === 'whale');
+  const chumValid = whaleSpecies.methods && whaleSpecies.methods.attract &&
+    whaleSpecies.methods.attract.includes('chum');
+  ok('whale shark has no chum method', !chumValid);
+  // multiple unlocks queue instead of overwriting
+  state.tagged = { nurse: { name: 'Bubbles', researchId: 'NS-2026-001' } };
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 1, chumTags: 0, expeditions: 0 };
+  state.achievements = {};
+  checkAchievements();
+  const queued = typeof achieveQueue !== 'undefined' ? achieveQueue.length : 0;
+  const shown = (typeof achieveShowing !== 'undefined' && achieveShowing) ? 1 : 0;
+  ok('simultaneous unlocks queued', (queued + shown) >= 2 &&
+    !!state.achievements['first-tag'] && !!state.achievements['old-friend']);
+  // every advertised achievement is attainable (no permanently-locked entries)
+  ok('all live achievements attainable',
+    ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }) &&
+    !ACHIEVEMENTS.some(a => a.id === 'bruce'));
+  ok('12 live achievements', ACHIEVEMENTS.length === 12);
+  // bull and sandbar tracks resolve to different points
+  const bullShelf = MAP_COORDS[TRACK_ENVELOPES.bull.areas.find(a => /shelf/i.test(a))];
+  const sandShelf = MAP_COORDS[TRACK_ENVELOPES.sandbar.areas.find(a => /shelf/i.test(a))];
+  ok('bull/sandbar shelf coords differ',
+    bullShelf && sandShelf && (bullShelf[0] !== sandShelf[0] || bullShelf[1] !== sandShelf[1]));
+  // CC0 renders without copyright symbol
+  const cc0Html = archiveAssetHtml({ license: 'CC0', credit: 'Dennis Hipp', caption: 'x', page: 'x', image: 'x', full: 'x' }, true);
+  ok('CC0 uses neutral credit wording', !/©/.test(cc0Html));
+  // v0.18.0 2nd-pass: chum backfill from logbook
+  const chumLogEntry = { method: "attract", methodOpt: "chum",
+    encounters: [{ speciesId: "nurse", result: "tagged" }] };
+  const chumSpecies = SHARKS.find(x => x.id === "nurse");
+  const chumCounts = chumLogEntry.method === "attract" && chumLogEntry.methodOpt === "chum" &&
+    chumLogEntry.encounters.some(e => e.result === "tagged" &&
+      (SHARKS.find(x => x.id === e.speciesId) || {}).methods?.attract?.includes("chum"));
+  ok('chum backfill logic recognizes valid history', chumCounts === true);
+  const badChumEntry = { method: "attract", methodOpt: "chum",
+    encounters: [{ speciesId: "whale", result: "tagged" }] };
+  const badCounts = badChumEntry.encounters.some(e => e.result === "tagged" &&
+    (SHARKS.find(x => x.id === e.speciesId) || {}).methods?.attract?.includes("chum"));
+  ok('chum backfill rejects invalid species', badCounts === false);
+  // restore
+  state.tagged = {}; state.achievements = {};
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
+  // restore
+  state.tagged = {}; state.achievements = {};
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.17.1** — *a shark research game*
+**v0.18.0** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,13 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.18.0 changes — achievements + the seven-shark wave
+
+- **Achievements are here.** A new 🏆 tab lists 12 achievements, visible upfront — but each shows a breadcrumb hint instead of the real requirement until you earn it. ("Tag the most anxious-looking shark"... you'll figure it out.)
+- **Seven new sharks join the roster (23 → 30).** Scalloped hammerhead, smooth hammerhead, bonnethead, bull shark, grey reef shark, Caribbean reef shark, and sandbar shark — each with full research dossiers, Sarah's chats and nudges, derpy art, field-guide sketches, tracking envelopes, and verified Wild Archive media.
+- **Basking shark archive cleanup.** The dossier had two near-identical filter-feeding photos; the duplicate is gone.
+- **Future Archive batch staged.** The salmon shark's media remains pre-curated and hidden as `future: true` until it joins the playable roster.
 
 ## v0.17.1 changes — the sanity-check batch
 
