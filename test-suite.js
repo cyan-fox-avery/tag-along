@@ -292,6 +292,19 @@ code += `
   // CC0 renders without copyright symbol
   const cc0Html = archiveAssetHtml({ license: 'CC0', credit: 'Dennis Hipp', caption: 'x', page: 'x', image: 'x', full: 'x' }, true);
   ok('CC0 uses neutral credit wording', !/©/.test(cc0Html));
+  // v0.18.0 2nd-pass: chum backfill from logbook
+  const chumLogEntry = { method: "attract", methodOpt: "chum",
+    encounters: [{ speciesId: "nurse", result: "tagged" }] };
+  const chumSpecies = SHARKS.find(x => x.id === "nurse");
+  const chumCounts = chumLogEntry.method === "attract" && chumLogEntry.methodOpt === "chum" &&
+    chumLogEntry.encounters.some(e => e.result === "tagged" &&
+      (SHARKS.find(x => x.id === e.speciesId) || {}).methods?.attract?.includes("chum"));
+  ok('chum backfill logic recognizes valid history', chumCounts === true);
+  const badChumEntry = { method: "attract", methodOpt: "chum",
+    encounters: [{ speciesId: "whale", result: "tagged" }] };
+  const badCounts = badChumEntry.encounters.some(e => e.result === "tagged" &&
+    (SHARKS.find(x => x.id === e.speciesId) || {}).methods?.attract?.includes("chum"));
+  ok('chum backfill rejects invalid species', badCounts === false);
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
