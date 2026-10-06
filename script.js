@@ -359,10 +359,10 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 1.6],
-    research: "A slender reef shark with white tips on its dorsal and tail, and a trick no other requiem shark has: it can pump water over its gills while lying perfectly still. So by day, whitetip reef sharks pile together in reef caves and under ledges, heaped like firewood, and by night they slide out to hunt — wriggling into crevices after eels, octopus and spiny lobster. They are fiercely loyal to one reef, returning to the same daytime shelter for months or years. Find the cave, and the sharks are already home. Octopus or reef-fish scraps on a reef at night will draw them out.",
-    hook: "Naps in heaps in reef caves by day — the only requiem shark that can breathe while lying still.",
-    bonus: "Whitetip reef sharks are the only living species in their genus, Triaenodon — a true evolutionary singleton, with no close relatives left.",
-    cheer: "A WHITETIP REEF SHARK!!! the cave-napper!!! they pile up in caves during the day like a heap of puppies and then go hunting at night!! the ONLY requiem shark that can breathe lying still!!",
+    research: "A slender reef shark with white tips on its dorsal and tail, and a trick few requiem sharks share: it can pump water over its gills while lying perfectly still. So by day, whitetip reef sharks pile together in reef caves and under ledges, heaped like firewood, and by night they slide out to hunt — wriggling into crevices after eels, octopus and spiny lobster. They are fiercely loyal to one reef, returning to the same daytime shelter for months or years. Find the cave, and the sharks are already home. Octopus or reef-fish scraps on a reef at night will draw them out.",
+    hook: "Naps in heaps in reef caves by day — one of the few requiem sharks that can breathe while lying still.",
+    bonus: "The whitetip reef shark is the only living species in the genus Triaenodon.",
+    cheer: "A WHITETIP REEF SHARK!!! the cave-napper!!! they pile up in caves during the day like a heap of puppies and then go hunting at night!! they can breathe lying STILL — barely any other requiem shark can!!",
     opener: "A WHITETIP?!?! WAS IT IN THE CAVE HEAP?!?! the napping shark!!! TELL ME EVERYTHING",
     sketchCap: "white-tipped fins",
     nameIdeas: ["Nappy", "Cavey", "Puddles", "Heap"]
@@ -395,7 +395,7 @@ const COUSIN_NUDGES = {
   epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs and shellfish!!",
   lemon: "LEMON SHARKS!!! my FAVOURITE!!! they're yellow with TWO dorsal fins that are almost the SAME SIZE!! the moms swim back to where THEY were born to have their babies!! caribbean, shallow water, and they hunt at night — sardines!!",
   blacktip: "blacktip reef sharks!!! the ones with black DIPPED fins!!! they swim in water so shallow their fin sticks out of the water!! maldives!! reef flats!! they're shy but bait makes them EXCITED — reef fish or shrimp!!",
-  whitetip: "whitetip reef sharks NAP IN CAVES!!! they pile up together during the day because they can breathe lying still (the ONLY requiem shark that can!!) and hunt at night!! philippines!! octopus bait!!"
+  whitetip: "whitetip reef sharks NAP IN CAVES!!! they pile up together during the day because they can breathe lying still (barely any other requiem shark can!!) and hunt at night!! philippines!! octopus bait!!"
 };
 
 /* Field-guide sketches: rough pencil-style drawings of one distinctive
@@ -769,7 +769,11 @@ function renderMap() {
   const pop = $("mapPopup");
   const legend = $("mapLegend");
   const ids = Object.keys(state.tagged);
-  pop.classList.add("hidden");
+  /* v0.11.0: a focus glide re-renders every frame — hiding the popup here
+     would eat it on the first animation frame, right after the tap showed
+     it. Skip the hide while a glide is in flight; the popup still hides on
+     any later render, exactly as before. */
+  if (!mapGlide) pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
   /* v0.10.3: literal gesture ownership (review fix) — explore mode owns
      gestures ("none", set before any touch begins); normal mode always
