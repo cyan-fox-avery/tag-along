@@ -5,179 +5,10 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.10.4";
+const VERSION = "v0.11.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
-const ART = {
-  thresher: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Thresher shark">
-    <polygon points="150,50 210,6 172,56" fill="#5d7f9e"/>
-    <polygon points="152,62 176,92 160,62" fill="#5d7f9e"/>
-    <ellipse cx="96" cy="56" rx="60" ry="17" fill="#6f93b8"/>
-    <ellipse cx="96" cy="63" rx="52" ry="10" fill="#dfe9f2" opacity="0.85"/>
-    <polygon points="38,56 56,47 56,65" fill="#6f93b8"/>
-    <polygon points="96,40 108,20 118,40" fill="#5d7f9e"/>
-    <polygon points="82,70 70,90 94,71" fill="#5d7f9e"/>
-    <circle cx="54" cy="52" r="3.6" fill="#1c2733"/>
-    <circle cx="55.2" cy="50.8" r="1.1" fill="#ffffff"/>
-    <g stroke="#4a6a86" stroke-width="1.6" stroke-linecap="round">
-      <line x1="72" y1="48" x2="70" y2="62"/>
-      <line x1="78" y1="47" x2="76" y2="63"/>
-      <line x1="84" y1="47" x2="82" y2="63"/>
-    </g>
-  </svg>`,
-  whale: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Whale shark">
-    <polygon points="168,48 208,22 206,88" fill="#54687a"/>
-    <ellipse cx="100" cy="55" rx="72" ry="25" fill="#5f7484"/>
-    <ellipse cx="100" cy="66" rx="62" ry="14" fill="#cfd9e2" opacity="0.7"/>
-    <polygon points="104,31 118,12 128,31" fill="#54687a"/>
-    <polygon points="84,76 70,100 102,78" fill="#54687a"/>
-    <circle cx="44" cy="50" r="3.2" fill="#1c2733"/>
-    <path d="M28,62 Q40,70 54,68" stroke="#3c4c5c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <g fill="#ffffff" opacity="0.9">
-      <circle cx="80" cy="44" r="2.6"/><circle cx="98" cy="40" r="2.6"/><circle cx="116" cy="43" r="2.6"/>
-      <circle cx="134" cy="47" r="2.6"/><circle cx="70" cy="54" r="2.4"/><circle cx="90" cy="54" r="2.4"/>
-      <circle cx="110" cy="56" r="2.4"/><circle cx="130" cy="58" r="2.4"/><circle cx="148" cy="56" r="2.2"/>
-      <circle cx="82" cy="64" r="2.2"/><circle cx="104" cy="66" r="2.2"/><circle cx="126" cy="66" r="2.2"/>
-    </g>
-  </svg>`,
-  nurse: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Nurse shark">
-    <polygon points="160,54 200,36 198,84" fill="#7a6242"/>
-    <ellipse cx="100" cy="60" rx="64" ry="19" fill="#8a6f4d"/>
-    <ellipse cx="100" cy="68" rx="56" ry="11" fill="#d8c6a6" opacity="0.8"/>
-    <polygon points="112,42 122,26 130,42" fill="#7a6242"/>
-    <polygon points="142,43 150,30 156,43" fill="#7a6242"/>
-    <polygon points="88,76 78,96 100,77" fill="#7a6242"/>
-    <circle cx="52" cy="55" r="3.2" fill="#1c2733"/>
-    <g stroke="#5e4a30" stroke-width="2" stroke-linecap="round">
-      <line x1="40" y1="64" x2="33" y2="71"/>
-      <line x1="40" y1="67" x2="33" y2="74"/>
-    </g>
-    <g stroke="#6e5739" stroke-width="1.6" stroke-linecap="round">
-      <line x1="72" y1="52" x2="70" y2="66"/>
-      <line x1="78" y1="51" x2="76" y2="67"/>
-    </g>
-  </svg>`,
-  goblin: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Goblin shark">
-    <polygon points="158,50 198,28 196,82" fill="#c08484"/>
-    <ellipse cx="106" cy="55" rx="56" ry="15" fill="#d99a9a"/>
-    <ellipse cx="106" cy="61" rx="48" ry="9" fill="#f2d9d9" opacity="0.8"/>
-    <polygon points="52,55 10,46 10,62" fill="#d99a9a"/>
-    <polygon points="106,41 116,28 122,41" fill="#c08484"/>
-    <polygon points="92,68 82,86 102,69" fill="#c08484"/>
-    <circle cx="48" cy="50" r="3.2" fill="#1c2733"/>
-    <path d="M30,60 Q44,66 56,64" stroke="#a86a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <g stroke="#a86a6a" stroke-width="1.4" stroke-linecap="round">
-      <line x1="76" y1="48" x2="74" y2="60"/>
-      <line x1="82" y1="47" x2="80" y2="61"/>
-    </g>
-  </svg>`,
-  tiger: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Tiger shark">
-    <polygon points="160,54 200,32 198,86" fill="#5a6a72"/>
-    <ellipse cx="100" cy="58" rx="64" ry="20" fill="#6b7d85"/>
-    <ellipse cx="100" cy="66" rx="56" ry="11" fill="#d3dce0" opacity="0.8"/>
-    <polygon points="108,39 120,22 128,39" fill="#5a6a72"/>
-    <polygon points="86,74 76,94 98,75" fill="#5a6a72"/>
-    <circle cx="50" cy="53" r="3.2" fill="#1c2733"/>
-    <circle cx="51.2" cy="51.8" r="1.1" fill="#ffffff"/>
-    <g stroke="#4c5b63" stroke-width="3.4" opacity="0.5" stroke-linecap="round">
-      <line x1="92" y1="42" x2="90" y2="72"/>
-      <line x1="106" y1="40" x2="104" y2="74"/>
-      <line x1="120" y1="42" x2="118" y2="72"/>
-      <line x1="134" y1="46" x2="132" y2="68"/>
-    </g>
-  </svg>`,
-  sandtiger: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Sand tiger shark">
-    <polygon points="162,52 202,30 200,84" fill="#6e6250"/>
-    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#7d6f5b"/>
-    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#ddd2bd" opacity="0.8"/>
-    <polygon points="110,41 120,24 128,41" fill="#6e6250"/>
-    <polygon points="138,42 146,28 152,42" fill="#6e6250"/>
-    <polygon points="88,72 78,92 100,73" fill="#6e6250"/>
-    <polygon points="42,58 22,52 22,64" fill="#7d6f5b"/>
-    <g stroke="#ece5d3" stroke-width="1.6" stroke-linecap="round">
-      <line x1="29" y1="55" x2="25" y2="60"/>
-      <line x1="33" y1="57" x2="29" y2="62"/>
-    </g>
-    <circle cx="52" cy="52" r="3.2" fill="#1c2733"/>
-    <circle cx="53.2" cy="50.8" r="1.1" fill="#ffffff"/>
-  </svg>`,
-  galapagos: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Galapagos shark">
-    <polygon points="158,54 200,34 198,84" fill="#5f6b66"/>
-    <ellipse cx="100" cy="58" rx="64" ry="19" fill="#6e7b75"/>
-    <ellipse cx="100" cy="66" rx="56" ry="11" fill="#d5dcd6" opacity="0.8"/>
-    <polygon points="106,40 118,22 128,40" fill="#5f6b66"/>
-    <polygon points="86,74 76,94 98,75" fill="#5f6b66"/>
-    <polygon points="40,58 22,52 22,64" fill="#6e7b75"/>
-    <circle cx="48" cy="53" r="3.2" fill="#1c2733"/>
-    <circle cx="49.2" cy="51.8" r="1.1" fill="#ffffff"/>
-  </svg>`,
-  greatwhite: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Great white shark">
-    <polygon points="160,54 204,30 200,88" fill="#5a6470"/>
-    <ellipse cx="102" cy="56" rx="66" ry="20" fill="#6b7683"/>
-    <ellipse cx="102" cy="65" rx="58" ry="12" fill="#eef1f3" opacity="0.9"/>
-    <polygon points="110,37 124,16 132,37" fill="#5a6470"/>
-    <polygon points="88,72 76,94 100,73" fill="#5a6470"/>
-    <polygon points="40,56 22,50 22,62" fill="#6b7683"/>
-    <circle cx="52" cy="51" r="3.4" fill="#14181d"/>
-  </svg>`,
-  hammerhead: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Great hammerhead shark">
-    <polygon points="160,54 200,32 198,86" fill="#5e6a70"/>
-    <ellipse cx="112" cy="58" rx="58" ry="18" fill="#6d7a81"/>
-    <ellipse cx="112" cy="66" rx="50" ry="10" fill="#d8dee1" opacity="0.8"/>
-    <rect x="18" y="48" width="56" height="16" rx="8" fill="#6d7a81"/>
-    <circle cx="27" cy="56" r="2.6" fill="#1c2733"/>
-    <circle cx="65" cy="56" r="2.6" fill="#1c2733"/>
-    <polygon points="118,41 130,24 138,41" fill="#5e6a70"/>
-    <polygon points="96,72 86,92 108,73" fill="#5e6a70"/>
-  </svg>`,
-  mako: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Shortfin mako shark">
-    <polygon points="162,54 206,34 202,84" fill="#3f5a7a"/>
-    <ellipse cx="104" cy="56" rx="64" ry="16" fill="#4a6a8c"/>
-    <ellipse cx="104" cy="63" rx="56" ry="9" fill="#dbe4ee" opacity="0.85"/>
-    <polygon points="110,41 122,24 130,41" fill="#3f5a7a"/>
-    <polygon points="90,70 80,90 102,71" fill="#3f5a7a"/>
-    <polygon points="42,56 24,50 24,62" fill="#4a6a8c"/>
-    <circle cx="54" cy="51" r="3.2" fill="#14181d"/>
-    <circle cx="55.2" cy="49.8" r="1.1" fill="#ffffff"/>
-  </svg>`,
-  basking: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Basking shark">
-    <polygon points="170,54 206,36 204,84" fill="#5c5a52"/>
-    <ellipse cx="104" cy="57" rx="70" ry="22" fill="#6b695f"/>
-    <ellipse cx="104" cy="66" rx="60" ry="12" fill="#d9d5c8" opacity="0.7"/>
-    <polygon points="112,36 124,18 132,36" fill="#5c5a52"/>
-    <circle cx="56" cy="52" r="2.6" fill="#1c2733"/>
-    <g stroke="#4a4840" stroke-width="2" stroke-linecap="round">
-      <line x1="76" y1="44" x2="74" y2="68"/>
-      <line x1="86" y1="43" x2="84" y2="69"/>
-      <line x1="96" y1="43" x2="94" y2="69"/>
-    </g>
-  </svg>`,
-  epaulette: `
-  <svg viewBox="0 0 220 110" role="img" aria-label="Epaulette shark">
-    <polygon points="168,56 200,42 198,76" fill="#7a6a4e"/>
-    <ellipse cx="108" cy="60" rx="58" ry="13" fill="#8a795c"/>
-    <ellipse cx="108" cy="65" rx="50" ry="8" fill="#ded3b8" opacity="0.8"/>
-    <polygon points="118,48 126,36 132,48" fill="#7a6a4e"/>
-    <circle cx="62" cy="56" r="2.8" fill="#1c2733"/>
-    <g fill="#4e4130" opacity="0.8">
-      <circle cx="90" cy="56" r="3"/><circle cx="110" cy="58" r="3"/><circle cx="130" cy="57" r="3"/>
-      <circle cx="150" cy="58" r="2.5"/>
-    </g>
-    <circle cx="140" cy="52" r="4" fill="none" stroke="#4e4130" stroke-width="2"/>
-  </svg>`
-};
 
 /* ---------- Data ---------- */
 
@@ -479,6 +310,62 @@ const SHARKS = [
     opener: "AN EPAULETTE SHARK?!?! THE WALKING SHARK!!! DID IT WALK?!?! TELL ME EVERYTHING",
     sketchCap: "the walking fin",
     nameIdeas: ["Puddles", "Waddles", "Tiptoe", "Reef"]
+  },
+  {
+    id: "lemon",
+    name: "Lemon Shark", latin: "Negaprion brevirostris", status: "Vulnerable",
+    code: "LS",
+    /* The yellow nursery shark: Bimini's famous returners. Night feeder
+       that hunts by electroreception — sardines (folded into
+       schooling-fish) fished at night are the honest bait. */
+    combo: { region: "caribbean", bait: ["schooling-fish"] },
+    depths: ["surface", "reef"],
+    methods: { attract: ["chum"] },
+    sizeRange: [2.4, 3.4],
+    research: "A heavy-bodied shark of the warm, shallow western Atlantic, unmistakable for two things: a lemon-yellow wash over its flanks, and two dorsal fins of nearly equal size — the quickest ID feature in the book. The juveniles grow up in mangrove lagoons and shallow bays, and the females do something extraordinary: after years away, they return to the exact nursery where they themselves were born to give birth. Decades of tagging at Bimini have followed the same mothers home again and again. They hunt mostly at night, sensing the faint electricity of sleeping fish, rarely leaving water shallower than about 90 metres. A chum slick and a school of sardines after dark is the classic way to meet one.",
+    hook: "Females return to the exact nursery where they were born to give birth — Bimini's most faithful mothers.",
+    bonus: "Lemon sharks can live 25 to 30 years, and one lived to 40 in captivity. The Bimini tagging program has followed some individuals for decades.",
+    cheer: "A LEMON SHARK!!! sarah's favourite!!! the yellow one with the twin dorsal fins!! did you know the mothers swim all the way back to where THEY were born to have their babies?? i'm crying",
+    opener: "A LEMON SHARK?!?! THE YELLOW ONE!!! did you see the two matching dorsal fins?!?! TELL ME EVERYTHING",
+    sketchCap: "twin dorsal fins (nearly equal!)",
+    nameIdeas: ["Zest", "Sunny", "Meringue", "Custard"]
+  },
+  {
+    id: "blacktip",
+    name: "Blacktip Reef Shark", latin: "Carcharhinus melanopterus", status: "Vulnerable",
+    code: "BR",
+    /* The knee-deep shark: reef flats so shallow the dorsal breaks
+       water. Timid — frightened off by swimmers, but bait excites it. */
+    combo: { region: "maldives", bait: ["schooling-fish", "crustaceans"] },
+    depths: ["surface", "reef"],
+    methods: { attract: ["chum"] },
+    sizeRange: [1.2, 2.0],
+    research: "The classic reef shark — the fin cutting the surface in every tropical daydream. Blacktip reef sharks patrol reef flats so shallow their dorsal fins break the water, each fin dipped in crisp black like ink. They are timid animals, often frightened away by swimmers, but bait excites them and they have been known to leap clear of the water when feeding. Individuals hold tiny home ranges for years; photo-ID work in Moorea found the same sharks choosing to hang out together, stable friendships on the reef. They rarely leave the shallows. A chum slick over a reef flat with reef fish or shrimp will bring the locals in.",
+    hook: "Patrols water so shallow its black-tipped dorsal fin breaks the surface.",
+    bonus: "Blacktip reef sharks form stable, non-random social groups — the same individuals repeatedly choose each other's company, year after year.",
+    cheer: "A BLACKTIP REEF SHARK!!! the one with the little black-dipped fins!!! they patrol in water so shallow their fin sticks OUT. and they have FRIENDS. stable friend groups!!!",
+    opener: "A BLACKTIP?!?! DID ITS FIN BREAK THE SURFACE?!?! the knee-deep shark!!! TELL ME EVERYTHING",
+    sketchCap: "black-tipped fins",
+    nameIdeas: ["Inky", "Tippy", "Reef", "Shallows"]
+  },
+  {
+    id: "whitetip",
+    name: "Whitetip Reef Shark", latin: "Triaenodon obesus", status: "Vulnerable",
+    code: "WR",
+    /* The cave-napper: one of the few requiem sharks that can breathe while
+       lying still, so by day it piles in reef caves. Hunts crevices
+       by night — octopus and reef-fish scraps are the honest baits. */
+    combo: { region: "philippines", bait: ["squid", "schooling-fish"] },
+    depths: ["surface", "reef"],
+    methods: { attract: ["chum"] },
+    sizeRange: [1.0, 1.6],
+    research: "A slender reef shark with white tips on its dorsal and tail, and a trick few requiem sharks share: it can pump water over its gills while lying perfectly still. So by day, whitetip reef sharks pile together in reef caves and under ledges, heaped like firewood, and by night they slide out to hunt — wriggling into crevices after eels, octopus and spiny lobster. They are fiercely loyal to one reef, returning to the same daytime shelter for months or years. Find the cave, and the sharks are already home. Octopus or reef-fish scraps on a reef at night will draw them out.",
+    hook: "Naps in heaps in reef caves by day — one of the few requiem sharks that can breathe while lying still.",
+    bonus: "The whitetip reef shark is the only living species in the genus Triaenodon.",
+    cheer: "A WHITETIP REEF SHARK!!! the cave-napper!!! they pile up in caves during the day like a heap of puppies and then go hunting at night!! they can breathe lying STILL — barely any other requiem shark can!!",
+    opener: "A WHITETIP?!?! WAS IT IN THE CAVE HEAP?!?! the napping shark!!! TELL ME EVERYTHING",
+    sketchCap: "white-tipped fins",
+    nameIdeas: ["Nappy", "Cavey", "Puddles", "Heap"]
   }
 ];
 
@@ -505,7 +392,10 @@ const COUSIN_NUDGES = {
   hammerhead: "hammerheads!!! the caribbean has great hammerheads!! they hunt STINGRAYS on the reef — ray bait!! (fish works too). shallow water + their heads are basically metal detectors",
   mako: "makos are the FASTEST sharks!!! open atlantic, and they love squid and tuna!! they hunt up near the surface. they're basically underwater race cars",
   basking: "basking sharks don't eat bait either!! they're plankton eaters like whale sharks!! cornwall in the summer, right at the surface where the water's green!! researchers find them by boat or through the sightings network — fishermen and divers phoning in every big dorsal fin!!",
-  epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs and shellfish!!"
+  epaulette: "epaulette sharks WALK!!! they walk on their fins across the reef in papua new guinea!! super shallow water, and they eat crabs and shellfish!!",
+  lemon: "LEMON SHARKS!!! my FAVOURITE!!! they're yellow with TWO dorsal fins that are almost the SAME SIZE!! the moms swim back to where THEY were born to have their babies!! caribbean, shallow water, and they hunt at night — sardines!!",
+  blacktip: "blacktip reef sharks!!! the ones with black DIPPED fins!!! they swim in water so shallow their fin sticks out of the water!! maldives!! reef flats!! they're shy but bait makes them EXCITED — reef fish or shrimp!!",
+  whitetip: "whitetip reef sharks NAP IN CAVES!!! they pile up together during the day because they can breathe lying still (barely any other requiem shark can!!) and hunt at night!! philippines!! octopus bait!!"
 };
 
 /* Field-guide sketches: rough pencil-style drawings of one distinctive
@@ -616,6 +506,31 @@ const SKETCH = {
       <path d="M60,40 Q90,55 100,85"/>
       <path d="M100,85 L85,100 M100,85 L100,102 M100,85 L115,100"/>
       <line x1="14" y1="104" x2="206" y2="104" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>`,
+  lemon: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: lemon shark twin dorsal fins">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M88,46 L96,24 L106,46 Z"/>
+      <path d="M128,46 L136,24 L146,46 Z"/>
+      <line x1="96" y1="24" x2="136" y2="24" stroke-dasharray="4 4" opacity="0.7"/>
+    </g>
+  </svg>`,
+  blacktip: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: blacktip reef shark black-tipped dorsal">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M96,46 L104,22 L114,46 Z"/>
+    </g>
+    <polygon points="100,32 104,22 109,31" fill="#9fb8cc"/>
+  </svg>`,
+  whitetip: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: whitetip reef shark white-tipped dorsal">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M96,46 L104,22 L114,46 Z"/>
+      <path d="M100,32 L104,22 L109,31" stroke="#e8edf2" stroke-width="3"/>
     </g>
   </svg>`
 };
@@ -854,7 +769,11 @@ function renderMap() {
   const pop = $("mapPopup");
   const legend = $("mapLegend");
   const ids = Object.keys(state.tagged);
-  pop.classList.add("hidden");
+  /* v0.11.0: a focus glide re-renders every frame — hiding the popup here
+     would eat it on the first animation frame, right after the tap showed
+     it. Skip the hide while a glide is in flight; the popup still hides on
+     any later render, exactly as before. */
+  if (!mapGlide) pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
   /* v0.10.3: literal gesture ownership (review fix) — explore mode owns
      gestures ("none", set before any touch begins); normal mode always
@@ -915,7 +834,7 @@ function renderMap() {
     wrap.innerHTML = svg;
     legend.innerHTML = ids.map(sid => {
       const s = sharkById(sid), t = state.tagged[sid];
-      return `<span class="map-chip"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
+      return `<span class="map-chip" data-sid="${sid}" role="button" tabindex="0"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
     }).join("");
   }
   wrap.querySelectorAll(".map-marker").forEach(m => {
@@ -924,7 +843,14 @@ function renderMap() {
          the gesture code sets this flag past ~10px of movement. */
       if (suppressMarkerClick) { suppressMarkerClick = false; return; }
       showMapPopup(m.dataset.sid);
+      mapFocusOn(m.dataset.sid); // v0.11.0: glide the map to the shark
     });
+  });
+  /* v0.11.0: legend chips focus the map too — same tap, same glide. */
+  legend.querySelectorAll(".map-chip").forEach(c => {
+    const go = () => { showMapPopup(c.dataset.sid); mapFocusOn(c.dataset.sid); };
+    c.addEventListener("click", go);
+    c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
   });
   const tg = $("mapCurrentsToggle");
   if (tg) tg.setAttribute("aria-pressed", mapCurrentsOn ? "true" : "false");
@@ -1175,15 +1101,18 @@ function fillRegions() {
 /* v0.7.0: regions unlock in two stages now.
    - Tagging the first six (the original roster) unlocks the Galápagos and
      South Africa as real, selectable waters.
-   - Tagging all twelve wins the game (Master Shark Tagger). */
+   - Tagging the full roster wins the game (Master Shark Tagger).
+     v0.11.0: the win keeps moving up with the roster — always SHARKS.length. */
 function applyRegions() {
   if (!state.regionsUnlocked) return;
   for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
 }
 
 /* v0.7.0 migration: v0.6.0 winners had tyi-won=1 at 6/6, but the win is
-   now 12/12. They keep their tags and earn the regions; the win resets
-   until all twelve are tagged. */
+   now the full roster. They keep their tags and earn the regions; the win
+   resets until every shark is tagged.
+   v0.11.0: same rule keeps applying as the roster grows — a win at 12/12
+   resets when new sharks arrive, until 15/15, 18/18, and so on. */
 function migrateWinV07() {
   const taggedCount = Object.keys(state.tagged).length;
   if (state.won && taggedCount < SHARKS.length) {
@@ -1886,7 +1815,8 @@ $("releaseBtn").addEventListener("click", () => {
    v0.7.0: two stages.
    - Tagging the first six (the original roster) unlocks the Galápagos and
      South Africa as real, selectable waters.
-   - Tagging all twelve wins the game: Master Shark Tagger. */
+   - Tagging the full roster wins the game: Master Shark Tagger.
+     v0.11.0: the win moves up with the roster (SHARKS.length), always. */
 function checkMilestones() {
   const taggedIds = Object.keys(state.tagged);
   if (!state.regionsUnlocked && ORIGINAL_SIX.every(id => taggedIds.includes(id))) {
@@ -2300,13 +2230,14 @@ function updateAllVisuals() {
    Guarded lookups: if this script ever loads against older HTML, the game
    boots fine and the map simply renders without the toolbar. */
 const onMapBtn = (id, fn) => { const b = $(id); if (b) b.addEventListener("click", fn); };
-onMapBtn("mapZoomIn", () => { mapZoom = Math.min(MAP_ZOOM_MAX, mapZoom * 1.5); renderMap(); });
+onMapBtn("mapZoomIn", () => { mapFocusClear(); mapZoom = Math.min(MAP_ZOOM_MAX, mapZoom * 1.5); renderMap(); });
 onMapBtn("mapZoomOut", () => {
+  mapFocusClear();
   mapZoom = Math.max(MAP_ZOOM_MIN, mapZoom / 1.5);
   if (mapZoom === MAP_ZOOM_MIN) { mapCX = MAP_W / 2; mapCY = MAP_H / 2; }
   renderMap();
 });
-onMapBtn("mapZoomReset", () => { mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
+onMapBtn("mapZoomReset", () => { mapFocusClear(); mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
 function setMapExplore(on) {
   mapExplore = on;
@@ -2351,7 +2282,56 @@ function mapZoomAt(clientX, clientY, newZoom) {
     mapCX = px - nx * w2 + w2 / 2;
     mapCY = py - ny * h2 + h2 / 2;
   }
+  mapFocusClear(); // manual zoom breaks the tap-focus toggle contract
   requestMapRender();
+}
+/* v0.11.0: tap-a-marker focus. Tapping a shark marker (or its legend chip)
+   glides the map to that shark's latest ping at ~3x and centers on it;
+   tapping the same marker again glides back to the saved view. Hopping to
+   a different marker glides straight there, keeping the original restore
+   view. The zoom is programmatic, so it behaves identically in normal and
+   explore mode — no gesture-ownership issues. Any manual map move cancels
+   the glide and clears the focus: the toggle only promises "back to where
+   you were" while the app still owns the view. */
+const MAP_FOCUS_ZOOM = 3, MAP_FOCUS_MS = 500;
+let mapGlide = null;  // in-flight animation token; replaced to cancel
+let mapFocus = null;  // { sid, prevZoom, prevCX, prevCY } | null
+function mapGlideCancel() { mapGlide = null; }
+function mapFocusClear() { mapGlideCancel(); mapFocus = null; }
+function mapGlideTo(x, y, z, ms) {
+  mapGlideCancel();
+  const dur = ms || MAP_FOCUS_MS;
+  const now0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+  const anim = { fz: mapZoom, fcx: mapCX, fcy: mapCY, tz: z, tcx: x, tcy: y, t0: now0, dur };
+  mapGlide = anim;
+  const step = now => {
+    if (mapGlide !== anim) return; // superseded or cancelled
+    const t = Math.min(1, (now - anim.t0) / anim.dur);
+    const e = 1 - Math.pow(1 - t, 3); // ease-out cubic: fast launch, soft landing
+    mapZoom = anim.fz + (anim.tz - anim.fz) * e;
+    mapCX = anim.fcx + (anim.tcx - anim.fcx) * e;
+    mapCY = anim.fcy + (anim.tcy - anim.fcy) * e;
+    renderMap(); // direct render: the glide IS the frame budget
+    if (t < 1) requestAnimationFrame(step);
+    else mapGlide = null;
+  };
+  if (typeof requestAnimationFrame === "function") requestAnimationFrame(step);
+  else { mapZoom = z; mapCX = x; mapCY = y; mapGlide = null; renderMap(); }
+}
+function mapFocusOn(sid) {
+  const t = state.tagged[sid];
+  if (!t) return;
+  const pts = mapPoints(t);
+  if (!pts.length) return;
+  if (mapFocus && mapFocus.sid === sid) {
+    const f = mapFocus; mapFocus = null; // toggle: back to the saved view
+    mapGlideTo(f.prevCX, f.prevCY, f.prevZoom);
+    return;
+  }
+  if (!mapFocus) mapFocus = { sid, prevZoom: mapZoom, prevCX: mapCX, prevCY: mapCY };
+  else mapFocus.sid = sid;
+  const last = pts[pts.length - 1]; // latest ping: where the shark "is"
+  mapGlideTo(last.x, last.y, MAP_FOCUS_ZOOM);
 }
 /* Mouse-wheel zoom, centered on the pointer. preventDefault stops the page
    scrolling while the pointer is over the map (standard map-widget behavior). */
@@ -2377,6 +2357,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   };
   wrap.addEventListener("pointerdown", e => {
     suppressMarkerClick = false; // a stale flag never eats a real tap
+    mapGlideCancel(); // grabbing the map mid-glide hands control to the hand
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pts.size === 1) {
       downX = panX = e.clientX; downY = panY = e.clientY;
@@ -2403,6 +2384,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
       movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
       if (mapExplore && mapZoom > 1 && movedMax > 10) {
         e.preventDefault();
+        mapFocusClear(); // a real pan breaks the tap-focus toggle contract
         const svgEl = $("worldMapSvg");
         if (svgEl) {
           const r = svgEl.getBoundingClientRect(), vb = mapViewBox();
