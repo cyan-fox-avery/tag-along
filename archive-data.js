@@ -208,7 +208,8 @@ const ARCHIVE_MEDIA = {
     "license": "CC BY 4.0",
     "page": "https://commons.wikimedia.org/wiki/File%3AAn%20ominous%20grey%20nurse%20shark.gif",
     "image": "https://upload.wikimedia.org/wikipedia/commons/0/00/An_ominous_grey_nurse_shark.gif",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/0/00/An_ominous_grey_nurse_shark.gif"
+    "full": "https://upload.wikimedia.org/wikipedia/commons/0/00/An_ominous_grey_nurse_shark.gif",
+    "framing": "landscape-crop"
    },
    {
     "type": "photo",

@@ -32,11 +32,13 @@ global.performance = { now: () => 0 };
 
 let code = files.map(f => fs.readFileSync(path.join(DIR, f), 'utf8')).join('\n');
 const fileCode = code;
+const cssCode = fs.readFileSync(path.join(DIR, 'style.css'), 'utf8');
+const htmlCode = fs.readFileSync(path.join(DIR, 'index.html'), 'utf8');
 code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.17.0', VERSION === 'v0.17.0');
+  ok('version v0.17.1', VERSION === 'v0.17.1');
 
   // roster
   ok('roster is 23', SHARKS.length === 23);
@@ -182,6 +184,26 @@ code += `
   ok('every CC license has a canonical URL', unmapped.length === 0);
   // mobile perf: videos render with preload="none" + poster, not preload="metadata"
   ok('videos use preload=none with poster', /preload=\\"none\\"/.test(fileCode) && /poster=/.test(fileCode));
+
+  // v0.17.1 sanity-check batch
+  const openerRe = /opener:\\s*"([^"]+)"/g;
+  const openers = []; let m;
+  while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
+  ok('23 species openers present', openers.length === 23);
+  ok('no shared verbatim closer', new Set(openers).size === openers.length);
+  ok('release offers both destinations',
+    htmlCode.includes('id="releaseShipBtn"') && /releaseShipBtn/.test(fileCode));
+  ok('doRelease resolves the encounter directly', /function doRelease\\(headBack\\)/.test(fileCode));
+  ok('phone clock ticks', /setInterval\\(tickPhoneClock/.test(fileCode));
+  ok('auto-nudge waits for five failures', /state\\.failures >= 5/.test(fileCode));
+  ok('ask-Sarah advice path exists', typeof askSarahAdvice === 'function' && typeof renderSarahAsk === 'function');
+  ok('encounter announces tagged status', fileCode.includes('already in your book') && fileCode.includes('new to your book'));
+  ok('map legend is two-column', /\\.map-legend\\s*\\{\\s*display:\\s*grid/.test(cssCode));
+  ok('chip shows common name first', /esc\\(s\\.name\\)\\} · /.test(fileCode));
+  ok('overlays scroll when overflowing', /\\.overlay\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+  ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
+  const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
+  ok('sand tiger GIF flagged for reframe', !!stGif);
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
