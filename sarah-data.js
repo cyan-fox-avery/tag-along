@@ -124,6 +124,42 @@ const COUSIN_CHATS = {
     { them: "Zebra shark babies don't look like zebra shark adults at all. The pups are dark with white stripes — actual zebra pattern — and they grow into spots. Two sharks for the price of one.", me: "A wardrobe change with age." },
     { them: "Zebra sharks can rest on the seafloor and pump water over their gills, like the whitetip reef sharks do. Most sharks would suffocate sitting still. These two just... nap.", me: "Professional nappers." },
     { them: "They're called zebra sharks but the adults look more like leopards — all spots. The zebra name comes from the babies. Taxonomy's little joke.", me: "Named for the children, not the adults." }
+  ],
+  /* v0.18.0 wave. */
+  scalloped: [
+    { them: "Scalloped hammerheads gather in schools of hundreds around seamounts. Hundreds. Of hammerheads. Swimming in formation like some kind of shark ballet company.", me: "A ballet company with teeth." },
+    { them: "The hammerhead's head is basically a giant sensor array — packed with electroreceptors that detect the electric fields of prey buried in sand. They sweep it side to side like a metal detector.", me: "A metal detector made of shark." },
+    { them: "Female scalloped hammerheads migrate thousands of kilometres between nurseries and the seamount schools. The great aggregations are mostly females. Girl gangs of the deep.", me: "The seamount sisterhood." }
+  ],
+  smooth: [
+    { them: "Smooth hammerheads handle cooler water than their cousins — they're the temperate hammerhead. Cornwall, New Zealand, the open Atlantic. Not fussy about latitude.", me: "The cosmopolitan hammerhead." },
+    { them: "Telling a smooth hammerhead from a scalloped one is all about the front edge: smooth is one clean curve, scalloped has the central notch. One curve, and you've got your ID.", me: "One curve changes everything." },
+    { them: "Smooth hammerheads are more oceanic than the other hammerheads — they roam the open water rather than hugging the seamounts. Wanderers with hammers.", me: "Hammerheads, but make it pelagic." }
+  ],
+  bonnethead: [
+    { them: "Bonnetheads are the smallest hammerheads and they eat seagrass. Like, half their diet can be plants. An omnivorous shark. I think about this constantly.", me: "The vegetarian hammerhead." },
+    { them: "A bonnethead's head is a little rounded shovel, not a big wide hammer. They're the pocket-sized members of the family — most are barely a metre long.", me: "Fun-size hammerhead." },
+    { them: "Bonnetheads digest seagrass with specialized enzymes, which is wild because sharks are supposed to be obligate carnivores. This one read the rulebook and ate it.", me: "Rules are suggestions." }
+  ],
+  bull: [
+    { them: "Bull sharks swim up rivers — actual rivers. They've been found thousands of kilometres inland — the Amazon, the Mississippi. A shark, in a river, just vibing.", me: "Geography is a suggestion." },
+    { them: "Bull sharks can switch their salt balance between ocean and fresh water. Almost no other shark can do that. It's like having two completely different kidneys.", me: "Two kidneys' worth of talent." },
+    { them: "Lake Nicaragua has bull sharks living in it full-time. A lake. With sharks. The locals just... live with that. Iconic.", me: "The lake sharks of Nicaragua." }
+  ],
+  greyreef: [
+    { them: "Grey reef sharks do this whole threat display when they're annoyed — hunched back, dropped fins, swimming in loopy exaggeration. It's the shark equivalent of 'do you want to go, mate.'", me: "Aggressive posturing, shark edition." },
+    { them: "Grey reef sharks are incredibly site-attached — the same sharks patrol the same reef drop-offs for years. Learn the reef and you learn the individuals.", me: "Regulars at their local reef." },
+    { them: "That threat display is actually one of the best-studied behaviors in all of shark science. Researchers can read a grey reef's mood from its body language.", me: "Fluent in shark." }
+  ],
+  caribbean: [
+    { them: "Caribbean reef sharks can lie still on the seafloor and breathe — most requiem sharks would suffocate doing that. They just park themselves and pump water over their gills.", me: "Professional reef nappers." },
+    { them: "The Bahamas basically runs on Caribbean reef sharks — they're the home team, and the shark-diving protections there are one of their strongholds. Conservation that works.", me: "The Bahamas did it right." },
+    { them: "Caribbean reef sharks share Tiger Beach with lemons and bulls. Three big coastal species, one reef, zero drama. Mostly.", me: "A surprisingly peaceful neighborhood." }
+  ],
+  sandbar: [
+    { them: "The sandbar shark's dorsal fin is enormous — tall and sail-like. It's the ID feature: no similar shark carries a fin that high. You can spot one from the silhouette alone.", me: "The sail-fin shark." },
+    { them: "Chesapeake Bay is a giant sandbar shark nursery — pups are born there in summer. One bay, thousands of baby sharks. The cuteness is structural.", me: "A bay full of pups." },
+    { them: "Sandbars migrate up and down the US east coast with the seasons. Winter in the south, summer in the north. They have a commute.", me: "Seasonal commuters." }
   ]
 
 };
@@ -153,6 +189,14 @@ const COUSIN_NUDGES = {
   sevengill: "Sevengills hunt South Africa's kelp forests and bays — shallow water, under 136 metres mostly. They eat seals, fish, even other sharks. Oily fish with chum, and seal scent works too. Count the gills: seven, not five.",
   bronze: "Bronze whalers cruise South Africa's coast chasing sardine schools — surface to about 100 metres. Sardines, schooling fish, squid, with chum. During the Sardine Run they hunt baitballs in groups. Look for the bronze sheen.",
   frilled: "Frilled sharks live deep off Japan — Sagami Bay, twilight zone down into the dark, a few hundred metres and deeper. They hunt deep-sea squid. Squid on the line, chum to lift one off the bottom. Look for the eel-like body and frilly gills.",
-  zebra: "Zebra sharks cruise Philippine reefs — shallow water, coral and sand. They vacuum up shellfish, crabs and small fish off the bottom. Crabs, lobster or shellfish, with chum. Pups wear stripes, adults wear spots."
+  zebra: "Zebra sharks cruise Philippine reefs — shallow water, coral and sand. They vacuum up shellfish, crabs and small fish off the bottom. Crabs, lobster or shellfish, with chum. Pups wear stripes, adults wear spots.",
+  /* v0.18.0 wave. */
+  scalloped: "Scalloped hammerheads school around oceanic islands and seamounts — the Galápagos, Cocos, Malpelo. Daytime schools, hundreds strong, in the surface shallows. Schooling fish or squid, with chum. Look for the central notch in the hammer's front edge.",
+  smooth: "Smooth hammerheads like temperate water — Cornwall, the northeast Atlantic. Surface shallows, schooling fish and squid, chum to draw them in. The head is one smooth unbroken curve: no notch, no scallops. That's the ID.",
+  bonnethead: "Bonnetheads are tiny hammerheads of the Caribbean shallows — surface to reef, under 90 metres. They root in seagrass for crabs and shrimp, and eat the seagrass too. Crabs, shellfish or urchins, with chum. Look for the little rounded shovel head.",
+  bull: "Bull sharks patrol the Caribbean coast — Playa del Carmen, estuaries, anywhere the water's warm and coastal. Big oily fish like tuna, or schooling fish, with chum. Broad flat snout, heavy build. They'll come up rivers, but you'll meet yours at sea.",
+  greyreef: "Grey reef sharks hold Indo-Pacific reef drop-offs — Papua New Guinea, the channels and current-swept edges. Reef fish or squid, with chum. They patrol the same ground for years, so learn the reef and you'll learn the shark.",
+  caribbean: "Caribbean reef sharks are Bahamas home-team — Tiger Beach, the reef flats. Shallow water, schooling fish or tuna, with chum. They share the reef with lemons and bulls, so check your fins: no black tips, no heavy bull build.",
+  sandbar: "Sandbar sharks work the sandy coastal shelves — the Outer Banks, shallow bays and banks. Schooling fish, squid or crabs, with chum. The ID is the dorsal fin: tall, almost sail-like. Nothing else carries one that high."
 
 };
