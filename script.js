@@ -2041,6 +2041,9 @@ const LICENSE_URLS = {
   "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
   "CC BY 3.0": "https://creativecommons.org/licenses/by/3.0/",
   "CC BY 2.0": "https://creativecommons.org/licenses/by/2.0/",
+  "CC BY 2.5": "https://creativecommons.org/licenses/by/2.5/",
+  "CC BY 3.0 AU": "https://creativecommons.org/licenses/by/3.0/au/",
+  "CC BY-SA 2.5": "https://creativecommons.org/licenses/by-sa/2.5/",
   "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
   "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
   "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0/",
@@ -2061,7 +2064,7 @@ function archiveAssetHtml(a, isPrimary) {
     // are honored by modern browsers incl. iOS Safari, so the Archive presents
     // the excerpt Avery chose instead of the whole source video.
     const clip = (a.clipStart != null && a.clipEnd != null) ? `#t=${a.clipStart},${a.clipEnd}` : "";
-    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="metadata" src="${esc(a.play + clip)}"></video>`;
+    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="none"${a.image ? ` poster="${esc(a.image)}"` : ""} src="${esc(a.play + clip)}"></video>`;
   } else {
     mediaHtml = `<a href="${esc(a.full || a.image)}" target="_blank" rel="noopener"><img class="archive-media${isPrimary ? " primary" : ""}" src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></a>`;
   }

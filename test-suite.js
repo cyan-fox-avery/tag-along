@@ -172,6 +172,16 @@ code += `
   const pdHtml = archiveAssetHtml({ type: 'photo', caption: 'x', credit: 'NOAA', license: 'Public domain', page: 'https://example.com', image: 'https://example.com/i.jpg' }, false);
   ok('public-domain uses neutral Credit (no \u00a9)', pdHtml.includes('Credit NOAA') && !pdHtml.includes('\u00a9 NOAA'));
   ok('dossiers require an actual tag', fileCode.includes('if (!state.tagged[s.id]) return'));
+  // v0.17.0 review fix: every non-public-domain CC license in the data must
+  // have a LICENSE_URLS entry, so new sharks can't silently lose license links.
+  const usedLicenses = new Set();
+  Object.values(ARCHIVE_MEDIA).forEach(m => (m.assets || []).forEach(a => {
+    if (a.license && !/public domain/i.test(a.license)) usedLicenses.add(a.license);
+  }));
+  const unmapped = [...usedLicenses].filter(l => !LICENSE_URLS[l]);
+  ok('every CC license has a canonical URL', unmapped.length === 0);
+  // mobile perf: videos render with preload="none" + poster, not preload="metadata"
+  ok('videos use preload=none with poster', /preload=\\"none\\"/.test(fileCode) && /poster=/.test(fileCode));
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
