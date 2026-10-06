@@ -222,3 +222,140 @@ const ART = {
     </g>
   </svg>`
 };
+
+/* Field-guide sketches: rough pencil-style drawings of one distinctive
+   feature per shark. Deliberately NOT the real shark art — the true
+   appearance is revealed only when a shark is caught and tagged.
+   (The real ART above is never shown in Research.) */
+const SKETCH = {
+  nurse: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: nurse shark barbels">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <line x1="52" y1="56" x2="46" y2="76"/>
+      <line x1="62" y1="57" x2="60" y2="77"/>
+      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>`,
+  thresher: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: thresher shark tail">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="70" cy="62" rx="42" ry="14"/>
+      <path d="M110,58 Q150,50 168,18 Q176,8 186,6"/>
+      <path d="M110,66 Q140,64 158,50" stroke-dasharray="7 5"/>
+      <circle cx="42" cy="58" r="2.5" fill="#9fb8cc" stroke="none"/>
+    </g>
+  </svg>`,
+  whale: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: whale shark spot pattern">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="55" rx="80" ry="26"/>
+      <path d="M188,55 L210,40 M188,55 L210,70"/>
+    </g>
+    <g fill="#9fb8cc" opacity="0.7">
+      <circle cx="80" cy="45" r="3"/><circle cx="105" cy="42" r="3"/><circle cx="130" cy="46" r="3"/>
+      <circle cx="92" cy="58" r="3"/><circle cx="118" cy="60" r="3"/><circle cx="143" cy="57" r="3"/>
+      <circle cx="70" cy="62" r="2.5"/><circle cx="155" cy="64" r="2.5"/>
+    </g>
+  </svg>`,
+  goblin: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: goblin shark snout">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M80,50 L18,44 L18,58 Z"/>
+      <ellipse cx="130" cy="55" rx="55" ry="15"/>
+      <path d="M183,52 Q200,48 208,44" stroke-dasharray="7 5"/>
+    </g>
+  </svg>`,
+  tiger: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: tiger shark stripes">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="55" rx="70" ry="20"/>
+      <path d="M173,50 L205,34 M173,60 L205,76"/>
+      <line x1="90" y1="37" x2="88" y2="73"/>
+      <line x1="110" y1="35" x2="110" y2="75"/>
+      <line x1="130" y1="37" x2="132" y2="73"/>
+    </g>
+  </svg>`,
+  sandtiger: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: sand tiger teeth">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M30,55 Q70,38 120,42 Q170,46 200,40"/>
+      <path d="M30,55 Q70,68 120,66 Q170,64 200,60" stroke-dasharray="7 5"/>
+      <path d="M44,52 l5,8 l5,-8 l5,8 l5,-8 l5,8 l5,-8"/>
+    </g>
+  </svg>`,
+  galapagos: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: Galapagos shark eye">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M70,55 Q110,35 150,55 Q110,75 70,55 Z"/>
+      <circle cx="110" cy="55" r="10"/>
+      <circle cx="110" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
+    </g>
+  </svg>`,
+  greatwhite: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: great white countershading">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M20,45 Q70,35 120,42 Q170,49 200,42"/>
+      <path d="M20,65 Q70,58 120,63 Q170,68 200,62" stroke-dasharray="7 5"/>
+      <line x1="14" y1="92" x2="206" y2="92" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>`,
+  hammerhead: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: hammerhead cephalofoil">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <rect x="40" y="42" width="140" height="26" rx="13"/>
+      <path d="M110,68 L110,96" stroke-dasharray="7 5"/>
+      <circle cx="55" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
+      <circle cx="165" cy="55" r="3" fill="#9fb8cc" stroke="none"/>
+    </g>
+  </svg>`,
+  mako: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: mako torpedo body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M30,55 Q110,30 190,55 Q110,80 30,55 Z"/>
+      <path d="M190,55 L210,42 M190,55 L210,68"/>
+    </g>
+  </svg>`,
+  basking: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: basking shark mouth">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="55" rx="75" ry="24"/>
+      <path d="M45,55 Q110,85 175,55" stroke-width="3.5"/>
+      <path d="M45,55 Q110,30 175,55" stroke-dasharray="7 5"/>
+    </g>
+  </svg>`,
+  epaulette: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: epaulette walking fin">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M60,40 Q90,55 100,85"/>
+      <path d="M100,85 L85,100 M100,85 L100,102 M100,85 L115,100"/>
+      <line x1="14" y1="104" x2="206" y2="104" stroke-dasharray="4 7" opacity="0.6"/>
+    </g>
+  </svg>`,
+  lemon: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: lemon shark twin dorsal fins">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M88,46 L96,24 L106,46 Z"/>
+      <path d="M128,46 L136,24 L146,46 Z"/>
+      <line x1="96" y1="24" x2="136" y2="24" stroke-dasharray="4 4" opacity="0.7"/>
+    </g>
+  </svg>`,
+  blacktip: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: blacktip reef shark black-tipped dorsal">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M96,46 L104,22 L114,46 Z"/>
+    </g>
+    <polygon points="100,32 104,22 109,31" fill="#9fb8cc"/>
+  </svg>`,
+  whitetip: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: whitetip reef shark white-tipped dorsal">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="62" rx="70" ry="18"/>
+      <path d="M96,46 L104,22 L114,46 Z"/>
+      <path d="M100,32 L104,22 L109,31" stroke="#e8edf2" stroke-width="3"/>
+    </g>
+  </svg>`
+};
