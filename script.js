@@ -1495,6 +1495,7 @@ function confirmTag(name) {
     sex: s._gen.sex,
     location: regionName,
     date: dateStr,
+    taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
     track: genTrack(s, { location: regionName, date: dateStr })
   };
   state.tagged[s.id] = rec;
@@ -1594,11 +1595,23 @@ function winThread() {
 /* v0.16.0: Sarah's celebration — the emotional core of the ending. Calm adult
    voice (v0.12.0): proud and emotional, never a wall of caps. Uses the
    player's ACTUAL first-tagged shark so it lands personally. */
+/* v0.16.0 review fix: genuine chronological order for tagged sharks.
+   New records carry taggedAt (ms epoch). Old saves fall back to the
+   insertion order of state.tagged — for non-integer string keys that IS
+   the order each shark was first tagged. Both the Sarah thread and the
+   map finale use this same source. */
+function taggedChronological() {
+  return Object.keys(state.tagged)
+    .map((sid, idx) => ({ sid, t: state.tagged[sid], idx }))
+    .sort((a, b) => {
+      const ta = a.t.taggedAt, tb = b.t.taggedAt;
+      if (ta != null && tb != null && ta !== tb) return ta - tb;
+      return a.idx - b.idx;
+    });
+}
 function sarahWinThread() {
-  const ids = Object.keys(state.tagged);
-  const byDate = ids
-    .map(sid => ({ sid, t: state.tagged[sid] }))
-    .sort((a, b) => (a.t.date || "") < (b.t.date || "") ? -1 : 1);
+  const byDate = taggedChronological();
+  const ids = byDate.map(e => e.sid);
   const first = byDate[0] || { sid: "nurse", t: { researchId: "??" } };
   const s = sharkById(first.sid) || { name: "shark" };
   const firstName = first.t.name ? `“${first.t.name}”` : first.t.researchId;
@@ -1623,7 +1636,14 @@ function sarahWinThread() {
    Each lands separately — a moment, not a checklist. */
 function doWin() {
   state.won = true;
-  try { localStorage.setItem("tyi-won", "1"); } catch {}
+  /* v0.16.0 review fix: the archive unlock is part of the win itself, not
+     beat 4. A player who closes mid-ceremony keeps the unlock — beat 4 is
+     where they're TOLD about it. */
+  state.archiveUnlocked = true;
+  try {
+    localStorage.setItem("tyi-won", "1");
+    localStorage.setItem("tyi-archive", "1");
+  } catch {}
   renderCollection();
   renderResearch();
   renderSightings();
@@ -1670,7 +1690,8 @@ function winStep(n) {
 
   } else {
     /* Beat 4: the acknowledgement — it lives here now, not on the Research tab.
-       Also unlocks the Wild Archive for the postgame. */
+       The Wild Archive unlock was already persisted in doWin(); this beat is
+       where the player is told about it. The set below is idempotent. */
     state.archiveUnlocked = true;
     try { localStorage.setItem("tyi-archive", "1"); } catch {}
     box(`
@@ -1694,9 +1715,7 @@ function winStep(n) {
 function winMapFinale() {
   const ov = $("winOverlay");
   ov.classList.remove("hidden");
-  const ordered = Object.keys(state.tagged)
-    .map(sid => ({ sid, t: state.tagged[sid] }))
-    .sort((a, b) => (a.t.date || "") < (b.t.date || "") ? -1 : 1);
+  const ordered = taggedChronological();
   const n = ordered.length;
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
 
@@ -1711,7 +1730,12 @@ function winMapFinale() {
       </div>
     </div>`;
 
+  /* v0.16.0 review fix: count = sharks revealed so far. The caption names
+     the shark that was JUST revealed (ordered[count - 1]); count 0 is the
+     intro state with an empty map. Only the newest marker gets the pop
+     animation — earlier ones stay settled instead of re-popping every step. */
   const renderRevealed = (count) => {
+    const newIdx = count - 1; // index of the just-revealed shark (-1 when none)
     let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of all tagged sharks">`
       + `<rect x="0" y="0" width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`
       + (bmUrl ? `<image href="${bmUrl}" x="0" y="0" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : ``);
@@ -1728,7 +1752,8 @@ function winMapFinale() {
       }
       const last = pts[pts.length - 1];
       if (last) {
-        svg += `<g class="finale-marker" style="animation: finalePop 0.5s ease">`
+        const pop = idx === newIdx ? ` style="animation: finalePop 0.5s ease"` : ``;
+        svg += `<g class="finale-marker"${pop}>`
           + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="7" fill="${color}" stroke="#fff" stroke-width="2"/>`
           + `</g>`;
       }
@@ -1736,11 +1761,13 @@ function winMapFinale() {
     svg += `</svg>`;
     $("finaleMap").innerHTML = svg;
     const cap = $("finaleCaption");
-    if (count < n) {
-      const { sid, t } = ordered[count];
+    if (count === 0) {
+      cap.textContent = "";
+    } else if (count < n) {
+      const { sid, t } = ordered[count - 1];
       const s = sharkById(sid);
       const nm = t.name ? `\u201c${t.name}\u201d` : t.researchId;
-      cap.textContent = `${nm} — ${s ? s.name : sid}  (${count + 1} / ${n})`;
+      cap.textContent = `${nm} — ${s ? s.name : sid}  (${count} / ${n})`;
     } else {
       cap.textContent = `${n} sharks. ${n} releases. All still swimming.`;
     }
@@ -1967,7 +1994,7 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
