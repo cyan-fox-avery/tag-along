@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.10.2** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.10.3** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
