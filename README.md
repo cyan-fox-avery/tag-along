@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.10.4** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.11.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,23 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.11.0 changes — the reef trio + tap-to-focus map
+
+- Three new sharks join the roster (12 → 15): the **lemon shark** (sarah's
+  favourite — twin equal dorsal fins, Bimini's faithful mothers), the
+  **blacktip reef shark** (black-dipped fins, knee-deep Maldivian reef flats),
+  and the **whitetip reef shark** (the cave-napper, Philippine reefs by night).
+  Each comes with full derpy art, a field-guide sketch, research notes,
+  sarah's texts, and an honest acoustic-telemetry track envelope.
+- Tapping a shark marker — or its legend chip — now glides the map to that
+  shark's latest ping at 3× and centers on it (smooth half-second ease-out,
+  so you keep your bearings on the globe). Tapping the same marker again
+  glides back to where you were; tapping a different marker flies straight
+  there. The popup still appears as before, and it works in both normal and
+  explore mode. Grabbing or pinching the map yourself cancels the glide.
+- The win keeps moving up with the roster: Master Shark Tagger now needs
+  15/15, and will keep pace with every future wave (standing rule).
 
 ## v0.10.4 changes — phone layout fix
 

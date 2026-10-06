@@ -138,6 +138,36 @@ const TRACK_ENVELOPES = {
     areas: ["Tag-site reef flat", "Adjacent coral-head pools", "PNG reef crest", "Lagoon patch", "North beach pools", "Reef-flat edge"],
     hop: [0.1, 2], dayStep: [1, 7], nPoints: [6, 8], kind: "resightings",
     corridor: "extreme residency — greatest net displacement on record 475 m; scale inferred from Heron Island mark-recapture (no PNG telemetry exists)"
+  },
+  lemon: {
+    start: "Bimini lagoon (tag site)", // game tags in the Caribbean Sea; Bimini (Bahamas) is the lemon shark's most-studied nursery
+    /* Behaviour and scale from the decades-long Bimini Biological Field
+       Station program (acoustic + PIT tagging): extreme natal philopatry,
+       small juvenile home ranges in mangrove lagoons, adults moving
+       between nearby islands. Areas are real western-Atlantic sites
+       clustered at the Caribbean tag region — honest local scale. */
+    areas: ["Bimini", "Andros Island", "Eleuthera", "Florida Keys", "Bimini mangrove nursery"],
+    hop: [2, 40], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
+    corridor: "natal philopatry — females return to their own birthplace to pup; juveniles resident in mangrove lagoons; acoustic tagging, Bimini Biological Field Station"
+  },
+  blacktip: {
+    start: "North Malé Atoll reef flat (tag site)", // game tags in the Maldives; envelope is Maldives-local by design
+    /* Behaviour from Indo-Pacific reef-shark acoustic telemetry (Moorea
+       photo-ID / acoustic work on C. melanopterus): extremely small home
+       ranges, multi-year site fidelity, stable social associations. Areas
+       are real Maldivian atolls — no imported waypoints. */
+    areas: ["North Malé Atoll", "Rasdhoo Atoll", "Baa Atoll", "Addu Atoll", "Fuvahmulah"],
+    hop: [1, 25], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
+    corridor: "extremely resident — among the smallest home ranges of any requiem shark; stable social associations (Moorea photo-ID)"
+  },
+  whitetip: {
+    start: "Tubbataha reef cave (tag site)", // game tags in the Philippines; envelope is Philippines-local by design
+    /* Behaviour from Indo-Pacific acoustic work on T. obesus: fierce reef
+       fidelity, daytime cave-sheltering, nocturnal crevice hunting. Areas
+       are real Philippine reef sites; scale is reef-local. */
+    areas: ["Tubbataha Reefs Natural Park", "Apo Reef", "El Nido reefs", "Northern Palawan", "Sulu Sea"],
+    hop: [1, 20], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
+    corridor: "strong reef fidelity — returns to the same daytime cave shelter for months/years; nocturnal, reef-local movements"
   }
 };
 
@@ -189,7 +219,8 @@ const SPECIES_COLORS = {
   nurse: "#ffd166", thresher: "#ef476f", whale: "#06d6a0", goblin: "#9b5de5",
   tiger: "#f78c6b", sandtiger: "#4cc9f0", galapagos: "#80ed99",
   greatwhite: "#f4f1de", hammerhead: "#f3722c", mako: "#00bbf9",
-  basking: "#b8c0ff", epaulette: "#ff8fab"
+  basking: "#b8c0ff", epaulette: "#ff8fab",
+  lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da"
 };
 
 /* Every label a track point can carry: region names (tag sites and
@@ -314,7 +345,16 @@ const MAP_COORDS = {
   "PNG reef crest": [-6.002, 147.001],
   "Lagoon patch": [-6.002, 146.998],
   "North beach pools": [-5.999, 147.003],
-  "Reef-flat edge": [-6.001, 146.997]
+  "Reef-flat edge": [-6.001, 146.997],
+  /* v0.11.0: new envelope labels — Maldives atolls (blacktip) and
+     Philippine reef sites (whitetip) are real places; Bimini's mangrove
+     nursery is the lemon shark's famous pupping ground. */
+  "Bimini mangrove nursery": [25.72, -79.28],
+  "North Malé Atoll": [4.3, 73.5],
+  "Rasdhoo Atoll": [4.27, 73.0],
+  "Baa Atoll": [5.15, 73.1],
+  "Apo Reef": [12.66, 120.42],
+  "El Nido reefs": [11.2, 119.3]
 };
 
 const MAP_W = 1000, MAP_H = 500;
