@@ -503,3 +503,21 @@ select option:disabled { color: #7a8a9e; }
 .link-button:active { color: var(--ink); }
 
 .hidden { display: none !important; }
+
+/* v0.17.0: Wild Archive — real-world media dossiers */
+.archive-asset { margin: 0 0 18px; }
+.archive-asset.primary { margin-bottom: 22px; }
+.archive-media {
+  display: block; width: 100%; border-radius: 10px;
+  border: 1px solid #2c5364; background: #0d2f4d;
+}
+.archive-media.primary { border-width: 2px; }
+video.archive-media { max-height: 420px; }
+.archive-asset figcaption { font-size: 14px; line-height: 1.55; margin: 8px 2px 4px; color: var(--ink); }
+.archive-credit { font-size: 12px; color: var(--ink-dim); margin: 0 2px; line-height: 1.5; }
+.archive-credit a { color: var(--ink-dim); }
+.archive-label {
+  display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #0d2f4d; background: #ffd166;
+  border-radius: 6px; padding: 3px 9px; margin-bottom: 8px;
+}

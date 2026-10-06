@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -36,7 +36,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.16.0', VERSION === 'v0.16.0');
+  ok('version v0.17.0', VERSION === 'v0.17.0');
 
   // roster
   ok('roster is 23', SHARKS.length === 23);
@@ -140,6 +140,48 @@ code += `
   migrateArchiveUnlock();
   ok('old winners get archive unlock', state.archiveUnlocked === true && localStorage.getItem('tyi-archive') === '1');
   state.won = _w2; state.archiveUnlocked = _a2; state.tagged = _t2;
+
+  // v0.17.0 Wild Archive
+  ok('ARCHIVE_MEDIA exists', typeof ARCHIVE_MEDIA === 'object');
+  const liveIds = SHARKS.map(x => x.id);
+  const archivedLive = liveIds.filter(id => ARCHIVE_MEDIA[id] && !ARCHIVE_MEDIA[id].future);
+  ok('all 23 live sharks have archive media', archivedLive.length === 23);
+  ok('salmon is future-only', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === true);
+  let assetsOk = true, videosOk = true;
+  liveIds.forEach(id => {
+    (ARCHIVE_MEDIA[id].assets || []).forEach(a => {
+      if (!a.caption || !a.credit || !a.license || !a.page) assetsOk = false;
+      if (a.type === 'video' && !a.play) videosOk = false;
+      if (!a.image && !(a.type === 'video' && a.play)) assetsOk = false;
+    });
+  });
+  ok('every asset has caption/credit/license/page', assetsOk);
+  ok('every video has an iOS play URL', videosOk);
+  ok('renderArchive exists', typeof renderArchive === 'function');
+  ok('updateArchiveTab exists', typeof updateArchiveTab === 'function');
+  ok('archive tab hidden until unlock', /updateArchiveTab/.test(fileCode));
+  // v0.17.0 review fixes: curated clip boundaries, license URLs, tagged-only dossiers
+  const lemonVid = ARCHIVE_MEDIA.lemon.assets.find(a => a.type === 'video');
+  ok('lemon video has curated clip (28-58s)', lemonVid.trimmed === true && lemonVid.clipStart === 28 && lemonVid.clipEnd === 58);
+  const wtVid = ARCHIVE_MEDIA.whitetip.assets.find(a => a.type === 'video');
+  ok('whitetip video has curated clip (13-54s)', wtVid.trimmed === true && wtVid.clipStart === 13 && wtVid.clipEnd === 54);
+  const clipHtml = archiveAssetHtml(lemonVid, true);
+  ok('video src enforces clip via media fragment', clipHtml.includes('#t=28,58'));
+  ok('trimmed videos note the trim', clipHtml.includes('trimmed from original'));
+  ok('license links to canonical CC URL', clipHtml.includes('href="https://creativecommons.org/licenses/by/3.0/"'));
+  const pdHtml = archiveAssetHtml({ type: 'photo', caption: 'x', credit: 'NOAA', license: 'Public domain', page: 'https://example.com', image: 'https://example.com/i.jpg' }, false);
+  ok('public-domain uses neutral Credit (no \u00a9)', pdHtml.includes('Credit NOAA') && !pdHtml.includes('\u00a9 NOAA'));
+  ok('dossiers require an actual tag', fileCode.includes('if (!state.tagged[s.id]) return'));
+  // v0.17.0 review fix: every non-public-domain CC license in the data must
+  // have a LICENSE_URLS entry, so new sharks can't silently lose license links.
+  const usedLicenses = new Set();
+  Object.values(ARCHIVE_MEDIA).forEach(m => (m.assets || []).forEach(a => {
+    if (a.license && !/public domain/i.test(a.license)) usedLicenses.add(a.license);
+  }));
+  const unmapped = [...usedLicenses].filter(l => !LICENSE_URLS[l]);
+  ok('every CC license has a canonical URL', unmapped.length === 0);
+  // mobile perf: videos render with preload="none" + poster, not preload="metadata"
+  ok('videos use preload=none with poster', /preload=\\"none\\"/.test(fileCode) && /poster=/.test(fileCode));
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.16.0** — *a shark research game*
+**v0.17.0** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,11 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.17.0 changes — the Wild Archive
+
+- **The Wild Archive is open.** Completing the roster now unlocks a new Archive tab with real-world photography and footage of every species you tagged — 44 hand-curated assets across the 23-shark roster (46 in the archive data, with the next species already pre-curated), each with a caption and full creator/license attribution. "You know these sharks now. Here they really are."
+- Video uses iOS-compatible streams; research/handling photos are labeled "Research in Action."
 
 ## v0.16.0 changes — the ending
 

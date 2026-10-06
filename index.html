@@ -23,6 +23,7 @@
       <button class="tab" data-tab="map" type="button">🗺️ Map</button>
       <button class="tab" data-tab="logbook" type="button">📓 Logbook</button>
       <button class="tab" data-tab="phone" type="button">📱 Phone <span id="msgBadge" class="count-badge hidden">0</span></button>
+      <button class="tab hidden" data-tab="archive" type="button">📸 Archive</button>
     </nav>
 
     <main>
@@ -139,6 +140,15 @@
           <div id="messagesList" class="phone-convo"></div>
         </div>
       </section>
+
+      <!-- WILD ARCHIVE — real-world media, unlocked by completing the roster -->
+      <section id="tab-archive" class="panel">
+        <div class="section-head">
+          <h2>Wild Archive</h2>
+          <p>You know these sharks now. Here they really are — real photographs and footage of the animals you tagged and released, hand-picked for this archive.</p>
+        </div>
+        <div id="archiveList" class="guide-list"></div>
+      </section>
     </main>
 
     <footer class="foot">
@@ -205,6 +215,7 @@
   <script src="art-data.js"></script>
   <script src="sarah-data.js"></script>
   <script src="sharks-data.js"></script>
+  <script src="archive-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
