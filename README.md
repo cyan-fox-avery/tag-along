@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.17.0** — *a shark research game*
+**v0.17.1** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,18 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.17.1 changes — the sanity-check batch
+
+Small fixes and polish from Avery's post-release playthrough:
+- **Sarah's openers have variety.** All 23 species openers now end differently — no more "Tell me everything" on every shark.
+- **Release is the destination choice.** After the health check, pick "🌊 Release & keep diving" or "⛵ Release & return to ship" directly — no second prompt.
+- **The phone clock ticks.** The status bar clock refreshes every 30 seconds.
+- **Ask Sarah for advice.** After your first failed trip, Sarah offers her notes — you pick the species. She only nudges on her own after five failures (was three).
+- **Encounters announce tagged status.** "🦈 Shark! A nurse shark — already in your book as "Bubbles"!" vs "— new to your book!"
+- **Map legend polish.** Two-column chip layout, taller touch targets, common name before the ID.
+- **Bug fix: win overlay trap.** On short screens, the ending's text thread could push the Continue button below the fold with no scroll. Overlays now scroll.
+- **Sand tiger GIF reframed.** The giant portrait GIF is cropped and rotated into a landscape frame.
 
 ## v0.17.0 changes — the Wild Archive
 

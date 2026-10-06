@@ -214,6 +214,20 @@ select option:disabled { color: #7a8a9e; }
 }
 .phone-convo .empty-note { background: transparent; }
 
+/* v0.17.1: Ask Sarah panel — player-initiated advice after a tough trip. */
+.sarah-ask {
+  padding: 12px 14px; border-top: 1px solid #2c5364;
+  background: var(--bg-panel); border-radius: 0 0 26px 26px;
+}
+.sarah-ask p { margin: 0 0 8px; font-size: 13px; }
+.sarah-ask-row { display: flex; gap: 8px; }
+.sarah-ask-row select {
+  flex: 1; min-width: 0; font-size: 15px; padding: 10px 8px;
+  border-radius: 10px; border: 1px solid #2c5364;
+  background: var(--bg-soft); color: var(--ink);
+}
+.sarah-ask-row .secondary-button { flex: none; }
+
 /* v0.6.0: field guide entries */
 .guide-list { display: grid; gap: 14px; }
 .guide-entry {
@@ -266,8 +280,14 @@ select option:disabled { color: #7a8a9e; }
 /* Overlays */
 .overlay {
   position: fixed; inset: 0; background: rgba(2, 8, 16, 0.72);
-  display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 20;
+  display: flex; padding: 18px; z-index: 20;
+  /* v0.17.1: overlays must scroll when content exceeds the viewport —
+     beat 2's 10-bubble thread trapped short screens with the Continue
+     button below the fold. margin:auto centers when content fits and
+     scrolls when it doesn't (unlike align-items:center, which clips). */
+  overflow-y: auto; align-items: flex-start;
 }
+.overlay > * { margin: auto; }
 .phone {
   background: var(--bg-panel); border-radius: 22px; padding: 16px;
   width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
@@ -484,9 +504,11 @@ select option:disabled { color: #7a8a9e; }
 .map-popup .latin { font-size: 13px; color: var(--ink-dim); margin: 0 0 6px; }
 .map-popup .map-meta { font-size: 13px; color: var(--ink-dim); margin: 0 0 8px; line-height: 1.6; }
 .map-popup .map-kind-note { font-size: 12px; color: var(--ink-dim); font-style: italic; margin: 0 0 8px; }
-.map-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+/* v0.17.1: two-column legend, taller chips (friendlier touch targets),
+   common name before the ID. */
+.map-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .map-chip {
-  font-size: 12px; padding: 3px 10px; border-radius: 999px;
+  font-size: 13px; padding: 10px 12px; border-radius: 999px;
   background: var(--bg-soft); border: 1px solid #2c5364; color: var(--ink-dim);
   display: inline-flex; align-items: center; gap: 6px;
   cursor: pointer; /* v0.11.0: chips focus the map, like markers */
@@ -513,6 +535,22 @@ select option:disabled { color: #7a8a9e; }
 }
 .archive-media.primary { border-width: 2px; }
 video.archive-media { max-height: 420px; }
+/* v0.17.1: the sand tiger GIF is 600x1067 portrait — full-width it fills
+   more than the screen. Crop the dead water above the nose (~35% from top)
+   and rotate 90deg into a landscape frame. The values below are tuned for
+   this specific GIF: frame ratio 693/600 matches the cropped+rotated content,
+   img width 86.5% gives exact cover, and the 17.5% shift puts the nose near
+   the frame's right edge. If the source GIF ever changes, re-derive these. */
+.gif-landscape-frame {
+  position: relative; width: 100%; aspect-ratio: 693/600;
+  overflow: hidden; border-radius: 10px; border: 1px solid #2c5364;
+  background: #000;
+}
+.gif-landscape-frame img {
+  position: absolute; top: 50%; left: 50%;
+  width: 86.5%; aspect-ratio: 600/1067;
+  transform: translate(-50%,-50%) rotate(90deg) translateY(17.5%);
+}
 .archive-asset figcaption { font-size: 14px; line-height: 1.55; margin: 8px 2px 4px; color: var(--ink); }
 .archive-credit { font-size: 12px; color: var(--ink-dim); margin: 0 2px; line-height: 1.5; }
 .archive-credit a { color: var(--ink-dim); }
