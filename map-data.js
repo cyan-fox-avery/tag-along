@@ -267,7 +267,7 @@ const TRACK_ENVELOPES = {
   },
   bull: {
     start: "Caribbean coast (tag site)",
-    areas: ["Tag-site estuary mouth", "Coastal shelf", "River channel", "Nearshore reef", "Bay system"],
+    areas: ["Tag-site estuary mouth", "Caribbean coastal shelf", "River channel", "Nearshore reef", "Bay system"],
     hop: [10, 250], dayStep: [7, 30], nPoints: [4, 6], kind: "acoustic",
     corridor: "estuary commuter — acoustic arrays show bulls moving between rivers, estuaries and coastal shelf; some individuals are resident, others migrate hundreds of kilometres"
   },
@@ -285,7 +285,7 @@ const TRACK_ENVELOPES = {
   },
   sandbar: {
     start: "Outer Banks shelf (tag site)",
-    areas: ["Tag-site sandbank", "Coastal shelf", "Bay mouth", "Migration corridor", "Wintering ground"],
+    areas: ["Tag-site sandbank", "Outer Banks coastal shelf", "Bay mouth", "Migration corridor", "Wintering ground"],
     hop: [80, 700], dayStep: [10, 35], nPoints: [4, 6], kind: "satellite",
     corridor: "seasonal migrant — US east-coast satellite/acoustic work shows north-south migrations along the shelf, with Chesapeake Bay as a key nursery"
   }
@@ -410,7 +410,8 @@ const MAP_COORDS = {
   "Shallow lagoon": [14.8, -70.0],
   "Patch reef": [15.1, -69.7],
   "Tag-site estuary mouth": [15.3, -70.3],
-  "Coastal shelf": [15.5, -71.0],
+  "Caribbean coastal shelf": [15.5, -71.0],
+  "Outer Banks coastal shelf": [35.5, -75.0],
   "River channel": [15.6, -70.5],
   "Nearshore reef": [14.9, -69.9],
   "Bay system": [15.0, -70.5],
