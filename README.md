@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.12.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.13.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -11,7 +11,37 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
-## v0.12.0 changes — Sarah finds her voice
+## v0.13.0 changes — the six-shark wave + a livelier dive
+
+- **Six new sharks (roster 15 → 21).** The open-ocean trio — **blue shark**
+  (indigo countershading, 6,840 km Ireland-to-West-Africa migration),
+  **porbeagle** (cold-water lamnid, white dorsal badge, Cornwall),
+  **silky shark** (silk-smooth skin, tuna's shadow) — plus the **oceanic
+  whitetip** (paddle fins, Critically Endangered sentinel), and two for
+  South Africa's locked waters: the **broadnose sevengill** (seven gills,
+  Jurassic lineage, kelp forests) and the **bronze whaler** (Sardine Run
+  star, copper shark by its other name). Each with derpy art, field-guide
+  sketch, two-paragraph research, Sarah's full text set, and an acoustic
+  or satellite track envelope. The win moves to 21/21, as always.
+- **No more flavour repeats.** Sighting lines are now dealt like cards per
+  trip (the old pure-random pick stacked three turtles in one dive), the
+  thin sighting pools got fatter, and the deck skips whatever creature the
+  region note already mentioned.
+- **A dive scene with scenery.** Each depth now has its own persistent
+  backdrop — coral heads on the reef, a rock slope in the twilight zone,
+  marine snow falling in the deep — plus small background fish drifting
+  through between sightings so the water never feels empty.
+- **One goodbye, not two.** Tapping "Head back to the ship" after an
+  encounter now closes the dive on its own after the closing lines — the
+  second "Return to ship" button is gone. (Natural day-ends still get the
+  single dismiss button.)
+- **Research tab sorts itself.** Untagged sharks stay up top where you're
+  hunting; tagged ones settle to the bottom.
+- **Locked regions look locked.** They were already in the region dropdown
+  as disabled options, but nothing made them *look* unavailable — now
+  they're greyed out, so the 🔒 reads at a glance.
+- **Housekeeping.** SHARKS moved to its own `sharks-data.js` module
+  (script.js was about to blow the push size limit again).
 
 - **Sarah voice pass.** The in-game Sarah now sounds like the real one: an
   enthusiastic but calm adult, not a hype machine. Caps-lock and
