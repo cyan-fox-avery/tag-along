@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.13.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.14.0** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -11,7 +11,20 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
-## v0.13.0 changes — the six-shark wave + a livelier dive
+## v0.14.0 changes — two more sharks + clearer research
+
+- **Two new sharks (roster 21 → 23).** The **frilled shark** — an eel-like
+  living fossil from Sagami Bay's deep slope, six frilly gill slits and 300
+  trident teeth — and the **zebra shark**, the gentle reef cruiser whose
+  pups wear zebra stripes and whose adults wear leopard spots. Each with
+  derpy art, field-guide sketch, two-paragraph research, Sarah's full text
+  set, and a track envelope (archival for the frilled, acoustic for the
+  zebra). The win moves to 23/23, as always.
+- **Research says what the planner says.** Four entries named baits that
+  don't exist on the bait buttons — blacktip ("shrimp"), whitetip
+  ("octopus"), sandtiger ("skates" for the Ray bait), sevengill (squid
+  never named). All 21 existing entries audited; prose now matches the
+  planner's labels so nobody gets stuck the way Avery did on the blacktip.
 
 - **Six new sharks (roster 15 → 21).** The open-ocean trio — **blue shark**
   (indigo countershading, 6,840 km Ireland-to-West-Africa migration),
