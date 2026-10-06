@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.10.1";
+const VERSION = "v0.10.2";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -852,6 +852,9 @@ function renderMap() {
   const ids = Object.keys(state.tagged);
   pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
+  /* v0.10.2: touch-action follows zoom — "pan-y" at 1x so a vertical swipe
+     scrolls the page normally; "none" when zoomed so drags pan the map. */
+  wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
   /* Blue Marble background (dark rect behind it in case the hotlink fails;
      the URL guard keeps the map working if map-data.js ever fails to load). */
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
@@ -910,7 +913,12 @@ function renderMap() {
     }).join("");
   }
   wrap.querySelectorAll(".map-marker").forEach(m => {
-    m.addEventListener("click", () => showMapPopup(m.dataset.sid));
+    m.addEventListener("click", () => {
+      /* v0.10.2: a drag that ends on a marker must not open its popup —
+         the gesture code sets this flag past ~10px of movement. */
+      if (suppressMarkerClick) { suppressMarkerClick = false; return; }
+      showMapPopup(m.dataset.sid);
+    });
   });
   const tg = $("mapCurrentsToggle");
   if (tg) tg.setAttribute("aria-pressed", mapCurrentsOn ? "true" : "false");
@@ -2294,20 +2302,104 @@ onMapBtn("mapZoomOut", () => {
 });
 onMapBtn("mapZoomReset", () => { mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
+/* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
+   then applies the new zoom (clamped). Used by wheel AND pinch. */
+let suppressMarkerClick = false;
+let mapRenderQueued = false;
+function requestMapRender() {
+  /* rAF-throttle so pinch/pan stay smooth on phones; direct render where
+     requestAnimationFrame doesn't exist (tests, old webviews). */
+  if (typeof requestAnimationFrame === "function") {
+    if (mapRenderQueued) return;
+    mapRenderQueued = true;
+    requestAnimationFrame(() => { mapRenderQueued = false; renderMap(); });
+  } else {
+    renderMap();
+  }
+}
+function mapZoomAt(clientX, clientY, newZoom) {
+  const svgEl = $("worldMapSvg");
+  if (!svgEl) return;
+  const r = svgEl.getBoundingClientRect(), vb = mapViewBox();
+  mapCX = vb.x + (clientX - r.left) / r.width * vb.w;
+  mapCY = vb.y + (clientY - r.top) / r.height * vb.h;
+  mapZoom = Math.min(MAP_ZOOM_MAX, Math.max(MAP_ZOOM_MIN, newZoom));
+  if (mapZoom === MAP_ZOOM_MIN) { mapCX = MAP_W / 2; mapCY = MAP_H / 2; }
+  requestMapRender();
+}
 /* Mouse-wheel zoom, centered on the pointer. preventDefault stops the page
    scrolling while the pointer is over the map (standard map-widget behavior). */
 const mapWrapEl = $("worldMapWrap");
 if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
-  const svgEl = $("worldMapSvg");
-  if (!svgEl) return;
-  const r = svgEl.getBoundingClientRect(), vb = mapViewBox();
-  mapCX = vb.x + (e.clientX - r.left) / r.width * vb.w;
-  mapCY = vb.y + (e.clientY - r.top) / r.height * vb.h;
-  mapZoom = Math.min(MAP_ZOOM_MAX, Math.max(MAP_ZOOM_MIN, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3)));
-  if (mapZoom === MAP_ZOOM_MIN) { mapCX = MAP_W / 2; mapCY = MAP_H / 2; }
-  renderMap();
+  mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
+/* v0.10.2: touchscreen gestures — pinch-to-zoom + one-finger pan.
+   Pointer Events give one code path for mouse and touch. Move/up/cancel
+   listen on window so a finger sliding off the map can't strand a pointer.
+   Panning only engages for touch/pen pointers while zoomed in; at 1x the
+   browser owns the gesture (touch-action: pan-y, so the page scrolls). */
+(function initMapGestures() {
+  const wrap = $("worldMapWrap");
+  if (!wrap || typeof window === "undefined") return;
+  const pts = new Map(); // pointerId -> {x, y}
+  let pinchD0 = 0, pinchZ0 = 1, pinched = false;
+  let panX = 0, panY = 0, downX = 0, downY = 0, movedMax = 0;
+  const spread = () => {
+    const p = [...pts.values()];
+    return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+  };
+  wrap.addEventListener("pointerdown", e => {
+    suppressMarkerClick = false; // a stale flag never eats a real tap
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 1) {
+      downX = panX = e.clientX; downY = panY = e.clientY;
+      movedMax = 0; pinched = false;
+    } else if (pts.size === 2) {
+      pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
+    }
+  });
+  window.addEventListener("pointermove", e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 2) {
+      const d = spread();
+      if (pinchD0 > 0 && d > 0) {
+        const p = [...pts.values()];
+        e.preventDefault();
+        mapZoomAt((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, pinchZ0 * d / pinchD0);
+      }
+      return;
+    }
+    if (e.pointerType !== "mouse" && pts.size === 1) {
+      movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
+      if (mapZoom > 1 && movedMax > 10) {
+        e.preventDefault();
+        const svgEl = $("worldMapSvg");
+        if (svgEl) {
+          const r = svgEl.getBoundingClientRect(), vb = mapViewBox();
+          mapCX -= (e.clientX - panX) / r.width * vb.w;
+          mapCY -= (e.clientY - panY) / r.height * vb.h;
+          requestMapRender();
+        }
+      }
+      panX = e.clientX; panY = e.clientY;
+    }
+  }, { passive: false });
+  const endPointer = e => {
+    pts.delete(e.pointerId);
+    if (pts.size === 0) {
+      if (movedMax > 10 || pinched) suppressMarkerClick = true;
+      pinched = false;
+    } else if (pts.size === 1) {
+      /* Pinch lifted to one finger: re-anchor so it can't jump into a pan. */
+      const p = [...pts.values()][0];
+      downX = panX = p.x; downY = panY = p.y; movedMax = 0; pinchD0 = 0;
+    }
+  };
+  window.addEventListener("pointerup", endPointer);
+  window.addEventListener("pointercancel", endPointer);
+})();
 $("buildTag").textContent = VERSION;
 $("phoneTime").textContent =
   new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
