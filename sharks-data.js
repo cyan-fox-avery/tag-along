@@ -22,7 +22,7 @@ const SHARKS = [
     hook: "By day they nap in cuddly heaps of up to 40 on the seafloor.",
     bonus: "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks have to keep swimming to breathe. That's the secret behind the cuddle heaps.",
     cheer: "Nurse sharks are the cuddiest. Forty of them napping in a pile, just vibing. I'm so jealous.",
-    opener: "A nurse shark! Was it in the cuddle heap? Tell me everything.",
+    opener: "A nurse shark! Was it in the cuddle heap? I need every detail.",
     sketchCap: "barbels (the 'whiskers')",
     nameIdeas: ["Puddles", "Biscuit", "Sandy", "Nugget"]
   },
@@ -38,7 +38,7 @@ const SHARKS = [
     hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Multiple threshers have been seen around the same bait ball, though coordinated pair hunting isn't established — the observations remain anecdotal. The tail-slap strike itself is well documented.",
     cheer: "Threshers hunt by whipping their tails — half their body length, fast enough to stun fish. Coolest hunting method in the ocean, no contest.",
-    opener: "A thresher! Did you see the tail whip? Tell me everything.",
+    opener: "A thresher! Did you see the tail whip? Don\u2019t leave anything out!",
     sketchCap: "the tail (half the body!)",
     nameIdeas: ["Whip", "Nervous Nigel", "Swoosh", "Comet"]
   },
@@ -89,7 +89,7 @@ const SHARKS = [
     hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
     bonus: "Tiger sharks cross entire ocean basins. One tagged individual travelled more than 7,500 kilometres.",
     cheer: "Tigers will eat anything — fish, turtles, seabirds, the occasional license plate. Glorious, indiscriminate appetite.",
-    opener: "A tiger shark! The garbage can of the sea! Tell me everything.",
+    opener: "A tiger shark! The garbage can of the sea! Spill. All of it.",
     sketchCap: "stripes (they fade with age)",
     nameIdeas: ["Stripes", "Tigger", "Marbles", "Scout"]
   },
@@ -105,7 +105,7 @@ const SHARKS = [
     hook: "Gulps air at the surface to hover motionless like a blimp — the only shark that does this.",
     bonus: "Looks like a nightmare, but there are no confirmed fatalities — one of the most docile big sharks in the ocean.",
     cheer: "They hover motionless by holding air like a balloon, then just strike. Gentle, floaty ambush predators.",
-    opener: "A sand tiger! Was it at the wrecks? Tell me everything.",
+    opener: "A sand tiger! Was it at the wrecks? Give me the full rundown!",
     sketchCap: "the grin (all teeth, no bite)",
     nameIdeas: ["Toothy", "Grin", "Smiley", "Wreck"]
   },
@@ -121,7 +121,7 @@ const SHARKS = [
     hook: "Bold island shark — known to circle divers just to check them out.",
     bonus: "Galápagos sharks use nursery areas: pups grow up in sheltered island bays before heading out to the reefs.",
     cheer: "Bold, curious island sharks. The Galápagos ones practically introduce themselves.",
-    opener: "A Galápagos shark! Did it circle you? Tell me everything.",
+    opener: "A Galápagos shark! Did it circle you? What was it LIKE?",
     sketchCap: "the curious eye",
     nameIdeas: ["Darwin", "Isla", "Booby", "Lava"]
   },
@@ -137,7 +137,7 @@ const SHARKS = [
     hook: "Warm-bodied hunter; can breach fully out of the water.",
     bonus: "Humans are often released after a great white's first bite, but scientists still debate why those bites happen — investigation is one hypothesis among several.",
     cheer: "The world's largest predatory fish, and you tagged one. The seal-tracking, warm-muscled legend.",
-    opener: "A great white! Did it breach? Tell me everything!",
+    opener: "A great white! Did it breach? And then what happened?!",
     sketchCap: "the countershaded flank",
     nameIdeas: ["Bruce", "Chomp", "Apex", "Finley"]
   },
@@ -153,7 +153,7 @@ const SHARKS = [
     hook: "The hammer is a sensory array — it 'sees' stingrays hidden in sand.",
     bonus: "Hammerhead pups are born with a soft, folded hammer that straightens out as they grow.",
     cheer: "That hammer isn't for show — it's a sensory array. Stingrays don't stand a chance.",
-    opener: "A hammerhead! Did you watch it sweep for rays? Tell me everything.",
+    opener: "A hammerhead! Did you watch it sweep for rays? Walk me through the whole thing!",
     sketchCap: "the hammer (a sensory array)",
     nameIdeas: ["Hammer", "T-Bone", "Nail", "Mal"]
   },
@@ -169,7 +169,7 @@ const SHARKS = [
     hook: "Clocks ~70 km/h — the fastest shark alive.",
     bonus: "Makos are warm-bodied like great whites — their swimming muscles run several degrees warmer than the water.",
     cheer: "70 km/h, warm muscles, leaps 20 feet out of the water. The ocean's race car.",
-    opener: "A mako! The fastest shark in the sea! Tell me everything!",
+    opener: "A mako! The fastest shark in the sea! Details, cousin, details!",
     sketchCap: "the torpedo body",
     nameIdeas: ["Dash", "Turbo", "Zip", "Rocket"]
   },
@@ -185,7 +185,7 @@ const SHARKS = [
     hook: "Second-largest fish on Earth; feeds with a mouth up to a metre wide.",
     bonus: "A basking shark filters the equivalent of an Olympic swimming pool of water every hour.",
     cheer: "Second-biggest fish in the world, eating the smallest food. Gentle giants, both of them.",
-    opener: "A basking shark! Did you see the dorsal fin cut the surface? Tell me everything!",
+    opener: "A basking shark! Did you see the dorsal fin cut the surface? Describe everything!",
     sketchCap: "the gaping mouth",
     nameIdeas: ["Sunny", "Lounge", "Drifter", "Mellow"]
   },
@@ -203,7 +203,7 @@ const SHARKS = [
     hook: "Walks between tide pools on its fins when the reef drains.",
     bonus: "Epaulettes can survive over an hour out of water by slowing their bodies right down — the ultimate low-tide specialist.",
     cheer: "It walks! On its fins! Like a puppy strolling the reef. I can't cope, in the best way.",
-    opener: "An epaulette! Did you see it walk? Tell me everything!",
+    opener: "An epaulette! Did you see it walk? Okay, from the top \u2014 go!",
     sketchCap: "the walking fin",
     nameIdeas: ["Puddles", "Waddles", "Tiptoe", "Reef"]
   },
@@ -222,7 +222,7 @@ const SHARKS = [
     hook: "Females return to the exact nursery where they were born to give birth — Bimini's most faithful mothers.",
     bonus: "Lemon sharks can live 25 to 30 years, and one lived to 40 in captivity. The Bimini tagging program has followed some individuals for decades.",
     cheer: "The yellow one! My absolute favourite. The twin fins, the Bimini mothers coming home — everything about them.",
-    opener: "A lemon shark! My favourite! Did you see the twin dorsal fins? Tell me everything!",
+    opener: "A lemon shark! My favourite! Did you see the twin dorsal fins? I\u2019m dying to hear everything.",
     sketchCap: "twin dorsal fins (nearly equal!)",
     nameIdeas: ["Zest", "Sunny", "Meringue", "Custard"]
   },
@@ -240,7 +240,7 @@ const SHARKS = [
     hook: "Patrols water so shallow its black-tipped dorsal fin breaks the surface.",
     bonus: "Blacktip reef sharks form stable, non-random social groups — the same individuals repeatedly choose each other's company, year after year.",
     cheer: "Knee-deep water, black-dipped fins, and a loyal friend group. The reef's socialites.",
-    opener: "A blacktip! Did its fin break the surface? Tell me everything!",
+    opener: "A blacktip! Did its fin break the surface? Go on, go on!",
     sketchCap: "black-tipped fins",
     nameIdeas: ["Inky", "Tippy", "Reef", "Shallows"]
   },
@@ -259,7 +259,7 @@ const SHARKS = [
     hook: "Naps in heaps in reef caves by day — one of the few requiem sharks that can breathe while lying still.",
     bonus: "The whitetip reef shark is the only living species in the genus Triaenodon.",
     cheer: "The cave-nappers. Piled in heaps by day, hunting crevices by night. A genus all to themselves.",
-    opener: "A whitetip! Was it in the cave heap? Tell me everything!",
+    opener: "A whitetip! Was it in the cave heap? Every. Single. Detail.",
     sketchCap: "white-tipped fins",
     nameIdeas: ["Nappy", "Cavey", "Puddles", "Heap"]
   },
@@ -277,7 +277,7 @@ const SHARKS = [
     hook: "Deep indigo back, snow-white belly \u2014 the most beautiful shark in the Atlantic, and one of its longest migrants.",
     bonus: "A blue shark tagged in Ireland was recaptured 274 days later off West Africa: an estimated 6,840 km cruise. Female blue sharks have much thicker skin than males \u2014 courtship involves biting \u2014 and can store sperm until conditions suit.",
     cheer: "The indigo one! Six thousand kilometres of open ocean behind it, and it still showed up for you. What a traveller.",
-    opener: "A blue shark! Was it as blue as they say? Tell me everything!",
+    opener: "A blue shark! Was it as blue as they say? I want the whole story.",
     sketchCap: "indigo countershading",
     nameIdeas: ["Indigo", "Cruiser", "Azure", "Voyager"]
   },
@@ -295,7 +295,7 @@ const SHARKS = [
     hook: "A mini-great-white of chilly northern seas \u2014 warm-bodied, fast, and wearing a white badge on its dorsal fin.",
     bonus: "Northeast Atlantic porbeagles are Critically Endangered even though the species is Vulnerable globally. A tagged juvenile swam over 2,400 km in 122 days, Ireland to Morocco \u2014 the long migrations start young.",
     cheer: "The cold-water athlete! Warm muscles, a white dorsal badge, hunting mackerel in near-freezing water. Respect.",
-    opener: "A porbeagle! Did you see the white patch on the dorsal fin? Tell me everything!",
+    opener: "A porbeagle! Did you see the white patch on the dorsal fin? Start from the beginning!",
     sketchCap: "white dorsal-fin patch (the ID badge)",
     nameIdeas: ["Porgie", "Chilly", "Mackerel", "Badge"]
   },
@@ -313,7 +313,7 @@ const SHARKS = [
     hook: "Named for skin like silk \u2014 the sleek shadow that follows every tuna school in the tropics.",
     bonus: "Juvenile silkies satellite-tracked around the Gal\u00e1pagos routinely left the 133,000 km\u00b2 marine reserve, spending less than half their time inside it. Protection has to think bigger than borders.",
     cheer: "The silk-skinned one! It probably followed a tuna school right to you. Opportunist, but make it elegant.",
-    opener: "A silky shark! Was the skin really that smooth? Tell me everything!",
+    opener: "A silky shark! Was the skin really that smooth? I\u2019m all ears!",
     sketchCap: "silk-smooth skin (tiny denticles)",
     nameIdeas: ["Silk", "Shadow", "Satin", "Tuna"]
   },
@@ -331,7 +331,7 @@ const SHARKS = [
     hook: "Long, rounded, white-tipped fins like paddles \u2014 the bold sentinel of the open ocean, and one of its most endangered.",
     bonus: "Oceanic whitetips were once thought to be among the most abundant large sharks on Earth. Finning and longline bycatch cut some populations by 80 to 98%. They are often accompanied by pilot fish swimming alongside.",
     cheer: "The open-ocean sentinel! Those paddle fins, that fearless curiosity \u2014 and you tagged one. A Critically Endangered one, no less.",
-    opener: "An oceanic whitetip! The real open-ocean one, not the reef napper! Tell me everything!",
+    opener: "An oceanic whitetip! The real open-ocean one, not the reef napper! I need to hear about this right now.",
     sketchCap: "paddle-like white-tipped fins",
     nameIdeas: ["Paddles", "Sentinel", "Tippy", "Bluewater"]
   },
@@ -350,7 +350,7 @@ const SHARKS = [
     hook: "Seven gills, one far-back dorsal fin, and a lineage older than the dinosaurs' heyday \u2014 the cow shark of the kelp forests.",
     bonus: "Sevengill relatives with seven gills were already swimming in the Jurassic \u2014 fossils 200 to 145 million years old show the same layout. Females bear litters of 67 to 104 pups, among the largest of any shark.",
     cheer: "Seven gills! A single dorsal fin! It is like a shark from a museum diorama came to life. Incredible.",
-    opener: "A sevengill! Did you count all seven? Tell me everything!",
+    opener: "A sevengill! Did you count all seven? You have to tell me all about it.",
     sketchCap: "seven gill slits (most sharks have five)",
     nameIdeas: ["Seven", "Cowboy", "Kelpie", "Ancient"]
   },
@@ -368,7 +368,7 @@ const SHARKS = [
     hook: "The bronze star of the Sardine Run \u2014 driving baitballs upward while dolphins and gannets rain down from above.",
     bonus: "Female bronze whalers do not mature until about 20 years old and pup only every two to three years \u2014 among the slowest reproduction of any coastal requiem shark. Males and females live apart for most of the year.",
     cheer: "The Sardine Run star! Bronze, bold, and it hunts baitballs with dolphins. What a show-off. Affectionate.",
-    opener: "A bronze whaler! The sardine-run hunter! Tell me everything!",
+    opener: "A bronze whaler! The sardine-run hunter! I bet it was incredible \u2014 tell me!",
     sketchCap: "bronze flanks",
     nameIdeas: ["Bronze", "Sardine", "Runny", "Copper"]
   },
@@ -387,7 +387,7 @@ const SHARKS = [
     hook: "Six frilly gill slits, 300 trident teeth, and a lineage tens of millions of years old \u2014 the deep's own sea serpent.",
     bonus: "Frilled sharks get their name from the frilly margins of their six gill slits \u2014 most sharks have five plain ones. Their embryos develop inside egg cases, and gestation may last over three years, among the longest of any vertebrate.",
     cheer: "The living fossil! An eel with three hundred teeth, hauled up from the deep dark. Incredible.",
-    opener: "A frilled shark! Did you see the frilly gills? Tell me everything!",
+    opener: "A frilled shark! Did you see the frilly gills? Tell me it was amazing.",
     sketchCap: "frilly gill slits (six pairs!)",
     nameIdeas: ["Frill", "Serpent", "Eely", "Ruffle"]
   },
@@ -405,7 +405,7 @@ const SHARKS = [
     hook: "Pups wear zebra stripes, adults wear leopard spots \u2014 two sharks for the price of one, and gentle with it.",
     bonus: "Zebra shark pups hatch at around 20 to 36 centimetres already wearing full stripes. Adults can reach 2.5 metres and live over 25 years. They are strong swimmers despite the bottom-feeding \u2014 flexible, eel-like bodies.",
     cheer: "The zebra \u2014 or the leopard, depending on its age! Stripes, spots, all wonderful. What a gentle giant.",
-    opener: "A zebra shark! Stripes or spots \u2014 which was it? Tell me everything!",
+    opener: "A zebra shark! Stripes or spots \u2014 which was it? Don\u2019t skip a thing!",
     sketchCap: "pup stripes breaking into adult spots",
     nameIdeas: ["Ziggy", "Stripes", "Domino", "Pard"]
   },
