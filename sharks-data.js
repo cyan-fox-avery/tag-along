@@ -467,7 +467,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.2, 3.4],
-    research: "Bull sharks are the heavyweights of the coastal tropics — powerfully built, broad-snouted, and famous for going where other sharks can't: up rivers. They regulate their body's salt balance, switching between ocean and fresh water, and they've been found thousands of kilometres inland in the Amazon and Mississippi systems, and living in Lake Nicaragua. In salt water they patrol coastlines and estuaries — Playa del Carmen, Fiji's Shark Reef — eating fish, rays and whatever else fits. A chum slick works; they're not subtle animals.",
+    research: "Bull sharks are the heavyweights of the coastal tropics — powerfully built, broad-snouted, and famous for going where other sharks can't: up rivers. They regulate their body's salt balance, switching between ocean and fresh water, and they've been found far inland in river systems, and tagging work famously showed bull sharks travelling between the Caribbean Sea and Lake Nicaragua through the San Juan River. In salt water they patrol coastlines and estuaries — Playa del Carmen, Fiji's Shark Reef — eating fish, rays and whatever else fits. A chum slick works; they're not subtle animals.",
     hook: "Bull sharks swim up rivers — they've been found thousands of kilometres inland.",
     bonus: "Bull sharks can switch their osmoregulation between salt and fresh water. Most sharks can't do that at all.",
     cheer: "Bull sharks are the river-running heavyweights! You tagged a shark that commutes between ocean and river!",
