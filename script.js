@@ -2264,6 +2264,9 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     if (pts.size === 0) {
       if (movedMax > 10) suppressMarkerClick = true;
     } else if (pts.size === 1) {
+      // A lifted finger during an (unsupported) two-finger touch collapses
+      // back into a normal one-finger pan: re-anchor the remaining finger
+      // so the map doesn't jump from its older position.
       const p = [...pts.values()][0];
       downX = panX = p.x;
       downY = panY = p.y;
