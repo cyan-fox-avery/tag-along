@@ -1,4 +1,4 @@
-/* Tag Along — v0.15.0
+/* Tag Along — v0.16.0
    Research -> plan (region/depth/bait/method) -> dive -> watch/tag/resight
    -> collection book + logbook. */
 
