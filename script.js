@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.17.0";
+const VERSION = "v0.17.1";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -430,7 +430,7 @@ function renderMap() {
     wrap.innerHTML = svg;
     legend.innerHTML = ids.map(sid => {
       const s = sharkById(sid), t = state.tagged[sid];
-      return `<span class="map-chip" data-sid="${sid}" role="button" tabindex="0"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
+      return `<span class="map-chip" data-sid="${sid}" role="button" tabindex="0"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(s.name)} · ${esc(t.name || t.researchId)}</span>`;
     }).join("");
   }
   wrap.querySelectorAll(".map-marker").forEach(m => {
@@ -542,6 +542,7 @@ const state = {
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
+  sarahAdviceOffered: false, // v0.17.1: player can ask Sarah for advice after struggling (session-only)
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
 };
@@ -951,7 +952,12 @@ function doEncounter(species, plan) {
     const sharkEl = $("diveShark");
     sharkEl.innerHTML = ART[species.id];
     sharkEl.classList.remove("hidden");
-    logLine(`🦈 <span class="found">Shark! A ${species.name}!</span>`, "found");
+    /* v0.17.1: the moment a shark appears, say whether it's already in the
+       book — no squinting at the small print under the buttons. */
+    const already = rec
+      ? ` — already in your book${rec.name ? ` as \u201c${esc(rec.name)}\u201d` : ""}!`
+      : ` — new to your book!`;
+    logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
     const actions = $("diveActions");
     actions.classList.remove("hidden");
     actions.innerHTML = "";
@@ -1000,7 +1006,13 @@ function doEncounter(species, plan) {
       tagBtn.addEventListener("click", () => {
         actions.classList.add("hidden");
         actions.innerHTML = "";
-        openTagging(species, finish);
+        /* v0.17.1: the release buttons resolve the encounter directly —
+           no second keep-diving/head-back prompt after the health check. */
+        openTagging(species, (headBack) => {
+          actions.classList.add("hidden");
+          actions.innerHTML = "";
+          resolve(headBack === true);
+        });
       });
       actions.appendChild(tagBtn);
     } else {
@@ -1018,11 +1030,6 @@ function doEncounter(species, plan) {
         finish();
       });
       actions.appendChild(resightBtn);
-      const note = document.createElement("p");
-      note.className = "latin";
-      note.style.cssText = "width:100%;text-align:center;margin:4px 0 0";
-      note.textContent = `Already in your book${rec.name ? ` as “${rec.name}”` : ""} — enjoy the visit.`;
-      actions.appendChild(note);
     }
   });
 }
@@ -1401,8 +1408,10 @@ function afterExpedition(plan) {
   if (plan && plan.region) { state.lastRegion = plan.region; saveMsgs(); }
   if (state.taggedThisTrip || state.resightedThisTrip) return;
   let thread;
-  if (state.failures >= 3) {
-    // gentle nudge, genuine-conversation style — about YOUR waters
+  if (state.failures >= 5) {
+    // gentle nudge, genuine-conversation style — about YOUR waters.
+    // v0.17.1: Sarah only butts in on her own after five; before that,
+    // asking is the player's call (see the Ask Sarah panel).
     const s = pick(regionalSpecies(true));
     thread = [
       { who: "them", text: "How's the shark hunting going?" },
@@ -1411,6 +1420,16 @@ function afterExpedition(plan) {
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
     ];
     state.failures = 0;
+  } else if (state.failures === 1 && !state.sarahAdviceOffered) {
+    /* v0.17.1: after the first failed trip, Sarah offers her notes — the
+       player picks the species, since the game may not know what they're
+       actually after. The Ask Sarah panel appears in the Phone tab. */
+    thread = [
+      { who: "them", text: "Rough day out there?" },
+      { who: "me", text: "Yeah. Empty water." },
+      { who: "them", text: "I've got notes on every shark we've studied. Pick one below and I'll tell you what I know — where to look, what they like." }
+    ];
+    state.sarahAdviceOffered = true;
   } else {
     /* v0.8.0: sometimes she just checks in about one of your named
        sharks — the cousin who remembers. */
@@ -1426,6 +1445,37 @@ function afterExpedition(plan) {
     }
   }
   pushThread(thread);
+  renderSarahAsk();
+}
+
+/* v0.17.1: Ask Sarah — player-initiated advice. The panel appears in the
+   Phone tab after the first failed trip; the player picks the species. */
+function renderSarahAsk() {
+  const panel = $("sarahAsk");
+  if (!panel) return;
+  const show = !!state.sarahAdviceOffered && untagged().length > 0;
+  panel.classList.toggle("hidden", !show);
+  if (!show) return;
+  const sel = $("sarahAskSelect");
+  sel.innerHTML = "";
+  untagged().forEach(s => {
+    const o = document.createElement("option");
+    o.value = s.id;
+    o.textContent = s.name;
+    sel.appendChild(o);
+  });
+}
+function askSarahAdvice(sid) {
+  const s = sharkById(sid);
+  if (!s) return;
+  pushThread([
+    { who: "me", text: `I'm striking out — any advice on the ${s.name.toLowerCase()}?` },
+    { who: "them", text: COUSIN_NUDGES[sid] || "You'll get the next one. I believe in you." },
+    { who: "me", text: "Thanks, kiddo. That's actually really helpful." }
+  ]);
+  state.sarahAdviceOffered = false;
+  renderSarahAsk();
+  goTab("phone");
 }
 
 /* ---------- Tagging ---------- */
@@ -1529,7 +1579,10 @@ function showHealthCheck(s, rec) {
   `;
 }
 
-$("releaseBtn").addEventListener("click", () => {
+/* v0.17.1: the release IS the destination choice — keep diving or head back.
+   The release buttons resolve the encounter directly instead of dropping the
+   player into a second keep-diving/head-back prompt. */
+function doRelease(headBack) {
   const done = state.encounterDone;
   const s = state.healthSpecies;
   state.encounterDone = null;
@@ -1539,7 +1592,14 @@ $("releaseBtn").addEventListener("click", () => {
     logLine(`🌊 The ${s.name} kicks once and is gone — back to its life, carrying your tag.`);
   }
   renderAll();
-  if (done) done();
+  if (done) done(headBack);
+}
+$("releaseBtn").addEventListener("click", () => doRelease(false));
+$("releaseShipBtn").addEventListener("click", () => doRelease(true));
+/* v0.17.1: Ask Sarah for advice. */
+$("sarahAskBtn").addEventListener("click", () => {
+  const sid = $("sarahAskSelect").value;
+  if (sid) askSarahAdvice(sid);
 });
 
 /* ---------- Milestones & win state ----------
@@ -2023,6 +2083,7 @@ function renderAll() {
   updateMsgBadge();
   updateArchiveTab();
   if (state.archiveUnlocked) renderArchive();
+  renderSarahAsk();
 }
 
 /* ---------- Wild Archive (v0.17.0) ----------
@@ -2065,6 +2126,9 @@ function archiveAssetHtml(a, isPrimary) {
     // the excerpt Avery chose instead of the whole source video.
     const clip = (a.clipStart != null && a.clipEnd != null) ? `#t=${a.clipStart},${a.clipEnd}` : "";
     mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="none"${a.image ? ` poster="${esc(a.image)}"` : ""} src="${esc(a.play + clip)}"></video>`;
+  } else if (a.framing === "landscape-crop") {
+    // v0.17.1: portrait GIF reframed as landscape (crop + 90deg rotate in CSS).
+    mediaHtml = `<div class="gif-landscape-frame"><img src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></div>`;
   } else {
     mediaHtml = `<a href="${esc(a.full || a.image)}" target="_blank" rel="noopener"><img class="archive-media${isPrimary ? " primary" : ""}" src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></a>`;
   }
@@ -2365,6 +2429,12 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   window.addEventListener("pointercancel", endPointer);
 })();
 $("buildTag").textContent = VERSION;
-$("phoneTime").textContent =
-  new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+const tickPhoneClock = () => {
+  $("phoneTime").textContent =
+    new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+};
+tickPhoneClock();
+/* v0.17.1: the phone clock ticks — refresh every 30s so it never goes stale
+   next to message timestamps. */
+setInterval(tickPhoneClock, 30000);
 renderAll();
