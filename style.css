@@ -395,11 +395,14 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
   border: 1px solid #2c5364; position: relative;
 }
 .map-wrap svg { display: block; width: 100%; height: auto; }
+/* v0.10.2: touch-action base — JS flips it to "none" when zoomed so drags pan */
+#worldMapWrap { touch-action: pan-y; }
 /* v0.10.0: map toolbar (zoom + currents toggle) */
+/* v0.10.2: 44px minimum tap targets for touchscreens */
 .map-toolbar { display: flex; gap: 8px; margin: 0 0 10px; align-items: center; }
 .map-toolbar button {
   font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1;
-  min-width: 40px; padding: 8px 10px; border-radius: 999px; cursor: pointer;
+  min-width: 44px; min-height: 44px; padding: 10px 14px; border-radius: 999px; cursor: pointer;
   background: var(--bg-soft); color: var(--ink); border: 1px solid #2c5364;
 }
 .map-toolbar button:hover { border-color: var(--accent); }

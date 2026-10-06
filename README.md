@@ -11,6 +11,15 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.10.2 changes — touchscreen map support
+
+- The world map finally works on phones: pinch to zoom (1×–4×, centered
+  between your fingers), drag to pan when zoomed in, and taps still open
+  the shark popups — a drag won't trigger one by accident. At normal zoom
+  a vertical swipe scrolls the page like always; the map only takes over
+  your finger once you're zoomed in. The zoom and currents buttons are
+  proper finger-sized targets now too.
+
 ## v0.10.1 changes — tracking-note consistency
 
 - The nurse shark's collection-card track view now correctly describes
