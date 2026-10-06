@@ -23,6 +23,9 @@ body {
 }
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; }
+/* v0.10.4: safety net — no flex row may ever widen the page again.
+   `clip` (not `hidden`) keeps position:sticky working on the tab bar. */
+body { overflow-x: clip; }
 
 /* Build number — top corner, always visible, bump every release. */
 .build-tag {
@@ -57,6 +60,15 @@ body {
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
 }
 .tab.active .count-badge { background: rgba(0,0,0,0.15); color: var(--accent-ink); }
+/* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
+   so they used to overflow the page and leave a dead strip on the right.
+   Two rows of three keeps every tab visible and tappable with no overflow.
+   (Review fix: this block sits AFTER the general .tab rule — equal
+   specificity, so source order decides.) */
+@media (max-width: 559px) {
+  .tabs { flex-wrap: wrap; gap: 6px; }
+  .tab { flex: 1 1 30%; font-size: 13px; padding: 10px 2px; }
+}
 
 .panel { display: none; }
 .panel.active { display: block; animation: fadein 0.25s ease; }
@@ -399,7 +411,8 @@ select:focus, input:focus { outline: none; border-color: var(--accent); }
 #worldMapWrap { touch-action: pan-y; }
 /* v0.10.0: map toolbar (zoom + currents toggle) */
 /* v0.10.2: 44px minimum tap targets for touchscreens */
-.map-toolbar { display: flex; gap: 8px; margin: 0 0 10px; align-items: center; }
+/* v0.10.4: wrap so the Explore/Done buttons never push the page wider on phones */
+.map-toolbar { display: flex; gap: 8px; margin: 0 0 10px; align-items: center; flex-wrap: wrap; }
 .map-toolbar button {
   font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1;
   min-width: 44px; min-height: 44px; padding: 10px 14px; border-radius: 999px; cursor: pointer;

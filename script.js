@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.10.3";
+const VERSION = "v0.10.4";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
