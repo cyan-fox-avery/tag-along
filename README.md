@@ -1,6 +1,6 @@
 # Tag, You're It
 
-**v0.10.2** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
+**v0.10.3** (working title — final title to be decided later, as Rockhound was "Rock Go Crunch" until beta)
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,10 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.10.3 changes — explore-map mode
+
+- The map gets an explicit **Explore map** mode for touchscreens (thanks ChatGPT for the design steer). Tap it and the map takes full ownership of your gestures — pinch to zoom, drag to pan — with the rules set before your fingers land, so the browser can never steal a pinch for page scrolling. Tap **Done** to hand scrolling back. The mid-gesture fix from the first pass was racy by design, so it was replaced outright.
 
 ## v0.10.2 changes — touchscreen map support
 

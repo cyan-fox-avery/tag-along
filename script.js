@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.10.2";
+const VERSION = "v0.10.3";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -783,6 +783,10 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
+/* v0.10.3: explore mode — the user explicitly hands gestures to the map.
+   touch-action is decided BEFORE any touch begins, so pinch/pan are fully
+   ours with no mid-gesture race against page scroll. */
+let mapExplore = false;
 let mapCurrentsOn = true;
 const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
 
@@ -852,9 +856,11 @@ function renderMap() {
   const ids = Object.keys(state.tagged);
   pop.classList.add("hidden");
   const z = mapZoom, vb = mapViewBox();
-  /* v0.10.2: touch-action follows zoom — "pan-y" at 1x so a vertical swipe
-     scrolls the page normally; "none" when zoomed so drags pan the map. */
-  wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y";
+  /* v0.10.3: literal gesture ownership (review fix) — explore mode owns
+     gestures ("none", set before any touch begins); normal mode always
+     hands them to the page ("pan-y"), even when zoomed via +/- buttons. */
+  wrap.style.touchAction = mapExplore ? "none" : "pan-y";
+  wrap.classList.toggle("exploring", mapExplore);
   /* Blue Marble background (dark rect behind it in case the hotlink fails;
      the URL guard keeps the map working if map-data.js ever fails to load). */
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
@@ -2302,6 +2308,15 @@ onMapBtn("mapZoomOut", () => {
 });
 onMapBtn("mapZoomReset", () => { mapZoom = 1; mapCX = MAP_W / 2; mapCY = MAP_H / 2; renderMap(); });
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
+function setMapExplore(on) {
+  mapExplore = on;
+  const b = $("mapExploreBtn"), d = $("mapExploreDone");
+  if (b) b.classList.toggle("hidden", on);
+  if (d) d.classList.toggle("hidden", !on);
+  renderMap();
+}
+onMapBtn("mapExploreBtn", () => setMapExplore(true));
+onMapBtn("mapExploreDone", () => setMapExplore(false));
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
    then applies the new zoom (clamped). Used by wheel AND pinch. */
 let suppressMarkerClick = false;
@@ -2366,14 +2381,16 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     if (pts.size === 1) {
       downX = panX = e.clientX; downY = panY = e.clientY;
       movedMax = 0; pinched = false;
-    } else if (pts.size === 2) {
+    } else if (mapExplore && pts.size === 2) {
+      /* v0.10.3: pinch only exists in explore mode — normal mode never
+         enters the custom pinch path (page owns gestures there). */
       pinchD0 = spread(); pinchZ0 = mapZoom; pinched = true;
     }
   });
   window.addEventListener("pointermove", e => {
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pts.size === 2) {
+    if (mapExplore && pts.size === 2) {
       const d = spread();
       if (pinchD0 > 0 && d > 0) {
         const p = [...pts.values()];
@@ -2384,7 +2401,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     }
     if (e.pointerType !== "mouse" && pts.size === 1) {
       movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
-      if (mapZoom > 1 && movedMax > 10) {
+      if (mapExplore && mapZoom > 1 && movedMax > 10) {
         e.preventDefault();
         const svgEl = $("worldMapSvg");
         if (svgEl) {
