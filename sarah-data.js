@@ -33,7 +33,7 @@ const COUSIN_CHATS = {
   tiger: [
     { them: "Tiger sharks are called the garbage cans of the sea, which is rude but accurate. Researchers have found license plates in their stomachs. License plates.", me: "Not picky is an understatement." },
     { them: "Tiger sharks' stripes fade as they get older. The babies are stripy and the big adults are almost plain. They outgrow their own name.", me: "A tiger that fades its stripes. Poetic." },
-    { them: "A tiger shark's teeth differ top and bottom \u2014 serrated triangles above, hooked blades below. Built for sawing through turtle shell.", me: "Specialized cutlery." }
+    { them: "Every tiger-shark tooth is basically a hooked, serrated can opener, shaped to saw through tough prey like turtle shell. Top and bottom jaws carry the same style.", me: "Specialized cutlery." }
   ],
   sandtiger: [
     { them: "Sand tigers look terrifying but they're total softies. They gulp air at the surface and hold it to hover perfectly still. Floaty balloon sharks.", me: "The toothy grin is false advertising." },
@@ -52,7 +52,7 @@ const COUSIN_CHATS = {
   ],
   hammerhead: [
     { them: "A hammerhead's head is packed with electroreceptors. They sweep it side to side over the sand and can feel a stingray's heartbeat buried underneath. A metal detector made of shark.", me: "Feeling a heartbeat through sand. Astonishing." },
-    { them: "The hammer gives them 360-degree vision \u2014 eyes on the ends. And the wide head works like a wing, giving extra lift in turns. Hydrodynamic too.", me: "Binoculars that also fly." },
+    { them: "That wide head gives hammerheads an unusually broad visual field and enhanced binocular overlap, which helps with depth perception. And it works like a wing, giving extra lift in turns. Hydrodynamic too.", me: "Panoramic and aerodynamic." },
     { them: "Great hammerheads are solitary, unlike scalloped hammerheads that school in the hundreds. The big ones hunt alone.", me: "Lone wolves of the reef." }
   ],
   mako: [
