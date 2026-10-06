@@ -2321,10 +2321,21 @@ function mapZoomAt(clientX, clientY, newZoom) {
   const svgEl = $("worldMapSvg");
   if (!svgEl) return;
   const r = svgEl.getBoundingClientRect(), vb = mapViewBox();
-  mapCX = vb.x + (clientX - r.left) / r.width * vb.w;
-  mapCY = vb.y + (clientY - r.top) / r.height * vb.h;
+  /* Anchor-preserving zoom (v0.10.2 review fix): the map point under the
+     pointer must stay under the same screen spot after zooming. Record the
+     pointer's normalized position in the OLD viewBox, then re-anchor the
+     new viewBox so that same map point sits at the same normalized spot.
+     (The old code made the pointer's point the new CENTER, so the map
+     jumped toward the pinch midpoint.) */
+  const nx = (clientX - r.left) / r.width, ny = (clientY - r.top) / r.height;
+  const px = vb.x + nx * vb.w, py = vb.y + ny * vb.h;
   mapZoom = Math.min(MAP_ZOOM_MAX, Math.max(MAP_ZOOM_MIN, newZoom));
   if (mapZoom === MAP_ZOOM_MIN) { mapCX = MAP_W / 2; mapCY = MAP_H / 2; }
+  else {
+    const w2 = MAP_W / mapZoom, h2 = MAP_H / mapZoom;
+    mapCX = px - nx * w2 + w2 / 2;
+    mapCY = py - ny * h2 + h2 / 2;
+  }
   requestMapRender();
 }
 /* Mouse-wheel zoom, centered on the pointer. preventDefault stops the page
