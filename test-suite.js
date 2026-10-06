@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'achievements-data.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.17.1', VERSION === 'v0.17.1');
+  ok('version v0.18.0', VERSION === 'v0.18.0');
 
   // roster
   ok('roster is 23', SHARKS.length === 23);
@@ -215,6 +215,32 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
   ok('sand tiger GIF flagged for reframe', !!stGif);
+
+  // v0.18.0: achievements
+  ok('ACHIEVEMENTS data loads', typeof ACHIEVEMENTS !== 'undefined' && ACHIEVEMENTS.length >= 12);
+  ok('every achievement has a breadcrumb', ACHIEVEMENTS.every(a => a.breadcrumb && a.name !== a.breadcrumb));
+  ok('breadcrumbs never leak the real requirement', !ACHIEVEMENTS.some(a =>
+    a.id !== 'bruce' && a.breadcrumb.toLowerCase() === a.description.toLowerCase()));
+  // Simulate earns: first tag, thresher, Sarah naming, endangered tag.
+  state.tagged = { nurse: { name: 'Bubbles', researchId: 'NS-2026-001' } };
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
+  state.achievements = {};
+  checkAchievements();
+  ok('first tag unlocks', !!state.achievements['first-tag']);
+  state.tagged.thresher = { name: 'Whip', researchId: 'NS-2026-002' };
+  checkAchievements();
+  ok('thresher unlocks Perpetually Nervous', !!state.achievements.nervous);
+  state.tagged.nurse.name = 'Sarah';
+  checkAchievements();
+  ok('naming a shark Sarah unlocks Best Cousin Ever', !!state.achievements['best-cousin']);
+  state.tagged.whale = { name: 'Dot', researchId: 'NS-2026-003' };
+  checkAchievements();
+  ok('endangered tag unlocks Every One Counts', !!state.achievements['every-one-counts']);
+  ok('Bruce stays locked without the chain', !state.achievements.bruce);
+  ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
+  // restore
+  state.tagged = {}; state.achievements = {};
+  state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
