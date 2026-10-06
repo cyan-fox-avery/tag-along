@@ -11,6 +11,10 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.10.3 changes — pinch-gesture fix
+
+- Fixed pinch-to-zoom at normal zoom: the page could steal a two-finger gesture for scrolling mid-pinch. The map now claims the gesture the moment the second finger lands, and hands page scroll back when the gesture ends.
+
 ## v0.10.2 changes — touchscreen map support
 
 - The world map finally works on phones: pinch to zoom (1×–4×, centered
