@@ -368,6 +368,111 @@ const ART = {
       <line x1="76" y1="53" x2="74" y2="69"/>
       <line x1="82" y1="53" x2="80" y2="69"/>
     </g>
+  </svg>`,
+  /* v0.18.0 wave — derpy art for the seven new species. */
+  scalloped: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Scalloped hammerhead">
+    <polygon points="160,54 200,36 198,84" fill="#5d7f9e"/>
+    <ellipse cx="105" cy="58" rx="58" ry="17" fill="#6f93b8"/>
+    <ellipse cx="105" cy="65" rx="50" ry="10" fill="#dfe9f2" opacity="0.85"/>
+    <rect x="28" y="48" width="34" height="20" rx="9" fill="#6f93b8"/>
+    <path d="M45,48 q0,10 0,20" stroke="#4a6a86" stroke-width="2" fill="none"/>
+    <circle cx="36" cy="58" r="3" fill="#1c2733"/>
+    <circle cx="54" cy="58" r="3" fill="#1c2733"/>
+    <polygon points="112,42 122,26 130,42" fill="#5d7f9e"/>
+    <polygon points="92,74 82,94 104,75" fill="#5d7f9e"/>
+    <g stroke="#4a6a86" stroke-width="1.6" stroke-linecap="round">
+      <line x1="76" y1="50" x2="74" y2="64"/>
+      <line x1="82" y1="49" x2="80" y2="65"/>
+    </g>
+  </svg>`,
+  smooth: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Smooth hammerhead">
+    <polygon points="160,54 200,36 198,84" fill="#64707c"/>
+    <ellipse cx="105" cy="58" rx="58" ry="17" fill="#75828e"/>
+    <ellipse cx="105" cy="65" rx="50" ry="10" fill="#e2e7eb" opacity="0.85"/>
+    <ellipse cx="45" cy="58" rx="18" ry="11" fill="#75828e"/>
+    <circle cx="34" cy="58" r="3" fill="#1c2733"/>
+    <circle cx="56" cy="58" r="3" fill="#1c2733"/>
+    <polygon points="112,42 122,26 130,42" fill="#64707c"/>
+    <polygon points="92,74 82,94 104,75" fill="#64707c"/>
+    <g stroke="#4c565f" stroke-width="1.6" stroke-linecap="round">
+      <line x1="76" y1="50" x2="74" y2="64"/>
+      <line x1="82" y1="49" x2="80" y2="65"/>
+    </g>
+  </svg>`,
+  bonnethead: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Bonnethead">
+    <polygon points="150,56 184,42 182,80" fill="#7a8a6a"/>
+    <ellipse cx="100" cy="60" rx="48" ry="15" fill="#8b9a76"/>
+    <ellipse cx="100" cy="66" rx="42" ry="9" fill="#e6ebda" opacity="0.85"/>
+    <ellipse cx="48" cy="60" rx="13" ry="10" fill="#8b9a76"/>
+    <circle cx="42" cy="60" r="2.8" fill="#1c2733"/>
+    <circle cx="54" cy="60" r="2.8" fill="#1c2733"/>
+    <polygon points="106,46 114,32 121,46" fill="#7a8a6a"/>
+    <polygon points="88,73 80,90 98,74" fill="#7a8a6a"/>
+    <g stroke="#5c6a4e" stroke-width="1.5" stroke-linecap="round">
+      <line x1="72" y1="53" x2="70" y2="65"/>
+      <line x1="78" y1="52" x2="76" y2="66"/>
+    </g>
+  </svg>`,
+  bull: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Bull shark">
+    <polygon points="158,52 198,32 196,82" fill="#6e7a68"/>
+    <ellipse cx="100" cy="58" rx="62" ry="21" fill="#7e8a76"/>
+    <ellipse cx="100" cy="68" rx="54" ry="12" fill="#e8e6d8" opacity="0.85"/>
+    <ellipse cx="44" cy="58" rx="14" ry="15" fill="#7e8a76"/>
+    <circle cx="38" cy="54" r="3.2" fill="#1c2733"/>
+    <polygon points="108,38 120,20 130,38" fill="#6e7a68"/>
+    <polygon points="88,76 76,98 102,77" fill="#6e7a68"/>
+    <g stroke="#525c48" stroke-width="1.8" stroke-linecap="round">
+      <line x1="70" y1="50" x2="68" y2="66"/>
+      <line x1="76" y1="49" x2="74" y2="67"/>
+      <line x1="82" y1="49" x2="80" y2="67"/>
+    </g>
+  </svg>`,
+  greyreef: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Grey reef shark">
+    <polygon points="160,54 200,36 198,84" fill="#5f6e7a"/>
+    <ellipse cx="102" cy="58" rx="60" ry="17" fill="#6d7d89"/>
+    <ellipse cx="102" cy="65" rx="52" ry="10" fill="#dde3e7" opacity="0.85"/>
+    <polygon points="40,58 58,50 58,66" fill="#6d7d89"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <polygon points="110,42 121,24 130,42" fill="#5f6e7a"/>
+    <polygon points="90,74 80,94 102,75" fill="#5f6e7a"/>
+    <path d="M192,40 L200,36 M192,80 L198,84" stroke="#2c353c" stroke-width="3" stroke-linecap="round"/>
+    <g stroke="#46525a" stroke-width="1.6" stroke-linecap="round">
+      <line x1="74" y1="50" x2="72" y2="64"/>
+      <line x1="80" y1="49" x2="78" y2="65"/>
+    </g>
+  </svg>`,
+  caribbean: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Caribbean reef shark">
+    <polygon points="160,54 200,36 198,84" fill="#5a7a8c"/>
+    <ellipse cx="102" cy="58" rx="60" ry="17" fill="#688696"/>
+    <ellipse cx="102" cy="65" rx="52" ry="10" fill="#dce9ee" opacity="0.85"/>
+    <polygon points="40,58 58,50 58,66" fill="#688696"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <polygon points="110,42 121,24 130,42" fill="#5a7a8c"/>
+    <polygon points="90,74 80,94 102,75" fill="#5a7a8c"/>
+    <g stroke="#42565f" stroke-width="1.6" stroke-linecap="round">
+      <line x1="74" y1="50" x2="72" y2="64"/>
+      <line x1="80" y1="49" x2="78" y2="65"/>
+    </g>
+  </svg>`,
+  sandbar: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Sandbar shark">
+    <polygon points="160,54 200,36 198,84" fill="#6b7a72"/>
+    <ellipse cx="102" cy="58" rx="60" ry="17" fill="#7a8a80"/>
+    <ellipse cx="102" cy="65" rx="52" ry="10" fill="#e2e6df" opacity="0.85"/>
+    <polygon points="40,58 58,50 58,66" fill="#7a8a80"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <polygon points="106,42 118,14 132,42" fill="#6b7a72"/>
+    <polygon points="90,74 80,94 102,75" fill="#6b7a72"/>
+    <g stroke="#4e5a52" stroke-width="1.6" stroke-linecap="round">
+      <line x1="74" y1="50" x2="72" y2="64"/>
+      <line x1="80" y1="49" x2="78" y2="65"/>
+    </g>
   </svg>`
 
 };
@@ -585,6 +690,65 @@ const SKETCH = {
     <g fill="#9fb8cc" opacity="0.9">
       <circle cx="85" cy="58" r="2.4"/><circle cx="100" cy="62" r="2.4"/><circle cx="115" cy="59" r="2.4"/>
       <circle cx="130" cy="62" r="2.2"/><circle cx="92" cy="68" r="2.2"/><circle cx="108" cy="69" r="2.2"/>
+    </g>
+  </svg>`,
+  /* v0.18.0 wave — field sketches highlighting each species' key feature. */
+  scalloped: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: scalloped hammerhead head">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <rect x="30" y="48" width="40" height="22" rx="10"/>
+      <path d="M50,48 q0,5 0,0 M50,48 q-3,11 0,22" stroke-dasharray="3 3"/>
+      <ellipse cx="120" cy="60" rx="62" ry="17"/>
+      <path d="M112,44 L122,26 L132,44 Z"/>
+    </g>
+  </svg>`,
+  smooth: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: smooth hammerhead head">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="50" cy="59" rx="20" ry="12"/>
+      <ellipse cx="120" cy="60" rx="62" ry="17"/>
+      <path d="M112,44 L122,26 L132,44 Z"/>
+    </g>
+  </svg>`,
+  bonnethead: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: bonnethead shovel head">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="52" cy="60" rx="14" ry="11"/>
+      <ellipse cx="118" cy="60" rx="58" ry="15"/>
+      <path d="M110,46 L118,30 L126,46 Z"/>
+    </g>
+  </svg>`,
+  bull: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: bull shark broad snout">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="46" cy="59" rx="16" ry="17"/>
+      <ellipse cx="118" cy="60" rx="64" ry="20"/>
+      <path d="M110,41 L122,22 L134,41 Z"/>
+    </g>
+  </svg>`,
+  greyreef: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: grey reef shark tail">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="105" cy="60" rx="62" ry="17"/>
+      <path d="M160,52 L196,34 L194,82 Z"/>
+      <path d="M188,38 L196,34 M188,78 L194,82" stroke-width="4"/>
+      <path d="M98,44 L108,26 L118,44 Z"/>
+    </g>
+  </svg>`,
+  caribbean: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: Caribbean reef shark body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="60" rx="68" ry="17"/>
+      <path d="M165,54 L200,38 L198,80 Z"/>
+      <path d="M102,44 L112,26 L122,44 Z"/>
+    </g>
+  </svg>`,
+  sandbar: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: sandbar shark tall dorsal">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="62" rx="64" ry="17"/>
+      <path d="M100,46 L114,14 L130,46 Z"/>
+      <path d="M165,56 L198,40 L196,80 Z"/>
     </g>
   </svg>`
 
