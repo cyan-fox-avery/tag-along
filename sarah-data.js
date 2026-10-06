@@ -137,14 +137,14 @@ const COUSIN_CHATS = {
     { them: "Smooth hammerheads are more oceanic than the other hammerheads — they roam the open water rather than hugging the seamounts. Wanderers with hammers.", me: "Hammerheads, but make it pelagic." }
   ],
   bonnethead: [
-    { them: "Bonnetheads are the smallest hammerheads and they eat seagrass. Like, half their diet can be plants. An omnivorous shark. I think about this constantly.", me: "The vegetarian hammerhead." },
+    { them: "Bonnetheads are tiny hammerheads and they eat seagrass. Like, half their diet can be plants. An omnivorous shark. I think about this constantly.", me: "The vegetarian hammerhead." },
     { them: "A bonnethead's head is a little rounded shovel, not a big wide hammer. They're the pocket-sized members of the family — most are barely a metre long.", me: "Fun-size hammerhead." },
     { them: "Bonnetheads digest seagrass with specialized enzymes, which is wild because sharks are supposed to be obligate carnivores. This one read the rulebook and ate it.", me: "Rules are suggestions." }
   ],
   bull: [
     { them: "Bull sharks swim up rivers — actual rivers. They've been found thousands of kilometres inland — the Amazon, the Mississippi. A shark, in a river, just vibing.", me: "Geography is a suggestion." },
-    { them: "Bull sharks can switch their salt balance between ocean and fresh water. Almost no other shark can do that. It's like having two completely different kidneys.", me: "Two kidneys' worth of talent." },
-    { them: "Lake Nicaragua has bull sharks living in it full-time. A lake. With sharks. The locals just... live with that. Iconic.", me: "The lake sharks of Nicaragua." }
+    { them: "Bull sharks can shift their osmoregulatory physiology between ocean and fresh water. Almost no other shark can do that.", me: "Two kidneys' worth of talent." },
+    { them: "Bull sharks occur in Lake Nicaragua and travel between the lake and the Caribbean through the San Juan River. A lake with sharks in it. The locals just... live with that. Iconic.", me: "The lake sharks of Nicaragua." }
   ],
   greyreef: [
     { them: "Grey reef sharks do this whole threat display when they're annoyed — hunched back, dropped fins, swimming in loopy exaggeration. It's the shark equivalent of 'do you want to go, mate.'", me: "Aggressive posturing, shark edition." },
