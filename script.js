@@ -369,80 +369,7 @@ const SHARKS = [
   }
 ];
 
-/* Sarah's texts: genuine conversation, never a "hints" UI.
-   v0.12.0 voice pass: dignified enthusiasm. Sarah is an autistic adult
-   whose love of sharks runs calm and deep — precise, warm, measured.
-   Exclamation marks are earned, not default: they live where excitement
-   is real (a tag, a genuinely thrilling fact), never as decoration.
-   Keyed by species so hints and chats stay specific to what the player
-   is actually searching for. */
-const COUSIN_CHATS = {
-  nurse: [
-    { them: "Nurse sharks can breathe without swimming, did you know that? Most sharks have to keep moving to push water over their gills, but nurse sharks just pump it through while sitting still. That's the whole secret behind the cuddle heaps.", me: "That explains the piles of forty. Remarkable." }
-  ],
-  thresher: [
-    { them: "A thresher's tail is half its entire body. They whip it so fast the shockwave stuns the fish first. A sword made of shark.", me: "Half the body. Nature keeps outdoing itself." }
-  ],
-  whale: [
-    { them: "Whale sharks are the biggest fish in the ocean and they eat some of the smallest food. They just swim around with their mouths open like slow vacuums. Honestly, lifestyle goals.", me: "The gentle polka-dotted bus. Hard to argue." }
-  ],
-  goblin: [
-    { them: "Goblin sharks are pink because their skin is so thin you can see the blood vessels through it. And their jaws shoot forward like a slingshot. 125 million years old and still weird.", me: "Deep, pink, and ancient. The best combination." }
-  ],
-  tiger: [
-    { them: "Tiger sharks are called the garbage cans of the sea, which is rude but accurate. Researchers have found license plates in their stomachs. License plates.", me: "Not picky is an understatement." }
-  ],
-  sandtiger: [
-    { them: "Sand tigers look terrifying but they're total softies. They gulp air at the surface and hold it to hover perfectly still. Floaty balloon sharks.", me: "The toothy grin is false advertising." }
-  ],
-  galapagos: [
-    { them: "Gal\u00e1pagos sharks are so curious they'll circle divers just to have a look. Bold reef sharks of remote islands. I'd be nervous and flattered.", me: "Curiosity in a shark that size is a lot." }
-  ],
-  greatwhite: [
-    { them: "Great whites keep their swimming muscles warm \u2014 regional endothermy. A warm-bodied shark that can breach clear out of the water. Jaws undersold them, honestly.", me: "Warm muscles on a fish. Evolution showing off." }
-  ],
-  hammerhead: [
-    { them: "A hammerhead's head is packed with electroreceptors. They sweep it side to side over the sand and can feel a stingray's heartbeat buried underneath. A metal detector made of shark.", me: "Feeling a heartbeat through sand. Astonishing." }
-  ],
-  mako: [
-    { them: "Mako is the M\u0101ori word for shark \u2014 the word. And they're warm-bodied like great whites, which is how they stay so fast in cool water.", me: "70 kilometres an hour. With teeth." }
-  ],
-  basking: [
-    { them: "Basking sharks are the second-biggest fish in the ocean and they just... bask. Slow circles through plankton with their huge mouths open. The most relaxed giant alive.", me: "Maximum size, minimum effort. Respect." }
-  ],
-  epaulette: [
-    { them: "Epaulette sharks can survive over an hour out of water by slowing their bodies right down. They just wait out the low tide in a puddle, then walk to the next one.", me: "A shark that commutes on foot. Incredible." }
-  ],
-  lemon: [
-    { them: "Lemon shark mothers return to the exact nursery where they were born to give birth. Decades of tagging at Bimini, the same mothers coming home. It's called philopatry. I think about it a lot.", me: "Swimming home to where you were born. That's profound." }
-  ],
-  blacktip: [
-    { them: "Blacktip reef sharks have stable friend groups. Photo-ID in Moorea showed the same individuals choosing to hang out together, year after year. Sharks with best friends.", me: "Social lives on the reef. Lovely." }
-  ],
-  whitetip: [
-    { them: "Whitetip reef sharks are the only living species in their genus, Triaenodon. An evolutionary singleton. And they pile up in caves to nap like puppies.", me: "A genus of one. That's special." }
-  ]
-};
 
-const COUSIN_NUDGES = {
-  /* v0.12.0 voice pass: same dignified register as the chats. Hints are
-     useful, not hyper — Sarah respects the player enough to be precise. */
-  nurse:   "Nurse sharks stay shallow \u2014 surface to reef, about 0 to 75 metres. They pile up under reef ledges by day and hunt crabs and shellfish on the sand at night. Caribbean shallows, crabs or urchins, and a chum slick to call them in.",
-  thresher:"Threshers roam the open water, from the reefs down into the twilight zone \u2014 roughly 30 to 550 metres. They hunt schools of small fish and squid. Open Atlantic, reef or twilight depths, schooling fish, chum to draw them in.",
-  whale:   "Whale sharks don't take bait \u2014 they eat plankton. You have to find the aggregation: look for green water at the surface, the bloom. The Philippines. Researchers work it by boat, spotter plane, or the local sightings network.",
-  goblin:  "Goblin sharks live deep \u2014 twilight zone down into the real dark, about 270 to 960 metres. Sagami Bay in Japan is where scientists find them. Squid bait, and chum; scent travels well down there.",
-  tiger:   "Tiger sharks aren't picky at all \u2014 fish, squid, crabs, tuna, they'll try anything. The Maldives, shallow lagoons. With tigers the question is never what bait, it's where.",
-  sandtiger:"Sand tigers gather around the old shipwrecks off North Carolina \u2014 the Graveyard of the Atlantic. Same sharks, same wrecks, every year. Shallow water, squid and schooling fish, and they find chum hard to resist.",
-  galapagos: "Gal\u00e1pagos sharks love oceanic islands \u2014 the Gal\u00e1pagos, obviously. Shallow rocky reefs, under 80 metres. They hunt reef fish and squid, bold enough to come check you out. Chum brings them in.",
-  greatwhite: "Great whites gather off South Africa where the seals haul out. Shallow water, big oily fish like tuna \u2014 and seal scent in the water helps, since they follow the seals. They're warm-bodied, which is wild for a fish.",
-  hammerhead: "Great hammerheads hunt stingrays on Caribbean reefs \u2014 their heads are basically metal detectors for buried rays. Ray bait if you have it; schooling fish works too. Shallow water.",
-  mako: "Makos are the fastest sharks alive \u2014 open Atlantic, surface waters. They chase squid and tuna, the quick prey. If it's moving at 70 kilometres an hour out there, it's a mako.",
-  basking: "Basking sharks are plankton feeders like whale sharks \u2014 no bait works. Cornwall in summer, right at the surface where the water's green. Boat surveys and the sightings network: fishermen phoning in every tall dorsal fin.",
-  epaulette: "Epaulettes walk \u2014 on their fins, across the reef flats of Papua New Guinea at low tide. Ankle-deep water, crabs and shellfish. You don't scent the water for these; you need a falling tide and sharp eyes.",
-  lemon: "Lemon sharks: Caribbean shallows, surface to reef, under 90 metres. They hunt at night by electroreception \u2014 sardines after dark, with chum. Look for the twin dorsal fins, nearly equal. That's the ID.",
-  blacktip: "Blacktip reef sharks: the Maldives, reef flats so shallow their fins break the surface. Timid \u2014 swimmers scare them off \u2014 but bait excites them. Reef fish or shrimp, chum slick. Look for the black-dipped fins.",
-  whitetip: "Whitetips nap in reef caves by day \u2014 the Philippines, shallow reefs. They're one of the few requiem sharks that can breathe lying still. Hunt them at night: octopus or reef-fish scraps near the caves."
-};
 
 
 /* If you name a shark "Sarah", she finds out. Sweet, not progression. */
@@ -974,7 +901,7 @@ function renderResearch() {
       </button>
       <div class="guide-row-body hidden">
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
-        <p class="research-text">${s.research}</p>
+        ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
