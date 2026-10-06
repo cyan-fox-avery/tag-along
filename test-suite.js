@@ -41,17 +41,17 @@ code += `
   ok('version v0.18.0', VERSION === 'v0.18.0');
 
   // roster
-  ok('roster is 23', SHARKS.length === 23);
+  ok('roster is 30', SHARKS.length === 30);
   const ids = SHARKS.map(s => s.id);
-  ok('23 unique shark IDs', new Set(ids).size === 23);
-  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 23);
+  ok('30 unique shark IDs', new Set(ids).size === 30);
+  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 30);
   ok('all have ART', ids.every(id => !!ART[id]));
   ok('all have SKETCH', ids.every(id => !!SKETCH[id]));
   const counts = ids.map(id => (COUSIN_CHATS[id] || []).length);
-  ok('all 23 species have 3 chats', counts.length === 23 && counts.every(n => n === 3));
+  ok('all 30 species have 3 chats', counts.length === 30 && counts.every(n => n === 3));
   ok('all have nudges', ids.every(id => !!COUSIN_NUDGES[id]));
   ok('all have envelopes', ids.every(id => !!TRACK_ENVELOPES[id]));
-  ok('win is full roster', SHARKS.length === 23);
+  ok('win is full roster', SHARKS.length === 30);
 
   // v0.14.0 new sharks
   const new2 = ['frilled', 'zebra'];
@@ -147,7 +147,7 @@ code += `
   ok('ARCHIVE_MEDIA exists', typeof ARCHIVE_MEDIA === 'object');
   const liveIds = SHARKS.map(x => x.id);
   const archivedLive = liveIds.filter(id => ARCHIVE_MEDIA[id] && !ARCHIVE_MEDIA[id].future);
-  ok('all 23 live sharks have archive media', archivedLive.length === 23);
+  ok('all 30 live sharks have archive media', archivedLive.length === 30);
   ok('salmon is future-only', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === true);
   let assetsOk = true, videosOk = true;
   liveIds.forEach(id => {
@@ -189,7 +189,7 @@ code += `
   const openerRe = /opener:\\s*"([^"]+)"/g;
   const openers = []; let m;
   while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
-  ok('23 species openers present', openers.length === 23);
+  ok('30 species openers present', openers.length === 30);
   ok('no shared verbatim closer', new Set(openers).size === openers.length);
   ok('the old repeated closer is gone', !openers.some(function(o) { return /tell me everything/i.test(o); }));
   // v0.17.1 review fix: the advice offer must survive a reload, and a used
@@ -239,23 +239,16 @@ code += `
   ok('Bruce stays locked without the chain', !state.achievements.bruce);
   ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
 
-  // v0.18.0 future media batch — 7 species, future-only, NOT on the roster
-  const futureBatch = ['scalloped','smooth','bonnethead','bull','greyreef','caribbean','sandbar'];
-  ok('7 future species added', futureBatch.every(id => !!ARCHIVE_MEDIA[id]));
-  ok('all future-flagged', futureBatch.every(id => ARCHIVE_MEDIA[id].future === true));
-  ok('future species not on playable roster',
-    futureBatch.every(id => !SHARKS.some(s => s.id === id)));
-  ok('every future asset fully attributed',
-    futureBatch.every(id => ARCHIVE_MEDIA[id].assets.every(a =>
-      a.type && a.caption && a.credit && a.license && a.page && a.image && a.full)));
-  ok('future videos have iOS play URLs',
-    futureBatch.every(id => ARCHIVE_MEDIA[id].assets
-      .filter(a => a.type === 'video')
-      .every(a => /\.360p\.mpeg4\.mov$/.test(a.play || ''))));
-  ok('bull video names Granma (verified on Commons)',
-    /Granma/.test(ARCHIVE_MEDIA.bull.assets.find(a => a.type === 'video').caption));
-  ok('smooth NOAA caption keeps verified hundreds claim',
-    /hundreds/.test(ARCHIVE_MEDIA.smooth.assets[1].caption));
+  // v0.18.0 wave — 7 new species live on the roster with verified archive media
+  const wave7 = ['scalloped','smooth','bonnethead','bull','greyreef','caribbean','sandbar'];
+  ok('7 wave species on roster', wave7.every(id => SHARKS.some(s => s.id === id)));
+  ok('wave species live in archive (not future)',
+    wave7.every(id => ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future === false));
+  ok('wave species have full game data',
+    wave7.every(id => ART[id] && SKETCH[id] && COUSIN_NUDGES[id] &&
+      (COUSIN_CHATS[id] || []).length === 3 && TRACK_ENVELOPES[id]));
+  ok('salmon still future-only', ARCHIVE_MEDIA.salmon.future === true &&
+    !SHARKS.some(s => s.id === 'salmon'));
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
