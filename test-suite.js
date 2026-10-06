@@ -131,6 +131,15 @@ code += `
   // atomic archive unlock
   ok('doWin persists archive unlock', /function doWin\\(\\)[^}]*tyi-archive/.test(fileCode));
   ok('RESET_KEYS clears tyi-archive', RESET_KEYS.includes('tyi-archive'));
+  // old-winner migration: pre-v0.16 completed save gets the archive unlock
+  ok('migrateArchiveUnlock exists', typeof migrateArchiveUnlock === 'function');
+  const _w2 = state.won, _a2 = state.archiveUnlocked, _t2 = state.tagged;
+  state.won = true; state.archiveUnlocked = false; state.tagged = {};
+  SHARKS.forEach(x => { state.tagged[x.id] = { researchId: 'T' }; });
+  try { localStorage.removeItem('tyi-archive'); } catch {}
+  migrateArchiveUnlock();
+  ok('old winners get archive unlock', state.archiveUnlocked === true && localStorage.getItem('tyi-archive') === '1');
+  state.won = _w2; state.archiveUnlocked = _a2; state.tagged = _t2;
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
