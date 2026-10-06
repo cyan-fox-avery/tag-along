@@ -572,6 +572,24 @@ const state = {
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
 };
+/* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
+   and existing tags so established players get credit for their history. */
+(function migrateStats() {
+  const s = state.stats;
+  let changed = false;
+  const log = state.logbook || [];
+  if (!(s.expeditions > 0) && log.length > 0) {
+    s.expeditions = log.length; changed = true;
+  }
+  log.forEach(t => {
+    if (t.region && !s.regionsVisited.includes(t.region)) { s.regionsVisited.push(t.region); changed = true; }
+    if (t.bait && !s.baitsUsed.includes(t.bait)) { s.baitsUsed.push(t.bait); changed = true; }
+  });
+  let resights = 0;
+  Object.values(state.tagged || {}).forEach(t => { resights += (t.resightings || []).length; });
+  if (!(s.resights > 0) && resights > 0) { s.resights = resights; changed = true; }
+  if (changed) saveStats();
+})();
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
@@ -1542,8 +1560,19 @@ function unlockAchievement(a) {
   state.achievements[a.id] = Date.now();
   achieveStore.save(state.achievements);
   renderAchievements();
+  /* v0.18.0 review: queue celebrations so one action earning several
+     achievements shows each card in turn instead of overwriting. */
+  achieveQueue.push(a);
+  showNextAchievement();
+}
+const achieveQueue = [];
+let achieveShowing = false;
+function showNextAchievement() {
+  if (achieveShowing || !achieveQueue.length) return;
+  const a = achieveQueue.shift();
+  achieveShowing = true;
   const ov = $("achieveOverlay");
-  if (!ov) return;
+  if (!ov) { achieveShowing = false; return; }
   ov.classList.remove("hidden");
   ov.innerHTML = `<div class="phone">
     <div class="cert-trophy" style="font-size:52px; text-align:center">${a.icon}</div>
@@ -1552,7 +1581,11 @@ function unlockAchievement(a) {
     <p class="latin" style="text-align:center">${esc(a.description)}</p>
     <button id="achieveClose" class="primary-button" type="button">Sweet!</button>
   </div>`;
-  $("achieveClose").addEventListener("click", () => ov.classList.add("hidden"));
+  $("achieveClose").addEventListener("click", () => {
+    ov.classList.add("hidden");
+    achieveShowing = false;
+    showNextAchievement();
+  });
 }
 function renderAchievements() {
   const list = $("achieveList");
@@ -1655,8 +1688,11 @@ function confirmTag(name) {
   logTripEncounter(s, "tagged");
   store.save(state.tagged);
   state.pendingTag = null;
-  /* v0.18.0: chum tags feed the "Something in the Water" achievement. */
-  if (state.currentPlan && state.currentPlan.methodOpt === "chum") {
+  /* v0.18.0: chum tags feed the "Something in the Water" achievement —
+     v0.18.0 review: only when chum is a real method for THIS species. */
+  if (state.currentPlan && state.currentPlan.method === "attract" &&
+      state.currentPlan.methodOpt === "chum" &&
+      s.methods && s.methods.attract && s.methods.attract.includes("chum")) {
     state.stats.chumTags = (state.stats.chumTags || 0) + 1;
     saveStats();
   }
@@ -2164,7 +2200,7 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -2221,7 +2257,7 @@ const LICENSE_URLS = {
 };
 function archiveAssetHtml(a, isPrimary) {
   const label = a.label ? `<span class="archive-label">${esc(a.label)}</span>` : "";
-  const isPD = /public domain/i.test(a.license || "");
+  const isPD = /public domain/i.test(a.license || "") || a.license === "CC0";
   const licUrl = LICENSE_URLS[a.license];
   const licHtml = licUrl
     ? `<a href="${licUrl}" target="_blank" rel="noopener">${esc(a.license)}</a>`
@@ -2547,3 +2583,5 @@ tickPhoneClock();
    next to message timestamps. */
 setInterval(tickPhoneClock, 30000);
 renderAll();
+/* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
+checkAchievements();
