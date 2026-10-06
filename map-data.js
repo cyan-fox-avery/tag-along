@@ -177,7 +177,47 @@ const TRACK_ENVELOPES = {
     areas: ["Tag-site reef cave", "Tag-site cave ledge", "Tag-site reef crevice", "Night-hunt reef", "Shelter ledge"],
     hop: [1, 20], dayStep: [7, 21], nPoints: [5, 6], kind: "acoustic",
     corridor: "strong reef fidelity — same daytime cave shelter for months/years; nocturnal, reef-local (Indo-Pacific acoustic work)"
+  },
+  blue: {
+    start: "Open Atlantic (tag site)",
+    areas: ["Tag-site open water", "Gulf Stream meander", "Mid-Atlantic Ridge approaches", "Azores Current", "Canary Current edge"],
+    hop: [100, 800], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "among the longest migrants of any shark \u2014 New England to South America runs are classic; Irish-tagged sharks recaptured off West Africa (~6,840 km); movements strongly seasonal with water temperature (Atlantic tagging programs, ICCAT)"
+  },
+  porbeagle: {
+    start: "Cornwall, UK (tag site)",
+    areas: ["Tag-site Cornish waters", "Celtic Sea", "Bay of Biscay", "Mid-Atlantic Ridge", "Norwegian Sea approaches"],
+    hop: [100, 600], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "strong seasonal return migrations \u2014 Bay of Biscay taggings travelled up to 2,000 km (Arctic Circle, Madeira, mid-Atlantic Ridge) and returned the following spring; 5,000\u201313,000 km annual loops with clear site fidelity; transit bursts up to 100 km/day"
+  },
+  silky: {
+    start: "Open Atlantic (tag site)",
+    areas: ["Tag-site open water", "Tuna school grounds", "FAD drift line", "Shelf-edge front", "Seamount approaches"],
+    hop: [80, 500], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "highly migratory \u2014 juveniles tracked thousands of kilometres; follows tuna schools and fish aggregating devices; genetics suggest female site fidelity to pupping areas even as individuals range widely"
+  },
+  oceanic: {
+    start: "Open Atlantic (tag site)",
+    /* Deliberately modest: movement data are still thin across much of
+       the oceanic whitetip's range, so the envelope stays close and the
+       corridor says so. */
+    areas: ["Tag-site open water", "Seamount", "Oceanic island approaches", "Equatorial front"],
+    hop: [50, 400], dayStep: [7, 21], nPoints: [5, 6], kind: "satellite",
+    corridor: "highly migratory but movement data still thin across much of its range; philopatric migrations documented in the northern Atlantic; site fidelity off northeast Brazil"
+  },
+  sevengill: {
+    start: "South African bay (tag site)",
+    areas: ["Tag-site kelp forest", "Bay channel", "Estuary mouth", "Offshore reef", "Seal colony approaches"],
+    hop: [2, 60], dayStep: [7, 30], nPoints: [5, 6], kind: "acoustic",
+    corridor: "seasonal inshore\u2013offshore movement \u2014 into bays and estuaries, then out to deeper water; site-resident clusters documented over years; strong fidelity to seasonal aggregations (IUCN 2020)"
+  },
+  bronze: {
+    start: "South African coast (tag site)",
+    areas: ["Tag-site coastal bay", "Sardine run grounds", "Offshore reef", "Nursery bay", "Mozambique coast approaches"],
+    hop: [30, 300], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "seasonal coastwise migration \u2014 South African tagging shows 1,000+ km along the SA and Mozambique coasts in a single cycle; females move between coastal nursery bays and offshore waters"
   }
+
 };
 
 /* How each track kind is framed to the player — honesty first. */
@@ -229,7 +269,9 @@ const SPECIES_COLORS = {
   tiger: "#f78c6b", sandtiger: "#4cc9f0", galapagos: "#80ed99",
   greatwhite: "#f4f1de", hammerhead: "#f3722c", mako: "#00bbf9",
   basking: "#b8c0ff", epaulette: "#ff8fab",
-  lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da"
+  lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da",
+  blue: "#3b6ea5", porbeagle: "#8fa8bf", silky: "#a08b62",
+  oceanic: "#c9b458", sevengill: "#8a7f70", bronze: "#c98a3d"
 };
 
 /* Every label a track point can carry: region names (tag sites and
