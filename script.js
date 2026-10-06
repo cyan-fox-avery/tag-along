@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.16.0";
+const VERSION = "v0.17.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -1694,6 +1694,8 @@ function winStep(n) {
        where the player is told about it. The set below is idempotent. */
     state.archiveUnlocked = true;
     try { localStorage.setItem("tyi-archive", "1"); } catch {}
+    updateArchiveTab();
+    renderArchive();
     box(`
       <div class="ack-card" style="margin-top:0">
         <p class="eyebrow">ACKNOWLEDGEMENTS</p>
@@ -2019,6 +2021,62 @@ function renderAll() {
   renderLogbook();
   renderMessages();
   updateMsgBadge();
+  updateArchiveTab();
+  if (state.archiveUnlocked) renderArchive();
+}
+
+/* ---------- Wild Archive (v0.17.0) ----------
+   Post-win reward: real-world photography and footage of every tagged
+   species. All media was hand-curated by Avery from Wikimedia Commons
+   (CC BY / CC BY-SA / public domain); attribution is shown per asset.
+   Species not yet in the live roster stay hidden until they're added. */
+function updateArchiveTab() {
+  const btn = document.querySelector('.tab[data-tab="archive"]');
+  if (btn) btn.classList.toggle("hidden", !state.archiveUnlocked);
+}
+function archiveAssetHtml(a, isPrimary) {
+  const label = a.label ? `<span class="archive-label">${esc(a.label)}</span>` : "";
+  const credit = `<p class="archive-credit">\u00a9 ${esc(a.credit)} \u00b7 ${esc(a.license)} \u00b7 <a href="${esc(a.page)}" target="_blank" rel="noopener">Wikimedia Commons \u2197</a></p>`;
+  let mediaHtml;
+  if (a.type === "video" && a.play) {
+    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="metadata" src="${esc(a.play)}"></video>`;
+  } else {
+    mediaHtml = `<a href="${esc(a.full || a.image)}" target="_blank" rel="noopener"><img class="archive-media${isPrimary ? " primary" : ""}" src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></a>`;
+  }
+  return `<figure class="archive-asset${isPrimary ? " primary" : ""}">${label}${mediaHtml}<figcaption>${esc(a.caption)}</figcaption>${credit}</figure>`;
+}
+function renderArchive() {
+  const list = $("archiveList");
+  if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
+  list.innerHTML = "";
+  SHARKS.forEach(s => {
+    const media = ARCHIVE_MEDIA[s.id];
+    if (!media || media.future) return;
+    const t = state.tagged[s.id] || {};
+    const yourShark = t.researchId
+      ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
+      : "";
+    const row = document.createElement("div");
+    row.className = "guide-row";
+    row.innerHTML = `
+      <button type="button" class="guide-row-head" aria-expanded="false">
+        <span class="guide-row-name">${s.name}</span>
+        <span class="latin">${media.scientific}</span>
+        <span class="status-pill">IUCN: ${s.status}</span>
+        <span class="guide-caret" aria-hidden="true">\u25be</span>
+      </button>
+      <div class="guide-row-body hidden">
+        ${yourShark}
+        ${media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
+      </div>`;
+    const head = row.querySelector(".guide-row-head");
+    const body = row.querySelector(".guide-row-body");
+    head.addEventListener("click", () => {
+      const isHidden = body.classList.toggle("hidden");
+      head.setAttribute("aria-expanded", String(!isHidden));
+    });
+    list.appendChild(row);
+  });
 }
 
 /* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
