@@ -425,7 +425,7 @@ const SHARKS = [
     cheer: "Scalloped hammerheads school by the hundreds around seamounts! You tagged one out of a whole shimmering wall of hammers!",
     opener: "A scalloped hammerhead! Was it with the school? I need the numbers!",
     sketchCap: "the scalloped head (central notch)",
-    nameIdeas: ["Hammer", "Coco", "Seamount", "Malet"]
+    nameIdeas: ["Hammer", "Coco", "Seamount", "Mallet"]
   },
   {
     id: "smooth",
@@ -451,7 +451,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [0.8, 1.5],
-    research: "Bonnetheads are the smallest hammerheads — most adults are barely a metre long — and they live in the warm shallow west Atlantic: the Caribbean, the Gulf of Mexico, both American coastlines. The head is a compact rounded shovel rather than a wide hammer. They root around seagrass beds for crabs and shrimp, and remarkably, they eat the seagrass too: about half the diet can be plant matter, digested with specialized enzymes. One of the only truly omnivorous sharks. Wild footage is scarce, so the Archive holds aquarium animals for now.",
+    research: "Bonnetheads are among the smallest hammerheads — most adults are barely a metre long — and Sphyrna tiburo lives in the warm shallow western Atlantic: the Caribbean, the Gulf of Mexico, and nearby waters. (A 2024 revision split the old bonnethead complex, describing Caribbean populations separately.) The head is a compact rounded shovel rather than a wide hammer. They root around seagrass beds for crabs and shrimp, and remarkably, they eat the seagrass too: about half the diet can be plant matter, digested with specialized enzymes. One of the only truly omnivorous sharks. Wild footage is scarce, so the Archive holds aquarium animals for now.",
     hook: "Bonnetheads eat seagrass — they're one of the only truly omnivorous sharks.",
     bonus: "A bonnethead's diet can be roughly half seagrass, which it digests with specialized enzymes. A vegetarian-leaning shark!",
     cheer: "Bonnetheads are the pocket-sized hammerheads and they eat their vegetables! I'm obsessed!",
@@ -485,7 +485,7 @@ const SHARKS = [
     sizeRange: [1.4, 2.4],
     research: "Grey reef sharks are the sentinels of Indo-Pacific coral reefs — Palau, Sipadan, Papua New Guinea. They are strongly site-attached, patrolling the same drop-offs, channels and current-swept reef edges for years. They hunt reef fish and squid, and when crowded they perform one of the best-studied threat displays in sharks: back hunched, pectoral fins dropped, swimming in exaggerated loops. It's body language for 'back off,' and divers learn to read it. Reef populations have fallen hard to fishing pressure — they are Endangered.",
     hook: "Grey reef sharks do an exaggerated threat display — hunched back, dropped fins — when they feel crowded.",
-    bonus: "That threat display is one of the best-studied agonistic behaviors in sharks. Researchers use it to gauge how stressed a reef's sharks are.",
+    bonus: "That threat display is one of the best-studied warning displays in sharks. The posture is a remarkably clear piece of shark body language: back off.",
     cheer: "Grey reef sharks are the sentinels of the Indo-Pacific reefs! Classic coral-reef patroller, tagged!",
     opener: "A grey reef shark! Patrolling the drop-off? I want the whole scene!",
     sketchCap: "the broad black-edged tail",
@@ -515,10 +515,10 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.8, 2.5],
-    research: "Sandbar sharks are the classic coastal requiem shark of the Atlantic — and the tall, almost sail-like first dorsal fin is the giveaway. No similar shark carries a dorsal that high. They favor shallow coastal shelves, bays and sandy banks (the name is literal), and Chesapeake Bay is one of their great nurseries: pups are born there in summer. They eat fish, rays and crabs, migrate seasonally along the coast, and find chum as hard to resist as any carcharhinid. Heavily fished for fins historically — Endangered, and slowly recovering where protected.",
+    research: "Sandbar sharks are the classic coastal requiem shark of the Atlantic — and the tall, almost sail-like first dorsal fin is the giveaway. Few similar sharks carry a dorsal that high. They favor shallow coastal shelves, bays and sandy banks (the name is literal), and Chesapeake Bay is one of their great nurseries: pups are born there in summer. They eat fish, rays and crabs, migrate seasonally along the coast, and find chum as hard to resist as any carcharhinid. Heavily fished for fins historically — Endangered, and slowly recovering where protected.",
     hook: "That towering first dorsal fin is the sandbar shark's signature — taller than any similar shark's.",
     bonus: "Chesapeake Bay is one of the most important sandbar shark nurseries in the Atlantic. Pups are born there in summer.",
-    cheer: "Sandbar sharks have the tallest dorsal fin in the business! That silhouette is unmistakable!",
+    cheer: "That tall dorsal gives a sandbar a distinctive silhouette!",
     opener: "A sandbar shark! Did you see that tall dorsal fin? Describe everything!",
     sketchCap: "the tall first dorsal fin",
     nameIdeas: ["Sail", "Dune", "Fin", "Bank"]
