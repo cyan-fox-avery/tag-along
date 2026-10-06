@@ -352,7 +352,7 @@ const SHARKS = [
     id: "whitetip",
     name: "Whitetip Reef Shark", latin: "Triaenodon obesus", status: "Vulnerable",
     code: "WR",
-    /* The cave-napper: the only requiem shark that can breathe while
+    /* The cave-napper: one of the few requiem sharks that can breathe while
        lying still, so by day it piles in reef caves. Hunts crevices
        by night — octopus and reef-fish scraps are the honest baits. */
     combo: { region: "philippines", bait: ["squid", "schooling-fish"] },
