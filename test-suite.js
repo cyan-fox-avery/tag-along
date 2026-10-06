@@ -238,6 +238,24 @@ code += `
   ok('endangered tag unlocks Every One Counts', !!state.achievements['every-one-counts']);
   ok('Bruce stays locked without the chain', !state.achievements.bruce);
   ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
+
+  // v0.18.0 future media batch — 7 species, future-only, NOT on the roster
+  const futureBatch = ['scalloped','smooth','bonnethead','bull','greyreef','caribbean','sandbar'];
+  ok('7 future species added', futureBatch.every(id => !!ARCHIVE_MEDIA[id]));
+  ok('all future-flagged', futureBatch.every(id => ARCHIVE_MEDIA[id].future === true));
+  ok('future species not on playable roster',
+    futureBatch.every(id => !SHARKS.some(s => s.id === id)));
+  ok('every future asset fully attributed',
+    futureBatch.every(id => ARCHIVE_MEDIA[id].assets.every(a =>
+      a.type && a.caption && a.credit && a.license && a.page && a.image && a.full)));
+  ok('future videos have iOS play URLs',
+    futureBatch.every(id => ARCHIVE_MEDIA[id].assets
+      .filter(a => a.type === 'video')
+      .every(a => /\.360p\.mpeg4\.mov$/.test(a.play || ''))));
+  ok('bull video names Granma (verified on Commons)',
+    /Granma/.test(ARCHIVE_MEDIA.bull.assets.find(a => a.type === 'video').caption));
+  ok('smooth NOAA caption keeps verified hundreds claim',
+    /hundreds/.test(ARCHIVE_MEDIA.smooth.assets[1].caption));
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
