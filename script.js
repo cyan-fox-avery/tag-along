@@ -564,7 +564,8 @@ const state = {
   sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
-    { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 },
+    { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
+      depthsTagged: [], methodsUsed: [] },
     statsStore.load()
   ),
   achievements: achieveStore.load(), // id -> timestamp
@@ -590,6 +591,15 @@ const state = {
   if (!(s.resights > 0) && resights > 0) { s.resights = resights; changed = true; }
   /* v0.18.0 review 2nd pass: backfill "Something in the Water" — a log entry
      with attract+chum and a tagged encounter of a chum-valid species counts. */
+  log.forEach(t => {
+    if (t.methodOpt && t.methodOpt !== "none" && !(s.methodsUsed || []).includes(t.methodOpt)) {
+      s.methodsUsed.push(t.methodOpt); changed = true;
+    }
+    const taggedHere = (t.encounters || []).some(e => e.result === "tagged");
+    if (taggedHere && t.depth && !(s.depthsTagged || []).includes(t.depth)) {
+      s.depthsTagged.push(t.depth); changed = true;
+    }
+  });
   if (!(s.chumTags > 0)) {
     const chumEarned = log.some(t =>
       t.method === "attract" && t.methodOpt === "chum" &&
@@ -1246,6 +1256,9 @@ async function runExpedition(plan) {
   if (plan.bait && !state.stats.baitsUsed.includes(plan.bait)) {
     state.stats.baitsUsed.push(plan.bait);
   }
+  if (plan.methodOpt && plan.methodOpt !== "none" && !state.stats.methodsUsed.includes(plan.methodOpt)) {
+    state.stats.methodsUsed.push(plan.methodOpt);
+  }
   saveStats();
   tripDecks = { waiting: shuffled(WAITING_LINES), doing: shuffled(SIGHTING_DOINES), sightings: buildSightingDeck(plan.depth, plan.region) };
   /* v0.8.0: open a fresh logbook page for this trip. */
@@ -1846,6 +1859,12 @@ function confirmTag(name) {
       state.currentPlan.methodOpt === "chum" &&
       s.methods && s.methods.attract && s.methods.attract.includes("chum")) {
     state.stats.chumTags = (state.stats.chumTags || 0) + 1;
+    saveStats();
+  }
+  /* v0.19.0: depths tagged feed the "Full Fathom" achievement. */
+  if (state.currentPlan && state.currentPlan.depth &&
+      !state.stats.depthsTagged.includes(state.currentPlan.depth)) {
+    state.stats.depthsTagged.push(state.currentPlan.depth);
     saveStats();
   }
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
