@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.18.0', VERSION === 'v0.18.0');
+  ok('version v0.19.0', VERSION === 'v0.19.0');
 
   // roster
   ok('roster is 30', SHARKS.length === 30);
@@ -305,6 +305,42 @@ code += `
   const badCounts = badChumEntry.encounters.some(e => e.result === "tagged" &&
     (SHARKS.find(x => x.id === e.speciesId) || {}).methods?.attract?.includes("chum"));
   ok('chum backfill rejects invalid species', badCounts === false);
+
+  // v0.19.0: field-guide database
+  const resetGF = () => { guideFilters.q = ""; guideFilters.region.clear();
+    guideFilters.depth.clear(); guideFilters.methodOpt.clear();
+    guideFilters.bait.clear(); guideFilters.tagged = "all"; };
+  resetGF();
+  ok('no filters matches all', SHARKS.filter(guideMatches).length === SHARKS.length);
+  guideFilters.q = "hammerhead";
+  const hammers = SHARKS.filter(guideMatches);
+  ok('search finds hammerheads', hammers.length === 3 &&
+    hammers.every(s => /hammerhead/i.test(s.name)));
+  resetGF();
+  guideFilters.region.add("caribbean");
+  const carib = SHARKS.filter(guideMatches);
+  ok('region filter narrows', carib.length > 0 && carib.length < SHARKS.length &&
+    carib.every(s => s.combo.region === "caribbean"));
+  guideFilters.bait.add("tuna");
+  const stacked = SHARKS.filter(guideMatches);
+  ok('stacked filters narrow further', stacked.length <= carib.length &&
+    stacked.every(s => baitList(s).includes("tuna")));
+  resetGF();
+  state.tagged = { nurse: { name: "Bubbles", researchId: "NS-2026-001" } };
+  guideFilters.tagged = "tagged";
+  ok('tagged filter', SHARKS.filter(guideMatches).length === 1);
+  guideFilters.tagged = "untagged";
+  ok('untagged filter', SHARKS.filter(guideMatches).length === SHARKS.length - 1);
+  resetGF();
+  guideFilters.methodOpt.add("chum");
+  const chummers = SHARKS.filter(guideMatches);
+  ok('method filter uses exact planner vocabulary',
+    chummers.length > 0 && chummers.every(s => methodOpts(s).includes("chum")));
+  ok('filter count tracks active filters', (() => {
+    resetGF(); guideFilters.q = "x"; guideFilters.region.add("caribbean");
+    return activeFilterCount() === 2;
+  })());
+  resetGF(); state.tagged = {};
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
