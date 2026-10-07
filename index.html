@@ -38,16 +38,20 @@
         <div class="guide-tools">
           <input id="guideSearch" type="search" class="guide-search"
             placeholder="Search sharks by name…" aria-label="Search sharks by name" autocomplete="off">
-          <button id="filterToggle" class="filter-toggle" type="button" aria-expanded="false">
+          <button id="filterToggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filterPanel">
             🔍 Filters <span id="filterCount" class="count-badge hidden">0</span>
           </button>
         </div>
         <div id="activeChips" class="active-chips"></div>
         <div class="guide-meta">
           <span id="guideCount" class="latin"></span>
-          <button id="guideClear" class="link-button hidden" type="button">Clear all</button>
+          <button id="guideClear" class="hidden" type="button">Clear all</button>
         </div>
         <div id="filterPanel" class="filter-panel hidden">
+          <div class="sheet-head">
+            <h2>Filters</h2>
+            <button id="sheetClose" class="sheet-close" type="button" aria-label="Close filters">Done</button>
+          </div>
           <div class="filter-group" data-group="tagged">
             <h3>Status</h3>
             <div class="chip-row" id="filterTagged"></div>
