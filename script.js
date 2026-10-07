@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.18.0";
+const VERSION = "v0.19.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -703,13 +703,152 @@ function goTab(name) {
    v0.7.0: the guide is a compact roster list; each row expands into the
    full entry. Hard rule stands: NO pictures of the actual shark here —
    sketches only. The real face is earned at tagging. */
+/* ---------- Field guide database (v0.19.0) ----------
+   Search + stacked filters. Filters narrow the notebook; they never solve
+   the expedition — matching is on the shark's own data, nothing is revealed.
+   Filter state is session-only. */
+const guideFilters = {
+  q: "",
+  region: new Set(),
+  depth: new Set(),
+  methodOpt: new Set(),
+  bait: new Set(),
+  tagged: "all" // "all" | "tagged" | "untagged"
+};
+function baitList(s) {
+  return Array.isArray(s.combo.bait) ? s.combo.bait : [s.combo.bait];
+}
+function methodOpts(s) {
+  const m = s.methods || {};
+  return [...(m.attract || []), ...(m.aggregation || [])];
+}
+function guideMatches(s) {
+  const f = guideFilters;
+  if (f.q) {
+    const q = f.q.toLowerCase();
+    if (!s.name.toLowerCase().includes(q) && !s.latin.toLowerCase().includes(q)) return false;
+  }
+  if (f.region.size && !f.region.has(s.combo.region)) return false;
+  if (f.depth.size && !(s.depths || []).some(d => f.depth.has(d))) return false;
+  if (f.methodOpt.size && !methodOpts(s).some(m => f.methodOpt.has(m))) return false;
+  if (f.bait.size && !baitList(s).some(b => f.bait.has(b))) return false;
+  if (f.tagged === "tagged" && !state.tagged[s.id]) return false;
+  if (f.tagged === "untagged" && state.tagged[s.id]) return false;
+  return true;
+}
+function activeFilterCount() {
+  const f = guideFilters;
+  return f.region.size + f.depth.size + f.methodOpt.size + f.bait.size +
+    (f.tagged !== "all" ? 1 : 0) + (f.q ? 1 : 0);
+}
+function buildFilterChips() {
+  const mk = (elId, items, set) => {
+    const row = $(elId);
+    if (!row) return;
+    row.innerHTML = "";
+    items.forEach(([id, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = label;
+      b.setAttribute("aria-pressed", String(set.has(id)));
+      b.addEventListener("click", () => {
+        if (set.has(id)) set.delete(id); else set.add(id);
+        renderResearch();
+      });
+      row.appendChild(b);
+    });
+  };
+  mk("filterRegion", Object.entries(REGIONS).map(([id, r]) =>
+    [id, r.locked ? `🔒 ${r.name}` : r.name]), guideFilters.region);
+  mk("filterDepth", Object.entries(DEPTHS).map(([id, d]) => [id, d.name]), guideFilters.depth);
+  const mOpts = [];
+  Object.values(METHODS).forEach(m => Object.entries(m.opts).forEach(([id, label]) => {
+    if (id !== "none") mOpts.push([id, label]);
+  }));
+  mk("filterMethod", mOpts, guideFilters.methodOpt);
+  mk("filterBait", Object.entries(BAITS).map(([id, label]) => [id, label]), guideFilters.bait);
+  // tagged status: single-select chips
+  const tRow = $("filterTagged");
+  if (tRow) {
+    tRow.innerHTML = "";
+    [["all", "All"], ["tagged", "Tagged ✅"], ["untagged", "Untagged"]].forEach(([id, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = label;
+      b.setAttribute("aria-pressed", String(guideFilters.tagged === id));
+      b.addEventListener("click", () => { guideFilters.tagged = id; renderResearch(); });
+      tRow.appendChild(b);
+    });
+  }
+}
+function renderActiveChips() {
+  const wrap = $("activeChips");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  const f = guideFilters;
+  const addChip = (label, clear) => {
+    const c = document.createElement("span");
+    c.className = "chip-active";
+    c.innerHTML = `<span>${esc(label)}</span>`;
+    const x = document.createElement("button");
+    x.type = "button";
+    x.className = "chip-remove";
+    x.setAttribute("aria-label", `Remove filter: ${label}`);
+    x.textContent = "×";
+    x.addEventListener("click", () => { clear(); renderResearch(); });
+    c.appendChild(x);
+    wrap.appendChild(c);
+  };
+  if (f.q) addChip(`“${f.q}”`, () => { f.q = ""; const s = $("guideSearch"); if (s) s.value = ""; });
+  f.region.forEach(id => addChip(REGIONS[id] ? REGIONS[id].name : id, () => f.region.delete(id)));
+  f.depth.forEach(id => addChip(DEPTHS[id] ? DEPTHS[id].name : id, () => f.depth.delete(id)));
+  f.methodOpt.forEach(id => {
+    let label = id;
+    Object.values(METHODS).forEach(m => { if (m.opts[id]) label = m.opts[id]; });
+    addChip(label, () => f.methodOpt.delete(id));
+  });
+  f.bait.forEach(id => addChip(BAITS[id] || id, () => f.bait.delete(id)));
+  if (f.tagged !== "all") addChip(f.tagged === "tagged" ? "Tagged ✅" : "Untagged",
+    () => { f.tagged = "all"; });
+}
+function clearGuideFilters() {
+  guideFilters.q = "";
+  guideFilters.region.clear();
+  guideFilters.depth.clear();
+  guideFilters.methodOpt.clear();
+  guideFilters.bait.clear();
+  guideFilters.tagged = "all";
+  const s = $("guideSearch");
+  if (s) s.value = "";
+  renderResearch();
+}
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
   /* v0.13.0: untagged sharks first — the ones you're still hunting.
      Tagged ones settle to the bottom, out of the way. */
-  const ordered = [...SHARKS].sort((a, b) =>
-    ((state.tagged[a.id] ? 1 : 0) - (state.tagged[b.id] ? 1 : 0)));
+  const ordered = [...SHARKS]
+    .filter(guideMatches)
+    .sort((a, b) => ((state.tagged[a.id] ? 1 : 0) - (state.tagged[b.id] ? 1 : 0)));
+  // v0.19.0: filter UI state
+  buildFilterChips();
+  renderActiveChips();
+  const n = activeFilterCount();
+  const fc = $("filterCount");
+  if (fc) {
+    fc.textContent = String(n);
+    fc.classList.toggle("hidden", n === 0);
+  }
+  const gc = $("guideCount");
+  if (gc) gc.textContent = `Showing ${ordered.length} of ${SHARKS.length} sharks`;
+  const clr = $("guideClear");
+  if (clr) clr.classList.toggle("hidden", n === 0);
+  if (!ordered.length) {
+    list.innerHTML = `<p class="latin" style="text-align:center; padding: 24px 12px;">No sharks match those filters. Try clearing something — the ocean is bigger than it looks.</p>`;
+    return;
+  }
   ordered.forEach(s => {
     const done = !!state.tagged[s.id];
     const regionLocked = REGIONS[s.combo.region] && REGIONS[s.combo.region].locked;
@@ -2595,6 +2734,24 @@ tickPhoneClock();
 /* v0.17.1: the phone clock ticks — refresh every 30s so it never goes stale
    next to message timestamps. */
 setInterval(tickPhoneClock, 30000);
+/* v0.19.0: field-guide database controls. */
+(function initGuideTools() {
+  const search = $("guideSearch");
+  if (search) search.addEventListener("input", () => {
+    guideFilters.q = search.value.trim();
+    renderResearch();
+  });
+  const toggle = $("filterToggle");
+  const panel = $("filterPanel");
+  if (toggle && panel) toggle.addEventListener("click", () => {
+    const open = panel.classList.toggle("hidden");
+    toggle.setAttribute("aria-expanded", String(!open));
+    /* Mobile bottom sheet. */
+    panel.classList.toggle("open-sheet", !open && window.innerWidth <= 640);
+  });
+  const clr = $("guideClear");
+  if (clr) clr.addEventListener("click", clearGuideFilters);
+})();
 renderAll();
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();
