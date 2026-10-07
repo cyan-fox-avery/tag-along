@@ -2456,7 +2456,11 @@ const LICENSE_URLS = {
   "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
   "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
   "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0/",
-  "CC0": "https://creativecommons.org/publicdomain/zero/1.0/"
+  "CC0": "https://creativecommons.org/publicdomain/zero/1.0/",
+  /* v0.20.0: NC licenses allowed for exceptional images (project policy:
+     Tag Along is free and non-commercial; NC assets carry a licenseNote and
+     would be removed/replaced before any commercial use). */
+  "CC BY-NC 4.0": "https://creativecommons.org/licenses/by-nc/4.0/"
 };
 function archiveAssetHtml(a, isPrimary) {
   const label = a.label ? `<span class="archive-label">${esc(a.label)}</span>` : "";
@@ -2466,7 +2470,11 @@ function archiveAssetHtml(a, isPrimary) {
     ? `<a href="${licUrl}" target="_blank" rel="noopener">${esc(a.license)}</a>`
     : esc(a.license);
   const trimNote = a.trimmed ? " · trimmed from original" : "";
-  const credit = `<p class="archive-credit">${isPD ? "Credit" : "©"} ${esc(a.credit)} · ${licHtml}${trimNote} · <a href="${esc(a.page)}" target="_blank" rel="noopener">Wikimedia Commons ↗</a></p>`;
+  /* v0.20.0: sourceLabel (default Wikimedia Commons) for iNaturalist/FishBase
+     attribution; licenseNote for the NC project-policy notice. */
+  const srcLabel = a.sourceLabel || "Wikimedia Commons";
+  const credit = `<p class="archive-credit">${isPD ? "Credit" : "©"} ${esc(a.credit)} · ${licHtml}${trimNote} · <a href="${esc(a.page)}" target="_blank" rel="noopener">${esc(srcLabel)} ↗</a></p>`;
+  const ncNote = a.licenseNote ? `<p class="archive-nc">${esc(a.licenseNote)}</p>` : "";
   let mediaHtml;
   if (a.type === "video" && a.play) {
     // v0.17.0 review fix: curated clip boundaries. Media fragments (#t=start,end)
@@ -2480,7 +2488,7 @@ function archiveAssetHtml(a, isPrimary) {
   } else {
     mediaHtml = `<a href="${esc(a.full || a.image)}" target="_blank" rel="noopener"><img class="archive-media${isPrimary ? " primary" : ""}" src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></a>`;
   }
-  return `<figure class="archive-asset${isPrimary ? " primary" : ""}">${label}${mediaHtml}<figcaption>${esc(a.caption)}</figcaption>${credit}</figure>`;
+  return `<figure class="archive-asset${isPrimary ? " primary" : ""}">${label}${mediaHtml}<figcaption>${esc(a.caption)}</figcaption>${credit}${ncNote}</figure>`;
 }
 function renderArchive() {
   const list = $("archiveList");
