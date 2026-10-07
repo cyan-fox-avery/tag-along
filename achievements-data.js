@@ -7,7 +7,7 @@ const ACHIEVEMENTS = [
     id: "first-tag",
     name: "Tag, You're It",
     icon: "🏷️",
-    breadcrumb: "tag your first shark",
+    breadcrumb: "the book has to start somewhere",
     description: "Tagged your first shark. The collection book is officially open.",
     check: (st) => Object.keys(st.tagged).length >= 1
   },
@@ -31,7 +31,7 @@ const ACHIEVEMENTS = [
     id: "garbage-day",
     name: "Garbage Day",
     icon: "🗑️",
-    breadcrumb: "tag the garbage can of the sea",
+    breadcrumb: "one shark's trash...",
     description: "Tagged a tiger shark. It'll eat anything. Anything.",
     check: (st) => !!st.tagged.tiger
   },
@@ -39,7 +39,7 @@ const ACHIEVEMENTS = [
     id: "walks",
     name: "It Walks!",
     icon: "🚶",
-    breadcrumb: "tag a shark that goes for strolls",
+    breadcrumb: "it doesn't swim everywhere",
     description: "Tagged an epaulette shark. Yes, it walks. On its fins. Sharks do that.",
     check: (st) => !!st.tagged.epaulette
   },
@@ -47,7 +47,7 @@ const ACHIEVEMENTS = [
     id: "first-name",
     name: "On a First-Name Basis",
     icon: "📝",
-    breadcrumb: "get on a first-name basis with every shark",
+    breadcrumb: "every shark deserves a name",
     description: "Gave every tagged shark a nickname. They're individuals, after all.",
     check: (st) => {
       /* v0.18.0 review: naming one shark isn't a first-name basis with
@@ -70,7 +70,7 @@ const ACHIEVEMENTS = [
     id: "best-cousin",
     name: "Best Cousin Ever",
     icon: "💙",
-    breadcrumb: "give a shark a very personal name",
+    breadcrumb: "name one after someone who matters",
     description: "Named a shark Sarah. She noticed. She's still talking about it.",
     check: (st) => Object.values(st.tagged).some(t => (t.name || "").trim().toLowerCase() === "sarah")
   },
@@ -78,7 +78,7 @@ const ACHIEVEMENTS = [
     id: "ocean-hopper",
     name: "Ocean Hopper?",
     icon: "🗺️",
-    breadcrumb: "visit every region",
+    breadcrumb: "the whole ocean is waiting",
     description: "Ran expeditions in every region. The whole ocean is your office now.",
     check: (st) => {
       /* v0.18.0 review: locked regions count too — the achievement can't
@@ -91,7 +91,7 @@ const ACHIEVEMENTS = [
     id: "full-buffet",
     name: "Full Buffet",
     icon: "🍽️",
-    breadcrumb: "try everything on the menu",
+    breadcrumb: "a taste of everything",
     description: "Used every bait type. The sharks appreciate the variety. Probably.",
     check: (st) => {
       const baits = Object.keys(BAITS);
@@ -113,7 +113,7 @@ const ACHIEVEMENTS = [
     id: "sea-legs",
     name: "Sea Legs",
     icon: "⚓",
-    breadcrumb: "complete 10 expeditions",
+    breadcrumb: "ten trips out",
     description: "Completed 10 expeditions. You're not a landlubber anymore.",
     check: (st) => (st.stats.expeditions || 0) >= 10
   }
