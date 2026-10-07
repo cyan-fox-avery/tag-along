@@ -2743,11 +2743,21 @@ setInterval(tickPhoneClock, 30000);
   });
   const toggle = $("filterToggle");
   const panel = $("filterPanel");
+  const closeSheet = () => {
+    panel.classList.add("hidden");
+    panel.classList.remove("open-sheet");
+    toggle.setAttribute("aria-expanded", "false");
+  };
   if (toggle && panel) toggle.addEventListener("click", () => {
     const open = panel.classList.toggle("hidden");
     toggle.setAttribute("aria-expanded", String(!open));
     /* Mobile bottom sheet. */
     panel.classList.toggle("open-sheet", !open && window.innerWidth <= 640);
+  });
+  const sheetClose = $("sheetClose");
+  if (sheetClose) sheetClose.addEventListener("click", closeSheet);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && panel && !panel.classList.contains("hidden")) closeSheet();
   });
   const clr = $("guideClear");
   if (clr) clr.addEventListener("click", clearGuideFilters);
