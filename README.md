@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.18.0** — *a shark research game*
+**v0.19.0** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,15 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.19.0 changes — the field-guide database
+
+- **Research is now a real field guide.** Text search by name, plus stacked filters for location, depth, method, bait/diet (exact planner vocabulary), and tagged/untagged status. Applied filters show as removable chips, with a visible result count and an obvious Clear.
+- **Dyspraxia-friendly filter UI.** Large tappable chips throughout; on mobile the Filters button opens a compact bottom sheet.
+- **Design rule:** filters narrow the notebook, never solve the expedition.
+- **Six more achievements (12 → 18).** Full Fathom (all four depth zones), Fin-ished! (complete the collection), Bait and Switch (every method), Pen Pal (re-sight the same shark three times), Off the Map (first tag in a locked region), and Every Shade (every IUCN status). All breadcrumbs stay hints.
+- **Breadcrumb polish.** Nine existing breadcrumbs rewritten to hint rather than give away ("the book has to start somewhere", "a rare encounter"), per playtester feedback.
+- **Archive videos muted by default.** No surprise audio.
 
 ## v0.18.0 changes — achievements + the seven-shark wave
 

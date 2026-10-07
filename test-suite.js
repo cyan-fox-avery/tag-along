@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.18.0', VERSION === 'v0.18.0');
+  ok('version v0.19.0', VERSION === 'v0.19.0');
 
   // roster
   ok('roster is 30', SHARKS.length === 30);
@@ -283,7 +283,43 @@ code += `
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }) &&
     !ACHIEVEMENTS.some(a => a.id === 'bruce'));
-  ok('12 live achievements', ACHIEVEMENTS.length === 12);
+  ok('18 live achievements', ACHIEVEMENTS.length === 18);
+  // v0.19.0: six new achievements
+  const resetA = () => { state.tagged = {}; state.achievements = {};
+    state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
+      expeditions: 0, depthsTagged: [], methodsUsed: [] }; };
+  resetA();
+  state.stats.depthsTagged = ["surface", "reef", "twilight", "deep"];
+  checkAchievements();
+  ok('Full Fathom unlocks', !!state.achievements['full-fathom']);
+  resetA();
+  state.tagged = Object.fromEntries(SHARKS.map(s => [s.id, { name: "X", researchId: "R" }]));
+  checkAchievements();
+  ok('Fin-ished unlocks on full roster', !!state.achievements['finished']);
+  resetA();
+  state.stats.methodsUsed = ["chum", "seal", "boat", "plane", "network"];
+  checkAchievements();
+  ok('Bait and Switch unlocks', !!state.achievements['bait-switch']);
+  resetA();
+  state.tagged = { nurse: { name: "B", researchId: "R", resightings: [{}, {}, {}] } };
+  checkAchievements();
+  ok('Pen Pal unlocks at 3 resights', !!state.achievements['pen-pal']);
+  resetA();
+  state.tagged = { scalloped: { name: "S", researchId: "R" } };
+  checkAchievements();
+  ok('Off the Map unlocks in locked region', !!state.achievements['off-map']);
+  resetA();
+  const byStatus = {};
+  SHARKS.forEach(s => { if (!byStatus[s.status]) byStatus[s.status] = s.id; });
+  state.tagged = Object.fromEntries(Object.values(byStatus).map(id => [id, { name: "X", researchId: "R" }]));
+  checkAchievements();
+  ok('Every Shade unlocks across statuses', !!state.achievements['every-shade']);
+  ok('new breadcrumbs stay hints',
+    ["full-fathom","finished","bait-switch","pen-pal","off-map","every-shade"].every(id => {
+      const a = ACHIEVEMENTS.find(x => x.id === id);
+      return a && a.breadcrumb && !/tag your first|complete \d+|visit every/i.test(a.breadcrumb);
+    }));
+  resetA();
   // bull and sandbar tracks resolve to different points
   const bullShelf = MAP_COORDS[TRACK_ENVELOPES.bull.areas.find(a => /shelf/i.test(a))];
   const sandShelf = MAP_COORDS[TRACK_ENVELOPES.sandbar.areas.find(a => /shelf/i.test(a))];
@@ -305,6 +341,63 @@ code += `
   const badCounts = badChumEntry.encounters.some(e => e.result === "tagged" &&
     (SHARKS.find(x => x.id === e.speciesId) || {}).methods?.attract?.includes("chum"));
   ok('chum backfill rejects invalid species', badCounts === false);
+
+  // v0.19.0: field-guide database
+  const resetGF = () => { guideFilters.q = ""; guideFilters.region.clear();
+    guideFilters.depth.clear(); guideFilters.methodOpt.clear();
+    guideFilters.bait.clear(); guideFilters.tagged = "all"; };
+  resetGF();
+  ok('no filters matches all', SHARKS.filter(guideMatches).length === SHARKS.length);
+  guideFilters.q = "hammerhead";
+  const hammers = SHARKS.filter(guideMatches);
+  ok('search finds hammerheads', hammers.length === 3 &&
+    hammers.every(s => /hammerhead/i.test(s.name)));
+  resetGF();
+  guideFilters.region.add("caribbean");
+  const carib = SHARKS.filter(guideMatches);
+  ok('region filter narrows', carib.length > 0 && carib.length < SHARKS.length &&
+    carib.every(s => s.combo.region === "caribbean"));
+  guideFilters.bait.add("tuna");
+  const stacked = SHARKS.filter(guideMatches);
+  ok('stacked filters narrow further', stacked.length <= carib.length &&
+    stacked.every(s => baitList(s).includes("tuna")));
+  resetGF();
+  state.tagged = { nurse: { name: "Bubbles", researchId: "NS-2026-001" } };
+  guideFilters.tagged = "tagged";
+  ok('tagged filter', SHARKS.filter(guideMatches).length === 1);
+  guideFilters.tagged = "untagged";
+  ok('untagged filter', SHARKS.filter(guideMatches).length === SHARKS.length - 1);
+  resetGF();
+  guideFilters.methodOpt.add("chum");
+  const chummers = SHARKS.filter(guideMatches);
+  ok('method filter uses exact planner vocabulary',
+    chummers.length > 0 && chummers.every(s => methodOpts(s).includes("chum")));
+  ok('filter count tracks active filters', (() => {
+    resetGF(); guideFilters.q = "x"; guideFilters.region.add("caribbean");
+    return activeFilterCount() === 2;
+  })());
+  ok('latin-name search works', (() => {
+    resetGF(); guideFilters.q = "sphyrna lewini";
+    const r = SHARKS.filter(guideMatches);
+    return r.length === 1 && r[0].id === "scalloped";
+  })());
+  ok('depth filter narrows', (() => {
+    resetGF(); guideFilters.depth.add("deep");
+    const r = SHARKS.filter(guideMatches);
+    return r.length > 0 && r.length < SHARKS.length &&
+      r.every(s => (s.depths || []).includes("deep"));
+  })());
+  ok('clear resets everything', (() => {
+    guideFilters.q = "shark"; guideFilters.region.add("caribbean");
+    guideFilters.depth.add("reef"); guideFilters.methodOpt.add("chum");
+    guideFilters.bait.add("tuna"); guideFilters.tagged = "tagged";
+    clearGuideFilters();
+    return guideFilters.q === "" && guideFilters.region.size === 0 &&
+      guideFilters.depth.size === 0 && guideFilters.methodOpt.size === 0 &&
+      guideFilters.bait.size === 0 && guideFilters.tagged === "all" &&
+      SHARKS.filter(guideMatches).length === SHARKS.length;
+  })());
+  resetGF(); state.tagged = {};
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };

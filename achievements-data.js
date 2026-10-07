@@ -7,7 +7,7 @@ const ACHIEVEMENTS = [
     id: "first-tag",
     name: "Tag, You're It",
     icon: "🏷️",
-    breadcrumb: "tag your first shark",
+    breadcrumb: "the book has to start somewhere",
     description: "Tagged your first shark. The collection book is officially open.",
     check: (st) => Object.keys(st.tagged).length >= 1
   },
@@ -31,7 +31,7 @@ const ACHIEVEMENTS = [
     id: "garbage-day",
     name: "Garbage Day",
     icon: "🗑️",
-    breadcrumb: "tag the garbage can of the sea",
+    breadcrumb: "one shark's trash...",
     description: "Tagged a tiger shark. It'll eat anything. Anything.",
     check: (st) => !!st.tagged.tiger
   },
@@ -39,7 +39,7 @@ const ACHIEVEMENTS = [
     id: "walks",
     name: "It Walks!",
     icon: "🚶",
-    breadcrumb: "tag a shark that goes for strolls",
+    breadcrumb: "it doesn't swim everywhere",
     description: "Tagged an epaulette shark. Yes, it walks. On its fins. Sharks do that.",
     check: (st) => !!st.tagged.epaulette
   },
@@ -47,7 +47,7 @@ const ACHIEVEMENTS = [
     id: "first-name",
     name: "On a First-Name Basis",
     icon: "📝",
-    breadcrumb: "get on a first-name basis with every shark",
+    breadcrumb: "every shark deserves a name",
     description: "Gave every tagged shark a nickname. They're individuals, after all.",
     check: (st) => {
       /* v0.18.0 review: naming one shark isn't a first-name basis with
@@ -70,7 +70,7 @@ const ACHIEVEMENTS = [
     id: "best-cousin",
     name: "Best Cousin Ever",
     icon: "💙",
-    breadcrumb: "give a shark a very personal name",
+    breadcrumb: "name one after someone who matters",
     description: "Named a shark Sarah. She noticed. She's still talking about it.",
     check: (st) => Object.values(st.tagged).some(t => (t.name || "").trim().toLowerCase() === "sarah")
   },
@@ -78,7 +78,7 @@ const ACHIEVEMENTS = [
     id: "ocean-hopper",
     name: "Ocean Hopper?",
     icon: "🗺️",
-    breadcrumb: "visit every region",
+    breadcrumb: "the whole ocean is waiting",
     description: "Ran expeditions in every region. The whole ocean is your office now.",
     check: (st) => {
       /* v0.18.0 review: locked regions count too — the achievement can't
@@ -91,7 +91,7 @@ const ACHIEVEMENTS = [
     id: "full-buffet",
     name: "Full Buffet",
     icon: "🍽️",
-    breadcrumb: "try everything on the menu",
+    breadcrumb: "a taste of everything",
     description: "Used every bait type. The sharks appreciate the variety. Probably.",
     check: (st) => {
       const baits = Object.keys(BAITS);
@@ -102,7 +102,7 @@ const ACHIEVEMENTS = [
     id: "every-one-counts",
     name: "Every One Counts",
     icon: "🛡️",
-    breadcrumb: "tag a shark that really needed the science",
+    breadcrumb: "a rare encounter",
     description: "Tagged an Endangered or Critically Endangered species. This data matters.",
     check: (st) => Object.keys(st.tagged).some(id => {
       const s = SHARKS.find(x => x.id === id);
@@ -113,9 +113,76 @@ const ACHIEVEMENTS = [
     id: "sea-legs",
     name: "Sea Legs",
     icon: "⚓",
-    breadcrumb: "complete 10 expeditions",
+    breadcrumb: "ten trips out",
     description: "Completed 10 expeditions. You're not a landlubber anymore.",
     check: (st) => (st.stats.expeditions || 0) >= 10
+  },
+  {
+    id: "full-fathom",
+    name: "Full Fathom",
+    icon: "🌊",
+    breadcrumb: "from sunlight to midnight",
+    description: "Tagged sharks in all four depth zones, from the sunlit surface to the deep dark.",
+    check: (st) => {
+      const depths = Object.keys(DEPTHS);
+      return depths.length > 0 && depths.every(d => (st.stats.depthsTagged || []).includes(d));
+    }
+  },
+  {
+    id: "finished",
+    name: "Fin-ished!",
+    icon: "🎓",
+    breadcrumb: "finish what you started",
+    description: "Tagged the full roster. Every shark, every region. The collection book is complete.",
+    check: (st) => Object.keys(st.tagged).length >= SHARKS.length && SHARKS.length > 0
+  },
+  {
+    id: "bait-switch",
+    name: "Bait and Switch",
+    icon: "🎣",
+    breadcrumb: "every tool in the kit",
+    description: "Used every method in the field manual: chum, seal scent, boat survey, spotter plane, and the sightings network.",
+    check: (st) => {
+      const opts = ["chum", "seal", "boat", "plane", "network"];
+      return opts.every(o => (st.stats.methodsUsed || []).includes(o));
+    }
+  },
+  {
+    id: "pen-pal",
+    name: "Pen Pal",
+    icon: "💌",
+    breadcrumb: "keep bumping into the same shark",
+    description: "Re-sighted the same individual shark three times. You two are basically colleagues now.",
+    check: (st) => Object.values(st.tagged).some(t => (t.resightings || []).length >= 3)
+  },
+  {
+    id: "off-map",
+    name: "Off the Map",
+    icon: "🧭",
+    breadcrumb: "beyond the known map",
+    description: "Tagged your first shark in waters that had to be earned — the Galápagos or South Africa.",
+    check: (st) => {
+      const locked = ["galapagos", "south-africa"];
+      return Object.keys(st.tagged).some(id => {
+        const s = SHARKS.find(x => x.id === id);
+        return s && locked.includes(s.combo.region);
+      });
+    }
+  },
+  {
+    id: "every-shade",
+    name: "Every Shade",
+    icon: "🎨",
+    breadcrumb: "from least concern to critically endangered",
+    description: "Tagged sharks spanning every IUCN conservation status. The full spectrum, from secure to critical.",
+    check: (st) => {
+      const statuses = [...new Set(SHARKS.map(s => s.status))];
+      const taggedStatuses = new Set(Object.keys(st.tagged).map(id => {
+        const s = SHARKS.find(x => x.id === id);
+        return s ? s.status : null;
+      }));
+      return statuses.length > 0 && statuses.every(s => taggedStatuses.has(s));
+    }
   }
 ];
 

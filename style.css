@@ -230,6 +230,85 @@ select option:disabled { color: #7a8a9e; }
 
 /* v0.6.0: field guide entries */
 .guide-list { display: grid; gap: 14px; }
+/* v0.19.0: field-guide database tools. Large touch targets throughout. */
+.guide-tools { display: flex; gap: 10px; margin-bottom: 10px; }
+.guide-search {
+  flex: 1; min-height: 48px; padding: 10px 14px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.18); border-radius: 12px;
+  background: rgba(255,255,255,0.06); color: inherit;
+}
+.guide-search::placeholder { opacity: 0.55; }
+.filter-toggle {
+  min-height: 48px; padding: 10px 18px; font-size: 1rem; font-weight: 700;
+  border: 2px solid rgba(255,255,255,0.18); border-radius: 12px;
+  background: rgba(255,255,255,0.06); color: inherit; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+}
+.filter-toggle[aria-expanded="true"] { background: rgba(255,255,255,0.14); }
+.active-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.active-chips:empty { display: none; }
+.chip-active {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 6px 8px 6px 14px; border-radius: 999px;
+  background: rgba(140,200,255,0.18); border: 1px solid rgba(140,200,255,0.4);
+  font-size: 0.9rem;
+}
+.chip-remove {
+  min-width: 48px; min-height: 48px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.12); color: inherit; font-size: 1.3rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+/* v0.19.0 review: Clear all gets its own substantial target, not the tiny link-button. */
+#guideClear {
+  min-height: 48px; padding: 10px 20px; border-radius: 999px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06);
+  color: inherit; cursor: pointer; font-weight: 700;
+}
+.sheet-head { display: none; }
+/* Mobile: filter panel becomes a bottom sheet. */
+@media (max-width: 640px) {
+  .filter-panel.open-sheet .sheet-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .filter-panel.open-sheet .sheet-head h2 { margin: 0; font-size: 1.2rem; }
+  .sheet-close {
+    min-height: 52px; min-width: 96px; padding: 10px 24px; border-radius: 999px;
+    font-size: 1.05rem; font-weight: 800; cursor: pointer;
+    border: none; background: rgba(140,200,255,0.3); color: inherit;
+  }
+}
+.guide-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; min-height: 24px;
+}
+.filter-panel {
+  border: 2px solid rgba(255,255,255,0.14); border-radius: 14px;
+  padding: 14px; margin-bottom: 14px; background: rgba(255,255,255,0.04);
+  display: grid; gap: 14px;
+}
+.filter-group h3 { margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  min-height: 48px; padding: 10px 18px; border-radius: 999px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05);
+  color: inherit; cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: rgba(140,200,255,0.25); border-color: rgba(140,200,255,0.7);
+  font-weight: 700;
+}
+/* Mobile: filter panel becomes a bottom sheet. */
+@media (max-width: 640px) {
+  .filter-panel.open-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
+    max-height: 82vh; overflow-y: auto; margin: 0;
+    border-radius: 18px 18px 0 0; border-bottom: none;
+    background: #0f2233; padding: 18px 18px 28px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+  }
+  .chip { min-height: 52px; padding: 12px 22px; }
+}
 .guide-entry {
   background: var(--bg-card); border-radius: var(--radius);
   padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
