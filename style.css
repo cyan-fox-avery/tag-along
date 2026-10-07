@@ -758,6 +758,8 @@ video.archive-media { max-height: 420px; }
 .archive-asset figcaption { font-size: 14px; line-height: 1.55; margin: 8px 2px 4px; color: var(--ink); }
 .archive-credit { font-size: 12px; color: var(--ink-dim); margin: 0 2px; line-height: 1.5; }
 .archive-credit a { color: var(--ink-dim); }
+/* v0.20.0: non-commercial policy notice on NC-licensed assets. */
+.archive-nc { font-size: 11px; color: var(--ink-dim); font-style: italic; margin: 2px 2px 0; line-height: 1.4; }
 .archive-label {
   display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
   text-transform: uppercase; color: #0d2f4d; background: #ffd166;
