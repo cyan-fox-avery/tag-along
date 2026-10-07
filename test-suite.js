@@ -180,7 +180,10 @@ code += `
   Object.values(ARCHIVE_MEDIA).forEach(m => (m.assets || []).forEach(a => {
     if (a.license && !/public domain/i.test(a.license)) usedLicenses.add(a.license);
   }));
-  const unmapped = [...usedLicenses].filter(l => !LICENSE_URLS[l]);
+  /* v0.20.0: versionless "CC BY-NC" is a deliberate exception (Mira's rule —
+     iNaturalist records no version, so no version-specific link is applied).
+     Everything else needs its canonical URL. */
+  const unmapped = [...usedLicenses].filter(l => l !== "CC BY-NC" && !LICENSE_URLS[l]);
   ok('every CC license has a canonical URL', unmapped.length === 0);
   // mobile perf: videos render with preload="none" + poster, not preload="metadata"
   ok('videos use preload=none with poster', /preload=\\"none\\"/.test(fileCode) && /poster=/.test(fileCode));
@@ -417,8 +420,29 @@ code += `
     COUSIN_CHATS.dusky && COUSIN_CHATS.dusky.length === 3);
   ok('wave nudges present', !!COUSIN_NUDGES.salmon && !!COUSIN_NUDGES.dusky);
   ok('wave art + sketches', !!ART.salmon && !!ART.dusky && !!SKETCH.salmon && !!SKETCH.dusky);
-  ok('dusky archive coming-soon', ARCHIVE_MEDIA.dusky && ARCHIVE_MEDIA.dusky.comingSoon === true &&
-    (ARCHIVE_MEDIA.dusky.assets || []).length === 0);
+  ok('dusky archive live (Avery+Mira curated)', ARCHIVE_MEDIA.dusky && ARCHIVE_MEDIA.dusky.future === false &&
+    !ARCHIVE_MEDIA.dusky.comingSoon && ARCHIVE_MEDIA.dusky.assets.length === 2 &&
+    ARCHIVE_MEDIA.dusky.assets[0].credit === "Happy Little Nomad" &&
+    ARCHIVE_MEDIA.dusky.assets[1].license === "public domain (NOAA)");
+  // v0.20.0: Avery + Mira media batch — 18 future species staged, hidden until playable
+  const futures = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
+    "megamouth","sawshark","greenland","cookiecutter","sixgill","velvetbelly","dwarflantern",
+    "kitefin","pacificsleeper","spinydogfish","catshark"];
+  ok('media batch: 18 future entries', futures.every(id =>
+    ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future === true &&
+    (ARCHIVE_MEDIA[id].assets || []).length >= 1));
+  ok('batch: no pygmy (verification hold)', !ARCHIVE_MEDIA.pygmy);
+  ok('batch: every asset has image+page+credit+license', futures.every(id =>
+    ARCHIVE_MEDIA[id].assets.every(a => a.image && a.page && a.credit && a.license &&
+      !a.image.includes('commons.wikimedia.org/wiki/'))));
+  ok('batch: no HTML page URLs in image src', futures.every(id =>
+    ARCHIVE_MEDIA[id].assets.every(a => !a.image.includes('wikipedia.org') && !a.image.includes('.org/wiki/'))));
+  ok('spinner NC asset has notice + iNaturalist label', (() => {
+    const a = ARCHIVE_MEDIA.spinner.assets[0];
+    return a.license === "CC BY-NC" && !!a.licenseNote && a.sourceLabel === "iNaturalist" &&
+      !LICENSE_URLS["CC BY-NC"];
+  })());
+  ok('NC 4.0 license URL registered', LICENSE_URLS["CC BY-NC 4.0"] === "https://creativecommons.org/licenses/by-nc/4.0/");
   // v0.20.0: pinned shark
   ok('pin toggles', (() => {
     state.pinned = null;
