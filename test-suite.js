@@ -11,7 +11,7 @@ function makeEl() {
     style: {}, disabled: false, hidden: false,
     addEventListener() {}, removeEventListener() {}, setAttribute() {}, getAttribute() { return null; },
     getBoundingClientRect() { return { left: 0, top: 0, width: 800, height: 400 }; },
-    click() {}, focus() {}, scrollHeight: 999, scrollTop: 0,
+    click() {}, focus() {}, scrollIntoView() {}, scrollHeight: 999, scrollTop: 0,
     appendChild(c) { this.children.push(c); return c; },
     querySelector() { return makeEl(); }, querySelectorAll() { return []; },
   };
@@ -451,11 +451,60 @@ code += `
     togglePin("salmon");
     return on && state.pinned === null && pinStore.load() === null;
   })());
+  // v0.20.0 Mira review: sawshark secondary is a genuine detail crop
+  ok('sawshark secondary is a real detail crop', (() => {
+    const a = ARCHIVE_MEDIA.sawshark.assets[1];
+    if (a.framing !== 'detail-crop' || !a.detailCrop || !a.trimmed) return false;
+    const html = archiveAssetHtml(a, false);
+    return html.includes('detail-crop-frame') && html.includes('background-position') &&
+      html.includes('trimmed from original');
+  })());
   ok('pin switches', (() => {
     togglePin("salmon"); togglePin("dusky");
     const r = state.pinned === "dusky";
     state.pinned = null; pinStore.save(null);
     return r;
+  })());
+  // v0.20.0 Mira review: pinned filter-feeder (whale stores bait as a string)
+  ok('pinned filter-feeder renders expedition pin', (() => {
+    state.pinned = 'whale';
+    try { renderExpeditionPin(); } catch (e) { state.pinned = null; return false; }
+    const html = document.getElementById('expeditionPin').innerHTML;
+    state.pinned = null; renderExpeditionPin();
+    return html.includes('Plankton') || html.toLowerCase().includes('plankton');
+  })());
+  ok('pinned depth labels are names not objects', (() => {
+    state.pinned = 'dusky';
+    renderExpeditionPin();
+    const html = document.getElementById('expeditionPin').innerHTML;
+    state.pinned = null; renderExpeditionPin();
+    return !html.includes('[object Object]') && html.includes('Surface');
+  })());
+  ok('jump clears filters hiding the pinned shark', (() => {
+    state.pinned = 'dusky';
+    guideFilters.q = 'zzzz-no-match';
+    // filtered-out state: the entry is not in the rendered list
+    const list = { querySelector() { return null; } };
+    jumpToPinned(SHARKS.find(s => s.id === 'dusky'), list);
+    const cleared = activeFilterCount() === 0;
+    state.pinned = null;
+    return cleared;
+  })());
+  ok('repeat-plan with no method clears the planner method', (() => {
+    const mk = (vals) => {
+      const el = { value: '', options: vals.map(v => ({ value: v, disabled: false })),
+        _h: {}, addEventListener(t, h) { this._h[t] = h; },
+        dispatchEvent() { if (this._h.change) this._h.change(); } };
+      return el;
+    };
+    els['regionSelect'] = mk(['caribbean', 'japan']);
+    els['depthSelect'] = mk(['surface', 'reef']);
+    els['baitSelect'] = mk(['tuna', 'squid']);
+    els['methodSelect'] = mk(['', 'attract']);
+    els['methodOptSelect'] = mk(['none', 'chum']);
+    els['methodSelect'].value = 'attract';
+    repeatPlan({ region: 'japan', depth: 'surface', bait: 'tuna', method: '', methodOpt: 'none' });
+    return els['methodSelect'].value === '';
   })());
   // v0.20.0: quick pace
   ok('quick pace toggles PACE', (() => {
