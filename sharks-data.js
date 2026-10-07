@@ -546,14 +546,14 @@ const SHARKS = [
     id: "dusky",
     name: "Dusky Shark", latin: "Carcharhinus obscurus", status: "Endangered",
     code: "DS",
-    /* The slowest-lived shark in the game: females mature around 20,
+    /* The slowest-reproducing shark in the game: females mature around 20,
        gestate nearly two years, rest a year, breed every third year.
        The catalogue's best story about why sharks are vulnerable. */
     combo: { region: "south-africa", bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.5, 4.0],
-    research: "One of the largest requiem sharks — and one of the slowest-lived animals in the sea. Female dusky sharks mature at around 20 years old, gestate for 22 to 24 months (matched among vertebrates only by elephants), then rest a full year: a single litter every three years. That pace is why the species is Endangered — it cannot replace what fishing takes. Adults cruise tropical and temperate coastlines worldwide, from the surf zone to the outer shelf; off South Africa, groups of juveniles have been seen mobbing a humpback whale calf. There is no single field mark — identification is by proportion, including a low ridge of skin between the dorsal fins. Sardines or squid on chum, surface to reef.",
+    research: "One of the largest requiem sharks — and one of the slowest-reproducing sharks. Female dusky sharks mature at around 20 years old, gestate for 22 to 24 months (matched among vertebrates only by elephants), then rest a full year: a single litter every three years. That pace is why the species is Endangered — it cannot replace what fishing takes. Adults cruise tropical and temperate coastlines worldwide, from the surf zone to the outer shelf; off South Africa, groups of juveniles have been seen mobbing a humpback whale calf. There is no single field mark — identification is by proportion, including a low ridge of skin between the dorsal fins. Sardines or squid on chum, surface to reef.",
     hook: "Females breed only every third year — the slowest reproductive pace of any shark in the game.",
     bonus: "Dusky sharks have been tracked migrating up to 3,800 km — yet females return to their own nurseries, keeping local populations distinct.",
     cheer: "A dusky! Every tag on this species genuinely matters for the science.",
