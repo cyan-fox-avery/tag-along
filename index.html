@@ -92,6 +92,7 @@
           <h2>Plan an expedition</h2>
           <p>Choose the water — region, depth, bait, and method. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
         </div>
+        <div id="expeditionPin" class="expedition-pin hidden"></div>
 
         <div id="planner" class="planner-card">
           <label class="field">
@@ -120,6 +121,10 @@
             <div class="pick-visual" id="methodOptVisual" aria-hidden="true"></div>
           </label>
           <button id="launchBtn" class="primary-button" type="button">🚀 Launch expedition</button>
+          <label class="pace-toggle">
+            <input type="checkbox" id="quickPace">
+            <span>⚡ Quick pace <span class="latin">— shorter beats between log lines</span></span>
+          </label>
         </div>
 
         <div id="diveView" class="dive-view hidden" aria-live="polite">
