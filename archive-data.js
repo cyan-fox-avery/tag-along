@@ -548,7 +548,7 @@ const ARCHIVE_MEDIA = {
  },
  "salmon": {
   "scientific": "Lamna ditropis",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -570,6 +570,12 @@ const ARCHIVE_MEDIA = {
     "full": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Salmon_shark_afsc.jpg"
    }
   ]
+ },
+ "dusky": {
+  "scientific": "Carcharhinus obscurus",
+  "future": false,
+  "comingSoon": true,
+  "assets": []
  },
  /* v0.18.0 future batch — pre-curated by Avery + ChatGPT. NOT on the playable
     roster yet. All metadata independently verified against Commons 2026-10-06.
