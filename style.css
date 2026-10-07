@@ -750,6 +750,12 @@ video.archive-media { max-height: 420px; }
   overflow: hidden; border-radius: 10px; border: 1px solid #2c5364;
   background: #000;
 }
+/* v0.20.0: genuine detail crop (sawshark rostrum) — background-positioned
+   from the source image; geometry comes from the asset's detailCrop. */
+.detail-crop-frame {
+  width: 100%; overflow: hidden; border-radius: 10px; border: 1px solid #2c5364;
+  background-repeat: no-repeat; background-color: #0a2a3f;
+}
 .gif-landscape-frame img {
   position: absolute; top: 50%; left: 50%;
   width: 86.5%; aspect-ratio: 600/1067;
