@@ -283,7 +283,43 @@ code += `
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }) &&
     !ACHIEVEMENTS.some(a => a.id === 'bruce'));
-  ok('12 live achievements', ACHIEVEMENTS.length === 12);
+  ok('18 live achievements', ACHIEVEMENTS.length === 18);
+  // v0.19.0: six new achievements
+  const resetA = () => { state.tagged = {}; state.achievements = {};
+    state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
+      expeditions: 0, depthsTagged: [], methodsUsed: [] }; };
+  resetA();
+  state.stats.depthsTagged = ["surface", "reef", "twilight", "deep"];
+  checkAchievements();
+  ok('Full Fathom unlocks', !!state.achievements['full-fathom']);
+  resetA();
+  state.tagged = Object.fromEntries(SHARKS.map(s => [s.id, { name: "X", researchId: "R" }]));
+  checkAchievements();
+  ok('Fin-ished unlocks on full roster', !!state.achievements['finished']);
+  resetA();
+  state.stats.methodsUsed = ["chum", "seal", "boat", "plane", "network"];
+  checkAchievements();
+  ok('Bait and Switch unlocks', !!state.achievements['bait-switch']);
+  resetA();
+  state.tagged = { nurse: { name: "B", researchId: "R", resightings: [{}, {}, {}] } };
+  checkAchievements();
+  ok('Pen Pal unlocks at 3 resights', !!state.achievements['pen-pal']);
+  resetA();
+  state.tagged = { scalloped: { name: "S", researchId: "R" } };
+  checkAchievements();
+  ok('Off the Map unlocks in locked region', !!state.achievements['off-map']);
+  resetA();
+  const byStatus = {};
+  SHARKS.forEach(s => { if (!byStatus[s.status]) byStatus[s.status] = s.id; });
+  state.tagged = Object.fromEntries(Object.values(byStatus).map(id => [id, { name: "X", researchId: "R" }]));
+  checkAchievements();
+  ok('Every Shade unlocks across statuses', !!state.achievements['every-shade']);
+  ok('new breadcrumbs stay hints',
+    ["full-fathom","finished","bait-switch","pen-pal","off-map","every-shade"].every(id => {
+      const a = ACHIEVEMENTS.find(x => x.id === id);
+      return a && a.breadcrumb && !/tag your first|complete \d+|visit every/i.test(a.breadcrumb);
+    }));
+  resetA();
   // bull and sandbar tracks resolve to different points
   const bullShelf = MAP_COORDS[TRACK_ENVELOPES.bull.areas.find(a => /shelf/i.test(a))];
   const sandShelf = MAP_COORDS[TRACK_ENVELOPES.sandbar.areas.find(a => /shelf/i.test(a))];
