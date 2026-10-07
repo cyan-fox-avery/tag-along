@@ -751,6 +751,26 @@ function togglePin(id) {
   renderResearch();
   renderExpeditionPin();
 }
+/* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
+   clears any filters hiding the shark first, so Jump never silently fails. */
+function jumpToPinned(s, list) {
+  if (!list.querySelector(`[data-entry="${s.id}"]`) && activeFilterCount() > 0) {
+    clearGuideFilters();
+  }
+  const target = list.querySelector(`[data-entry="${s.id}"]`);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    const body = target.querySelector(".guide-row-body");
+    const head = target.querySelector(".guide-row-head");
+    if (body && body.classList.contains("hidden")) {
+      body.classList.remove("hidden");
+      head.setAttribute("aria-expanded", "true");
+      target.classList.add("open");
+    }
+    target.classList.add("pin-flash");
+    setTimeout(() => target.classList.remove("pin-flash"), 1200);
+  }
+}
 function renderPinnedCard(list) {
   const s = SHARKS.find(x => x.id === state.pinned);
   const card = document.createElement("div");
@@ -768,26 +788,12 @@ function renderPinnedCard(list) {
         <div>
           <strong>${s.name}</strong> ${done ? "✅" : ""}<br>
           <span class="latin">${s.latin}</span><br>
-          <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => DEPTHS[d]).join(", ")}</span>
+          <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
       </div>
       <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
     card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
-    card.querySelector("[data-jump]").addEventListener("click", () => {
-      const target = list.querySelector(`[data-entry="${s.id}"]`);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
-        const body = target.querySelector(".guide-row-body");
-        const head = target.querySelector(".guide-row-head");
-        if (body && body.classList.contains("hidden")) {
-          body.classList.remove("hidden");
-          head.setAttribute("aria-expanded", "true");
-          target.classList.add("open");
-        }
-        target.classList.add("pin-flash");
-        setTimeout(() => target.classList.remove("pin-flash"), 1200);
-      }
-    });
+    card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
   }
   list.appendChild(card);
 }
@@ -800,9 +806,11 @@ function renderExpeditionPin() {
   if (!s) { el.classList.add("hidden"); el.innerHTML = ""; return; }
   el.classList.remove("hidden");
   const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region;
-  const baits = s.combo.bait.map(b => BAITS[b] || b).join(", ");
+  /* v0.20.0: Mira review fix — filter feeders (whale, basking) store bait as a
+     string, not an array. baitList() normalizes both. */
+  const baits = baitList(s).map(b => BAITS[b] || b).join(", ");
   el.innerHTML = `📌 Currently researching: <strong>${s.name}</strong>
-    <span class="latin">${regionName} · ${s.depths.map(d => DEPTHS[d]).join(", ")} · ${baits}</span>`;
+    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>`;
 }
 function renderResearch() {
   const list = $("researchList");
@@ -828,8 +836,14 @@ function renderResearch() {
   if (gc) gc.textContent = `Showing ${ordered.length} of ${SHARKS.length} sharks`;
   const clr = $("guideClear");
   if (clr) clr.classList.toggle("hidden", n === 0);
+  /* v0.20.0: Mira review fix — the pinned card survives empty-results states;
+     it is a research focus, not a filter result. */
   if (!ordered.length) {
-    list.innerHTML = `<p class="latin" style="text-align:center; padding: 24px 12px;">No sharks match those filters. Try clearing something — the ocean is bigger than it looks.</p>`;
+    const p = document.createElement("p");
+    p.className = "latin";
+    p.style.cssText = "text-align:center; padding: 24px 12px;";
+    p.textContent = "No sharks match those filters. Try clearing something — the ocean is bigger than it looks.";
+    list.appendChild(p);
     return;
   }
   ordered.forEach(s => {
@@ -1261,7 +1275,9 @@ async function runExpedition(plan) {
     region: plan.region,
     depth: plan.depth,
     bait: plan.bait,
-    method: plan.method || "attract",
+    /* v0.20.0 Mira review fix: record the actual method ("" when unpicked) —
+       the logbook renders "No method chosen"; "attract" was a misrecord. */
+    method: plan.method || "",
     methodOpt: plan.methodOpt || "none",
     encounters: []
   };
@@ -1586,10 +1602,14 @@ function repeatPlan(t) {
   set("depthSelect", t.depth);
   set("baitSelect", t.bait);
   /* Method select's change handler fills the sub-options synchronously,
-     so the opt can be set right after. Legacy entries (lure, no method)
-     simply leave the method unpicked. */
+     so the opt can be set right after. v0.20.0 Mira review fix: a saved
+     expedition with no method restores NO method — it must not retain
+     whatever was previously picked in the planner. */
   if (set("methodSelect", t.method || "")) {
     set("methodOptSelect", t.methodOpt || "none");
+  } else {
+    const ms = $("methodSelect");
+    if (ms && !t.method) { ms.value = ""; ms.dispatchEvent(new Event("change")); }
   }
   goTab("expedition");
 }
@@ -2394,7 +2414,8 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements"];
+/* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -2424,113 +2445,19 @@ function renderAll() {
   renderSarahAsk();
   renderAchievements(); // v0.18.0
   renderExpeditionPin(); // v0.20.0
-  /* v0.20.0: restore quick-pace preference. */
+  /* v0.20.0: restore quick-pace preference (the change listener is bound
+     once at init — Mira review fix: binding it here accumulated listeners
+     on every renderAll). */
   const qp = $("quickPace");
   if (qp) {
-    qp.addEventListener("change", () => setPace(qp.checked));
     let saved = false;
     try { saved = localStorage.getItem("tyi-pace") === "quick"; } catch {}
+    qp.checked = saved;
     if (saved) setPace(true);
   }
 }
 
-/* ---------- Wild Archive (v0.17.0) ----------
-   Post-win reward: real-world photography and footage of every tagged
-   species. All media was hand-curated by Avery from Wikimedia Commons
-   (CC BY / CC BY-SA / public domain); attribution is shown per asset.
-   Species not yet in the live roster stay hidden until they're added. */
-function updateArchiveTab() {
-  const btn = document.querySelector('.tab[data-tab="archive"]');
-  if (btn) btn.classList.toggle("hidden", !state.archiveUnlocked);
-}
-/* v0.17.0 review fix: canonical license URLs so the Archive's credit line
-   links the license itself, not just names it. Public-domain assets get no
-   CC link (and no copyright symbol — "Credit:" instead of "©"). */
-const LICENSE_URLS = {
-  "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
-  "CC BY 3.0": "https://creativecommons.org/licenses/by/3.0/",
-  "CC BY 2.0": "https://creativecommons.org/licenses/by/2.0/",
-  "CC BY 2.5": "https://creativecommons.org/licenses/by/2.5/",
-  "CC BY 3.0 AU": "https://creativecommons.org/licenses/by/3.0/au/",
-  "CC BY-SA 2.5": "https://creativecommons.org/licenses/by-sa/2.5/",
-  "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
-  "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
-  "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0/",
-  "CC0": "https://creativecommons.org/publicdomain/zero/1.0/",
-  /* v0.20.0: NC licenses allowed for exceptional images (project policy:
-     Tag Along is free and non-commercial; NC assets carry a licenseNote and
-     would be removed/replaced before any commercial use). */
-  "CC BY-NC 4.0": "https://creativecommons.org/licenses/by-nc/4.0/"
-};
-function archiveAssetHtml(a, isPrimary) {
-  const label = a.label ? `<span class="archive-label">${esc(a.label)}</span>` : "";
-  const isPD = /public domain/i.test(a.license || "") || a.license === "CC0";
-  const licUrl = LICENSE_URLS[a.license];
-  const licHtml = licUrl
-    ? `<a href="${licUrl}" target="_blank" rel="noopener">${esc(a.license)}</a>`
-    : esc(a.license);
-  const trimNote = a.trimmed ? " · trimmed from original" : "";
-  /* v0.20.0: sourceLabel (default Wikimedia Commons) for iNaturalist/FishBase
-     attribution; licenseNote for the NC project-policy notice. */
-  const srcLabel = a.sourceLabel || "Wikimedia Commons";
-  const credit = `<p class="archive-credit">${isPD ? "Credit" : "©"} ${esc(a.credit)} · ${licHtml}${trimNote} · <a href="${esc(a.page)}" target="_blank" rel="noopener">${esc(srcLabel)} ↗</a></p>`;
-  const ncNote = a.licenseNote ? `<p class="archive-nc">${esc(a.licenseNote)}</p>` : "";
-  let mediaHtml;
-  if (a.type === "video" && a.play) {
-    // v0.17.0 review fix: curated clip boundaries. Media fragments (#t=start,end)
-    // are honored by modern browsers incl. iOS Safari, so the Archive presents
-    // the excerpt Avery chose instead of the whole source video.
-    const clip = (a.clipStart != null && a.clipEnd != null) ? `#t=${a.clipStart},${a.clipEnd}` : "";
-    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls muted playsinline preload="none"${a.image ? ` poster="${esc(a.image)}"` : ""} src="${esc(a.play + clip)}"></video>`;
-  } else if (a.framing === "landscape-crop") {
-    // v0.17.1: portrait GIF reframed as landscape (crop + 90deg rotate in CSS).
-    mediaHtml = `<div class="gif-landscape-frame"><img src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></div>`;
-  } else {
-    mediaHtml = `<a href="${esc(a.full || a.image)}" target="_blank" rel="noopener"><img class="archive-media${isPrimary ? " primary" : ""}" src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></a>`;
-  }
-  return `<figure class="archive-asset${isPrimary ? " primary" : ""}">${label}${mediaHtml}<figcaption>${esc(a.caption)}</figcaption>${credit}${ncNote}</figure>`;
-}
-function renderArchive() {
-  const list = $("archiveList");
-  if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
-  list.innerHTML = "";
-  SHARKS.forEach(s => {
-    const media = ARCHIVE_MEDIA[s.id];
-    if (!media || media.future) return;
-    /* v0.17.0 review fix: the archive promise is "the real animals you tagged."
-       A species dossier requires an actual tag, so a future roster expansion
-       (e.g. salmon) can't leak into a returning player's Archive before they
-       tag one. */
-    if (!state.tagged[s.id]) return;
-    const t = state.tagged[s.id] || {};
-    const yourShark = t.researchId
-      ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
-      : "";
-    const row = document.createElement("div");
-    row.className = "guide-row";
-    row.innerHTML = `
-      <button type="button" class="guide-row-head" aria-expanded="false">
-        <span class="guide-row-name">${s.name}</span>
-        <span class="latin">${media.scientific}</span>
-        <span class="status-pill">IUCN: ${s.status}</span>
-        <span class="guide-caret" aria-hidden="true">\u25be</span>
-      </button>
-      <div class="guide-row-body hidden">
-        ${yourShark}
-        ${media.comingSoon
-          ? `<p class="hook">📸 Wild media coming soon — being curated.</p>`
-          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
-      </div>`;
-    const head = row.querySelector(".guide-row-head");
-    const body = row.querySelector(".guide-row-body");
-    head.addEventListener("click", () => {
-      const isHidden = body.classList.toggle("hidden");
-      head.setAttribute("aria-expanded", String(!isHidden));
-    });
-    list.appendChild(row);
-  });
-}
-
+/* v0.20.0: Wild Archive UI lives in archive-ui.js (module split). */
 /* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
    completed v0.14 save boots with won=true, a full roster, and no archive
    unlock. Backfill the unlock they already earned. */
@@ -2800,6 +2727,9 @@ setInterval(tickPhoneClock, 30000);
   });
   const clr = $("guideClear");
   if (clr) clr.addEventListener("click", clearGuideFilters);
+  /* v0.20.0: quick-pace listener bound once at init (never in renderAll). */
+  const qp = $("quickPace");
+  if (qp) qp.addEventListener("change", () => setPace(qp.checked));
 })();
 renderAll();
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
