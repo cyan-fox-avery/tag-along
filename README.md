@@ -11,6 +11,14 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.20.0 changes — expedition flow + two-shark wave
+
+- **📌 Pinned shark ("currently researching").** Pin any field-guide entry to keep it in a focus card at the top of the Research tab — with a jump-to-entry button. The Expedition tab also shows your pinned shark's region/depth/bait as a planning reference. One pin at a time, persisted across sessions. A focus, never a filter.
+- **🔁 Repeat-plan.** Every logbook entry now has a "Repeat this plan" button that restores its region, depth, bait, and method into the planner and jumps you to the Expedition tab.
+- **⚡ Quick pace.** A new planner toggle shortens the beats between dive-log lines for faster expeditions. Preference persists.
+- **Two new sharks (30 → 32).** The salmon shark graduates from the future batch with its curated archive media; the dusky shark joins with a "coming soon" media slot awaiting curation. Both have full dossiers, Sarah's chats and nudges, derpy art, field-guide sketches, and tracking envelopes.
+- 130 tests passing.
+
 ## v0.19.1 changes — underwater ambience
 
 - **The site has water in it now.** The background is a descent: bright surface water behind the title card, darkening through the depths as you scroll. A shimmering surface band sits just below the title card, god rays slant down from it, slow bubbles rise, and a dark seafloor silhouette (with kelp) rests along the bottom. All decorative layers sit behind the app, ignore taps, and respect `prefers-reduced-motion`.
