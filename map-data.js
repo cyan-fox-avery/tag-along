@@ -288,6 +288,20 @@ const TRACK_ENVELOPES = {
     areas: ["Tag-site sandbank", "Outer Banks coastal shelf", "Bay mouth", "Migration corridor", "Wintering ground"],
     hop: [80, 700], dayStep: [10, 35], nPoints: [4, 6], kind: "satellite",
     corridor: "seasonal migrant — US east-coast satellite/acoustic work shows north-south migrations along the shelf, with Chesapeake Bay as a key nursery"
+  },
+  /* v0.20.0 wave. */
+  salmon: {
+    start: "Kuril Islands (tag site)",
+    areas: ["Tag-site waters", "Sea of Okhotsk", "Gulf of Alaska", "Prince William Sound", "Offshore Japan (wintering)", "Oregon/California coast"],
+    hop: [50, 400], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+    corridor: "seasonal migration following salmon — north in summer (Gulf of Alaska, Kurils), south in winter (Japan, Oregon/California); ~33 km/day on migratory legs; males more common west, females east"
+  },
+  dusky: {
+    start: "KwaZulu-Natal coast (tag site)",
+    areas: ["Tag-site coast", "Sardine Run corridor", "Mozambique coast", "Cape waters", "Offshore Agulhas", "Nursery bays"],
+    hop: [80, 500], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "strongly migratory — up to 3,800 km recorded, seasonal poleward shifts; females show natal site fidelity, keeping local populations distinct"
+
   }
 
 };
@@ -446,6 +460,19 @@ const MAP_COORDS = {
   "Seal Island (False Bay)": [-34.13, 18.58],
   "Mossel Bay": [-34.15, 22.1],
   "Cape Agulhas": [-34.83, 20.0],
+  /* v0.20.0 wave: salmon + dusky envelope areas. */
+  "Tag-site waters": [44.0, 150.0],
+  "Sea of Okhotsk": [55.0, 150.0],
+  "Gulf of Alaska": [58.0, -145.0],
+  "Prince William Sound": [60.5, -147.0],
+  "Offshore Japan (wintering)": [35.0, 142.0],
+  "Oregon/California coast": [40.0, -125.0],
+  "Tag-site coast": [-29.5, 31.5],
+  "Sardine Run corridor": [-30.5, 30.5],
+  "Mozambique coast": [-25.0, 34.0],
+  "Cape waters": [-34.5, 19.0],
+  "Offshore Agulhas": [-38.0, 25.0],
+  "Nursery bays": [-28.5, 32.0],
   "Open Indian Ocean (offshore leg)": [-38.0, 25.0],
   "Bimini": [25.7, -79.25],
   "Andros Island": [24.4, -77.9],
