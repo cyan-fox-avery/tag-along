@@ -160,6 +160,16 @@ const COUSIN_CHATS = {
     { them: "The sandbar shark's first dorsal is unusually tall and triangular. It's one of the quickest ways to separate it from similar coastal sharks. You can spot one from the silhouette alone.", me: "The sail-fin shark." },
     { them: "Chesapeake Bay is a giant sandbar shark nursery — pups are born there in summer. One bay, thousands of baby sharks. The cuteness is structural.", me: "A bay full of pups." },
     { them: "Sandbars migrate up and down the US east coast with the seasons. Winter in the south, summer in the north. They have a commute.", me: "Seasonal commuters." }
+  ],
+  salmon: [
+    { them: "Salmon sharks are partly warm-blooded — they keep their stomach, eyes and brain warm while hunting in water near freezing. A warm hunter in a cold ocean.", me: "Warm-blooded and hunting salmon. Remarkable." },
+    { them: "One study estimated salmon sharks eat 12 to 25 percent of the entire annual Prince William Sound salmon run. A quarter of the salmon, taken by sharks.", me: "The scale of that appetite." },
+    { them: "In summer, salmon sharks cruise just under the surface in slow circles, dorsal fins exposed. Males mostly in the west, females in the east — the ocean sorted by sex.", me: "Circling the cold surface." }
+  ],
+  dusky: [
+    { them: "Dusky shark females mature at around twenty, gestate for nearly two years, then rest a full year. One litter every three years. It's the slowest reproductive pace of any shark I know.", me: "Three years for one litter. Extraordinary." },
+    { them: "Young dusky sharks school together to feed — and one group was seen mobbing a humpback whale calf off South Africa. Ten to twenty juveniles, one very unlucky calf.", me: "Strength in numbers, even as pups." },
+    { them: "Duskies have no single field mark. You identify them by proportion — the general shape, and a low ridge of skin between the dorsal fins. Subtle sharks.", me: "Identified by almost nothing. My favourite kind." }
   ]
 
 };
@@ -197,6 +207,9 @@ const COUSIN_NUDGES = {
   bull: "Bull sharks patrol the Caribbean coast — Playa del Carmen, estuaries, anywhere the water's warm and coastal. Big oily fish like tuna, or schooling fish, with chum. Broad flat snout, heavy build. They'll come up rivers, but you'll meet yours at sea.",
   greyreef: "Grey reef sharks hold Indo-Pacific reef drop-offs — Papua New Guinea, the channels and current-swept edges. Reef fish or squid, with chum. They patrol the same ground for years, so learn the reef and you'll learn the shark.",
   caribbean: "Caribbean reef sharks are Bahamas home-team — Tiger Beach, the reef flats. Shallow water, schooling fish or tuna, with chum. They share the reef with lemons and bulls, so check your fins: no black tips, no heavy bull build.",
-  sandbar: "Sandbar sharks work the sandy coastal shelves — the Outer Banks, shallow bays and banks. Schooling fish, squid or crabs, with chum. Look for the unusually tall first dorsal fin — one of the species' clearest ID features."
+  sandbar: "Sandbar sharks work the sandy coastal shelves — the Outer Banks, shallow bays and banks. Schooling fish, squid or crabs, with chum. Look for the unusually tall first dorsal fin — one of the species' clearest ID features.",
+  /* v0.20.0 wave. */
+  salmon: "Salmon sharks hunt Japan's cold northern waters and the Kurils — surface cruising in summer, dorsal fins in slow circles. Big oily fish: tuna or squid, with chum. They're warm-blooded, so don't let the cold water fool you.",
+  dusky: "Dusky sharks patrol South Africa's coast — surface to reef, the surf zone out to the shelf. Sardines or squid, with chum. Slow to mature, slow to breed, Endangered: this is a tag that genuinely counts. Look for the low ridge between the dorsal fins."
 
 };
