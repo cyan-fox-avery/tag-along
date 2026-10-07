@@ -17,16 +17,20 @@
 body {
   margin: 0;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  /* v0.19.1: the descent — surface light at the top, deep dark below. */
+  /* v0.19.1: the descent — surface light at the top, deep dark below.
+     No background-attachment:fixed — the gradient belongs to the document,
+     so scrolling down genuinely takes you deeper. */
   background: linear-gradient(180deg, #17517e 0%, #10395c 22%, #0b2740 48%, #071a2c 72%, #030e1a 100%);
-  background-attachment: fixed;
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
 }
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
-/* v0.19.1: underwater ambience — sits behind the app, never interactive. */
-.ocean-decor { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+/* v0.19.1: underwater ambience — sits behind the app, never interactive.
+   Document-positioned (not viewport-fixed): the surface, light, and seafloor
+   belong to actual depths, so scrolling feels like descending. */
+.ocean-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 /* The surface, just below the title card. */
 .surface-shimmer {
   position: absolute; top: 0; left: 0; right: 0; height: 210px;
@@ -40,9 +44,9 @@ body {
   from { transform: translateX(-2%); opacity: 0.85; }
   to { transform: translateX(2%); opacity: 1; }
 }
-/* God rays slanting down from the surface. */
+/* God rays slanting down from the surface — document-positioned in the upper water column. */
 .god-rays span {
-  position: absolute; top: 120px; width: 90px; height: 70vh;
+  position: absolute; top: 120px; width: 90px; height: 640px;
   background: linear-gradient(180deg, rgba(180,225,255,0.10), transparent 80%);
   transform: skewX(-12deg); filter: blur(6px);
   animation: ray-sway 18s ease-in-out infinite alternate;
@@ -55,7 +59,8 @@ body {
   from { transform: skewX(-14deg) translateX(-12px); opacity: 0.7; }
   to { transform: skewX(-9deg) translateX(12px); opacity: 1; }
 }
-/* Slow rising bubbles. */
+/* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling. */
+.bubbles { position: fixed; inset: 0; pointer-events: none; }
 .bubbles span {
   position: absolute; bottom: -20px; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
