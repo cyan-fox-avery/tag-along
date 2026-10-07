@@ -11,6 +11,10 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.19.1 changes — underwater ambience
+
+- **The site has water in it now.** The background is a descent: bright surface water behind the title card, darkening through the depths as you scroll. A shimmering surface band sits just below the title card, god rays slant down from it, slow bubbles rise, and a dark seafloor silhouette (with kelp) rests along the bottom. All decorative layers sit behind the app, ignore taps, and respect `prefers-reduced-motion`.
+
 ## v0.19.0 changes — the field-guide database
 
 - **Research is now a real field guide.** Text search by name, plus stacked filters for location, depth, method, bait/diet (exact planner vocabulary), and tagged/untagged status. Applied filters show as removable chips, with a visible result count and an obvious Clear.
