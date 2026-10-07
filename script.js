@@ -5,118 +5,10 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.19.1";
+const VERSION = "v0.20.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
-
-/* ---------- Data ---------- */
-
-const REGIONS = {
-  "caribbean":    { name: "Caribbean Sea",        note: "A green sea turtle glides past the reef." },
-  /* v0.9.0: sand tiger moved here from Baja California. WHY (for reviewers):
-     FishBase gives Carcharias taurus as "Circumtropical: Except perhaps
-     the eastern Pacific," so the old Baja placement was an outright error.
-     The Outer Banks' WWII-era wrecks host the most famous sand tiger
-     aggregation in the world — Paxton et al. 2019 (Ecology) documented
-     female site fidelity to individual NC wrecks, backed by the Spot A
-     Shark USA citizen-science photo-ID program. Bonus: the wrecks
-     synergize with the game's scuttled-ship easter eggs — here, wrecks
-     are documented habitat, not scenery. South Africa and E. Australia
-     were considered but South Africa is a locked region and the sand
-     tiger is an original-six start-region species. */
-  "north-carolina": { name: "Outer Banks, North Carolina", note: "Below, the dark shapes of old wrecks rise from the sand — the Graveyard of the Atlantic." },
-  "philippines":  { name: "Philippines",          note: "A manta ray loops lazily overhead." },
-  "maldives":     { name: "Maldives",             note: "Dolphins click and whistle in the distance." },
-  "japan":        { name: "Sagami Bay, Japan",    note: "A lanternfish flickers in the dark." },
-  "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
-  "cornwall":     { name: "Cornwall, UK",         note: "Gannets dive-bomb the water around the boat." },
-  "papua-new-guinea": { name: "Papua New Guinea", note: "The reef flat stretches out, impossibly clear and shallow." },
-  /* These unlock once the first six sharks are tagged — new waters earned,
-     not given. v0.7.0: real species live here now, so they are selectable,
-     not teasers. */
-  "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
-  "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true }
-};
-
-const DEPTHS = {
-  "surface":  { name: "Surface waters (0–30 m)",     scene: "depth-surface" },
-  "reef":     { name: "Reef & shallows (30–100 m)", scene: "depth-shallow" },
-  "twilight": { name: "Twilight depths (100–400 m)", scene: "depth-midwater" },
-  "deep":     { name: "Deep dark (400–1000 m)",     scene: "depth-deep" }
-};
-
-const BAITS = {
-  "crustaceans":   "Crabs & lobster",
-  "squid":         "Squid",
-  "schooling-fish":"Schooling fish (mackerel)",
-  "plankton":      "Plankton bloom — no bait, follow the bloom",
-  /* v0.8.0: three new hook baits. Sardines fold into schooling fish —
-     a separate row would add planner complexity without a real
-     biological distinction. */
-  "tuna":          "Tuna / large oily fish",
-  "ray":           "Ray",
-  "urchins":       "Urchins & shellfish"
-};
-
-/* v0.9.0: "Method" replaces the v0.8.0 scent-lure row. The planner asks HOW
-   you'll try to meet the shark, and each top-level approach opens its own
-   sub-menu of real field practices. A species only boosts on methods that
-   are real for that animal — a whale shark never sees chum.
-   Boost-only semantics kept from v0.8.0: the right method raises a
-   species' encounter weight ~3x; a wrong method is neutral, never a gate.
-   WHY this shape (for reviewers): ChatGPT's v0.8.0 review argued that
-   forcing every shark through identical planner rows teaches something
-   more general than the evidence supports — e.g. "krill scent" for whale
-   sharks implied scenting the water works on filter feeders, when real
-   practice is locating a feeding aggregation. So the planner is now
-   asymmetric on purpose: hunters get attractants, filter feeders get
-   aggregation-finding. The asymmetry teaches the animal.
-   EXTENSION POINT for future versions: new top-level methods (deep
-   deployment, seal decoy, BRUV, ...) slot in here with their own `opts`;
-   add the method key to each species' `methods` map it genuinely fits. */
-const METHODS = {
-  "attract": {
-    name: "Attract — scent in the water",
-    subLabel: "Attractant",
-    opts: {
-      "none": "No attractant",
-      "chum": "Fish-oil chum",
-      "seal": "Seal scent"
-    }
-  },
-  "aggregation": {
-    name: "Find the aggregation",
-    subLabel: "Approach",
-    /* WHY these three (for reviewers): real whale/basking-shark field
-       practice per 2026 research — see research notes below. Boat surveys
-       at seasonal sites, aerial spotter surveys, and local sightings
-       networks are the three genuinely distinct ways researchers locate
-       feeding aggregations. All three boost equally: they are all real,
-       so the choice is about fieldcraft flavor, recorded in the logbook. */
-    opts: {
-      "boat": "Boat survey of the bloom",
-      "plane": "Spotter-plane survey",
-      "network": "Local sightings network"
-    }
-  }
-};
-
-/* Legacy labels for pre-v0.9.0 logbook entries, so old trips still read
-   sensibly after the scent-row removal. */
-const LEGACY_LURES = { "none": "No lure", "chum": "Fish-oil chum", "seal": "Seal scent", "krill": "Krill scent" };
-
-
-
-
-
-/* If you name a shark "Sarah", she finds out. Sweet, not progression. */
-const SARAH_EGG_THREAD = [
-  { who: "them", text: "Wait. You named a shark Sarah? Like me?" },
-  { who: "me",   text: "Well... yeah. You're the reason I know half of this stuff." },
-  { who: "them", text: "A shark with my name, out there somewhere carrying a tag. I don't think I'll ever get over that." },
-  { who: "me",   text: "She's got your name now. I think she knows." }
-];
 
 /* ---------- Ambient sea life: small silhouettes that drift through the dive ---------- */
 
@@ -533,6 +425,21 @@ const logStore = {
    unlocks the Galápagos and South Africa — new waters earned, not given. */
 const ORIGINAL_SIX = ["nurse", "thresher", "whale", "goblin", "tiger", "sandtiger"];
 
+/* v0.20.0: the pinned shark — "currently researching". One shark at a time,
+   persisted across sessions. A focus, not a filter. */
+const pinStore = {
+  load() {
+    try { return localStorage.getItem("tyi-pinned") || null; }
+    catch { return null; }
+  },
+  save(id) {
+    try {
+      if (id) localStorage.setItem("tyi-pinned", id);
+      else localStorage.removeItem("tyi-pinned");
+    } catch {}
+  }
+};
+
 /* v0.6.0: threads are {ts, msgs}. Migrate legacy bare-array threads. */
 function normThread(t) {
   if (Array.isArray(t)) return { ts: 0, msgs: t };
@@ -571,7 +478,8 @@ const state = {
   achievements: achieveStore.load(), // id -> timestamp
   bruceChainComplete: false, // v0.18.0: the Bruce chain isn't built yet
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
-  archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
+  archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
+  pinned: pinStore.load() // v0.20.0: "currently researching" shark id, or null
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -688,6 +596,7 @@ document.querySelectorAll(".tab").forEach(btn => {
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
     if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
+    if (btn.dataset.tab === "expedition") renderExpeditionPin(); // v0.20.0: pinned shark line
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
     if (btn.dataset.tab === "phone") {
       /* v0.12.0: like a real phone — the conversation opens pinned to the
@@ -834,9 +743,73 @@ function clearGuideFilters() {
   if (s) s.value = "";
   renderResearch();
 }
+/* v0.20.0: pin one shark as "currently researching". Tapping the pin on a
+   pinned shark unpins it. One pin at a time — a focus, not a collection. */
+function togglePin(id) {
+  state.pinned = (state.pinned === id) ? null : id;
+  pinStore.save(state.pinned);
+  renderResearch();
+  renderExpeditionPin();
+}
+function renderPinnedCard(list) {
+  const s = SHARKS.find(x => x.id === state.pinned);
+  const card = document.createElement("div");
+  card.className = "pinned-card" + (s ? "" : " pinned-empty");
+  if (!s) {
+    card.innerHTML = `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em></p>`;
+  } else {
+    const done = !!state.tagged[s.id];
+    card.innerHTML = `
+      <div class="pinned-head"><span>📌 Currently researching</span>
+        <button type="button" class="pin-btn unpin" data-unpin aria-label="Unpin ${s.name}">✕</button>
+      </div>
+      <div class="pinned-body">
+        <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
+        <div>
+          <strong>${s.name}</strong> ${done ? "✅" : ""}<br>
+          <span class="latin">${s.latin}</span><br>
+          <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => DEPTHS[d]).join(", ")}</span>
+        </div>
+      </div>
+      <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
+    card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
+    card.querySelector("[data-jump]").addEventListener("click", () => {
+      const target = list.querySelector(`[data-entry="${s.id}"]`);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        const body = target.querySelector(".guide-row-body");
+        const head = target.querySelector(".guide-row-head");
+        if (body && body.classList.contains("hidden")) {
+          body.classList.remove("hidden");
+          head.setAttribute("aria-expanded", "true");
+          target.classList.add("open");
+        }
+        target.classList.add("pin-flash");
+        setTimeout(() => target.classList.remove("pin-flash"), 1200);
+      }
+    });
+  }
+  list.appendChild(card);
+}
+/* v0.20.0: show the pinned shark on the Expedition tab — a research focus
+   to plan around. Never auto-fills the planner; the sea decides. */
+function renderExpeditionPin() {
+  const el = $("expeditionPin");
+  if (!el) return;
+  const s = SHARKS.find(x => x.id === state.pinned);
+  if (!s) { el.classList.add("hidden"); el.innerHTML = ""; return; }
+  el.classList.remove("hidden");
+  const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region;
+  const baits = s.combo.bait.map(b => BAITS[b] || b).join(", ");
+  el.innerHTML = `📌 Currently researching: <strong>${s.name}</strong>
+    <span class="latin">${regionName} · ${s.depths.map(d => DEPTHS[d]).join(", ")} · ${baits}</span>`;
+}
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
+  /* v0.20.0: the pinned shark — "currently researching". A focus card at the
+     top of the field guide; pinning is a focus, never a filter. */
+  renderPinnedCard(list);
   /* v0.13.0: untagged sharks first — the ones you're still hunting.
      Tagged ones settle to the bottom, out of the way. */
   const ordered = [...SHARKS]
@@ -862,15 +835,22 @@ function renderResearch() {
   ordered.forEach(s => {
     const done = !!state.tagged[s.id];
     const regionLocked = REGIONS[s.combo.region] && REGIONS[s.combo.region].locked;
+    const isPinned = state.pinned === s.id;
     const row = document.createElement("div");
     row.className = "guide-row";
+    row.setAttribute("data-entry", s.id);
     row.innerHTML = `
-      <button type="button" class="guide-row-head" aria-expanded="false">
-        <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
-        <span class="latin">${s.latin}</span>
-        <span class="status-pill">IUCN: ${s.status}</span>
-        <span class="guide-caret" aria-hidden="true">▾</span>
-      </button>
+      <div class="guide-row-top">
+        <button type="button" class="guide-row-head" aria-expanded="false">
+          <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
+          <span class="latin">${s.latin}</span>
+          <span class="status-pill">IUCN: ${s.status}</span>
+          <span class="guide-caret" aria-hidden="true">▾</span>
+        </button>
+        <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
+          aria-label="${isPinned ? "Unpin" : "Pin"} ${s.name} as currently researching"
+          aria-pressed="${isPinned}">📌</button>
+      </div>
       <div class="guide-row-body hidden">
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
@@ -887,6 +867,11 @@ function renderResearch() {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
       row.classList.toggle("open", !isHidden);
+    });
+    const pinBtn = row.querySelector("[data-pin]");
+    if (pinBtn) pinBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePin(s.id);
     });
     list.appendChild(row);
   });
@@ -986,8 +971,16 @@ function logLine(html, cls) {
   log.scrollTop = log.scrollHeight;
 }
 /* v0.7.3: expedition pacing — a beat slower than reading speed, so the
-   day breathes. Tune PACE to adjust globally. */
-const PACE = 1.5;
+   day breathes. Tune PACE to adjust globally.
+   v0.20.0: quick-pace option — the player can shorten the beats. */
+let PACE = 1.5;
+const QUICK_PACE = 0.35;
+function setPace(quick) {
+  PACE = quick ? QUICK_PACE : 1.5;
+  try { localStorage.setItem("tyi-pace", quick ? "quick" : "slow"); } catch {}
+  const box = $("quickPace");
+  if (box) box.checked = !!quick;
+}
 const wait = (ms) => new Promise(r => setTimeout(r, ms * PACE));
 
 /* v0.13.0: persistent depth scenery — the scene was gradient + rays and
@@ -1566,9 +1559,39 @@ function renderLogbook() {
     div.innerHTML = `
       <div class="logbook-date">🛥️ ${esc(t.date)}</div>
       <div class="logbook-plan">${planBits.map(esc).join(" · ")}</div>
-      <div class="logbook-enc">${enc}</div>`;
+      <div class="logbook-enc">${enc}</div>
+      <button type="button" class="repeat-btn" data-repeat>🔁 Repeat this plan</button>`;
+    const rb = div.querySelector("[data-repeat]");
+    if (rb) rb.addEventListener("click", () => repeatPlan(t));
     list.appendChild(div);
   });
+}
+
+/* v0.20.0: repeat a logged expedition's plan — restores region, depth, bait
+   and method into the planner and jumps to the Expedition tab. Values that
+   no longer exist (e.g. a re-locked region) are skipped, never forced. */
+function repeatPlan(t) {
+  if (!t) return;
+  const set = (id, val) => {
+    const el = $(id);
+    if (!el || val == null || val === "") return false;
+    if ([...el.options].some(o => o.value === val && !o.disabled)) {
+      el.value = val;
+      el.dispatchEvent(new Event("change"));
+      return true;
+    }
+    return false;
+  };
+  set("regionSelect", t.region);
+  set("depthSelect", t.depth);
+  set("baitSelect", t.bait);
+  /* Method select's change handler fills the sub-options synchronously,
+     so the opt can be set right after. Legacy entries (lure, no method)
+     simply leave the method unpicked. */
+  if (set("methodSelect", t.method || "")) {
+    set("methodOptSelect", t.methodOpt || "none");
+  }
+  goTab("expedition");
 }
 
 function updateMsgBadge() {
@@ -2400,6 +2423,15 @@ function renderAll() {
   if (state.archiveUnlocked) renderArchive();
   renderSarahAsk();
   renderAchievements(); // v0.18.0
+  renderExpeditionPin(); // v0.20.0
+  /* v0.20.0: restore quick-pace preference. */
+  const qp = $("quickPace");
+  if (qp) {
+    qp.addEventListener("change", () => setPace(qp.checked));
+    let saved = false;
+    try { saved = localStorage.getItem("tyi-pace") === "quick"; } catch {}
+    if (saved) setPace(true);
+  }
 }
 
 /* ---------- Wild Archive (v0.17.0) ----------
@@ -2477,7 +2509,9 @@ function renderArchive() {
       </button>
       <div class="guide-row-body hidden">
         ${yourShark}
-        ${media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
+        ${media.comingSoon
+          ? `<p class="hook">📸 Wild media coming soon — being curated.</p>`
+          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
       </div>`;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
@@ -2508,28 +2542,6 @@ migrateArchiveUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
-/* v0.9.1: live icon strips under each planner row. One small visual echo
-   of the current pick per select, in the game's emoji style. The ray gets
-   a simple styled oval ("dot:ray") — no honest emoji exists for it. Pure
-   decoration; the selects remain the source of truth. */
-const PICK_ICONS = {
-  regionSelect: {
-    "caribbean": "🏝️", "north-carolina": "⚓", "philippines": "🐠",
-    "maldives": "🏖️", "japan": "🗾", "open-atlantic": "🌊",
-    "cornwall": "🐦", "papua-new-guinea": "🪸",
-    "galapagos": "🐢", "south-africa": "🦭"
-  },
-  depthSelect: { "surface": "☀️", "reef": "🪸", "twilight": "🌅", "deep": "🌑" },
-  baitSelect: {
-    "crustaceans": "🦀", "squid": "🦑", "schooling-fish": "🐠",
-    "plankton": "🦐", "tuna": "🐟", "ray": "dot:ray", "urchins": "🐚"
-  },
-  methodSelect: { "attract": "🪣", "aggregation": "🔍", "": "" },
-  methodOptSelect: {
-    "none": "–", "chum": "🪣", "seal": "🦭",
-    "boat": "🚤", "plane": "✈️", "network": "📻"
-  }
-};
 function updateVisual(selectId) {
   const el = document.getElementById(selectId.replace(/Select$/, "Visual"));
   if (!el) return;
