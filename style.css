@@ -249,15 +249,34 @@ select option:disabled { color: #7a8a9e; }
 .active-chips:empty { display: none; }
 .chip-active {
   display: inline-flex; align-items: center; gap: 8px;
-  min-height: 40px; padding: 6px 8px 6px 14px; border-radius: 999px;
+  min-height: 48px; padding: 6px 8px 6px 14px; border-radius: 999px;
   background: rgba(140,200,255,0.18); border: 1px solid rgba(140,200,255,0.4);
   font-size: 0.9rem;
 }
 .chip-remove {
-  min-width: 36px; min-height: 36px; border-radius: 50%; border: none;
-  background: rgba(255,255,255,0.12); color: inherit; font-size: 1.1rem;
+  min-width: 48px; min-height: 48px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.12); color: inherit; font-size: 1.3rem;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
 }
+/* v0.19.0 review: Clear all gets its own substantial target, not the tiny link-button. */
+#guideClear {
+  min-height: 48px; padding: 10px 20px; border-radius: 999px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06);
+  color: inherit; cursor: pointer; font-weight: 700;
+}
+.sheet-head { display: none; }
+/* Mobile: filter panel becomes a bottom sheet. */
+@media (max-width: 640px) {
+  .filter-panel.open-sheet .sheet-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .filter-panel.open-sheet .sheet-head h2 { margin: 0; font-size: 1.2rem; }
+  .sheet-close {
+    min-height: 52px; min-width: 96px; padding: 10px 24px; border-radius: 999px;
+    font-size: 1.05rem; font-weight: 800; cursor: pointer;
+    border: none; background: rgba(140,200,255,0.3); color: inherit;
+  }
 .guide-meta {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 10px; min-height: 24px;
