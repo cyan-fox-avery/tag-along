@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'achievements-data.js', 'game-data.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'script.js'];
 
 function makeEl() {
   const el = {
