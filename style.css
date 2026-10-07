@@ -277,6 +277,7 @@ select option:disabled { color: #7a8a9e; }
     font-size: 1.05rem; font-weight: 800; cursor: pointer;
     border: none; background: rgba(140,200,255,0.3); color: inherit;
   }
+}
 .guide-meta {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 10px; min-height: 24px;
