@@ -102,7 +102,7 @@ const ACHIEVEMENTS = [
     id: "every-one-counts",
     name: "Every One Counts",
     icon: "🛡️",
-    breadcrumb: "tag a shark that really needed the science",
+    breadcrumb: "a rare encounter",
     description: "Tagged an Endangered or Critically Endangered species. This data matters.",
     check: (st) => Object.keys(st.tagged).some(id => {
       const s = SHARKS.find(x => x.id === id);
