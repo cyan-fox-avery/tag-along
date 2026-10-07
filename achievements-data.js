@@ -116,6 +116,73 @@ const ACHIEVEMENTS = [
     breadcrumb: "ten trips out",
     description: "Completed 10 expeditions. You're not a landlubber anymore.",
     check: (st) => (st.stats.expeditions || 0) >= 10
+  },
+  {
+    id: "full-fathom",
+    name: "Full Fathom",
+    icon: "🌊",
+    breadcrumb: "from sunlight to midnight",
+    description: "Tagged sharks in all four depth zones, from the sunlit surface to the deep dark.",
+    check: (st) => {
+      const depths = Object.keys(DEPTHS);
+      return depths.length > 0 && depths.every(d => (st.stats.depthsTagged || []).includes(d));
+    }
+  },
+  {
+    id: "finished",
+    name: "Fin-ished!",
+    icon: "🎓",
+    breadcrumb: "finish what you started",
+    description: "Tagged the full roster. Every shark, every region. The collection book is complete.",
+    check: (st) => Object.keys(st.tagged).length >= SHARKS.length && SHARKS.length > 0
+  },
+  {
+    id: "bait-switch",
+    name: "Bait and Switch",
+    icon: "🎣",
+    breadcrumb: "every tool in the kit",
+    description: "Used every method in the field manual: chum, seal scent, boat survey, spotter plane, and the sightings network.",
+    check: (st) => {
+      const opts = ["chum", "seal", "boat", "plane", "network"];
+      return opts.every(o => (st.stats.methodsUsed || []).includes(o));
+    }
+  },
+  {
+    id: "pen-pal",
+    name: "Pen Pal",
+    icon: "💌",
+    breadcrumb: "keep bumping into the same shark",
+    description: "Re-sighted the same individual shark three times. You two are basically colleagues now.",
+    check: (st) => Object.values(st.tagged).some(t => (t.resightings || []).length >= 3)
+  },
+  {
+    id: "off-map",
+    name: "Off the Map",
+    icon: "🧭",
+    breadcrumb: "beyond the known map",
+    description: "Tagged your first shark in waters that had to be earned — the Galápagos or South Africa.",
+    check: (st) => {
+      const locked = ["galapagos", "south-africa"];
+      return Object.keys(st.tagged).some(id => {
+        const s = SHARKS.find(x => x.id === id);
+        return s && locked.includes(s.combo.region);
+      });
+    }
+  },
+  {
+    id: "every-shade",
+    name: "Every Shade",
+    icon: "🎨",
+    breadcrumb: "from least concern to critically endangered",
+    description: "Tagged sharks spanning every IUCN conservation status. The full spectrum, from secure to critical.",
+    check: (st) => {
+      const statuses = [...new Set(SHARKS.map(s => s.status))];
+      const taggedStatuses = new Set(Object.keys(st.tagged).map(id => {
+        const s = SHARKS.find(x => x.id === id);
+        return s ? s.status : null;
+      }));
+      return statuses.length > 0 && statuses.every(s => taggedStatuses.has(s));
+    }
   }
 ];
 
