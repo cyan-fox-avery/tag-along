@@ -473,6 +473,40 @@ const ART = {
       <line x1="74" y1="50" x2="72" y2="64"/>
       <line x1="80" y1="49" x2="78" y2="65"/>
     </g>
+  </svg>`,
+  salmon: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Salmon shark">
+    <polygon points="158,54 188,28 190,60 188,92 158,66" fill="#3d5266"/>
+    <ellipse cx="100" cy="60" rx="62" ry="22" fill="#4c6379"/>
+    <ellipse cx="100" cy="69" rx="54" ry="12" fill="#dfe5ea" opacity="0.85"/>
+    <polygon points="50,60 66,52 66,68" fill="#4c6379"/>
+    <polygon points="106,40 116,18 126,40" fill="#3d5266"/>
+    <polygon points="116,24 121,18 124,26" fill="#eef2f5"/>
+    <polygon points="90,78 80,98 102,79" fill="#3d5266"/>
+    <circle cx="56" cy="55" r="3.4" fill="#1c2733"/>
+    <circle cx="57.2" cy="53.8" r="1.1" fill="#ffffff"/>
+    <g stroke="#2f4152" stroke-width="1.8" stroke-linecap="round">
+      <line x1="74" y1="52" x2="72" y2="68"/>
+      <line x1="81" y1="51" x2="79" y2="69"/>
+      <line x1="88" y1="51" x2="86" y2="69"/>
+    </g>
+  </svg>`,
+  dusky: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Dusky shark">
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#6e6e66"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#e4e2d8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#6e6e66"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <line x1="126" y1="42" x2="142" y2="46" stroke="#4a4a44" stroke-width="2" stroke-linecap="round"/>
+    <g stroke="#46463f" stroke-width="1.6" stroke-linecap="round">
+      <line x1="74" y1="50" x2="72" y2="64"/>
+      <line x1="80" y1="49" x2="78" y2="65"/>
+      <line x1="86" y1="49" x2="84" y2="65"/>
+    </g>
   </svg>`
 
 };
@@ -748,6 +782,25 @@ const SKETCH = {
     <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
       <ellipse cx="110" cy="62" rx="64" ry="17"/>
       <path d="M100,46 L114,14 L130,46 Z"/>
+      <path d="M165,56 L198,40 L196,80 Z"/>
+    </g>
+  </svg>`,
+  salmon: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: salmon shark heavy body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="62" rx="66" ry="20"/>
+      <path d="M44,62 L70,52 L70,72 Z"/>
+      <path d="M104,44 L116,22 L128,44 Z"/>
+      <path d="M168,56 L200,38 L198,82 Z"/>
+    </g>
+  </svg>`,
+  dusky: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: dusky shark interdorsal ridge">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <ellipse cx="110" cy="62" rx="64" ry="17"/>
+      <path d="M100,46 L112,24 L124,46 Z"/>
+      <path d="M138,44 L148,32 L156,44 Z"/>
+      <path d="M124,40 Q138,36 142,42" stroke-dasharray="4 3"/>
       <path d="M165,56 L198,40 L196,80 Z"/>
     </g>
   </svg>`
