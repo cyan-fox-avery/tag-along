@@ -340,6 +340,27 @@ code += `
     resetGF(); guideFilters.q = "x"; guideFilters.region.add("caribbean");
     return activeFilterCount() === 2;
   })());
+  ok('latin-name search works', (() => {
+    resetGF(); guideFilters.q = "sphyrna lewini";
+    const r = SHARKS.filter(guideMatches);
+    return r.length === 1 && r[0].id === "scalloped";
+  })());
+  ok('depth filter narrows', (() => {
+    resetGF(); guideFilters.depth.add("deep");
+    const r = SHARKS.filter(guideMatches);
+    return r.length > 0 && r.length < SHARKS.length &&
+      r.every(s => (s.depths || []).includes("deep"));
+  })());
+  ok('clear resets everything', (() => {
+    guideFilters.q = "shark"; guideFilters.region.add("caribbean");
+    guideFilters.depth.add("reef"); guideFilters.methodOpt.add("chum");
+    guideFilters.bait.add("tuna"); guideFilters.tagged = "tagged";
+    clearGuideFilters();
+    return guideFilters.q === "" && guideFilters.region.size === 0 &&
+      guideFilters.depth.size === 0 && guideFilters.methodOpt.size === 0 &&
+      guideFilters.bait.size === 0 && guideFilters.tagged === "all" &&
+      SHARKS.filter(guideMatches).length === SHARKS.length;
+  })());
   resetGF(); state.tagged = {};
   // restore
   state.tagged = {}; state.achievements = {};
