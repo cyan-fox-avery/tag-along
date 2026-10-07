@@ -3,11 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b2237" />
+  <meta name="theme-color" content="#17517e" />
   <title>Tag Along — a shark research game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="ocean-decor" aria-hidden="true">
+    <div class="surface-shimmer"></div>
+    <div class="god-rays"><span></span><span></span><span></span><span></span></div>
+    <div class="bubbles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <svg class="seafloor" viewBox="0 0 1440 140" preserveAspectRatio="none">
+      <path d="M0,90 C120,60 240,110 360,95 C480,80 600,40 720,55 C840,70 960,110 1080,100 C1200,90 1320,60 1440,80 L1440,140 L0,140 Z"/>
+      <path class="kelp" d="M180,95 C175,70 185,50 178,30 C176,24 182,22 184,28 C190,48 182,68 188,95 Z"/>
+      <path class="kelp" d="M1250,100 C1246,78 1254,60 1249,42 C1247,36 1253,34 1255,40 C1260,58 1253,76 1258,100 Z"/>
+    </svg>
+  </div>
   <div class="build-tag" id="buildTag" title="Build version"></div>
   <div class="app">
     <header class="topbar">

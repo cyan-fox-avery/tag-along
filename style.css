@@ -17,12 +17,80 @@
 body {
   margin: 0;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  background: linear-gradient(180deg, #0b2237 0%, #0e2c46 60%, #0b2237 100%);
+  /* v0.19.1: the descent — surface light at the top, deep dark below.
+     No background-attachment:fixed — the gradient belongs to the document,
+     so scrolling down genuinely takes you deeper. */
+  background: linear-gradient(180deg, #17517e 0%, #10395c 22%, #0b2740 48%, #071a2c 72%, #030e1a 100%);
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
 }
 
-.app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; }
+.app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
+/* v0.19.1: underwater ambience — sits behind the app, never interactive.
+   Document-positioned (not viewport-fixed): the surface, light, and seafloor
+   belong to actual depths, so scrolling feels like descending. */
+.ocean-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+/* The surface, just below the title card. */
+.surface-shimmer {
+  position: absolute; top: 0; left: 0; right: 0; height: 210px;
+  background:
+    radial-gradient(60% 90px at 20% 0%, rgba(170,220,255,0.28), transparent 70%),
+    radial-gradient(50% 70px at 70% 0%, rgba(170,220,255,0.20), transparent 70%),
+    linear-gradient(180deg, rgba(160,210,250,0.22) 0%, transparent 85%);
+  animation: shimmer-drift 14s ease-in-out infinite alternate;
+}
+@keyframes shimmer-drift {
+  from { transform: translateX(-2%); opacity: 0.85; }
+  to { transform: translateX(2%); opacity: 1; }
+}
+/* God rays slanting down from the surface — document-positioned in the upper water column. */
+.god-rays span {
+  position: absolute; top: 120px; width: 90px; height: 640px;
+  background: linear-gradient(180deg, rgba(180,225,255,0.10), transparent 80%);
+  transform: skewX(-12deg); filter: blur(6px);
+  animation: ray-sway 18s ease-in-out infinite alternate;
+}
+.god-rays span:nth-child(1) { left: 12%; animation-delay: -4s; }
+.god-rays span:nth-child(2) { left: 38%; width: 130px; animation-delay: -11s; }
+.god-rays span:nth-child(3) { left: 64%; width: 70px; animation-delay: -7s; }
+.god-rays span:nth-child(4) { left: 84%; animation-delay: -2s; }
+@keyframes ray-sway {
+  from { transform: skewX(-14deg) translateX(-12px); opacity: 0.7; }
+  to { transform: skewX(-9deg) translateX(12px); opacity: 1; }
+}
+/* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling. */
+.bubbles { position: fixed; inset: 0; pointer-events: none; }
+.bubbles span {
+  position: absolute; bottom: -20px; border-radius: 50%;
+  border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
+  animation: bubble-rise linear infinite;
+}
+.bubbles span:nth-child(1) { left: 8%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: -3s; }
+.bubbles span:nth-child(2) { left: 22%; width: 6px; height: 6px; animation-duration: 22s; animation-delay: -11s; }
+.bubbles span:nth-child(3) { left: 41%; width: 12px; height: 12px; animation-duration: 19s; animation-delay: -7s; }
+.bubbles span:nth-child(4) { left: 55%; width: 7px; height: 7px; animation-duration: 25s; animation-delay: -15s; }
+.bubbles span:nth-child(5) { left: 68%; width: 9px; height: 9px; animation-duration: 17s; animation-delay: -5s; }
+.bubbles span:nth-child(6) { left: 79%; width: 5px; height: 5px; animation-duration: 28s; animation-delay: -20s; }
+.bubbles span:nth-child(7) { left: 90%; width: 11px; height: 11px; animation-duration: 21s; animation-delay: -9s; }
+.bubbles span:nth-child(8) { left: 33%; width: 6px; height: 6px; animation-duration: 24s; animation-delay: -13s; }
+@keyframes bubble-rise {
+  from { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.6; }
+  to { transform: translateY(-105vh) translateX(24px); opacity: 0; }
+}
+/* Seafloor silhouette along the bottom. */
+.seafloor {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+  fill: #020a14; opacity: 0.9;
+}
+.seafloor .kelp { fill: #03141f; }
+/* Calm waters for those who need them. */
+@media (prefers-reduced-motion: reduce) {
+  .surface-shimmer, .god-rays span, .bubbles span { animation: none; }
+  .bubbles { display: none; }
+}
 /* v0.10.4: safety net — no flex row may ever widen the page again.
    `clip` (not `hidden`) keeps position:sticky working on the tab bar. */
 body { overflow-x: clip; }
