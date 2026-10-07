@@ -571,12 +571,7 @@ const ARCHIVE_MEDIA = {
    }
   ]
  },
- "dusky": {
-  "scientific": "Carcharhinus obscurus",
-  "future": false,
-  "comingSoon": true,
-  "assets": []
- },
+
  /* v0.18.0 future batch — pre-curated by Avery + ChatGPT. NOT on the playable
     roster yet. All metadata independently verified against Commons 2026-10-06.
     future: true keeps these hidden until the species enters SHARKS. */
@@ -751,5 +746,452 @@ const ARCHIVE_MEDIA = {
     "full": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Carcharhinus_plumbeus.jpg"
    }
   ]
- }
+ },
+/* v0.20.0 media batch — curated by Avery + Mira (ChatGPT), 2026-10-07.
+   19 species staged; all except dusky are future:true (hidden until playable).
+   Pygmy shark deliberately NOT included — verification hold on its image rights.
+   Spinner shark primary is CC BY-NC (version unconfirmed by iNaturalist) with
+   the project non-commercial notice; no version-specific license link. */
+ "dusky": {
+  "scientific": "Carcharhinus obscurus",
+  "future": false,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A dusky shark at Sea World Australia — a captive animal, photographed here cruising alongside a cobia.",
+    "credit": "Happy Little Nomad",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACarcharhinus_obscurus_at_Seaworld.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Carcharhinus_obscurus_at_Seaworld.jpg/960px-Carcharhinus_obscurus_at_Seaworld.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Carcharhinus_obscurus_at_Seaworld.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "A dusky shark documented during NOAA research operations.",
+    "credit": "NOAA",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACarcharhinus_obscurus_noaa.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Carcharhinus_obscurus_noaa.jpg/960px-Carcharhinus_obscurus_noaa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Carcharhinus_obscurus_noaa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "label": "Research in Action",
+   },
+  ]
+ },
+ "silvertip": {
+  "scientific": "Carcharhinus albimarginatus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A silvertip shark in clean profile — the pale margins edging the fins are clearly visible.",
+    "credit": "Albert Kok",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASilvertip_shark.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Silvertip_shark.jpg/960px-Silvertip_shark.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Silvertip_shark.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "spinner": {
+  "scientific": "Carcharhinus brevipinna",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A spinner shark caught mid-leap — the real airborne animal performing its namesake spin.",
+    "credit": "Niall Perrins",
+    "license": "CC BY-NC",
+    "page": "https://www.inaturalist.org/guide_taxa/2205513",
+    "image": "https://inaturalist-open-data.s3.amazonaws.com/photos/141413830/large.jpg",
+    "full": "https://inaturalist-open-data.s3.amazonaws.com/photos/141413830/large.jpg",
+    "sourceLabel": "iNaturalist",
+    "licenseNote": "Non-commercial use: Tag Along is a free, non-commercial project. If that ever changes, this image will be removed or replaced before any commercial use occurs.",
+   },
+   {
+    "type": "photo",
+    "caption": "NOAA Apex Predators Program species reference photograph.",
+    "credit": "Apex Predators Program, NOAA/NEFSC",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACarcharhinus_brevipinna_nefsc.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Carcharhinus_brevipinna_nefsc.jpg/960px-Carcharhinus_brevipinna_nefsc.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Carcharhinus_brevipinna_nefsc.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "wobbegong": {
+  "scientific": "Orectolobus maculatus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A spotted wobbegong camouflaged against the reef at Shelly Beach, Manly — nearly invisible until you know where to look.",
+    "credit": "Sylke Rohrlach",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AOrectolobus_maculatus_shelly_beach.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Orectolobus_maculatus_shelly_beach.jpg/960px-Orectolobus_maculatus_shelly_beach.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/49/Orectolobus_maculatus_shelly_beach.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "The wobbegong’s remarkable face in detail — head, eyes, and the fringe of sensory barbels around the mouth.",
+    "credit": "Just chaos",
+    "license": "CC BY 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AOrectolobus_maculatus_head.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/3/36/Orectolobus_maculatus_head.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/3/36/Orectolobus_maculatus_head.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "leopard": {
+  "scientific": "Triakis semifasciata",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A leopard shark weaving through the kelp tank at Scripps Aquarium — a captive animal.",
+    "credit": "Matthew Field (Mfield)",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ALeopard_shark_in_kelp.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Leopard_shark_in_kelp.jpg/960px-Leopard_shark_in_kelp.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Leopard_shark_in_kelp.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Leopard shark from above at Monterey Bay Aquarium — the dark saddle markings and spots show clearly. A captive animal.",
+    "credit": "Tewy",
+    "license": "CC BY 2.5",
+    "page": "https://commons.wikimedia.org/wiki/File%3ALeopard_shark_(Triakis_semifasciata)_01.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Leopard_shark_%28Triakis_semifasciata%29_01.jpg/960px-Leopard_shark_%28Triakis_semifasciata%29_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/0/07/Leopard_shark_%28Triakis_semifasciata%29_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "horn": {
+  "scientific": "Heterodontus francisci",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A wild horn shark off Santa Catalina, California — blunt head, brow ridges, and spotted flanks.",
+    "credit": "Ed Bierman",
+    "license": "CC BY 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHeterodontus_francisci_catalina.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Heterodontus_francisci_catalina.jpg/960px-Heterodontus_francisci_catalina.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Heterodontus_francisci_catalina.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "A juvenile horn shark at Monterey Bay Aquarium — the blunt head, brow ridges, spotting, and dorsal spine of a young animal. Captive.",
+    "credit": "Erik Ogan",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHeterodontus_francisci_monterey.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Heterodontus_francisci_monterey.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Heterodontus_francisci_monterey.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "portjackson": {
+  "scientific": "Heterodontus portusjacksoni",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A Port Jackson shark photographed at Flinders Island, South Australia.",
+    "credit": "Peter Southwood",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHeterodontus_portusjacksoni_P1081507.JPG",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Heterodontus_portusjacksoni_P1081507.JPG/960px-Heterodontus_portusjacksoni_P1081507.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Heterodontus_portusjacksoni_P1081507.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Port Jackson shark species profile at Fairy Bower, Manly.",
+    "credit": "Richard Ling",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHeterodontus_portusjacksoni.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Heterodontus_portusjacksoni.jpg/960px-Heterodontus_portusjacksoni.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/2/21/Heterodontus_portusjacksoni.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "angelshark": {
+  "scientific": "Squatina squatina",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A wild common angelshark off Lanzarote — flattened, ray-like, half-buried in the sand.",
+    "credit": "Julien Renoult",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASquatina_squatina_120867959.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Squatina_squatina_120867959.jpg/960px-Squatina_squatina_120867959.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Squatina_squatina_120867959.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "An angelshark disappearing into sand, seagrass, and seaweed off Tenerife — camouflage as a way of life.",
+    "credit": "Ben Jobson",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASquatina_squatina_camouflage.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Squatina_squatina_camouflage.jpg/960px-Squatina_squatina_camouflage.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Squatina_squatina_camouflage.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "megamouth": {
+  "scientific": "Megachasma pelagios",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A megamouth shark — full animal, huge cavernous mouth, one of the rarest sharks ever photographed.",
+    "credit": "OpenCage",
+    "license": "CC BY-SA 2.5",
+    "page": "https://commons.wikimedia.org/wiki/File%3AMegamouth_shark_japan2.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Megamouth_shark_japan2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Megamouth_shark_japan2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Preserved megamouth shark head specimen at the Western Australian Maritime Museum — not a live animal.",
+    "credit": "Saberwyn",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AMegamouth_shark_head_WAMM.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Megamouth_shark_head_WAMM.jpg/960px-Megamouth_shark_head_WAMM.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/44/Megamouth_shark_head_WAMM.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "sawshark": {
+  "scientific": "Pristiophorus cirratus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A common sawshark — full animal, saw-like rostrum lined with barbels.",
+    "credit": "Tim Binns",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACommon_Sawshark_(41395601210).jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/6/66/Common_Sawshark_%2841395601210%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/6/66/Common_Sawshark_%2841395601210%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Detail of the sawshark’s rostrum and barbels up close — cropped from the original photograph.",
+    "credit": "Tim Binns",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACommon_Sawshark_(41395601210).jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/6/66/Common_Sawshark_%2841395601210%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/6/66/Common_Sawshark_%2841395601210%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "greenland": {
+  "scientific": "Somniosus microcephalus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A Greenland shark encountered in deep water between the Alvin and Nantucket Canyons — NOAA OKEANOS Explorer Program.",
+    "credit": "NOAA OKEANOS Explorer Program / NOAA Photo Library",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AExpl9984_(14318817140).jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Expl9984_%2814318817140%29.jpg/960px-Expl9984_%2814318817140%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Expl9984_%2814318817140%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Greenland shark in close profile at Admiralty Inlet, Nunavut.",
+    "credit": "Hemming1952",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AGreenland_shark_profile.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Greenland_shark_profile.jpg/960px-Greenland_shark_profile.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/3/39/Greenland_shark_profile.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "cookiecutter": {
+  "scientific": "Isistius brasiliensis",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A cookiecutter shark — the whole tiny animal, small enough to hold.",
+    "credit": "NOAA Observer Project",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AIsistius_brasiliensis.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Isistius_brasiliensis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Isistius_brasiliensis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "The cookiecutter’s head and teeth — the unusual feeding anatomy that carves plugs from much larger animals. Smithsonian Institution.",
+    "credit": "Jennifer Strotman / Smithsonian Institution",
+    "license": "public domain (U.S. federal work)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AIsistius_brasiliensis_SI.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Isistius_brasiliensis_SI.jpg/960px-Isistius_brasiliensis_SI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/44/Isistius_brasiliensis_SI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "sixgill": {
+  "scientific": "Hexanchus griseus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A live bluntnose sixgill shark in deep water — Operation Deep Scope 2005 Expedition, Gulf of Mexico.",
+    "credit": "Operation Deep Scope 2005 Expedition / NOAA",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHexanchus_griseus.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/4/47/Hexanchus_griseus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/47/Hexanchus_griseus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Sixgill shark encountered at Santa Rosa Reef — Deepwater Exploration of the Marianas.",
+    "credit": "NOAA Ocean Explorer",
+    "license": "CC BY-SA 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHexanchus_griseus_santa_rosa.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Hexanchus_griseus_santa_rosa.jpg/960px-Hexanchus_griseus_santa_rosa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Hexanchus_griseus_santa_rosa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "velvetbelly": {
+  "scientific": "Etmopterus spinax",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A velvet-belly lanternshark hovering above the seabed.",
+    "credit": "Vsevolod Rudyi",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AVelvet_Belly_Lanternshark.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Velvet_Belly_Lanternshark.jpg/960px-Velvet_Belly_Lanternshark.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Velvet_Belly_Lanternshark.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Velvet-belly head in detail — the dark velvet skin and faint iridescence up close.",
+    "credit": "Vsevolod Rudyi",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AEtmopterus_spinax_closeup.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Etmopterus_spinax_closeup.jpg/960px-Etmopterus_spinax_closeup.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Etmopterus_spinax_closeup.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "dwarflantern": {
+  "scientific": "Etmopterus perryi",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A dwarf lanternshark — one of the smallest sharks in the world. Smithsonian Institution.",
+    "credit": "Chip Clark / Smithsonian Institution",
+    "license": "public domain (U.S. federal work)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AEtmopterus_perryi_SI.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Etmopterus_perryi_SI.jpg/960px-Etmopterus_perryi_SI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Etmopterus_perryi_SI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "The dwarf lanternshark held in hand — scale for one of the ocean’s tiniest sharks. Smithsonian Institution.",
+    "credit": "Chip Clark / Smithsonian Institution",
+    "license": "public domain (U.S. federal work)",
+    "page": "https://commons.wikimedia.org/wiki/File%3AEtmopterus_perryi_SI_cr.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/9/99/Etmopterus_perryi_SI_cr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/9/99/Etmopterus_perryi_SI_cr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "kitefin": {
+  "scientific": "Dalatias licha",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A kitefin shark — deep-water, heavy-bodied, rarely photographed.",
+    "credit": "Simon Tonge",
+    "license": "CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ADalatias_licha_22073024.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Dalatias_licha_22073024.jpg/960px-Dalatias_licha_22073024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Dalatias_licha_22073024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "pacificsleeper": {
+  "scientific": "Somniosus pacificus",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A Pacific sleeper shark photographed in the deep sea — NOAA CAPSTONE expedition.",
+    "credit": "NOAA / CAPSTONE expedition",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3APacific_sleeper_shark.png",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Pacific_sleeper_shark.png/960px-Pacific_sleeper_shark.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/0/02/Pacific_sleeper_shark.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Research figure from a baited-camera study of Pacific sleeper swimming speed — several frames from a scientific observation, not a conventional portrait.",
+    "credit": "Fujiwara, Matsumoto, Sato, Kawato & Tsuchida (2021)",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AFirst_record_of_swimming_speed_of_the_Pacific_sleeper_shark_Somniosus_pacificus_using_a_baited_camera_array_-_fig2.png",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/First_record_of_swimming_speed_of_the_Pacific_sleeper_shark_Somniosus_pacificus_using_a_baited_camera_array_-_fig2.png/960px-First_record_of_swimming_speed_of_the_Pacific_sleeper_shark_Somniosus_pacificus_using_a_baited_camera_array_-_fig2.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/4/4d/First_record_of_swimming_speed_of_the_Pacific_sleeper_shark_Somniosus_pacificus_using_a_baited_camera_array_-_fig2.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "label": "Research in Action",
+   },
+  ]
+ },
+ "spinydogfish": {
+  "scientific": "Squalus acanthias",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A spiny dogfish at the Josephine Marie shipwreck, Stellwagen Bank — cropped and adjusted from the source image.",
+    "credit": "Doug Costa / NOAA / Stellwagen Bank National Marine Sanctuary",
+    "license": "public domain (NOAA)",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASqualus_acanthias_stellwagen.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Squalus_acanthias_stellwagen.jpg/960px-Squalus_acanthias_stellwagen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/0/04/Squalus_acanthias_stellwagen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "A spiny dogfish in the Mediterranean Sea off Turkey.",
+    "credit": "Walterince",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASqualus_acanthias_Mediterranean_Sea_Turkey.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Squalus_acanthias_Mediterranean_Sea_Turkey.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Squalus_acanthias_Mediterranean_Sea_Turkey.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
+ "catshark": {
+  "scientific": "Scyliorhinus canicula",
+  "future": true,
+  "assets": [
+   {
+    "type": "photo",
+    "caption": "A small-spotted catshark — full animal, Southern North Sea.",
+    "credit": "Hans Hillewaert",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AScyliorhinus_canicula.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Scyliorhinus_canicula.jpg/960px-Scyliorhinus_canicula.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Scyliorhinus_canicula.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+   {
+    "type": "photo",
+    "caption": "Catshark pattern in detail — the small dark spots that give the species its name.",
+    "credit": "Christian Kahle",
+    "license": "CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AScyliorhinus_canicula_51703831.jpg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Scyliorhinus_canicula_51703831.jpg/960px-Scyliorhinus_canicula_51703831.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/2/26/Scyliorhinus_canicula_51703831.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   },
+  ]
+ },
 };
