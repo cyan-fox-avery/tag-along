@@ -2422,7 +2422,7 @@ function archiveAssetHtml(a, isPrimary) {
     // are honored by modern browsers incl. iOS Safari, so the Archive presents
     // the excerpt Avery chose instead of the whole source video.
     const clip = (a.clipStart != null && a.clipEnd != null) ? `#t=${a.clipStart},${a.clipEnd}` : "";
-    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls playsinline preload="none"${a.image ? ` poster="${esc(a.image)}"` : ""} src="${esc(a.play + clip)}"></video>`;
+    mediaHtml = `<video class="archive-media${isPrimary ? " primary" : ""}" controls muted playsinline preload="none"${a.image ? ` poster="${esc(a.image)}"` : ""} src="${esc(a.play + clip)}"></video>`;
   } else if (a.framing === "landscape-crop") {
     // v0.17.1: portrait GIF reframed as landscape (crop + 90deg rotate in CSS).
     mediaHtml = `<div class="gif-landscape-frame"><img src="${esc(a.image)}" alt="${esc(a.caption)}" loading="lazy"></div>`;
