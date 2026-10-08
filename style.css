@@ -771,3 +771,35 @@ video.archive-media { max-height: 420px; }
   text-transform: uppercase; color: #0d2f4d; background: #ffd166;
   border-radius: 6px; padding: 3px 9px; margin-bottom: 8px;
 }
+
+/* v0.22.0: logbook filters */
+.logbook-filters {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  margin-bottom: 12px; padding: 10px 12px;
+  background: var(--bg-soft); border-radius: 12px;
+}
+.filter-label { font-size: 12px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.filter-select {
+  font-size: 15px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  min-height: 44px; /* dyspraxia-friendly touch target */
+}
+.logbook-conditions { font-size: 12px; margin-top: 2px; opacity: 0.85; }
+
+/* v0.22.0: pin-gated soft hint */
+.pin-hint {
+  background: #fff8e1; border: 1px solid #ffd166; border-radius: 12px;
+  padding: 10px 14px; margin: 8px 0; font-size: 14px; line-height: 1.5;
+}
+.pin-hint .latin { display: block; font-size: 12px; margin-top: 2px; }
+
+/* v0.22.0: conservation note on collection cards */
+.conservation-note {
+  background: #e8f5e9; border-left: 3px solid #4caf50;
+  border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 8px 0;
+  font-size: 13px; line-height: 1.55;
+}
+
+/* v0.22.0: What's New screen */
+.whats-new-list { text-align: left; padding-left: 20px; line-height: 1.7; font-size: 14px; }
+.whats-new-list li { margin-bottom: 8px; }

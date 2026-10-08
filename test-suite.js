@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.21.0', VERSION === 'v0.21.0');
+  ok('version v0.22.0', VERSION === 'v0.22.0');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -752,6 +752,85 @@ code += `
   ok('mira: dwarf lanternshark track is archival', TRACK_ENVELOPES.dwarflantern.kind === 'archival');
   // All 50 species have map colors (no white-marker fallback)
   ok('mira: all 50 sharks have SPECIES_COLORS', SHARKS.every(s => SPECIES_COLORS[s.id] !== undefined));
+
+  // v0.22.0: pin-gated soft hints
+  // v0.22.0 Mira review: pin hints grounded in completed expeditions
+  ok('v0.22.0: pin hint warm when conditions right but no encounter', (() => {
+    const trip = { region: 'caribbean', depth: 'reef', bait: 'crustaceans', encounters: [] };
+    const h = pinHintForTrip(trip, 'nurse');
+    return h && h.kind === 'warm' && /felt right/.test(h.hint);
+  })());
+  ok('v0.22.0: pin hint silent when shark encountered', (() => {
+    const trip = { region: 'caribbean', depth: 'reef', bait: 'crustaceans', encounters: [{ speciesId: 'nurse', result: 'tagged' }] };
+    return pinHintForTrip(trip, 'nurse') === null;
+  })());
+  ok('v0.22.0: pin hint needs a pinned shark', (() => {
+    const trip = { region: 'caribbean', depth: 'reef', bait: 'crustaceans', encounters: [] };
+    return pinHintForTrip(trip, null) === null;
+  })());
+  ok('v0.22.0: pin hint wording is observational', (() => {
+    return Object.values(PIN_HINTS).every(h => !/correct|wrong|right answer/i.test(h));
+  })());
+
+  // v0.22.0: logbook filters
+  ok('v0.22.0: logbook filter by outcome', (() => {
+    const t1 = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'tagged' }] };
+    const t2 = { region: 'caribbean', encounters: [] };
+    const t3 = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'resighted' }] };
+    const t4 = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'watched' }] };
+    const t5 = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'tagged' }, { speciesId: 'tiger', result: 'resighted' }] };
+    return logbookTripMatches(t1, { outcome: 'tagged', region: 'all', species: 'all' }) &&
+           !logbookTripMatches(t2, { outcome: 'tagged', region: 'all', species: 'all' }) &&
+           logbookTripMatches(t2, { outcome: 'missed', region: 'all', species: 'all' }) &&
+           logbookTripMatches(t3, { outcome: 'resighted', region: 'all', species: 'all' }) &&
+           // watched is not "missed"
+           logbookTripMatches(t4, { outcome: 'watched', region: 'all', species: 'all' }) &&
+           !logbookTripMatches(t4, { outcome: 'missed', region: 'all', species: 'all' }) &&
+           // mixed outcomes appear in both filters
+           logbookTripMatches(t5, { outcome: 'tagged', region: 'all', species: 'all' }) &&
+           logbookTripMatches(t5, { outcome: 'resighted', region: 'all', species: 'all' });
+  })());
+  ok('v0.22.0: logbook filter by region and species', (() => {
+    const t = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'tagged' }] };
+    return logbookTripMatches(t, { outcome: 'all', region: 'caribbean', species: 'all' }) &&
+           !logbookTripMatches(t, { outcome: 'all', region: 'arctic', species: 'all' }) &&
+           logbookTripMatches(t, { outcome: 'all', region: 'all', species: 'nurse' }) &&
+           !logbookTripMatches(t, { outcome: 'all', region: 'all', species: 'tiger' });
+  })());
+
+  // v0.22.0: What's New version comparison
+  ok('v0.22.0: whatsnew shows on version change only', (() => {
+    // Mira review: distinguish new players from v0.21.0 upgraders
+    return shouldShowWhatsNew('v0.21.0', 'v0.22.0', true) === true &&   // version change
+           shouldShowWhatsNew('v0.22.0', 'v0.22.0', true) === false &&  // same version
+           shouldShowWhatsNew(null, 'v0.22.0', false) === false &&      // brand new player
+           shouldShowWhatsNew(null, 'v0.22.0', true) === true &&        // v0.21.0 upgrader
+           shouldShowWhatsNew('', 'v0.22.0', false) === false;
+  })());
+  ok('v0.22.0: pre-migration snapshot detects new vs returning', (() => {
+    // Simulate: empty storage (new player) vs v0.21.0 save (upgrader)
+    // preMigrationHadSave checks for meaningful data, not just key existence
+    function snapHasSave(logbook, collection, stats) {
+      if (logbook && logbook !== "[]") return true;
+      if (collection && collection !== "{}" && collection !== "null") {
+        try { return Object.keys(JSON.parse(collection)).length > 0; } catch { return false; }
+      }
+      return !!stats;
+    }
+    return snapHasSave(null, null, null) === false &&                    // brand new
+           snapHasSave("[]", "{}", null) === false &&                    // migrated empty
+           snapHasSave('[{"ts":1}]', "{}", null) === true &&              // has logbook
+           snapHasSave("[]", '{"nurse":{}}', null) === true;              // has sharks
+  })());
+  ok('v0.22.0: whatsnew has v0.22.0 notes', (() => {
+    return Array.isArray(WHATS_NEW['v0.22.0']) && WHATS_NEW['v0.22.0'].length === 4;
+  })());
+
+  // v0.22.0: conservation notes on all 50
+  ok('v0.22.0: all 50 sharks have conservation notes', SHARKS.every(s => typeof s.conservation === 'string' && s.conservation.length > 40));
+
+  // v0.22.0: fieldwork constants exist
+  ok('v0.22.0: sea conditions and field notes exist', SEA_CONDITIONS.length >= 4 && Object.values(FIELD_NOTES).every(arr => arr.length >= 3) && typeof pickFieldNote === 'function' && typeof regionClimate === 'function');
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

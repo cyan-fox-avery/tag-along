@@ -5,7 +5,42 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.21.0";
+const VERSION = "v0.22.0";
+
+/* v0.22.0: "What's new?" — shown once per version update. */
+const WHATS_NEW = {
+  "v0.22.0": [
+    "📓 <strong>Logbook filters.</strong> Filter your expedition log by outcome, region, or species — compare attempts and spot the pattern.",
+    "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
+    "🎣 <strong>Failed trips feel like fieldwork.</strong> Richer expedition narratives: weather, sea state, wildlife sightings, and proper field notes in the logbook.",
+    "🌊 <strong>Conservation notes.</strong> Every collection card now carries a conservation-science note — status context, threats, and the protection efforts making a difference."
+  ]
+};
+
+function whatsNewSeen() {
+  try { return localStorage.getItem("tyi-last-seen-version"); } catch { return null; }
+}
+function markWhatsNewSeen() {
+  try { localStorage.setItem("tyi-last-seen-version", VERSION); } catch {}
+}
+/* Pure: should the What's New screen show?
+   v0.22.0 Mira review: distinguish brand-new players from v0.21.0 upgraders.
+   - No save data at all → first run, don't show.
+   - Has save data but no version → v0.21.0 upgrader, show.
+   - Version differs → show. Same version → don't. */
+function shouldShowWhatsNew(lastSeen, current, hasSaveData) {
+  if (!hasSaveData) return false; // brand new player
+  if (!lastSeen) return true; // v0.21.0 upgrader (no version key yet)
+  return lastSeen !== current;
+}
+function playerHasSaveData() {
+  try {
+    // Any of these indicates an existing player
+    return !!(localStorage.getItem("tyi-logbook") ||
+              localStorage.getItem("tyi-collection") ||
+              localStorage.getItem("tyi-stats"));
+  } catch { return false; }
+}
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -131,6 +166,57 @@ const EASTER_EGGS = [
   { depths: ["twilight"],
     text: "This is the kind of dark water old monster movies warned you about. You check over your shoulder anyway." }
 ];
+
+/* v0.22.0: failed trips feel like fieldwork — weather, sea state, and
+   wildlife make every expedition a day on the water, not just a miss. */
+const SEA_CONDITIONS = [
+  "Flat calm this morning — the sea is glass, and the boat barely rocks.",
+  "A light chop keeps things interesting; whitecaps glint in the sun.",
+  "Overcast and moody — the water looks like hammered pewter.",
+  "A fresh breeze out of the east; the swells roll in long and lazy.",
+  "Morning fog burns off by nine, leaving the water silver-green.",
+  "Choppy and bright — spray on the bow, gulls screaming overhead."
+];
+/* v0.22.0 Mira review: wildlife sightings are region-appropriate.
+   No mantas in the Arctic! */
+const FIELD_NOTES = {
+  tropical: [
+    "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
+    "Field notes: a sea turtle surfaced beside the boat and regarded us with ancient indifference.",
+    "Field notes: a manta ray passed underneath, huge and unhurried. Not a shark, but nobody's complaining.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+  ],
+  temperate: [
+    "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
+    "Field notes: a seal watched us from a nearby rock, unimpressed by our sharklessness."
+  ],
+  polar: [
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: an iceberg drifted past, impossibly blue underneath. The sharks are down there somewhere.",
+    "Field notes: logged three seabird species. The Arctic terns seemed to pity us.",
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today."
+  ],
+  generic: [
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+  ]
+};
+/* Map regions to climate zones for wildlife notes. */
+function regionClimate(regionId) {
+  const tropical = ["caribbean", "maldives", "philippines", "galapagos", "south-africa"];
+  const polar = ["arctic"];
+  if (tropical.includes(regionId)) return "tropical";
+  if (polar.includes(regionId)) return "polar";
+  return "temperate";
+}
+function pickFieldNote(regionId) {
+  const zone = regionClimate(regionId);
+  const notes = FIELD_NOTES[zone] || FIELD_NOTES.generic;
+  return pick(notes);
+}
 
 /* v0.7.0: the day is the expedition. Quiet beats for when the water
    holds its sharks back a while — waiting is most of the job. */
@@ -805,6 +891,7 @@ function togglePin(id) {
   pinStore.save(state.pinned);
   renderResearch();
   renderExpeditionPin();
+  renderPinHint(); // v0.22.0
 }
 /* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
    clears any filters hiding the shark first, so Jump never silently fails. */
@@ -831,7 +918,7 @@ function renderPinnedCard(list) {
   const card = document.createElement("div");
   card.className = "pinned-card" + (s ? "" : " pinned-empty");
   if (!s) {
-    card.innerHTML = `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em></p>`;
+    card.innerHTML = `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
   } else {
     const done = !!state.tagged[s.id];
     card.innerHTML = `
@@ -852,6 +939,61 @@ function renderPinnedCard(list) {
   }
   list.appendChild(card);
 }
+/* v0.22.0: pin-gated soft hints. When a shark is pinned and the planned
+   expedition matches 3 of its 4 needs (region, depth, bait, method), the
+   logbook offers one soft observational nudge about the odd one out.
+   Wording is observational only — never "correct"/"wrong". This evolves
+   the old rule that failed trips give no signal: the logbook now means
+   "you're warm". Sarah remains the stronger help after repeated failures. */
+const PIN_HINTS = {
+  region: "Maybe we'll find them elsewhere?",
+  depth: "The water doesn't feel quite right for them at this depth…",
+  bait: "They didn't seem to like the food we were offering.",
+  method: "They didn't seem to notice us at all — maybe a different approach?"
+};
+
+/* Pure: given a plan and a pinned shark id, return {dimension, hint} when
+   exactly 3 of 4 dimensions match, else null. Testable. */
+/* v0.22.0 Mira review: hints are grounded in COMPLETED expeditions, not the
+   live planner. The logbook helps interpret evidence; it doesn't reveal
+   answers by trial-and-error clicking.
+   Distinguishes: conditions that make encounter POSSIBLE (region/depth/bait)
+   from methods that improve ODDS (method/methodOpt boost only). */
+function pinHintForTrip(trip, pinnedId) {
+  if (!pinnedId || !trip) return null;
+  const s = SHARKS.find(x => x.id === pinnedId);
+  if (!s || state.tagged[pinnedId]) return null;
+  // Did this trip's conditions make the pinned shark's appearance possible?
+  const baitOk = Array.isArray(s.combo.bait) ? s.combo.bait.includes(trip.bait) : s.combo.bait === trip.bait;
+  const possible = s.combo.region === trip.region &&
+    (s.depths || []).includes(trip.depth) && baitOk;
+  // Did the player encounter (or tag) the pinned shark this trip?
+  const encountered = (trip.encounters || []).some(e => e.speciesId === pinnedId);
+  if (possible && !encountered) {
+    // Conditions were right, shark just wasn't there — "you're warm"
+    return { kind: "warm", hint: "The water felt right for " + s.name.toLowerCase() + " today. Sometimes they're just not there." };
+  }
+  if (!possible && !encountered) {
+    // Which dimension was off? Observational only.
+    const off = [];
+    if (s.combo.region !== trip.region) off.push("region");
+    if (!(s.depths || []).includes(trip.depth)) off.push("depth");
+    if (!baitOk) off.push("bait");
+    if (off.length === 1) {
+      return { kind: "hint", dimension: off[0], hint: PIN_HINTS[off[0]] };
+    }
+  }
+  return null;
+}
+
+/* v0.22.0 Mira review: live planner hints removed. Hints now appear in the
+   logbook after completed expeditions (pinHintForTrip), preserving the
+   research puzzle. This function is kept as a no-op for compatibility. */
+function renderPinHint() {
+  const el = $("pinHint");
+  if (el) { el.classList.add("hidden"); el.innerHTML = ""; }
+}
+
 /* v0.20.0: show the pinned shark on the Expedition tab — a research focus
    to plan around. Never auto-fills the planner; the sea decides. */
 function renderExpeditionPin() {
@@ -865,7 +1007,8 @@ function renderExpeditionPin() {
      string, not an array. baitList() normalizes both. */
   const baits = baitList(s).map(b => BAITS[b] || b).join(", ");
   el.innerHTML = `📌 Currently researching: <strong>${s.name}</strong>
-    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>`;
+    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>
+    <br><span class="dim" style="font-size:12px">📓 Pin hints on — your logbook notes nudge you when the plan is close.</span>`;
 }
 function renderResearch() {
   const list = $("researchList");
@@ -1350,6 +1493,8 @@ async function runExpedition(plan) {
        the logbook renders "No method chosen"; "attract" was a misrecord. */
     method: plan.method || "",
     methodOpt: plan.methodOpt || "none",
+    /* v0.22.0: fieldwork conditions — weather/sea state for the logbook. */
+    conditions: pick(SEA_CONDITIONS),
     encounters: []
   };
   $("launchBtn").disabled = true;
@@ -1370,6 +1515,8 @@ async function runExpedition(plan) {
     : `Bait deployed: ${BAITS[plan.bait]}.`;
 
   logLine(`🛥️ <strong>Expedition begun</strong> — the research vessel leaves the harbor.`);
+  await wait(1700);
+  logLine(`🌤️ ${tripLog.conditions}`);
   await wait(1700);
   logLine(`🪝 ${baitText}`);
   await wait(1700);
@@ -1435,6 +1582,12 @@ async function runExpedition(plan) {
   if (!sawShark) {
     state.failures += 1;
     logLine(`<span class="miss">No sharks today. The sea keeps its counsel.</span>`, "miss");
+    await wait(1200);
+    /* v0.22.0: failed trips feel like fieldwork — warm, never punishing.
+       v0.22.0 Mira review: persist the note so it survives in the logbook. */
+    const fieldNote = pickFieldNote(plan.region);
+    logLine(`📓 <em>${fieldNote}</em>`);
+    if (tripLog) tripLog.fieldNote = fieldNote;
   } else {
     state.failures = 0;
   }
@@ -1443,8 +1596,13 @@ async function runExpedition(plan) {
   saveStats();
   checkAchievements();
 
-  /* v0.8.0: close the logbook page for this trip. */
+  /* v0.8.0: close the logbook page for this trip.
+     v0.22.0 Mira review: attach pin hint grounded in this completed expedition. */
   if (tripLog) {
+    if (state.pinned) {
+      const hint = pinHintForTrip(tripLog, state.pinned);
+      if (hint) tripLog.pinHint = hint.hint;
+    }
     state.logbook.unshift(tripLog);
     logStore.save(state.logbook);
     tripLog = null;
@@ -1622,15 +1780,87 @@ function maybeCheckinThread() {
 /* ---------- Expedition logbook: the scientist's notebook ----------
    v0.9.0: every trip lands here — plan (region/depth/bait/method),
    encounters and outcome. Compare attempts; the pattern is the answer. */
+/* v0.22.0: logbook filters — outcome, region, species. Filters narrow the
+   notebook; they never solve the expedition. */
+const logbookFilters = { outcome: "all", region: "all", species: "all" };
+
+/* Pure: does a logbook trip entry match the given filters? Testable. */
+/* v0.22.0 Mira review: filters represent EVENTS within the expedition.
+   - "tagged": any tagged encounter (trip may also have others)
+   - "resighted": any re-sighted encounter
+   - "watched": any watched (just watch) encounter
+   - "missed": no shark encounters at all
+   A trip with multiple outcomes appears in each relevant filter. */
+function logbookTripMatches(t, f) {
+  if (f.outcome !== "all") {
+    const enc = t.encounters || [];
+    if (f.outcome === "tagged" && !enc.some(e => e.result === "tagged")) return false;
+    if (f.outcome === "resighted" && !enc.some(e => e.result === "resighted")) return false;
+    if (f.outcome === "watched" && !enc.some(e => e.result === "watched")) return false;
+    if (f.outcome === "missed" && enc.length > 0) return false;
+  }
+  if (f.region !== "all" && t.region !== f.region) return false;
+  if (f.species !== "all" && !(t.encounters || []).some(e => e.speciesId === f.species)) return false;
+  return true;
+}
+
+function buildLogbookFilters() {
+  const rs = $("logFilterRegion"), ss = $("logFilterSpecies");
+  if (rs && rs.options && rs.options.length <= 1) {
+    Object.entries(REGIONS).forEach(([id, r]) => {
+      const o = document.createElement("option");
+      o.value = id; o.textContent = r.name;
+      rs.appendChild(o);
+    });
+  }
+  if (ss && ss.options && ss.options.length <= 1) {
+    SHARKS.forEach(s => {
+      const o = document.createElement("option");
+      o.value = s.id; o.textContent = s.name;
+      ss.appendChild(o);
+    });
+  }
+  ["logFilterOutcome", "logFilterRegion", "logFilterSpecies"].forEach(id => {
+    const el = $(id);
+    if (el && !el.dataset.bound) {
+      el.dataset.bound = "1";
+      el.addEventListener("change", () => {
+        logbookFilters.outcome = $("logFilterOutcome").value;
+        logbookFilters.region = $("logFilterRegion").value;
+        logbookFilters.species = $("logFilterSpecies").value;
+        renderLogbook();
+      });
+    }
+  });
+  const clr = $("logFilterClear");
+  if (clr && !clr.dataset.bound) {
+    clr.dataset.bound = "1";
+    clr.addEventListener("click", () => {
+      logbookFilters.outcome = "all"; logbookFilters.region = "all"; logbookFilters.species = "all";
+      $("logFilterOutcome").value = "all"; $("logFilterRegion").value = "all"; $("logFilterSpecies").value = "all";
+      renderLogbook();
+    });
+  }
+}
+
 function renderLogbook() {
   const list = $("logbookList");
   if (!list) return;
+  buildLogbookFilters();
   list.innerHTML = "";
+  const trips = state.logbook.filter(t => logbookTripMatches(t, logbookFilters));
+  const anyFilter = logbookFilters.outcome !== "all" || logbookFilters.region !== "all" || logbookFilters.species !== "all";
+  const clr = $("logFilterClear");
+  if (clr) clr.classList.toggle("hidden", !anyFilter);
   if (!state.logbook.length) {
     list.innerHTML = `<div class="empty-note">No expeditions logged yet.<br>Every trip lands here — plan, encounters, outcome. 📓</div>`;
     return;
   }
-  state.logbook.forEach(t => {
+  if (!trips.length) {
+    list.innerHTML = `<div class="empty-note">No trips match those filters.<br>Try clearing something — the ocean is bigger than it looks.</div>`;
+    return;
+  }
+  trips.forEach(t => {
     const div = document.createElement("div");
     div.className = "logbook-entry";
     const planBits = [
@@ -1655,7 +1885,10 @@ function renderLogbook() {
     div.innerHTML = `
       <div class="logbook-date">🛥️ ${esc(t.date)}</div>
       <div class="logbook-plan">${planBits.map(esc).join(" · ")}</div>
+      ${t.conditions ? `<div class="logbook-conditions latin">🌤️ ${esc(t.conditions)}</div>` : ""}
+      ${t.fieldNote ? `<div class="logbook-fieldnote latin">🔭 ${esc(t.fieldNote)}</div>` : ""}
       <div class="logbook-enc">${enc}</div>
+      ${t.pinHint ? `<div class="logbook-pinhint"><span class="pin-hint-icon">📓</span> <em>${esc(t.pinHint)}</em></div>` : ""}
       <button type="button" class="repeat-btn" data-repeat>🔁 Repeat this plan</button>`;
     const rb = div.querySelector("[data-repeat]");
     if (rb) rb.addEventListener("click", () => repeatPlan(t));
@@ -2445,6 +2678,7 @@ function openDetail(id) {
     </div>` : ""}
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
+    ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
   `;
   $("detailOverlay").classList.remove("hidden");
   $("trackBtn").addEventListener("click", () => openTrack(id));
@@ -2533,7 +2767,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -2563,6 +2797,7 @@ function renderAll() {
   renderSarahAsk();
   renderAchievements(); // v0.18.0
   renderExpeditionPin(); // v0.20.0
+  renderPinHint(); // v0.22.0
   /* v0.20.0: restore quick-pace preference (the change listener is bound
      once at init — Mira review fix: binding it here accumulated listeners
      on every renderAll). */
@@ -2588,6 +2823,21 @@ function migrateArchiveUnlock() {
     }
   } catch {}
 }
+/* v0.22.0 Mira review: capture pre-migration storage state for What's New.
+   Migrations write keys (e.g. tyi-collection) even for new players, so we
+   snapshot before they run. */
+const preMigrationHadSave = (() => {
+  try {
+    const log = localStorage.getItem("tyi-logbook");
+    const col = localStorage.getItem("tyi-collection");
+    // Meaningful data: non-empty logbook, or collection with actual sharks
+    if (log && log !== "[]") return true;
+    if (col && col !== "{}" && col !== "null") {
+      try { return Object.keys(JSON.parse(col)).length > 0; } catch { return false; }
+    }
+    return !!localStorage.getItem("tyi-stats");
+  } catch { return false; }
+})();
 migrateIds();
 migrateTracks();
 migrateWinV07();
@@ -2639,12 +2889,18 @@ function updateAllVisuals() {
     });
     updateVisual("methodOptSelect");
   };
-  mSel.addEventListener("change", () => { fillOpts(); updateVisual("methodSelect"); });
+  mSel.addEventListener("change", () => { fillOpts(); updateVisual("methodSelect"); renderPinHint(); });
   oSel.addEventListener("change", () => updateVisual("methodOptSelect"));
   ["regionSelect", "depthSelect", "baitSelect"].forEach(id =>
-    $(id).addEventListener("change", () => updateVisual(id)));
+    $(id).addEventListener("change", () => { updateVisual(id); renderPinHint(); }));
   fillOpts();
   updateAllVisuals();
+})();
+/* v0.22.0: re-render the pin hint when the Expedition tab opens (plan may
+   have been restored via repeat-plan) and when pinning changes. */
+(function initPinHint() {
+  const tab = document.querySelector('[data-tab="expedition"]');
+  if (tab) tab.addEventListener("click", () => setTimeout(renderPinHint, 50));
 })();
 /* v0.10.0: map toolbar — zoom controls + currents toggle (static HTML).
    Guarded lookups: if this script ever loads against older HTML, the game
@@ -2810,6 +3066,27 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   window.addEventListener("pointercancel", endPointer);
 })();
 $("buildTag").textContent = VERSION;
+/* v0.22.0: What's New — show once per version update for returning players. */
+(function initWhatsNew() {
+  const notes = WHATS_NEW[VERSION];
+  if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, preMigrationHadSave)) {
+    markWhatsNewSeen();
+    return;
+  }
+  const c = $("whatsNewContent");
+  c.innerHTML = `
+    <div class="cert-trophy" style="font-size:40px">🎉</div>
+    <h3 style="margin:6px 0 0">What's new in ${esc(VERSION)}</h3>
+    <p class="latin">Tag Along — field program updates</p>
+    <ul class="whats-new-list">
+      ${notes.map(n => `<li>${n}</li>`).join("")}
+    </ul>`;
+  $("whatsNewOverlay").classList.remove("hidden");
+  $("whatsNewClose").addEventListener("click", () => {
+    $("whatsNewOverlay").classList.add("hidden");
+    markWhatsNewSeen();
+  });
+})();
 const tickPhoneClock = () => {
   $("phoneTime").textContent =
     new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
