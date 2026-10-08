@@ -1,9 +1,9 @@
 # v0.24.0 — next batch (discussion)
 
-Standing thread for the road to Beta 1.0. Nothing here is authorized for building yet.
+Standing thread for the road to Beta 1.0.
 
-## Awaiting Mira
-- **Progressive Wild Archive unlock** — per-tag photo unlock vs win-gated.
+## In progress (Mira approved design, Avery authorized build)
+- **Progressive Wild Archive unlock** — per-tag photo unlock. First tag reveals tab + Sarah intro; later tags quiet badge; returning players migrated.
 
 ## Queued
 - "Just watch" natural-history texture (beta roadmap #6)
