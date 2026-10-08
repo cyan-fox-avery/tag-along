@@ -366,7 +366,7 @@ function showMapPopup(sid) {
   const pts = mapPoints(t);
   const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
   const kindNote = t.track.kind === "archival"
-    ? "Archival track — this species has never carried a tracking tag; this route is reconstructed from capture records and published depth ranges, not live pings."
+    ? "Archival track — this species has never carried a tracking tag. This route is an illustrative habitat-based scenario drawn from capture records and published depth ranges, not a reconstruction of an individual's movements."
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
       : t.track.kind === "acoustic"
