@@ -11,6 +11,15 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.20.0 changes — expedition flow + two-shark wave
+
+- **📌 Pinned shark ("currently researching").** Pin any field-guide entry to keep it in a focus card at the top of the Research tab — with a jump-to-entry button. The Expedition tab also shows your pinned shark's region/depth/bait as a planning reference. One pin at a time, persisted across sessions. A focus, never a filter.
+- **🔁 Repeat-plan.** Every logbook entry now has a "Repeat this plan" button that restores its region, depth, bait, and method into the planner and jumps you to the Expedition tab.
+- **⚡ Quick pace.** A new planner toggle shortens the beats between dive-log lines for faster expeditions. Preference persists.
+- **Two new sharks (30 → 32).** The salmon shark graduates from the future batch with its curated archive media; the dusky shark joins with its two curated archive photos (Happy Little Nomad's aquarium portrait, NOAA research shot).
+- **Wild Archive media batch (Avery + Mira).** 18 more species staged as `future: true` — hidden until they join the playable roster: silvertip, spinner, spotted wobbegong, leopard, horn, Port Jackson, common angelshark, megamouth, common sawshark, Greenland, cookiecutter, bluntnose sixgill, velvet-belly lanternshark, dwarf lanternshark, kitefin, Pacific sleeper, spiny dogfish, small-spotted catshark. The pygmy shark is on a verification hold (image rights unconfirmed) and was deliberately left out. Captive/research/preserved-specimen context preserved in captions; the spinner's iNaturalist photo is CC BY-NC (version unconfirmed) with the project non-commercial notice.
+- 141 tests passing, including regression coverage for Mira's v0.20.0 review (pinned filter-feeders, depth labels, filtered jump, repeat-plan with no method).
+
 ## v0.19.1 changes — underwater ambience
 
 - **The site has water in it now.** The background is a descent: bright surface water behind the title card, darkening through the depths as you scroll. A shimmering surface band sits just below the title card, god rays slant down from it, slow bubbles rise, and a dark seafloor silhouette (with kelp) rests along the bottom. All decorative layers sit behind the app, ignore taps, and respect `prefers-reduced-motion`.

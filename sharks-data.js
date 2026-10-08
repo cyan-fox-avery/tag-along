@@ -523,4 +523,42 @@ const SHARKS = [
     sketchCap: "the tall first dorsal fin",
     nameIdeas: ["Sail", "Dune", "Fin", "Bank"]
   },
+  {
+    id: "salmon",
+    name: "Salmon Shark", latin: "Lamna ditropis", status: "Least Concern",
+    code: "SS",
+    /* The Pacific's porbeagle cousin, named for what it eats. Partial
+       endotherm — warm stomach, eyes and brain — so it hunts salmon in
+       near-freezing water. Males west, females east. */
+    combo: { region: "japan", bait: ["tuna", "squid"] },
+    depths: ["surface"],
+    methods: { attract: ["chum"] },
+    sizeRange: [2.0, 3.05],
+    research: "A heavy-bodied, warm-blooded hunter of the North Pacific — the porbeagle's Pacific cousin, named for its favourite prey. Salmon sharks keep their stomach, eyes and brain warm (partial endothermy), which lets them hunt effectively in water as cold as 2\u00b0C. In summer they cruise just under the surface of the Gulf of Alaska and the Kuril Islands, dorsal fins exposed in slow circles; in winter they follow the salmon south toward Japan. One 1998 study estimated they take 12\u201325% of the entire annual Prince William Sound salmon run. Males are more common in the west, females in the east. Fish the surface with big oily bait on a chum slick — tuna or squid.",
+    hook: "A warm-blooded shark that hunts salmon in near-freezing water — the Pacific's porbeagle cousin.",
+    bonus: "Salmon sharks average about 33 km a day on their migratory legs, following the salmon between Alaska and Japan.",
+    cheer: "A salmon shark! Warm-blooded and built for cold water — what a combination.",
+    opener: "A salmon shark! Did you see it cruising just under the surface? I want every detail.",
+    sketchCap: "the heavy lamnid body, pointed snout",
+    nameIdeas: ["Sushi", "Roe", "Keta", "Bristol"]
+  },
+  {
+    id: "dusky",
+    name: "Dusky Shark", latin: "Carcharhinus obscurus", status: "Endangered",
+    code: "DS",
+    /* The slowest-reproducing shark in the game: females mature around 20,
+       gestate nearly two years, rest a year, breed every third year.
+       The catalogue's best story about why sharks are vulnerable. */
+    combo: { region: "south-africa", bait: ["schooling-fish", "squid"] },
+    depths: ["surface", "reef"],
+    methods: { attract: ["chum"] },
+    sizeRange: [2.5, 4.0],
+    research: "One of the largest requiem sharks — and one of the slowest-reproducing sharks. Female dusky sharks mature at around 20 years old, gestate for 22 to 24 months (matched among vertebrates only by elephants), then rest a full year: a single litter every three years. That pace is why the species is Endangered — it cannot replace what fishing takes. Adults cruise tropical and temperate coastlines worldwide, from the surf zone to the outer shelf; off South Africa, groups of juveniles have been seen mobbing a humpback whale calf. There is no single field mark — identification is by proportion, including a low ridge of skin between the dorsal fins. Sardines or squid on chum, surface to reef.",
+    hook: "Females breed only every third year — the slowest reproductive pace of any shark in the game.",
+    bonus: "Dusky sharks have been tracked migrating up to 3,800 km — yet females return to their own nurseries, keeping local populations distinct.",
+    cheer: "A dusky! Every tag on this species genuinely matters for the science.",
+    opener: "A dusky shark — Endangered, magnificent, and in no hurry at all. What did you see?",
+    sketchCap: "the interdorsal ridge (look closely!)",
+    nameIdeas: ["Patience", "Slow", "Ridge", "Calypso"]
+  },
 ];

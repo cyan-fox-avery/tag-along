@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'achievements-data.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -11,7 +11,7 @@ function makeEl() {
     style: {}, disabled: false, hidden: false,
     addEventListener() {}, removeEventListener() {}, setAttribute() {}, getAttribute() { return null; },
     getBoundingClientRect() { return { left: 0, top: 0, width: 800, height: 400 }; },
-    click() {}, focus() {}, scrollHeight: 999, scrollTop: 0,
+    click() {}, focus() {}, scrollIntoView() {}, scrollHeight: 999, scrollTop: 0,
     appendChild(c) { this.children.push(c); return c; },
     querySelector() { return makeEl(); }, querySelectorAll() { return []; },
   };
@@ -38,20 +38,20 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.19.1', VERSION === 'v0.19.1');
+  ok('version v0.20.0', VERSION === 'v0.20.0');
 
   // roster
-  ok('roster is 30', SHARKS.length === 30);
+  ok('roster is 32', SHARKS.length === 32);
   const ids = SHARKS.map(s => s.id);
-  ok('30 unique shark IDs', new Set(ids).size === 30);
-  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 30);
+  ok('32 unique shark IDs', new Set(ids).size === 32);
+  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 32);
   ok('all have ART', ids.every(id => !!ART[id]));
   ok('all have SKETCH', ids.every(id => !!SKETCH[id]));
   const counts = ids.map(id => (COUSIN_CHATS[id] || []).length);
-  ok('all 30 species have 3 chats', counts.length === 30 && counts.every(n => n === 3));
+  ok('all 32 species have 3 chats', counts.length === 32 && counts.every(n => n === 3));
   ok('all have nudges', ids.every(id => !!COUSIN_NUDGES[id]));
   ok('all have envelopes', ids.every(id => !!TRACK_ENVELOPES[id]));
-  ok('win is full roster', SHARKS.length === 30);
+  ok('win is full roster', SHARKS.length === 32);
 
   // v0.14.0 new sharks
   const new2 = ['frilled', 'zebra'];
@@ -147,8 +147,8 @@ code += `
   ok('ARCHIVE_MEDIA exists', typeof ARCHIVE_MEDIA === 'object');
   const liveIds = SHARKS.map(x => x.id);
   const archivedLive = liveIds.filter(id => ARCHIVE_MEDIA[id] && !ARCHIVE_MEDIA[id].future);
-  ok('all 30 live sharks have archive media', archivedLive.length === 30);
-  ok('salmon is future-only', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === true);
+  ok('all 32 live sharks have archive entries', archivedLive.length === 32);
+  ok('salmon is live with media', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === false && (ARCHIVE_MEDIA.salmon.assets || []).length > 0);
   let assetsOk = true, videosOk = true;
   liveIds.forEach(id => {
     (ARCHIVE_MEDIA[id].assets || []).forEach(a => {
@@ -180,7 +180,10 @@ code += `
   Object.values(ARCHIVE_MEDIA).forEach(m => (m.assets || []).forEach(a => {
     if (a.license && !/public domain/i.test(a.license)) usedLicenses.add(a.license);
   }));
-  const unmapped = [...usedLicenses].filter(l => !LICENSE_URLS[l]);
+  /* v0.20.0: versionless "CC BY-NC" is a deliberate exception (Mira's rule —
+     iNaturalist records no version, so no version-specific link is applied).
+     Everything else needs its canonical URL. */
+  const unmapped = [...usedLicenses].filter(l => l !== "CC BY-NC" && !LICENSE_URLS[l]);
   ok('every CC license has a canonical URL', unmapped.length === 0);
   // mobile perf: videos render with preload="none" + poster, not preload="metadata"
   ok('videos use preload=none with poster', /preload=\\"none\\"/.test(fileCode) && /poster=/.test(fileCode));
@@ -189,7 +192,7 @@ code += `
   const openerRe = /opener:\\s*"([^"]+)"/g;
   const openers = []; let m;
   while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
-  ok('30 species openers present', openers.length === 30);
+  ok('32 species openers present', openers.length === 32);
   ok('no shared verbatim closer', new Set(openers).size === openers.length);
   ok('the old repeated closer is gone', !openers.some(function(o) { return /tell me everything/i.test(o); }));
   // v0.17.1 review fix: the advice offer must survive a reload, and a used
@@ -247,8 +250,9 @@ code += `
   ok('wave species have full game data',
     wave7.every(id => ART[id] && SKETCH[id] && COUSIN_NUDGES[id] &&
       (COUSIN_CHATS[id] || []).length === 3 && TRACK_ENVELOPES[id]));
-  ok('salmon still future-only', ARCHIVE_MEDIA.salmon.future === true &&
-    !SHARKS.some(s => s.id === 'salmon'));
+  /* v0.20.0: salmon joined the roster — the future-only assertion retires. */
+  ok('salmon graduated from future batch', ARCHIVE_MEDIA.salmon.future === false &&
+    SHARKS.some(s => s.id === 'salmon'));
 
   // v0.18.0 review regressions
   ok('reset clears achievement/stat stores',
@@ -404,6 +408,139 @@ code += `
   // restore
   state.tagged = {}; state.achievements = {};
   state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0 };
+
+  // v0.20.0: salmon + dusky wave
+  const salmon = SHARKS.find(s => s.id === "salmon");
+  const dusky = SHARKS.find(s => s.id === "dusky");
+  ok('salmon dossier complete', salmon && salmon.combo.region === "japan" &&
+    salmon.depths.includes("surface") && salmon.latin === "Lamna ditropis");
+  ok('dusky dossier complete', dusky && dusky.combo.region === "south-africa" &&
+    dusky.status === "Endangered" && dusky.latin === "Carcharhinus obscurus");
+  ok('wave chats present', COUSIN_CHATS.salmon && COUSIN_CHATS.salmon.length === 3 &&
+    COUSIN_CHATS.dusky && COUSIN_CHATS.dusky.length === 3);
+  ok('wave nudges present', !!COUSIN_NUDGES.salmon && !!COUSIN_NUDGES.dusky);
+  ok('wave art + sketches', !!ART.salmon && !!ART.dusky && !!SKETCH.salmon && !!SKETCH.dusky);
+  ok('dusky archive live (Avery+Mira curated)', ARCHIVE_MEDIA.dusky && ARCHIVE_MEDIA.dusky.future === false &&
+    !ARCHIVE_MEDIA.dusky.comingSoon && ARCHIVE_MEDIA.dusky.assets.length === 2 &&
+    ARCHIVE_MEDIA.dusky.assets[0].credit === "Happy Little Nomad" &&
+    ARCHIVE_MEDIA.dusky.assets[1].license === "public domain (NOAA)");
+  // v0.20.0: Avery + Mira media batch — 18 future species staged, hidden until playable
+  const futures = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
+    "megamouth","sawshark","greenland","cookiecutter","sixgill","velvetbelly","dwarflantern",
+    "kitefin","pacificsleeper","spinydogfish","catshark"];
+  ok('media batch: 18 future entries', futures.every(id =>
+    ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future === true &&
+    (ARCHIVE_MEDIA[id].assets || []).length >= 1));
+  ok('batch: no pygmy (verification hold)', !ARCHIVE_MEDIA.pygmy);
+  ok('batch: every asset has image+page+credit+license', futures.every(id =>
+    ARCHIVE_MEDIA[id].assets.every(a => a.image && a.page && a.credit && a.license &&
+      !a.image.includes('commons.wikimedia.org/wiki/'))));
+  ok('batch: no HTML page URLs in image src', futures.every(id =>
+    ARCHIVE_MEDIA[id].assets.every(a => !a.image.includes('wikipedia.org') && !a.image.includes('.org/wiki/'))));
+  ok('spinner NC asset has notice + iNaturalist label', (() => {
+    const a = ARCHIVE_MEDIA.spinner.assets[0];
+    return a.license === "CC BY-NC" && !!a.licenseNote && a.sourceLabel === "iNaturalist" &&
+      !LICENSE_URLS["CC BY-NC"];
+  })());
+  ok('NC 4.0 license URL registered', LICENSE_URLS["CC BY-NC 4.0"] === "https://creativecommons.org/licenses/by-nc/4.0/");
+  // v0.20.0: pinned shark
+  ok('pin toggles', (() => {
+    state.pinned = null;
+    togglePin("salmon");
+    const on = state.pinned === "salmon" && pinStore.load() === "salmon";
+    togglePin("salmon");
+    return on && state.pinned === null && pinStore.load() === null;
+  })());
+  // v0.20.0 Mira review: sawshark secondary is a genuine detail crop
+  ok('sawshark secondary is a real detail crop', (() => {
+    const a = ARCHIVE_MEDIA.sawshark.assets[1];
+    if (a.framing !== 'detail-crop' || !a.detailCrop || !a.trimmed) return false;
+    const html = archiveAssetHtml(a, false);
+    return html.includes('detail-crop-frame') && html.includes('background-position') &&
+      html.includes('trimmed from original');
+  })());
+  ok('pin switches', (() => {
+    togglePin("salmon"); togglePin("dusky");
+    const r = state.pinned === "dusky";
+    state.pinned = null; pinStore.save(null);
+    return r;
+  })());
+  // v0.20.0 Mira review: pinned filter-feeder (whale stores bait as a string)
+  ok('pinned filter-feeder renders expedition pin', (() => {
+    state.pinned = 'whale';
+    try { renderExpeditionPin(); } catch (e) { state.pinned = null; return false; }
+    const html = document.getElementById('expeditionPin').innerHTML;
+    state.pinned = null; renderExpeditionPin();
+    return html.includes('Plankton') || html.toLowerCase().includes('plankton');
+  })());
+  ok('pinned depth labels are names not objects', (() => {
+    state.pinned = 'dusky';
+    renderExpeditionPin();
+    const html = document.getElementById('expeditionPin').innerHTML;
+    state.pinned = null; renderExpeditionPin();
+    return !html.includes('[object Object]') && html.includes('Surface');
+  })());
+  ok('jump clears filters hiding the pinned shark', (() => {
+    state.pinned = 'dusky';
+    guideFilters.q = 'zzzz-no-match';
+    // filtered-out state: the entry is not in the rendered list
+    const list = { querySelector() { return null; } };
+    jumpToPinned(SHARKS.find(s => s.id === 'dusky'), list);
+    const cleared = activeFilterCount() === 0;
+    state.pinned = null;
+    return cleared;
+  })());
+  ok('repeat-plan with no method clears the planner method', (() => {
+    const mk = (vals) => {
+      const el = { value: '', options: vals.map(v => ({ value: v, disabled: false })),
+        _h: {}, addEventListener(t, h) { this._h[t] = h; },
+        dispatchEvent() { if (this._h.change) this._h.change(); } };
+      return el;
+    };
+    els['regionSelect'] = mk(['caribbean', 'japan']);
+    els['depthSelect'] = mk(['surface', 'reef']);
+    els['baitSelect'] = mk(['tuna', 'squid']);
+    els['methodSelect'] = mk(['', 'attract']);
+    els['methodOptSelect'] = mk(['none', 'chum']);
+    els['methodSelect'].value = 'attract';
+    repeatPlan({ region: 'japan', depth: 'surface', bait: 'tuna', method: '', methodOpt: 'none' });
+    return els['methodSelect'].value === '';
+  })());
+  // v0.20.0: quick pace
+  ok('quick pace toggles PACE', (() => {
+    setPace(true);
+    const fast = PACE < 1;
+    setPace(false);
+    return fast && PACE === 1.5;
+  })());
+  ok('pace persists', (() => {
+    setPace(true);
+    const saved = localStorage.getItem("tyi-pace") === "quick";
+    setPace(false);
+    return saved;
+  })());
+  // v0.20.0: repeat plan restores planner values
+  ok('repeatPlan restores selects', (() => {
+    const mk = (vals) => {
+      const el = { value: "", options: vals.map(v => ({ value: v, disabled: false })),
+        _h: {}, addEventListener(t, h) { this._h[t] = h; },
+        dispatchEvent() { if (this._h.change) this._h.change(); } };
+      return el;
+    };
+    els["regionSelect"] = mk(["caribbean", "japan"]);
+    els["depthSelect"] = mk(["surface", "reef"]);
+    els["baitSelect"] = mk(["tuna", "squid"]);
+    els["methodSelect"] = mk(["", "attract"]);
+    els["methodOptSelect"] = mk(["none", "chum"]);
+    // method select change fills opts (initMethodSelects listener is mocked away; fill manually)
+    els["methodSelect"].addEventListener("change", () => {});
+    let wentTab = "";
+    const origGo = typeof goTab;
+    repeatPlan({ region: "japan", depth: "surface", bait: "tuna", method: "attract", methodOpt: "chum" });
+    return els["regionSelect"].value === "japan" && els["depthSelect"].value === "surface" &&
+      els["baitSelect"].value === "tuna" && els["methodSelect"].value === "attract" &&
+      els["methodOptSelect"].value === "chum";
+  })());
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
