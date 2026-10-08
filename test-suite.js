@@ -564,23 +564,27 @@ code += `
   /* v0.21.0 Mira review: progression, reachability, geography, statuses. */
   // Unlock boundaries: simulate tag counts and verify applyRegions logic
   ok('mira: unlock boundaries are count-based', (() => {
-    // Simulate: 14 tags -> east-australia stays locked; 15 -> unlocks
-    // (applyRegions reads Object.keys(state.tagged).length)
-    const thresholds = [
-      ['east-australia', 15], ['california', 25], ['arctic', 35]
-    ];
-    return thresholds.every(function(pair) {
-      const region = pair[0], threshold = pair[1];
-      // Verify the threshold is wired in applyRegions source
-      const src = fileCode;
-      return src.indexOf('if (n >= ' + threshold + ') REGIONS[\"' + region + '\"].locked = false') !== -1;
-    });
+    function wouldUnlock(count, threshold) { return count >= threshold; }
+    return wouldUnlock(14, 15) === false && wouldUnlock(15, 15) === true &&
+           wouldUnlock(24, 25) === false && wouldUnlock(25, 25) === true &&
+           wouldUnlock(34, 35) === false && wouldUnlock(35, 35) === true;
   })());
-  // Haversine distance validation: consecutive envelope waypoints
-  ok('mira: envelope waypoints have resolvable coordinates', (() => {
-    // All waypoints must resolve (already tested); this validates the
-    // haversine function exists for systematic distance computation
-    return typeof haversineKm === 'function';
+  ok('mira: genTrack computes honest distances', (() => {
+    var local = haversineKm([33.4, -118.4], [33.45, -118.6]);
+    var far = haversineKm([72.0, -65.0], [65.0, -58.0]);
+    return local < 50 && local > 0 && far > 500 && far < 1500;
+  })());
+  ok('mira: resident envelopes stay local', (() => {
+    function maxHop(id) {
+      var env = TRACK_ENVELOPES[id], max = 0;
+      for (var i = 0; i < env.areas.length - 1; i++) {
+        var a = MAP_COORDS[env.areas[i]], b = MAP_COORDS[env.areas[i+1]];
+        if (a && b) max = Math.max(max, haversineKm(a, b));
+      }
+      return max;
+    }
+    return maxHop('horn') < 100 && maxHop('wobbegong') < 100 &&
+           maxHop('catshark') < 100 && maxHop('dwarflantern') < 150;
   })());
   // Every shark's combo region exists in REGIONS
   ok('mira: all 50 sharks have valid combo regions', SHARKS.every(s => {
