@@ -924,7 +924,10 @@ code += `
            RESET_KEYS.includes("tyi-bruce");
   })());
   ok('v0.23.0: validateSaveData accepts good save', (() => {
-    const good = { version: "v0.23.0", keys: { "tyi-collection": "{}", "tyi-logbook": "[]" } };
+    const good = { version: "v0.23.0", keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
+      "tyi-logbook": '[{"trip":"done"}]'
+    } };
     const r = validateSaveData(good);
     return r.ok === true;
   })());
@@ -942,8 +945,40 @@ code += `
     const r = validateSaveData({ version: "v9.99.9", keys: { "tyi-collection": "{}" } });
     return r.ok === false;  // rejected, not just warned
   })());
-  ok('v0.23.0: snapshot/restore round-trip', (() => {
-    return typeof snapshotCurrentSave === "function" && typeof restoreSnapshot === "function";
+  ok('v0.23.0: validateSaveData rejects null records', (() => {
+    return validateSaveData({ version: "v0.23.0", keys: { "tyi-collection": '{"nurse":null}' } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-logbook": "[null]" } }).ok === false;
+  })());
+  ok('v0.23.0: validateSaveData rejects progress-less save', (() => {
+    // tyi-pace alone would wipe the collection
+    return validateSaveData({ version: "v0.23.0", keys: { "tyi-pace": "quick" } }).ok === false;
+  })());
+  ok('v0.23.0: rollback restores on mid-import failure', (() => {
+    // Failing stub storage: throws after 2 writes
+    let writes = 0, failNow = false;
+    const failing = {
+      data: { "tyi-collection": '{"nurse":{"researchId":"NS-001"}}', "tyi-pace": "slow" },
+      setItem(k, v) { if (failNow) throw new Error("quota"); this.data[k] = v; writes++; },
+      removeItem(k) { delete this.data[k]; }
+    };
+    const snapshot = { ...failing.data };
+    failNow = true;
+    let threw = false;
+    try { replaceSaveKeys({ "tyi-collection": '{"tiger":{"researchId":"NS-002"}}' }, failing); }
+    catch { threw = true; }
+    if (!threw) return false;
+    // Rollback restores every original key, including ones absent before import
+    failNow = false;
+    const restored = restoreSnapshot(snapshot, failing);
+    if (!restored) return false;
+    return failing.data["tyi-collection"] === snapshot["tyi-collection"] &&
+           failing.data["tyi-pace"] === snapshot["tyi-pace"];
+  })());
+  ok('v0.23.0: replaceSaveKeys swaps full key set', (() => {
+    const mem = { data: { "tyi-collection": "old", "tyi-pace": "old" },
+      setItem(k, v) { this.data[k] = v; }, removeItem(k) { delete this.data[k]; } };
+    replaceSaveKeys({ "tyi-collection": "new" }, mem);
+    return mem.data["tyi-collection"] === "new" && !("tyi-pace" in mem.data);
   })());
   ok('v0.23.0: whatsnew v0.23.0 entry exists', (() => {
     const notes = WHATS_NEW["v0.23.0"];
