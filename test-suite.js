@@ -564,10 +564,27 @@ code += `
   /* v0.21.0 Mira review: progression, reachability, geography, statuses. */
   // Unlock boundaries: simulate tag counts and verify applyRegions logic
   ok('mira: unlock boundaries are count-based', (() => {
-    function wouldUnlock(count, threshold) { return count >= threshold; }
-    return wouldUnlock(14, 15) === false && wouldUnlock(15, 15) === true &&
-           wouldUnlock(24, 25) === false && wouldUnlock(25, 25) === true &&
-           wouldUnlock(34, 35) === false && wouldUnlock(35, 35) === true;
+    // Behavioral: manipulate state.tagged, call applyRegions(), check REGIONS
+    function testUnlock(n, regionId, shouldUnlock) {
+      // Reset
+      REGIONS["east-australia"].locked = true;
+      REGIONS["california"].locked = true;
+      REGIONS["arctic"].locked = true;
+      // Mock n tagged sharks
+      state.tagged = {};
+      for (let k = 0; k < n; k++) state.tagged["shark" + k] = { nick: "Test" };
+      applyRegions();
+      const unlocked = !REGIONS[regionId].locked;
+      // Reset for next test
+      state.tagged = {};
+      return unlocked === shouldUnlock;
+    }
+    return testUnlock(14, "east-australia", false) &&
+           testUnlock(15, "east-australia", true) &&
+           testUnlock(24, "california", false) &&
+           testUnlock(25, "california", true) &&
+           testUnlock(34, "arctic", false) &&
+           testUnlock(35, "arctic", true);
   })());
   ok('mira: genTrack computes honest distances', (() => {
     var local = haversineKm([33.4, -118.4], [33.45, -118.6]);
