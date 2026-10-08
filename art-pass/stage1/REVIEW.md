@@ -1,45 +1,44 @@
 # Stage 1 — Reproduction Test: Revised Review Package
 
-**Species:** Great hammerhead (*Sphyrna mokarran*), Sawshark (*Pristiophorus japonicus*)
-**Date:** 2026-10-08 (revised per Mira's review)
+**Species:** Great hammerhead (*Sphyrna mokarran*), Common sawshark (*Pristiophorus cirratus*)
+**Date:** 2026-10-08 (revised per Mira's reviews, rounds 1 + 2)
 
 ## Final files (transparent backgrounds confirmed)
 
-| File | Species | Type | Status |
+| File (on PR #24, `art-pass/stage1/`) | Species | Type | Status |
 |------|---------|------|--------|
-| `hammerhead-illustration-final.png` | Great hammerhead | Full-colour | Revised: eye moved to hammer tip |
-| `hammerhead-silhouette-final.png` | Great hammerhead | Silhouette | v1 (see honest note below) |
-| `sawshark-illustration-final.png` | Sawshark | Full-colour | Revised: barbels at midpoint, upper-lobed tail |
-| `sawshark-silhouette-final.png` | Sawshark | Silhouette | Revised: barbels visible, upper-lobed tail |
+| `hammerhead-illustration.png` | Great hammerhead | Full-colour | ✅ Approved for prototype |
+| `hammerhead-silhouette.png` | Great hammerhead | Silhouette | ✅ Approved for in-game test |
+| `sawshark-illustration.png` | Common sawshark | Full-colour | Revised: barbels at rostrum midpoint |
+| `sawshark-silhouette.png` | Common sawshark | Silhouette | Revised: barbels at rostrum midpoint |
 
 All four have genuine transparent backgrounds (flood-fill background removal, corner alpha=0).
+
+## Species correction (Mira, round 2)
+
+Our game's Common Sawshark is *Pristiophorus cirratus*, not *P. japonicus*
+(Japanese sawshark). All references corrected. Fin arrangement verified against
+*P. cirratus*: two dorsal fins, no anal fin, pectoral fins, upper-lobed caudal.
 
 ## What changed per Mira's corrections
 
 **Hammerhead illustration:** Eye moved from inboard to the extreme outer tip of the
 cephalofoil via targeted edit (resumed from v1 snapshot, changed only the eye).
-Wide hammer, tall curved dorsal, colouration all preserved.
+Wide hammer, tall curved dorsal, colouration all preserved. ✅ Approved.
 
-**Sawshark illustration:** Regenerated with barbels at rostrum midpoint (were near
-mouth/gills) and predominantly upper-lobed caudal fin (was too forked).
+**Hammerhead silhouette:** v1 side profile accepted for first in-game test.
+Mira: "The silhouette needs to create mystery, not necessarily permit perfect
+identification before the reveal. Let's judge it in motion." ✅ Approved.
 
-**Sawshark silhouette:** Regenerated with visible barbels at midpoint and upper-lobed
-tail. Serrated saw edge retained.
+**Sawshark illustration (round 2):** Barbels moved to rostrum midpoint (~50%,
+slightly tip-ward). The image generator resisted this placement across 5 attempts
+(strong prior for mouth-adjacent barbels), so the final asset was produced by
+generating a clean barbel-free illustration and drawing two slender, unbranched
+barbels at the measured midpoint in post. Documented honestly here.
 
-## Honest note on the hammerhead silhouette
-
-I tried four approaches for the hammerhead silhouette: side profile (v1),
-three-quarter (v2 — turned the hammer into a bill), top-down T-shape (v3 —
-broke the swimming-shadow concept, added artifacts), and blocky/exaggerated (v4 —
-literal rectangle). The v1 side profile remains the strongest: wide head region,
-clean, no internal detail. Its limitation is what Mira identified — the hammer
-reads as a wide bulk rather than a crisp T. This is genuinely hard in side-profile
-silhouette because the hammer's width extends toward/away from the viewer.
-
-I'm presenting v1 as my best current answer and flagging it openly rather than
-burning more generations going in circles. If Mira wants me to keep pushing on
-this specific asset, I will — or we can accept it as the shadow and let the
-full-colour illustration carry the hammer's precision.
+**Sawshark silhouette (round 2):** Same approach — clean barbel-free silhouette,
+two barbels drawn at rostrum midpoint in post. Serrated saw edge, upper-lobed
+tail retained.
 
 ## Transparency workflow (confirmed)
 
@@ -48,8 +47,9 @@ threshold >240 on all channels, only background pixels → alpha 0. White/light
 areas *within* the shark (belly, highlights) are preserved because flood-fill
 only traverses connected background regions. Verified: corner alpha=0 on all four.
 
-For production: same script, batch-run per species. Final export as transparent
-WebP (or PNG where WebP softens fine linework — will test).
+Still to do per Mira: visually test processed PNGs against the actual dark
+underwater background to catch pale halos or accidentally removed details.
+(This happens at the in-game prototype stage.)
 
 ## Batch priority (per Mira)
 
@@ -58,3 +58,8 @@ WebP (or PNG where WebP softens fine linework — will test).
 2. Unusual body types: angelsharks, wobbegongs, sawsharks, hammerheads,
    lanternsharks, others
 3. Remaining roster in regional batches
+
+## Next step
+
+In-game expedition encounter prototype using these four assets, before scaling
+production. Tests: silhouettes in motion, illustrations on mobile, transition feel.
