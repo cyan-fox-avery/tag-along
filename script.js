@@ -747,6 +747,11 @@ document.querySelectorAll(".tab").forEach(btn => {
     if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
     if (btn.dataset.tab === "expedition") renderExpeditionPin(); // v0.20.0: pinned shark line
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
+    /* v0.24.0: clear the Archive new-photo badge on visit. */
+    if (btn.dataset.tab === "archive") {
+      const badge = btn.querySelector(".tab-badge");
+      if (badge) badge.classList.add("hidden");
+    }
     if (btn.dataset.tab === "phone") {
       /* v0.12.0: like a real phone — the conversation opens pinned to the
          newest message. renderMessages' own scroll can't do this: it runs
@@ -3128,11 +3133,14 @@ function renderAll() {
 /* v0.20.0: Wild Archive UI lives in archive-ui.js (module split). */
 /* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
    completed v0.14 save boots with won=true, a full roster, and no archive
-   unlock. Backfill the unlock they already earned. */
+   unlock. Backfill the unlock they already earned.
+   v0.24.0 Mira review: ANY returning player with ≥1 tag gets Archive access,
+   not just winners. New players get the Sarah intro on their first tag;
+   returning players get quiet access (no first-tag message). */
 function migrateArchiveUnlock() {
   try {
     const taggedCount = Object.keys(state.tagged).length;
-    if (state.won && taggedCount >= SHARKS.length && !state.archiveUnlocked) {
+    if (taggedCount >= 1 && !state.archiveUnlocked) {
       state.archiveUnlocked = true;
       localStorage.setItem("tyi-archive", "1");
     }
