@@ -1,4 +1,4 @@
-/* Tag, You're It — prototype v0.9.0
+/* Tag Along — v0.16.0
    Research -> plan (region/depth/bait/method) -> dive -> watch/tag/resight
    -> collection book + logbook. */
 
@@ -7,116 +7,51 @@
 /* Build number — shown in the top corner of the page. Bump every release. */
 const VERSION = "v0.26.0";
 
+/* v0.22.0: "What's new?" — shown once per version update. */
+const WHATS_NEW = {
+  "v0.22.0": [
+    "📓 <strong>Logbook filters.</strong> Filter your expedition log by outcome, region, or species — compare attempts and spot the pattern.",
+    "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
+    "🎣 <strong>Failed trips feel like fieldwork.</strong> Richer expedition narratives: weather, sea state, wildlife sightings, and proper field notes in the logbook.",
+    "🌊 <strong>Conservation notes.</strong> Every collection card now carries a conservation-science note — status context, threats, and the protection efforts making a difference."
+  ],
+  "v0.24.0": [
+    "🖼️ <strong>Progressive Wild Archive.</strong> Your Archive now grows with every tag — Sarah introduces it after your first shark, and each new species adds its real photo quietly.",
+  ],
+  "v0.23.0": [
+    "🦈 <strong>Real-shark stories.</strong> Name a great white Mary Lee or Nicole, and Sarah will tell you about the real sharks behind the names — their extraordinary journeys.",
+    "🤫 <strong>A secret swims in these waters.</strong> There's a new hidden surprise for curious researchers. We won't spoil it here.",
+    "💾 <strong>Save export/import.</strong> Back up your research as a JSON file, or bring a save to a new device. Find it in the footer."
+  ]
+};
+
+function whatsNewSeen() {
+  try { return localStorage.getItem("tyi-last-seen-version"); } catch { return null; }
+}
+function markWhatsNewSeen() {
+  try { localStorage.setItem("tyi-last-seen-version", VERSION); } catch {}
+}
+/* Pure: should the What's New screen show?
+   v0.22.0 Mira review: distinguish brand-new players from v0.21.0 upgraders.
+   - No save data at all → first run, don't show.
+   - Has save data but no version → v0.21.0 upgrader, show.
+   - Version differs → show. Same version → don't. */
+function shouldShowWhatsNew(lastSeen, current, hasSaveData) {
+  if (!hasSaveData) return false; // brand new player
+  if (!lastSeen) return true; // v0.21.0 upgrader (no version key yet)
+  return lastSeen !== current;
+}
+function playerHasSaveData() {
+  try {
+    // Any of these indicates an existing player
+    return !!(localStorage.getItem("tyi-logbook") ||
+              localStorage.getItem("tyi-collection") ||
+              localStorage.getItem("tyi-stats"));
+  } catch { return false; }
+}
+
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
-
-/* ---------- Data ---------- */
-
-const REGIONS = {
-  "caribbean":    { name: "Caribbean Sea",        note: "A green sea turtle glides past the reef." },
-  /* v0.9.0: sand tiger moved here from Baja California. WHY (for reviewers):
-     FishBase gives Carcharias taurus as "Circumtropical: Except perhaps
-     the eastern Pacific," so the old Baja placement was an outright error.
-     The Outer Banks' WWII-era wrecks host the most famous sand tiger
-     aggregation in the world — Paxton et al. 2019 (Ecology) documented
-     female site fidelity to individual NC wrecks, backed by the Spot A
-     Shark USA citizen-science photo-ID program. Bonus: the wrecks
-     synergize with the game's scuttled-ship easter eggs — here, wrecks
-     are documented habitat, not scenery. South Africa and E. Australia
-     were considered but South Africa is a locked region and the sand
-     tiger is an original-six start-region species. */
-  "north-carolina": { name: "Outer Banks, North Carolina", note: "Below, the dark shapes of old wrecks rise from the sand — the Graveyard of the Atlantic." },
-  "philippines":  { name: "Philippines",          note: "A manta ray loops lazily overhead." },
-  "maldives":     { name: "Maldives",             note: "Dolphins click and whistle in the distance." },
-  "japan":        { name: "Sagami Bay, Japan",    note: "A lanternfish flickers in the dark." },
-  "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
-  "cornwall":     { name: "Cornwall, UK",         note: "Gannets dive-bomb the water around the boat." },
-  "papua-new-guinea": { name: "Papua New Guinea", note: "The reef flat stretches out, impossibly clear and shallow." },
-  /* These unlock once the first six sharks are tagged — new waters earned,
-     not given. v0.7.0: real species live here now, so they are selectable,
-     not teasers. */
-  "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
-  "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true }
-};
-
-const DEPTHS = {
-  "surface":  { name: "Surface waters (0–30 m)",     scene: "depth-surface" },
-  "reef":     { name: "Reef & shallows (30–100 m)", scene: "depth-shallow" },
-  "twilight": { name: "Twilight depths (100–400 m)", scene: "depth-midwater" },
-  "deep":     { name: "Deep dark (400–1000 m)",     scene: "depth-deep" }
-};
-
-const BAITS = {
-  "crustaceans":   "Crabs & lobster",
-  "squid":         "Squid",
-  "schooling-fish":"Schooling fish (mackerel)",
-  "plankton":      "Plankton bloom — no bait, follow the bloom",
-  /* v0.8.0: three new hook baits. Sardines fold into schooling fish —
-     a separate row would add planner complexity without a real
-     biological distinction. */
-  "tuna":          "Tuna / large oily fish",
-  "ray":           "Ray",
-  "urchins":       "Urchins & shellfish"
-};
-
-/* v0.9.0: "Method" replaces the v0.8.0 scent-lure row. The planner asks HOW
-   you'll try to meet the shark, and each top-level approach opens its own
-   sub-menu of real field practices. A species only boosts on methods that
-   are real for that animal — a whale shark never sees chum.
-   Boost-only semantics kept from v0.8.0: the right method raises a
-   species' encounter weight ~3x; a wrong method is neutral, never a gate.
-   WHY this shape (for reviewers): ChatGPT's v0.8.0 review argued that
-   forcing every shark through identical planner rows teaches something
-   more general than the evidence supports — e.g. "krill scent" for whale
-   sharks implied scenting the water works on filter feeders, when real
-   practice is locating a feeding aggregation. So the planner is now
-   asymmetric on purpose: hunters get attractants, filter feeders get
-   aggregation-finding. The asymmetry teaches the animal.
-   EXTENSION POINT for future versions: new top-level methods (deep
-   deployment, seal decoy, BRUV, ...) slot in here with their own `opts`;
-   add the method key to each species' `methods` map it genuinely fits. */
-const METHODS = {
-  "attract": {
-    name: "Attract — scent in the water",
-    subLabel: "Attractant",
-    opts: {
-      "none": "No attractant",
-      "chum": "Fish-oil chum",
-      "seal": "Seal scent"
-    }
-  },
-  "aggregation": {
-    name: "Find the aggregation",
-    subLabel: "Approach",
-    /* WHY these three (for reviewers): real whale/basking-shark field
-       practice per 2026 research — see research notes below. Boat surveys
-       at seasonal sites, aerial spotter surveys, and local sightings
-       networks are the three genuinely distinct ways researchers locate
-       feeding aggregations. All three boost equally: they are all real,
-       so the choice is about fieldcraft flavor, recorded in the logbook. */
-    opts: {
-      "boat": "Boat survey of the bloom",
-      "plane": "Spotter-plane survey",
-      "network": "Local sightings network"
-    }
-  }
-};
-
-/* Legacy labels for pre-v0.9.0 logbook entries, so old trips still read
-   sensibly after the scent-row removal. */
-const LEGACY_LURES = { "none": "No lure", "chum": "Fish-oil chum", "seal": "Seal scent", "krill": "Krill scent" };
-
-
-
-
-
-/* If you name a shark "Sarah", she finds out. Sweet, not progression. */
-const SARAH_EGG_THREAD = [
-  { who: "them", text: "Wait. You named a shark Sarah? Like me?" },
-  { who: "me",   text: "Well... yeah. You're the reason I know half of this stuff." },
-  { who: "them", text: "A shark with my name, out there somewhere carrying a tag. I don't think I'll ever get over that." },
-  { who: "me",   text: "She's got your name now. I think she knows." }
-];
 
 /* ---------- Ambient sea life: small silhouettes that drift through the dive ---------- */
 
@@ -208,7 +143,7 @@ const SIGHTINGS = {
 /* v0.13.0: the sighting deck is filtered against the region note so the
    trip doesn't echo it — the Caribbean note already mentions a green sea
    turtle, Japan's a lanternfish, the Maldives' dolphins. */
-const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jellyfish" };
+const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly" };
 function buildSightingDeck(depth, region) {
   const pool = SIGHTINGS[depth] || [];
   const note = ((REGIONS[region] && REGIONS[region].note) || "").toLowerCase();
@@ -231,6 +166,57 @@ const EASTER_EGGS = [
   { depths: ["twilight"],
     text: "This is the kind of dark water old monster movies warned you about. You check over your shoulder anyway." }
 ];
+
+/* v0.22.0: failed trips feel like fieldwork — weather, sea state, and
+   wildlife make every expedition a day on the water, not just a miss. */
+const SEA_CONDITIONS = [
+  "Flat calm this morning — the sea is glass, and the boat barely rocks.",
+  "A light chop keeps things interesting; whitecaps glint in the sun.",
+  "Overcast and moody — the water looks like hammered pewter.",
+  "A fresh breeze out of the east; the swells roll in long and lazy.",
+  "Morning fog burns off by nine, leaving the water silver-green.",
+  "Choppy and bright — spray on the bow, gulls screaming overhead."
+];
+/* v0.22.0 Mira review: wildlife sightings are region-appropriate.
+   No mantas in the Arctic! */
+const FIELD_NOTES = {
+  tropical: [
+    "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
+    "Field notes: a sea turtle surfaced beside the boat and regarded us with ancient indifference.",
+    "Field notes: a manta ray passed underneath, huge and unhurried. Not a shark, but nobody's complaining.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+  ],
+  temperate: [
+    "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
+    "Field notes: a seal watched us from a nearby rock, unimpressed by our sharklessness."
+  ],
+  polar: [
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: an iceberg drifted past, impossibly blue underneath. The sharks are down there somewhere.",
+    "Field notes: logged three seabird species. The Arctic terns seemed to pity us.",
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today."
+  ],
+  generic: [
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+  ]
+};
+/* Map regions to climate zones for wildlife notes. */
+function regionClimate(regionId) {
+  const tropical = ["caribbean", "maldives", "philippines", "galapagos", "south-africa"];
+  const polar = ["arctic"];
+  if (tropical.includes(regionId)) return "tropical";
+  if (polar.includes(regionId)) return "polar";
+  return "temperate";
+}
+function pickFieldNote(regionId) {
+  const zone = regionClimate(regionId);
+  const notes = FIELD_NOTES[zone] || FIELD_NOTES.generic;
+  return pick(notes);
+}
 
 /* v0.7.0: the day is the expedition. Quiet beats for when the water
    holds its sharks back a while — waiting is most of the job. */
@@ -260,6 +246,23 @@ const REGION_UNLOCK_THREAD = [
   { who: "me", text: "Six for six. The institute just cleared two new survey regions for us." },
   { who: "them", text: "The Galápagos and South Africa. I've read everything about those waters. Ask me anything — I mean it." },
   { who: "me", text: "I have a feeling I'm going to. 🦈" }
+];
+
+/* v0.21.0 sharknado: unlock threads for the three new regions. */
+const EAST_AUS_UNLOCK_THREAD = [
+  { who: "them", text: "Fifteen sharks! The institute just cleared Eastern Australia for us." },
+  { who: "me", text: "Wobbegongs and Port Jackson sharks. Reef country." },
+  { who: "them", text: "I've wanted to see a wobbegong my whole life. They look like someone dropped a shark on a carpet. 😂" }
+];
+const CALIFORNIA_UNLOCK_THREAD = [
+  { who: "them", text: "Twenty-five! California Coast is open now." },
+  { who: "me", text: "Leopard sharks in the bays, horn sharks on the reefs." },
+  { who: "them", text: "Horn sharks have those little brow ridges. They look permanently unimpressed. I love them." }
+];
+const ARCTIC_UNLOCK_THREAD = [
+  { who: "them", text: "Thirty-five sharks. The institute cleared... the Arctic?" },
+  { who: "me", text: "Greenland sharks. The cold dark. The long-lived ones." },
+  { who: "them", text: "Be careful out there. And bring back stories. 🩵" }
 ];
 
 /* World-map + tracking data lives in map-data.js (loaded before this file). */
@@ -422,7 +425,7 @@ function renderMap() {
     wrap.innerHTML = svg;
     legend.innerHTML = ids.map(sid => {
       const s = sharkById(sid), t = state.tagged[sid];
-      return `<span class="map-chip" data-sid="${sid}" role="button" tabindex="0"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(t.name || t.researchId)} · ${esc(s.name)}</span>`;
+      return `<span class="map-chip" data-sid="${sid}" role="button" tabindex="0"><span class="dot" style="background:${SPECIES_COLORS[sid] || "#fff"}"></span>${esc(s.name)} · ${esc(t.name || t.researchId)}</span>`;
     }).join("");
   }
   wrap.querySelectorAll(".map-marker").forEach(m => {
@@ -448,8 +451,10 @@ function showMapPopup(sid) {
   const s = sharkById(sid), t = state.tagged[sid];
   const pts = mapPoints(t);
   const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
-  const kindNote = t.track.kind === "archival"
-    ? "Archival track — goblin sharks have never carried satellite tags; this route is reconstructed from capture records."
+  const kindNote = t.track.hypothetical
+    ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey."
+    : t.track.kind === "archival"
+    ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (s.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "")
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
       : t.track.kind === "acoustic"
@@ -485,6 +490,23 @@ const msgStore = {
 };
 const _savedMsgs = msgStore.load();
 
+/* v0.18.0: achievement + stats stores. Stats feed achievement checks
+   (regions visited, baits used, re-sights, chum tags, expedition count). */
+const statsStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-stats") || "{}"); }
+    catch { return {}; }
+  },
+  save(d) { localStorage.setItem("tyi-stats", JSON.stringify(d)); }
+};
+const achieveStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-achievements") || "{}"); }
+    catch { return {}; }
+  },
+  save(d) { localStorage.setItem("tyi-achievements", JSON.stringify(d)); }
+};
+
 /* v0.7.0: the sightings log — spotted but not tagged. Pure field notes. */
 const sightStore = {
   load() {
@@ -507,6 +529,21 @@ const logStore = {
 /* v0.7.0: the first six sharks (the original roster). Tagging all six
    unlocks the Galápagos and South Africa — new waters earned, not given. */
 const ORIGINAL_SIX = ["nurse", "thresher", "whale", "goblin", "tiger", "sandtiger"];
+
+/* v0.20.0: the pinned shark — "currently researching". One shark at a time,
+   persisted across sessions. A focus, not a filter. */
+const pinStore = {
+  load() {
+    try { return localStorage.getItem("tyi-pinned") || null; }
+    catch { return null; }
+  },
+  save(id) {
+    try {
+      if (id) localStorage.setItem("tyi-pinned", id);
+      else localStorage.removeItem("tyi-pinned");
+    } catch {}
+  }
+};
 
 /* v0.6.0: threads are {ts, msgs}. Migrate legacy bare-array threads. */
 function normThread(t) {
@@ -534,12 +571,68 @@ const state = {
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
+  /* v0.17.1: Ask Sarah offer persists in the message store — Sarah's saved
+     thread promises "pick one below", so the panel must survive a reload. */
+  sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
+  /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
+  stats: Object.assign(
+    { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
+      depthsTagged: [], methodsUsed: [] },
+    statsStore.load()
+  ),
+  achievements: achieveStore.load(), // id -> timestamp
+  bruceChainComplete: false, // v0.18.0: the Bruce chain isn't built yet
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
-  archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })()
+  archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
+  pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
+  /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
+  bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
+  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })()
 };
+/* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
+   and existing tags so established players get credit for their history. */
+(function migrateStats() {
+  const s = state.stats;
+  let changed = false;
+  const log = state.logbook || [];
+  if (!(s.expeditions > 0) && log.length > 0) {
+    s.expeditions = log.length; changed = true;
+  }
+  log.forEach(t => {
+    if (t.region && !s.regionsVisited.includes(t.region)) { s.regionsVisited.push(t.region); changed = true; }
+    if (t.bait && !s.baitsUsed.includes(t.bait)) { s.baitsUsed.push(t.bait); changed = true; }
+  });
+  let resights = 0;
+  Object.values(state.tagged || {}).forEach(t => { resights += (t.resightings || []).length; });
+  if (!(s.resights > 0) && resights > 0) { s.resights = resights; changed = true; }
+  /* v0.18.0 review 2nd pass: backfill "Something in the Water" — a log entry
+     with attract+chum and a tagged encounter of a chum-valid species counts. */
+  log.forEach(t => {
+    if (t.methodOpt && t.methodOpt !== "none" && !(s.methodsUsed || []).includes(t.methodOpt)) {
+      s.methodsUsed.push(t.methodOpt); changed = true;
+    }
+    const taggedHere = (t.encounters || []).some(e => e.result === "tagged");
+    if (taggedHere && t.depth && !(s.depthsTagged || []).includes(t.depth)) {
+      s.depthsTagged.push(t.depth); changed = true;
+    }
+  });
+  if (!(s.chumTags > 0)) {
+    const chumEarned = log.some(t =>
+      t.method === "attract" && t.methodOpt === "chum" &&
+      (t.encounters || []).some(e => {
+        if (e.result !== "tagged") return false;
+        const sp = SHARKS.find(x => x.id === e.speciesId);
+        return sp && sp.methods && sp.methods.attract && sp.methods.attract.includes("chum");
+      })
+    );
+    if (chumEarned) { s.chumTags = 1; changed = true; }
+  }
+  if (changed) saveStats();
+})();
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
-    lastRegion: state.lastRegion, chatSeen: state.chatSeen });
+    lastRegion: state.lastRegion, chatSeen: state.chatSeen,
+    sarahAdviceOffered: state.sarahAdviceOffered });
 }
 /* Every new thread gets a timestamp for the Phone tab. */
 function pushThread(msgs) {
@@ -585,8 +678,44 @@ function migrateIds() {
 function migrateTracks() {
   let changed = false;
   Object.entries(state.tagged).forEach(([sid, t]) => {
-    if (!t.track) {
+    /* v0.21.0 Mira final: regenerate tracks that predate the tag-anchor fix.
+       Old tracks start at generic regional centers and teleport to the envelope.
+       v0.21.0 Mira re-review: preserve player re-sighting points. */
+    if (!t.track || t.track.v !== 2) {
+      /* v0.21.0 Mira: legacy tracks lack the resighting flag. Reconstruct
+         from t.resightings records if no flagged points exist. */
+      let resightPoints = (t.track && t.track.points || []).filter(p => p.resighting);
+      const resightRecords = t.resightings || [];
+      if (resightPoints.length === 0 && resightRecords.length > 0 && t.track && t.track.points) {
+        // Legacy: reconstruct from resightings records. Old points lack the flag,
+        // so we treat points beyond the typical generated count as re-sightings.
+        // Each resighting record corresponds to a point appended after generation.
+        const genCount = t.track.points.length - resightRecords.length;
+        if (genCount >= 0 && resightRecords.length > 0) {
+          resightPoints = t.track.points.slice(genCount).map((p) => ({
+            label: p.label, day: p.day, km: p.km, resighting: true
+          }));
+        }
+      }
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+      t.track.v = 2;
+      const species = sharkById(sid);
+      const env = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id]) || null;
+      resightPoints.forEach((rp) => {
+        const anchorLabel = (env && env.tagAnchor) || rp.label;
+        const last = t.track.points[t.track.points.length - 1];
+        const lastCoord = MAP_COORDS[last.label];
+        const newCoord = MAP_COORDS[anchorLabel];
+        let km = 0;
+        if (lastCoord && newCoord && typeof haversineKm === "function") {
+          km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
+        }
+        t.track.points.push({ label: anchorLabel, day: rp.day, km, resighting: true });
+        t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
+        // Ensure day count agrees with final point (legacy points may be newer)
+        if (rp.day > t.track.days) t.track.days = rp.day;
+      });
+      if (resightRecords.length) t.resightings = resightRecords;
       changed = true;
     }
   });
@@ -611,7 +740,13 @@ document.querySelectorAll(".tab").forEach(btn => {
     btn.classList.add("active");
     $("tab-" + btn.dataset.tab).classList.add("active");
     if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
+    if (btn.dataset.tab === "expedition") renderExpeditionPin(); // v0.20.0: pinned shark line
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
+    /* v0.24.0: clear the Archive new-photo badge on visit. */
+    if (btn.dataset.tab === "archive") {
+      const badge = btn.querySelector(".tab-badge");
+      if (badge) badge.classList.add("hidden");
+    }
     if (btn.dataset.tab === "phone") {
       /* v0.12.0: like a real phone — the conversation opens pinned to the
          newest message. renderMessages' own scroll can't do this: it runs
@@ -636,32 +771,313 @@ function goTab(name) {
    v0.7.0: the guide is a compact roster list; each row expands into the
    full entry. Hard rule stands: NO pictures of the actual shark here —
    sketches only. The real face is earned at tagging. */
+/* ---------- Field guide database (v0.19.0) ----------
+   Search + stacked filters. Filters narrow the notebook; they never solve
+   the expedition — matching is on the shark's own data, nothing is revealed.
+   Filter state is session-only. */
+const guideFilters = {
+  q: "",
+  region: new Set(),
+  depth: new Set(),
+  methodOpt: new Set(),
+  bait: new Set(),
+  tagged: "all" // "all" | "tagged" | "untagged"
+};
+function baitList(s) {
+  return Array.isArray(s.combo.bait) ? s.combo.bait : [s.combo.bait];
+}
+function methodOpts(s) {
+  const m = s.methods || {};
+  return [...(m.attract || []), ...(m.aggregation || [])];
+}
+function guideMatches(s) {
+  const f = guideFilters;
+  if (f.q) {
+    const q = f.q.toLowerCase();
+    if (!s.name.toLowerCase().includes(q) && !s.latin.toLowerCase().includes(q)) return false;
+  }
+  if (f.region.size && !f.region.has(s.combo.region)) return false;
+  if (f.depth.size && !(s.depths || []).some(d => f.depth.has(d))) return false;
+  if (f.methodOpt.size && !methodOpts(s).some(m => f.methodOpt.has(m))) return false;
+  if (f.bait.size && !baitList(s).some(b => f.bait.has(b))) return false;
+  if (f.tagged === "tagged" && !state.tagged[s.id]) return false;
+  if (f.tagged === "untagged" && state.tagged[s.id]) return false;
+  return true;
+}
+function activeFilterCount() {
+  const f = guideFilters;
+  return f.region.size + f.depth.size + f.methodOpt.size + f.bait.size +
+    (f.tagged !== "all" ? 1 : 0) + (f.q ? 1 : 0);
+}
+function buildFilterChips() {
+  const mk = (elId, items, set) => {
+    const row = $(elId);
+    if (!row) return;
+    row.innerHTML = "";
+    items.forEach(([id, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = label;
+      b.setAttribute("aria-pressed", String(set.has(id)));
+      b.addEventListener("click", () => {
+        if (set.has(id)) set.delete(id); else set.add(id);
+        renderResearch();
+      });
+      row.appendChild(b);
+    });
+  };
+  mk("filterRegion", Object.entries(REGIONS).map(([id, r]) =>
+    [id, r.locked ? `🔒 ${r.name}` : r.name]), guideFilters.region);
+  mk("filterDepth", Object.entries(DEPTHS).map(([id, d]) => [id, d.name]), guideFilters.depth);
+  const mOpts = [];
+  Object.values(METHODS).forEach(m => Object.entries(m.opts).forEach(([id, label]) => {
+    if (id !== "none") mOpts.push([id, label]);
+  }));
+  mk("filterMethod", mOpts, guideFilters.methodOpt);
+  mk("filterBait", Object.entries(BAITS).map(([id, label]) => [id, label]), guideFilters.bait);
+  // tagged status: single-select chips
+  const tRow = $("filterTagged");
+  if (tRow) {
+    tRow.innerHTML = "";
+    [["all", "All"], ["tagged", "Tagged ✅"], ["untagged", "Untagged"]].forEach(([id, label]) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = label;
+      b.setAttribute("aria-pressed", String(guideFilters.tagged === id));
+      b.addEventListener("click", () => { guideFilters.tagged = id; renderResearch(); });
+      tRow.appendChild(b);
+    });
+  }
+}
+function renderActiveChips() {
+  const wrap = $("activeChips");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  const f = guideFilters;
+  const addChip = (label, clear) => {
+    const c = document.createElement("span");
+    c.className = "chip-active";
+    c.innerHTML = `<span>${esc(label)}</span>`;
+    const x = document.createElement("button");
+    x.type = "button";
+    x.className = "chip-remove";
+    x.setAttribute("aria-label", `Remove filter: ${label}`);
+    x.textContent = "×";
+    x.addEventListener("click", () => { clear(); renderResearch(); });
+    c.appendChild(x);
+    wrap.appendChild(c);
+  };
+  if (f.q) addChip(`“${f.q}”`, () => { f.q = ""; const s = $("guideSearch"); if (s) s.value = ""; });
+  f.region.forEach(id => addChip(REGIONS[id] ? REGIONS[id].name : id, () => f.region.delete(id)));
+  f.depth.forEach(id => addChip(DEPTHS[id] ? DEPTHS[id].name : id, () => f.depth.delete(id)));
+  f.methodOpt.forEach(id => {
+    let label = id;
+    Object.values(METHODS).forEach(m => { if (m.opts[id]) label = m.opts[id]; });
+    addChip(label, () => f.methodOpt.delete(id));
+  });
+  f.bait.forEach(id => addChip(BAITS[id] || id, () => f.bait.delete(id)));
+  if (f.tagged !== "all") addChip(f.tagged === "tagged" ? "Tagged ✅" : "Untagged",
+    () => { f.tagged = "all"; });
+}
+function clearGuideFilters() {
+  guideFilters.q = "";
+  guideFilters.region.clear();
+  guideFilters.depth.clear();
+  guideFilters.methodOpt.clear();
+  guideFilters.bait.clear();
+  guideFilters.tagged = "all";
+  const s = $("guideSearch");
+  if (s) s.value = "";
+  renderResearch();
+}
+/* v0.20.0: pin one shark as "currently researching". Tapping the pin on a
+   pinned shark unpins it. One pin at a time — a focus, not a collection. */
+function togglePin(id) {
+  state.pinned = (state.pinned === id) ? null : id;
+  pinStore.save(state.pinned);
+  renderResearch();
+  renderExpeditionPin();
+  renderPinHint(); // v0.22.0
+}
+/* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
+   clears any filters hiding the shark first, so Jump never silently fails. */
+function jumpToPinned(s, list) {
+  if (!list.querySelector(`[data-entry="${s.id}"]`) && activeFilterCount() > 0) {
+    clearGuideFilters();
+  }
+  const target = list.querySelector(`[data-entry="${s.id}"]`);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    const body = target.querySelector(".guide-row-body");
+    const head = target.querySelector(".guide-row-head");
+    if (body && body.classList.contains("hidden")) {
+      body.classList.remove("hidden");
+      head.setAttribute("aria-expanded", "true");
+      target.classList.add("open");
+    }
+    target.classList.add("pin-flash");
+    setTimeout(() => target.classList.remove("pin-flash"), 1200);
+  }
+}
+function renderPinnedCard(list) {
+  const s = SHARKS.find(x => x.id === state.pinned);
+  const card = document.createElement("div");
+  card.className = "pinned-card" + (s ? "" : " pinned-empty");
+  if (!s) {
+    card.innerHTML = `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
+  } else {
+    const done = !!state.tagged[s.id];
+    card.innerHTML = `
+      <div class="pinned-head"><span>📌 Currently researching</span>
+        <button type="button" class="pin-btn unpin" data-unpin aria-label="Unpin ${s.name}">✕</button>
+      </div>
+      <div class="pinned-body">
+        <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
+        <div>
+          <strong>${s.name}</strong> ${done ? "✅" : ""}<br>
+          <span class="latin">${s.latin}</span><br>
+          <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
+        </div>
+      </div>
+      <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
+    card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
+    card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
+  }
+  list.appendChild(card);
+}
+/* v0.22.0: pin-gated soft hints. When a shark is pinned and the planned
+   expedition matches 3 of its 4 needs (region, depth, bait, method), the
+   logbook offers one soft observational nudge about the odd one out.
+   Wording is observational only — never "correct"/"wrong". This evolves
+   the old rule that failed trips give no signal: the logbook now means
+   "you're warm". Sarah remains the stronger help after repeated failures. */
+const PIN_HINTS = {
+  region: "Maybe we'll find them elsewhere?",
+  depth: "The water doesn't feel quite right for them at this depth…",
+  bait: "They didn't seem to like the food we were offering.",
+  method: "They didn't seem to notice us at all — maybe a different approach?"
+};
+
+/* Pure: given a plan and a pinned shark id, return {dimension, hint} when
+   exactly 3 of 4 dimensions match, else null. Testable. */
+/* v0.22.0 Mira review: hints are grounded in COMPLETED expeditions, not the
+   live planner. The logbook helps interpret evidence; it doesn't reveal
+   answers by trial-and-error clicking.
+   Distinguishes: conditions that make encounter POSSIBLE (region/depth/bait)
+   from methods that improve ODDS (method/methodOpt boost only). */
+function pinHintForTrip(trip, pinnedId) {
+  if (!pinnedId || !trip) return null;
+  const s = SHARKS.find(x => x.id === pinnedId);
+  if (!s || state.tagged[pinnedId]) return null;
+  // Did this trip's conditions make the pinned shark's appearance possible?
+  const baitOk = Array.isArray(s.combo.bait) ? s.combo.bait.includes(trip.bait) : s.combo.bait === trip.bait;
+  const possible = s.combo.region === trip.region &&
+    (s.depths || []).includes(trip.depth) && baitOk;
+  // Did the player encounter (or tag) the pinned shark this trip?
+  const encountered = (trip.encounters || []).some(e => e.speciesId === pinnedId);
+  if (possible && !encountered) {
+    // Conditions were right, shark just wasn't there — "you're warm"
+    return { kind: "warm", hint: "The water felt right for " + s.name.toLowerCase() + " today. Sometimes they're just not there." };
+  }
+  if (!possible && !encountered) {
+    // Which dimension was off? Observational only.
+    const off = [];
+    if (s.combo.region !== trip.region) off.push("region");
+    if (!(s.depths || []).includes(trip.depth)) off.push("depth");
+    if (!baitOk) off.push("bait");
+    if (off.length === 1) {
+      return { kind: "hint", dimension: off[0], hint: PIN_HINTS[off[0]] };
+    }
+  }
+  return null;
+}
+
+/* v0.22.0 Mira review: live planner hints removed. Hints now appear in the
+   logbook after completed expeditions (pinHintForTrip), preserving the
+   research puzzle. This function is kept as a no-op for compatibility. */
+function renderPinHint() {
+  const el = $("pinHint");
+  if (el) { el.classList.add("hidden"); el.innerHTML = ""; }
+}
+
+/* v0.20.0: show the pinned shark on the Expedition tab — a research focus
+   to plan around. Never auto-fills the planner; the sea decides. */
+function renderExpeditionPin() {
+  const el = $("expeditionPin");
+  if (!el) return;
+  const s = SHARKS.find(x => x.id === state.pinned);
+  if (!s) { el.classList.add("hidden"); el.innerHTML = ""; return; }
+  el.classList.remove("hidden");
+  const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region;
+  /* v0.20.0: Mira review fix — filter feeders (whale, basking) store bait as a
+     string, not an array. baitList() normalizes both. */
+  const baits = baitList(s).map(b => BAITS[b] || b).join(", ");
+  el.innerHTML = `📌 Currently researching: <strong>${s.name}</strong>
+    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>
+    <br><span class="dim" style="font-size:12px">📓 Pin hints on — your logbook notes nudge you when the plan is close.</span>`;
+}
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
+  /* v0.20.0: the pinned shark — "currently researching". A focus card at the
+     top of the field guide; pinning is a focus, never a filter. */
+  renderPinnedCard(list);
   /* v0.13.0: untagged sharks first — the ones you're still hunting.
      Tagged ones settle to the bottom, out of the way. */
-  const ordered = [...SHARKS].sort((a, b) =>
-    ((state.tagged[a.id] ? 1 : 0) - (state.tagged[b.id] ? 1 : 0)));
+  const ordered = [...SHARKS]
+    .filter(guideMatches)
+    .sort((a, b) => ((state.tagged[a.id] ? 1 : 0) - (state.tagged[b.id] ? 1 : 0)));
+  // v0.19.0: filter UI state
+  buildFilterChips();
+  renderActiveChips();
+  const n = activeFilterCount();
+  const fc = $("filterCount");
+  if (fc) {
+    fc.textContent = String(n);
+    fc.classList.toggle("hidden", n === 0);
+  }
+  const gc = $("guideCount");
+  if (gc) gc.textContent = `Showing ${ordered.length} of ${SHARKS.length} sharks`;
+  const clr = $("guideClear");
+  if (clr) clr.classList.toggle("hidden", n === 0);
+  /* v0.20.0: Mira review fix — the pinned card survives empty-results states;
+     it is a research focus, not a filter result. */
+  if (!ordered.length) {
+    const p = document.createElement("p");
+    p.className = "latin";
+    p.style.cssText = "text-align:center; padding: 24px 12px;";
+    p.textContent = "No sharks match those filters. Try clearing something — the ocean is bigger than it looks.";
+    list.appendChild(p);
+    return;
+  }
   ordered.forEach(s => {
     const done = !!state.tagged[s.id];
     const regionLocked = REGIONS[s.combo.region] && REGIONS[s.combo.region].locked;
+    const isPinned = state.pinned === s.id;
     const row = document.createElement("div");
     row.className = "guide-row";
+    row.setAttribute("data-entry", s.id);
     row.innerHTML = `
-      <button type="button" class="guide-row-head" aria-expanded="false">
-        <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
-        <span class="latin">${s.latin}</span>
-        <span class="status-pill">IUCN: ${s.status}</span>
-        <span class="guide-caret" aria-hidden="true">▾</span>
-      </button>
+      <div class="guide-row-top">
+        <button type="button" class="guide-row-head" aria-expanded="false">
+          <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
+          <span class="latin">${s.latin}</span>
+          <span class="status-pill">IUCN: ${s.status}</span>
+          <span class="guide-caret" aria-hidden="true">▾</span>
+        </button>
+        <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
+          aria-label="${isPinned ? "Unpin" : "Pin"} ${s.name} as currently researching"
+          aria-pressed="${isPinned}">📌</button>
+      </div>
       <div class="guide-row-body hidden">
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
-            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the first six sharks to unlock them.</p>`
+            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the six original species (nurse, thresher, whale, goblin, tiger, sandtiger) to unlock them.</p>`
             : ``}
       </div>
     `;
@@ -671,6 +1087,11 @@ function renderResearch() {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
       row.classList.toggle("open", !isHidden);
+    });
+    const pinBtn = row.querySelector("[data-pin]");
+    if (pinBtn) pinBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePin(s.id);
     });
     list.appendChild(row);
   });
@@ -696,7 +1117,16 @@ function fillRegions() {
     const o = document.createElement("option");
     o.value = id;
     if (v.locked) {
-      o.textContent = `🔒 ${v.name} — unlocks after six successful tags`;
+      const unlockText = id === "galapagos" || id === "south-africa"
+        ? `🔒 ${v.name} — tag the six original species to unlock`
+        : id === "east-australia"
+          ? `🔒 ${v.name} — unlocks at 15 tags`
+          : id === "california"
+            ? `🔒 ${v.name} — unlocks at 25 tags`
+            : id === "arctic"
+              ? `🔒 ${v.name} — unlocks at 35 tags`
+              : `🔒 ${v.name} — locked`;
+      o.textContent = unlockText;
       o.disabled = true;
     } else {
       o.textContent = v.name;
@@ -712,8 +1142,15 @@ function fillRegions() {
    - Tagging the full roster wins the game (Master Shark Tagger).
      v0.11.0: the win keeps moving up with the roster — always SHARKS.length. */
 function applyRegions() {
-  if (!state.regionsUnlocked) return;
-  for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+  /* v0.21.0 Mira review: 15/25/35 milestones are genuinely count-based,
+     independent of the original-six unlock. */
+  const n = Object.keys(state.tagged).length;
+  if (state.regionsUnlocked) {
+    for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+  }
+  if (n >= 15) REGIONS["east-australia"].locked = false;
+  if (n >= 25) REGIONS["california"].locked = false;
+  if (n >= 35) REGIONS["arctic"].locked = false;
 }
 
 /* v0.7.0 migration: v0.6.0 winners had tyi-won=1 at 6/6, but the win is
@@ -770,8 +1207,16 @@ function logLine(html, cls) {
   log.scrollTop = log.scrollHeight;
 }
 /* v0.7.3: expedition pacing — a beat slower than reading speed, so the
-   day breathes. Tune PACE to adjust globally. */
-const PACE = 1.5;
+   day breathes. Tune PACE to adjust globally.
+   v0.20.0: quick-pace option — the player can shorten the beats. */
+let PACE = 1.5;
+const QUICK_PACE = 0.35;
+function setPace(quick) {
+  PACE = quick ? QUICK_PACE : 1.5;
+  try { localStorage.setItem("tyi-pace", quick ? "quick" : "slow"); } catch {}
+  const box = $("quickPace");
+  if (box) box.checked = !!quick;
+}
 const wait = (ms) => new Promise(r => setTimeout(r, ms * PACE));
 
 /* v0.13.0: persistent depth scenery — the scene was gradient + rays and
@@ -958,18 +1403,24 @@ function doEncounter(species, plan) {
     actions.classList.add("hidden");
     actions.innerHTML = "";
 
-    /* Phase 2: the reveal. Swaps silhouette for illustration, then
-       shows the species name and the Watch/Tag buttons. */
+    /* Phase 2: the reveal. Swaps silhouette for illustration, reveals
+       the species name (with v0.17.1 already-in-book info), then shows
+       the Watch/Tag buttons. */
     const reveal = () => {
       const sil = sharkEl.querySelector(".shark-silhouette");
       if (!sil || sil.dataset.revealed) return;
       sil.dataset.revealed = "true";
+      /* v0.17.1: the moment a shark appears, say whether it's already in the
+         book — no squinting at the small print under the buttons. */
+      const already = rec
+        ? ` — already in your book${rec.name ? ` as \u201c${esc(rec.name)}\u201d` : ""}!`
+        : ` — new to your book!`;
       const showIllustration = () => {
         sharkEl.innerHTML =
           `<div class="shark-reveal">` +
           sharkArtImg(species.id, "illustration", species.name) +
           `</div>`;
-        logLine(`🦈 <span class="found">Shark! A ${species.name}!</span>`, "found");
+        logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
         showEncounterActions();
       };
       if (reducedMotion) {
@@ -1033,7 +1484,13 @@ function doEncounter(species, plan) {
       tagBtn.addEventListener("click", () => {
         actions.classList.add("hidden");
         actions.innerHTML = "";
-        openTagging(species, finish);
+        /* v0.17.1: the release buttons resolve the encounter directly —
+           no second keep-diving/head-back prompt after the health check. */
+        openTagging(species, (headBack) => {
+          actions.classList.add("hidden");
+          actions.innerHTML = "";
+          resolve(headBack === true);
+        });
       });
       actions.appendChild(tagBtn);
     } else {
@@ -1051,11 +1508,6 @@ function doEncounter(species, plan) {
         finish();
       });
       actions.appendChild(resightBtn);
-      const note = document.createElement("p");
-      note.className = "latin";
-      note.style.cssText = "width:100%;text-align:center;margin:4px 0 0";
-      note.textContent = `Already in your book${rec.name ? ` as “${rec.name}”` : ""} — enjoy the visit.`;
-      actions.appendChild(note);
     }
     }; // end showEncounterActions
   });
@@ -1069,6 +1521,17 @@ async function runExpedition(plan) {
   state.pendingWin = false;
   state.taggedThisTrip = false;
   state.resightedThisTrip = false;
+  /* v0.18.0: feed achievement stats — regions visited, baits used. */
+  if (plan.region && !state.stats.regionsVisited.includes(plan.region)) {
+    state.stats.regionsVisited.push(plan.region);
+  }
+  if (plan.bait && !state.stats.baitsUsed.includes(plan.bait)) {
+    state.stats.baitsUsed.push(plan.bait);
+  }
+  if (plan.methodOpt && plan.methodOpt !== "none" && !state.stats.methodsUsed.includes(plan.methodOpt)) {
+    state.stats.methodsUsed.push(plan.methodOpt);
+  }
+  saveStats();
   tripDecks = { waiting: shuffled(WAITING_LINES), doing: shuffled(SIGHTING_DOINES), sightings: buildSightingDeck(plan.depth, plan.region) };
   /* v0.8.0: open a fresh logbook page for this trip. */
   tripLog = {
@@ -1077,8 +1540,12 @@ async function runExpedition(plan) {
     region: plan.region,
     depth: plan.depth,
     bait: plan.bait,
-    method: plan.method || "attract",
+    /* v0.20.0 Mira review fix: record the actual method ("" when unpicked) —
+       the logbook renders "No method chosen"; "attract" was a misrecord. */
+    method: plan.method || "",
     methodOpt: plan.methodOpt || "none",
+    /* v0.22.0: fieldwork conditions — weather/sea state for the logbook. */
+    conditions: pick(SEA_CONDITIONS),
     encounters: []
   };
   $("launchBtn").disabled = true;
@@ -1099,6 +1566,8 @@ async function runExpedition(plan) {
     : `Bait deployed: ${BAITS[plan.bait]}.`;
 
   logLine(`🛥️ <strong>Expedition begun</strong> — the research vessel leaves the harbor.`);
+  await wait(1700);
+  logLine(`🌤️ ${tripLog.conditions}`);
   await wait(1700);
   logLine(`🪝 ${baitText}`);
   await wait(1700);
@@ -1164,12 +1633,28 @@ async function runExpedition(plan) {
   if (!sawShark) {
     state.failures += 1;
     logLine(`<span class="miss">No sharks today. The sea keeps its counsel.</span>`, "miss");
+    await wait(1200);
+    /* v0.22.0: failed trips feel like fieldwork — warm, never punishing.
+       v0.22.0 Mira review: persist the note so it survives in the logbook. */
+    const fieldNote = pickFieldNote(plan.region);
+    logLine(`📓 <em>${fieldNote}</em>`);
+    if (tripLog) tripLog.fieldNote = fieldNote;
   } else {
     state.failures = 0;
   }
+  /* v0.18.0: expedition count feeds the "Sea Legs" achievement. */
+  state.stats.expeditions = (state.stats.expeditions || 0) + 1;
+  saveStats();
+  checkAchievements();
+  advanceBruceChain(); // v0.23.0: slow-burn easter egg
 
-  /* v0.8.0: close the logbook page for this trip. */
+  /* v0.8.0: close the logbook page for this trip.
+     v0.22.0 Mira review: attach pin hint grounded in this completed expedition. */
   if (tripLog) {
+    if (state.pinned) {
+      const hint = pinHintForTrip(tripLog, state.pinned);
+      if (hint) tripLog.pinHint = hint.hint;
+    }
     state.logbook.unshift(tripLog);
     logStore.save(state.logbook);
     tripLog = null;
@@ -1279,12 +1764,25 @@ function recordResighting(species, plan) {
     const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
     const last = t.track.points[t.track.points.length - 1];
     const day = last.day + env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
-    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
-    t.track.points.push({ label: entry.location, day, km });
+    /* v0.21.0 Mira review: compute real distance from coordinates, not random hop. */
+    const anchorLabel = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id] && TRACK_ENVELOPES[species.id].tagAnchor) || entry.location;
+    const lastCoord = MAP_COORDS[last.label];
+    const newCoord = MAP_COORDS[anchorLabel];
+    let km;
+    if (lastCoord && newCoord && typeof haversineKm === "function") {
+      km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
+    } else {
+      km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    }
+    t.track.points.push({ label: anchorLabel, day, km, resighting: true });
     t.track.days = day;
     t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
   }
   store.save(state.tagged);
+  /* v0.18.0: re-sights feed the "Old Friend" achievement. */
+  state.stats.resights = (state.stats.resights || 0) + 1;
+  saveStats();
+  checkAchievements();
   renderCollection();
   return entry;
 }
@@ -1334,15 +1832,87 @@ function maybeCheckinThread() {
 /* ---------- Expedition logbook: the scientist's notebook ----------
    v0.9.0: every trip lands here — plan (region/depth/bait/method),
    encounters and outcome. Compare attempts; the pattern is the answer. */
+/* v0.22.0: logbook filters — outcome, region, species. Filters narrow the
+   notebook; they never solve the expedition. */
+const logbookFilters = { outcome: "all", region: "all", species: "all" };
+
+/* Pure: does a logbook trip entry match the given filters? Testable. */
+/* v0.22.0 Mira review: filters represent EVENTS within the expedition.
+   - "tagged": any tagged encounter (trip may also have others)
+   - "resighted": any re-sighted encounter
+   - "watched": any watched (just watch) encounter
+   - "missed": no shark encounters at all
+   A trip with multiple outcomes appears in each relevant filter. */
+function logbookTripMatches(t, f) {
+  if (f.outcome !== "all") {
+    const enc = t.encounters || [];
+    if (f.outcome === "tagged" && !enc.some(e => e.result === "tagged")) return false;
+    if (f.outcome === "resighted" && !enc.some(e => e.result === "resighted")) return false;
+    if (f.outcome === "watched" && !enc.some(e => e.result === "watched")) return false;
+    if (f.outcome === "missed" && enc.length > 0) return false;
+  }
+  if (f.region !== "all" && t.region !== f.region) return false;
+  if (f.species !== "all" && !(t.encounters || []).some(e => e.speciesId === f.species)) return false;
+  return true;
+}
+
+function buildLogbookFilters() {
+  const rs = $("logFilterRegion"), ss = $("logFilterSpecies");
+  if (rs && rs.options && rs.options.length <= 1) {
+    Object.entries(REGIONS).forEach(([id, r]) => {
+      const o = document.createElement("option");
+      o.value = id; o.textContent = r.name;
+      rs.appendChild(o);
+    });
+  }
+  if (ss && ss.options && ss.options.length <= 1) {
+    SHARKS.forEach(s => {
+      const o = document.createElement("option");
+      o.value = s.id; o.textContent = s.name;
+      ss.appendChild(o);
+    });
+  }
+  ["logFilterOutcome", "logFilterRegion", "logFilterSpecies"].forEach(id => {
+    const el = $(id);
+    if (el && !el.dataset.bound) {
+      el.dataset.bound = "1";
+      el.addEventListener("change", () => {
+        logbookFilters.outcome = $("logFilterOutcome").value;
+        logbookFilters.region = $("logFilterRegion").value;
+        logbookFilters.species = $("logFilterSpecies").value;
+        renderLogbook();
+      });
+    }
+  });
+  const clr = $("logFilterClear");
+  if (clr && !clr.dataset.bound) {
+    clr.dataset.bound = "1";
+    clr.addEventListener("click", () => {
+      logbookFilters.outcome = "all"; logbookFilters.region = "all"; logbookFilters.species = "all";
+      $("logFilterOutcome").value = "all"; $("logFilterRegion").value = "all"; $("logFilterSpecies").value = "all";
+      renderLogbook();
+    });
+  }
+}
+
 function renderLogbook() {
   const list = $("logbookList");
   if (!list) return;
+  buildLogbookFilters();
   list.innerHTML = "";
+  const trips = state.logbook.filter(t => logbookTripMatches(t, logbookFilters));
+  const anyFilter = logbookFilters.outcome !== "all" || logbookFilters.region !== "all" || logbookFilters.species !== "all";
+  const clr = $("logFilterClear");
+  if (clr) clr.classList.toggle("hidden", !anyFilter);
   if (!state.logbook.length) {
     list.innerHTML = `<div class="empty-note">No expeditions logged yet.<br>Every trip lands here — plan, encounters, outcome. 📓</div>`;
     return;
   }
-  state.logbook.forEach(t => {
+  if (!trips.length) {
+    list.innerHTML = `<div class="empty-note">No trips match those filters.<br>Try clearing something — the ocean is bigger than it looks.</div>`;
+    return;
+  }
+  trips.forEach(t => {
     const div = document.createElement("div");
     div.className = "logbook-entry";
     const planBits = [
@@ -1367,9 +1937,46 @@ function renderLogbook() {
     div.innerHTML = `
       <div class="logbook-date">🛥️ ${esc(t.date)}</div>
       <div class="logbook-plan">${planBits.map(esc).join(" · ")}</div>
-      <div class="logbook-enc">${enc}</div>`;
+      ${t.conditions ? `<div class="logbook-conditions latin">🌤️ ${esc(t.conditions)}</div>` : ""}
+      ${t.fieldNote ? `<div class="logbook-fieldnote latin">🔭 ${esc(t.fieldNote)}</div>` : ""}
+      <div class="logbook-enc">${enc}</div>
+      ${t.pinHint ? `<div class="logbook-pinhint"><span class="pin-hint-icon">📓</span> <em>${esc(t.pinHint)}</em></div>` : ""}
+      <button type="button" class="repeat-btn" data-repeat>🔁 Repeat this plan</button>`;
+    const rb = div.querySelector("[data-repeat]");
+    if (rb) rb.addEventListener("click", () => repeatPlan(t));
     list.appendChild(div);
   });
+}
+
+/* v0.20.0: repeat a logged expedition's plan — restores region, depth, bait
+   and method into the planner and jumps to the Expedition tab. Values that
+   no longer exist (e.g. a re-locked region) are skipped, never forced. */
+function repeatPlan(t) {
+  if (!t) return;
+  const set = (id, val) => {
+    const el = $(id);
+    if (!el || val == null || val === "") return false;
+    if ([...el.options].some(o => o.value === val && !o.disabled)) {
+      el.value = val;
+      el.dispatchEvent(new Event("change"));
+      return true;
+    }
+    return false;
+  };
+  set("regionSelect", t.region);
+  set("depthSelect", t.depth);
+  set("baitSelect", t.bait);
+  /* Method select's change handler fills the sub-options synchronously,
+     so the opt can be set right after. v0.20.0 Mira review fix: a saved
+     expedition with no method restores NO method — it must not retain
+     whatever was previously picked in the planner. */
+  if (set("methodSelect", t.method || "")) {
+    set("methodOptSelect", t.methodOpt || "none");
+  } else {
+    const ms = $("methodSelect");
+    if (ms && !t.method) { ms.value = ""; ms.dispatchEvent(new Event("change")); }
+  }
+  goTab("expedition");
 }
 
 function updateMsgBadge() {
@@ -1435,8 +2042,10 @@ function afterExpedition(plan) {
   if (plan && plan.region) { state.lastRegion = plan.region; saveMsgs(); }
   if (state.taggedThisTrip || state.resightedThisTrip) return;
   let thread;
-  if (state.failures >= 3) {
-    // gentle nudge, genuine-conversation style — about YOUR waters
+  if (state.failures >= 5) {
+    // gentle nudge, genuine-conversation style — about YOUR waters.
+    // v0.17.1: Sarah only butts in on her own after five; before that,
+    // asking is the player's call (see the Ask Sarah panel).
     const s = pick(regionalSpecies(true));
     thread = [
       { who: "them", text: "How's the shark hunting going?" },
@@ -1445,6 +2054,17 @@ function afterExpedition(plan) {
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
     ];
     state.failures = 0;
+  } else if (state.failures === 1 && !state.sarahAdviceOffered) {
+    /* v0.17.1: after the first failed trip, Sarah offers her notes — the
+       player picks the species, since the game may not know what they're
+       actually after. The Ask Sarah panel appears in the Phone tab. */
+    thread = [
+      { who: "them", text: "Rough day out there?" },
+      { who: "me", text: "Yeah. Empty water." },
+      { who: "them", text: "I've got notes on every shark we've studied. Pick one below and I'll tell you what I know — where to look, what they like." }
+    ];
+    state.sarahAdviceOffered = true;
+    saveMsgs(); // v0.17.1 review fix: the offer must survive a reload
   } else {
     /* v0.8.0: sometimes she just checks in about one of your named
        sharks — the cousin who remembers. */
@@ -1460,6 +2080,112 @@ function afterExpedition(plan) {
     }
   }
   pushThread(thread);
+  renderSarahAsk();
+}
+
+/* v0.17.1: Ask Sarah — player-initiated advice. The panel appears in the
+   Phone tab after the first failed trip; the player picks the species. */
+function renderSarahAsk() {
+  const panel = $("sarahAsk");
+  if (!panel) return;
+  const show = !!state.sarahAdviceOffered && untagged().length > 0;
+  panel.classList.toggle("hidden", !show);
+  if (!show) return;
+  const sel = $("sarahAskSelect");
+  sel.innerHTML = "";
+  untagged().forEach(s => {
+    const o = document.createElement("option");
+    o.value = s.id;
+    o.textContent = s.name;
+    sel.appendChild(o);
+  });
+}
+function askSarahAdvice(sid) {
+  const s = sharkById(sid);
+  if (!s) return;
+  pushThread([
+    { who: "me", text: `I'm striking out — any advice on the ${s.name.toLowerCase()}?` },
+    { who: "them", text: COUSIN_NUDGES[sid] || "You'll get the next one. I believe in you." },
+    { who: "me", text: "Thanks, kiddo. That's actually really helpful." }
+  ]);
+  state.sarahAdviceOffered = false;
+  saveMsgs(); // v0.17.1 review fix: a used offer stays used across reloads
+  renderSarahAsk();
+  goTab("phone");
+}
+
+/* ---------- Achievements (v0.18.0) ----------
+   Visible upfront with breadcrumb hints until unlocked. Checks run after
+   the actions that can earn them; unlocks persist and celebrate. */
+function saveStats() {
+  statsStore.save(state.stats);
+}
+function checkAchievements() {
+  if (typeof ACHIEVEMENTS === "undefined") return;
+  ACHIEVEMENTS.forEach(a => {
+    if (state.achievements[a.id]) return;
+    let earned = false;
+    try { earned = !!a.check(state); } catch { earned = false; }
+    if (earned) unlockAchievement(a);
+  });
+}
+function unlockAchievement(a) {
+  state.achievements[a.id] = Date.now();
+  achieveStore.save(state.achievements);
+  renderAchievements();
+  /* v0.18.0 review: queue celebrations so one action earning several
+     achievements shows each card in turn instead of overwriting. */
+  achieveQueue.push(a);
+  showNextAchievement();
+}
+const achieveQueue = [];
+let achieveShowing = false;
+function showNextAchievement() {
+  if (achieveShowing || !achieveQueue.length) return;
+  const a = achieveQueue.shift();
+  achieveShowing = true;
+  const ov = $("achieveOverlay");
+  if (!ov) { achieveShowing = false; return; }
+  ov.classList.remove("hidden");
+  ov.innerHTML = `<div class="phone">
+    <div class="cert-trophy" style="font-size:52px; text-align:center">${a.icon}</div>
+    <h2 style="text-align:center; margin:8px 0 2px">Achievement Unlocked!</h2>
+    <p style="text-align:center; font-weight:800; margin:4px 0">${esc(a.name)}</p>
+    <p class="latin" style="text-align:center">${esc(a.description)}</p>
+    <button id="achieveClose" class="primary-button" type="button">Sweet!</button>
+  </div>`;
+  $("achieveClose").addEventListener("click", () => {
+    ov.classList.add("hidden");
+    achieveShowing = false;
+    showNextAchievement();
+  });
+}
+function renderAchievements() {
+  const list = $("achieveList");
+  if (!list || typeof ACHIEVEMENTS === "undefined") return;
+  /* v0.23.0: hidden achievements (e.g. Bruce) don't appear until unlocked. */
+  const visible = ACHIEVEMENTS.filter(a => !a.hidden || state.achievements[a.id]);
+  const unlockedCount = visible.filter(a => state.achievements[a.id]).length;
+  const head = $("achieveHead");
+  if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${visible.length} unlocked</p>`;
+  list.innerHTML = "";
+  visible.forEach(a => {
+    const unlocked = !!state.achievements[a.id];
+    const row = document.createElement("div");
+    row.className = "guide-row" + (unlocked ? "" : " locked");
+    row.innerHTML = `
+      <div class="guide-row-head" style="cursor:default">
+        <span style="font-size:22px">${unlocked ? a.icon : "🔒"}</span>
+        <span class="guide-row-name">${unlocked ? esc(a.name) : "???"}</span>
+        <span class="latin">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
+      </div>`;
+    list.appendChild(row);
+  });
+  const badge = $("achieveBadge");
+  if (badge) {
+    badge.textContent = `${unlockedCount}/${visible.length}`;
+    badge.classList.toggle("hidden", unlockedCount === 0);
+  }
 }
 
 /* ---------- Tagging ---------- */
@@ -1503,7 +2229,6 @@ function openTagging(species, doneCb) {
   state.pendingTag._gen = { length, sex, researchId };
   $("tagForm").classList.remove("hidden");
   $("healthView").classList.add("hidden");
-  /* v0.26.0: full-colour illustration (WebP) with SVG fallback. */
   $("tagSharkArt").innerHTML = sharkArtImg(species.id, "illustration", species.name);
   $("tagInfo").innerHTML = `
     <strong>${species.name}</strong> <em>(${species.latin})</em><br>
@@ -1530,6 +2255,7 @@ function confirmTag(name) {
     sex: s._gen.sex,
     location: regionName,
     date: dateStr,
+    taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
     track: genTrack(s, { location: regionName, date: dateStr })
   };
   state.tagged[s.id] = rec;
@@ -1537,6 +2263,20 @@ function confirmTag(name) {
   logTripEncounter(s, "tagged");
   store.save(state.tagged);
   state.pendingTag = null;
+  /* v0.18.0: chum tags feed the "Something in the Water" achievement —
+     v0.18.0 review: only when chum is a real method for THIS species. */
+  if (state.currentPlan && state.currentPlan.method === "attract" &&
+      state.currentPlan.methodOpt === "chum" &&
+      s.methods && s.methods.attract && s.methods.attract.includes("chum")) {
+    state.stats.chumTags = (state.stats.chumTags || 0) + 1;
+    saveStats();
+  }
+  /* v0.19.0: depths tagged feed the "Full Fathom" achievement. */
+  if (state.currentPlan && state.currentPlan.depth &&
+      !state.stats.depthsTagged.includes(state.currentPlan.depth)) {
+    state.stats.depthsTagged.push(state.currentPlan.depth);
+    saveStats();
+  }
   // Sarah celebrates wins, not just failures: excitement + a bonus fact.
   // v0.6.0: the opener varies per species (draft openers — Avery to revise).
   pushThread([
@@ -1545,7 +2285,29 @@ function confirmTag(name) {
     { who: "them", text: s.cheer }
   ]);
   maybeSarahEgg(s.id, rec);
+  maybeNameEgg(s.id, rec); // v0.23.0
+  /* v0.24.0: progressive Wild Archive unlock (Mira approved). First tag
+     reveals the Archive tab with a Sarah intro; later tags add entries
+     quietly. Existing winners keep full access via migrateArchiveUnlock. */
+  const wasFirstTag = Object.keys(state.tagged).length === 1;
+  if (!state.archiveUnlocked && wasFirstTag) {
+    state.archiveUnlocked = true;
+    try { localStorage.setItem("tyi-archive", "1"); } catch {}
+    pushThread([
+      { who: "them", text: "WAIT. I have something for you 📸" },
+      { who: "them", text: "Every shark you tag, I'm going to find you a real photo of their species. The actual animal. Check the new 🖼️ Archive tab!" },
+      { who: "me", text: "Real photos? Of the actual species?" },
+      { who: "them", text: "The real deal! Your field-guide art is for ID work — the Archive is for meeting them. Every tag adds another face to the collection 🩵" }
+    ]);
+  } else if (state.archiveUnlocked && !wasFirstTag) {
+    // Quiet notification: Archive tab gets a badge
+    try {
+      const tab = document.querySelector('.tab[data-tab="archive"] .tab-badge');
+      if (tab) { tab.textContent = "•"; tab.classList.remove("hidden"); }
+    } catch {}
+  }
   checkMilestones();
+  checkAchievements(); // v0.18.0
   renderAll();
   showHealthCheck(s, rec);
 }
@@ -1554,7 +2316,6 @@ function showHealthCheck(s, rec) {
   state.healthSpecies = s;
   $("tagForm").classList.add("hidden");
   $("healthView").classList.remove("hidden");
-  /* v0.26.0: full-colour illustration (WebP) with SVG fallback. */
   $("healthArt").innerHTML = sharkArtImg(s.id, "illustration", s.name);
   $("healthInfo").innerHTML = `
     <strong>${s.name}</strong> — ${esc(rec.researchId)}<br>
@@ -1564,7 +2325,10 @@ function showHealthCheck(s, rec) {
   `;
 }
 
-$("releaseBtn").addEventListener("click", () => {
+/* v0.17.1: the release IS the destination choice — keep diving or head back.
+   The release buttons resolve the encounter directly instead of dropping the
+   player into a second keep-diving/head-back prompt. */
+function doRelease(headBack) {
   const done = state.encounterDone;
   const s = state.healthSpecies;
   state.encounterDone = null;
@@ -1574,7 +2338,14 @@ $("releaseBtn").addEventListener("click", () => {
     logLine(`🌊 The ${s.name} kicks once and is gone — back to its life, carrying your tag.`);
   }
   renderAll();
-  if (done) done();
+  if (done) done(headBack);
+}
+$("releaseBtn").addEventListener("click", () => doRelease(false));
+$("releaseShipBtn").addEventListener("click", () => doRelease(true));
+/* v0.17.1: Ask Sarah for advice. */
+$("sarahAskBtn").addEventListener("click", () => {
+  const sid = $("sarahAskSelect").value;
+  if (sid) askSarahAdvice(sid);
 });
 
 /* ---------- Milestones & win state ----------
@@ -1593,6 +2364,27 @@ function checkMilestones() {
     pushThread(REGION_UNLOCK_THREAD.map(m => ({ ...m })));
     showRegionUnlock();
   }
+  /* v0.21.0 sharknado: progressive region unlocks by tag count.
+     v0.21.0 Mira review: independent of original-six unlock. */
+  const n = taggedIds.length;
+  if (n >= 15 && REGIONS["east-australia"].locked) {
+    REGIONS["east-australia"].locked = false;
+    fillRegions();
+    pushThread(EAST_AUS_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("east-australia", "Eastern Australia", "wobbegongs hide in the reef ledges here.");
+  }
+  if (n >= 25 && REGIONS["california"].locked) {
+    REGIONS["california"].locked = false;
+    fillRegions();
+    pushThread(CALIFORNIA_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("california", "California Coast", "leopard sharks cruise the bays and kelp.");
+  }
+  if (n >= 35 && REGIONS["arctic"].locked) {
+    REGIONS["arctic"].locked = false;
+    fillRegions();
+    pushThread(ARCTIC_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("arctic", "Arctic Waters", "the Greenland shark waits in the cold dark.");
+  }
   if (taggedIds.length >= SHARKS.length && !state.won) {
     /* The ceremony waits for day's end — the trip always finishes first. */
     state.pendingWin = true;
@@ -1607,7 +2399,24 @@ function showRegionUnlock() {
     <div class="cert-body">
       <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
       <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
-      <p class="latin">Six successful tags. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+      <p class="latin">The six original species. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+    </div>
+    <button id="winNext" class="primary-button" type="button">Back to the water</button>
+  </div>`;
+  $("winNext").addEventListener("click", () => {
+    ov.classList.add("hidden");
+  });
+}
+
+/* v0.21.0 sharknado: single-region unlock overlay. */
+function showRegionUnlockSingle(regionId, regionName, flavor) {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  ov.innerHTML = `<div class="phone">
+    <div class="phone-head">🗺️ New waters surveyed</div>
+    <div class="cert-body">
+      <p><strong>${regionName}</strong> — ${flavor}</p>
+      <p class="latin">The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
     </div>
     <button id="winNext" class="primary-button" type="button">Back to the water</button>
   </div>`;
@@ -1630,11 +2439,23 @@ function winThread() {
 /* v0.16.0: Sarah's celebration — the emotional core of the ending. Calm adult
    voice (v0.12.0): proud and emotional, never a wall of caps. Uses the
    player's ACTUAL first-tagged shark so it lands personally. */
+/* v0.16.0 review fix: genuine chronological order for tagged sharks.
+   New records carry taggedAt (ms epoch). Old saves fall back to the
+   insertion order of state.tagged — for non-integer string keys that IS
+   the order each shark was first tagged. Both the Sarah thread and the
+   map finale use this same source. */
+function taggedChronological() {
+  return Object.keys(state.tagged)
+    .map((sid, idx) => ({ sid, t: state.tagged[sid], idx }))
+    .sort((a, b) => {
+      const ta = a.t.taggedAt, tb = b.t.taggedAt;
+      if (ta != null && tb != null && ta !== tb) return ta - tb;
+      return a.idx - b.idx;
+    });
+}
 function sarahWinThread() {
-  const ids = Object.keys(state.tagged);
-  const byDate = ids
-    .map(sid => ({ sid, t: state.tagged[sid] }))
-    .sort((a, b) => (a.t.date || "") < (b.t.date || "") ? -1 : 1);
+  const byDate = taggedChronological();
+  const ids = byDate.map(e => e.sid);
   const first = byDate[0] || { sid: "nurse", t: { researchId: "??" } };
   const s = sharkById(first.sid) || { name: "shark" };
   const firstName = first.t.name ? `“${first.t.name}”` : first.t.researchId;
@@ -1659,7 +2480,14 @@ function sarahWinThread() {
    Each lands separately — a moment, not a checklist. */
 function doWin() {
   state.won = true;
-  try { localStorage.setItem("tyi-won", "1"); } catch {}
+  /* v0.16.0 review fix: the archive unlock is part of the win itself, not
+     beat 4. A player who closes mid-ceremony keeps the unlock — beat 4 is
+     where they're TOLD about it. */
+  state.archiveUnlocked = true;
+  try {
+    localStorage.setItem("tyi-won", "1");
+    localStorage.setItem("tyi-archive", "1");
+  } catch {}
   renderCollection();
   renderResearch();
   renderSightings();
@@ -1705,15 +2533,17 @@ function winStep(n) {
     winMapFinale();
 
   } else {
-    /* Beat 4: the acknowledgement — it lives here now, not on the Research tab.
-       Also unlocks the Wild Archive for the postgame. */
-    state.archiveUnlocked = true;
-    try { localStorage.setItem("tyi-archive", "1"); } catch {}
+    /* Beat 4: the acknowledgement. v0.24.0: the Archive is no longer a
+       win-gated reward — it's been growing all game. This beat celebrates
+       the completed collection instead. */
+    updateArchiveTab();
+    renderArchive();
     box(`
       <div class="ack-card" style="margin-top:0">
         <p class="eyebrow">ACKNOWLEDGEMENTS</p>
         <p class="ack-name">For <span>Sarah</span></p>
         <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
+        <p style="margin-top:8px">🖼️ Your Wild Archive is complete — every species you tagged, face to face with the real animal.</p>
       </div>
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
     $("winNext").addEventListener("click", () => {
@@ -1730,9 +2560,7 @@ function winStep(n) {
 function winMapFinale() {
   const ov = $("winOverlay");
   ov.classList.remove("hidden");
-  const ordered = Object.keys(state.tagged)
-    .map(sid => ({ sid, t: state.tagged[sid] }))
-    .sort((a, b) => (a.t.date || "") < (b.t.date || "") ? -1 : 1);
+  const ordered = taggedChronological();
   const n = ordered.length;
   const bmUrl = (typeof BLUE_MARBLE_URL !== "undefined") ? BLUE_MARBLE_URL : "";
 
@@ -1747,7 +2575,12 @@ function winMapFinale() {
       </div>
     </div>`;
 
+  /* v0.16.0 review fix: count = sharks revealed so far. The caption names
+     the shark that was JUST revealed (ordered[count - 1]); count 0 is the
+     intro state with an empty map. Only the newest marker gets the pop
+     animation — earlier ones stay settled instead of re-popping every step. */
   const renderRevealed = (count) => {
+    const newIdx = count - 1; // index of the just-revealed shark (-1 when none)
     let svg = `<svg viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="World map of all tagged sharks">`
       + `<rect x="0" y="0" width="${MAP_W}" height="${MAP_H}" fill="#0d2f4d"/>`
       + (bmUrl ? `<image href="${bmUrl}" x="0" y="0" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/>` : ``);
@@ -1764,7 +2597,8 @@ function winMapFinale() {
       }
       const last = pts[pts.length - 1];
       if (last) {
-        svg += `<g class="finale-marker" style="animation: finalePop 0.5s ease">`
+        const pop = idx === newIdx ? ` style="animation: finalePop 0.5s ease"` : ``;
+        svg += `<g class="finale-marker"${pop}>`
           + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="7" fill="${color}" stroke="#fff" stroke-width="2"/>`
           + `</g>`;
       }
@@ -1772,11 +2606,13 @@ function winMapFinale() {
     svg += `</svg>`;
     $("finaleMap").innerHTML = svg;
     const cap = $("finaleCaption");
-    if (count < n) {
-      const { sid, t } = ordered[count];
+    if (count === 0) {
+      cap.textContent = "";
+    } else if (count < n) {
+      const { sid, t } = ordered[count - 1];
       const s = sharkById(sid);
       const nm = t.name ? `\u201c${t.name}\u201d` : t.researchId;
-      cap.textContent = `${nm} — ${s ? s.name : sid}  (${count + 1} / ${n})`;
+      cap.textContent = `${nm} — ${s ? s.name : sid}  (${count} / ${n})`;
     } else {
       cap.textContent = `${n} sharks. ${n} releases. All still swimming.`;
     }
@@ -1795,8 +2631,8 @@ function winMapFinale() {
   };
   const timer = setInterval(() => {
     revealed++;
+    if (revealed >= n) { finish(); return; } // finish() renders the final state once
     renderRevealed(revealed);
-    if (revealed >= n) finish();
   }, 650);
   $("finaleSkip").addEventListener("click", finish);
   $("finaleNext").addEventListener("click", () => winStep(4));
@@ -1810,6 +2646,80 @@ function maybeSarahEgg(speciesId, rec) {
     store.save(state.tagged);
     pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
   }
+}
+
+/* v0.23.0: real-shark easter eggs. Called on rename/tag.
+   - Mary Lee / Nicole: great white + matching name → Sarah thread (immediate)
+   - Bruce: any shark + "bruce" → starts SLOW chain (no immediate message!) */
+function maybeNameEgg(speciesId, rec) {
+  if (!rec || !rec.name) return;
+  const name = rec.name.trim().toLowerCase();
+  const s = sharkById(speciesId);
+
+  // Mary Lee: great white only
+  if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
+    rec.maryLeeEgg = true;
+    store.save(state.tagged);
+    pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
+    return;
+  }
+  // Nicole: great white only
+  if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
+    rec.nicoleEgg = true;
+    store.save(state.tagged);
+    pushThread(NICOLE_THREAD.map(m => ({ ...m })));
+    return;
+  }
+  // Bruce: ANY shark. No immediate message — the slow chain begins silently.
+  if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
+    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+    try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+    // Deliberately no pushThread here. Sarah will notice... eventually.
+  }
+}
+
+/* v0.23.0: advance the Bruce chain. Called on expedition completion and game
+   load. Stages are spaced: at least 2 expeditions OR 12 hours between stages,
+   so it unfolds slowly over multiple sessions. */
+function advanceBruceChain() {
+  if (!state.bruceEgg || state.bruceChainComplete) return;
+  if (typeof BRUCE_CHAIN === "undefined") return;
+  const now = Date.now();
+  const expeditionsSince = (state.stats.expeditions || 0) - (state.bruceEgg.expeditionsAtStage || 0);
+  const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
+  // Need either 2+ expeditions or 12+ hours since last stage
+  if (expeditionsSince < 2 && hoursSince < 12) return;
+
+  const stage = state.bruceEgg.stage;
+  if (stage >= BRUCE_CHAIN.length) {
+    // Chain complete — unlock hidden achievement
+    state.bruceChainComplete = true;
+    try {
+      localStorage.setItem("tyi-bruce-done", "1");
+      localStorage.removeItem("tyi-bruce");
+    } catch {}
+    state.bruceEgg = null;
+    checkAchievements(); // Bruce achievement check uses st.bruceChainComplete
+    return;
+  }
+
+  // Push this stage's messages
+  pushThread(BRUCE_CHAIN[stage].map(m => ({ ...m })));
+  state.bruceEgg.stage = stage + 1;
+  state.bruceEgg.lastAdvance = now;
+  state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
+  // If that was the final stage, complete the chain NOW (not on a later call)
+  if (state.bruceEgg.stage >= BRUCE_CHAIN.length) {
+    state.bruceChainComplete = true;
+    try {
+      localStorage.setItem("tyi-bruce-done", "1");
+      localStorage.removeItem("tyi-bruce");
+    } catch {}
+    state.bruceEgg = null;
+    checkAchievements();
+    return;
+  }
+  try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
 }
 
 $("tagConfirm").addEventListener("click", () => confirmTag($("sharkName").value.trim()));
@@ -1872,7 +2782,7 @@ function openCertificate() {
   c.innerHTML = `
     <div class="cert-trophy" style="font-size:44px">🏆</div>
     <h3 style="margin:6px 0 0">Master Shark Tagger</h3>
-    <p class="latin">Tag, You're It — field program</p>
+    <p class="latin">Tag Along — field program</p>
     <div class="cert-body">
       <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
       <p class="cert-sig">Awarded with salt on it. 🦈</p>
@@ -1916,6 +2826,7 @@ function openDetail(id) {
     </div>` : ""}
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
+    ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
   `;
   $("detailOverlay").classList.remove("hidden");
   $("trackBtn").addEventListener("click", () => openTrack(id));
@@ -1934,6 +2845,7 @@ function openDetail(id) {
     t.name = $("renameInput").value.trim();
     store.save(state.tagged);
     maybeSarahEgg(id, t);
+    maybeNameEgg(id, t); // v0.23.0: Mary Lee / Nicole / Bruce
     renderCollection();
     renderResearch();
     openDetail(id);
@@ -1981,7 +2893,7 @@ function openTrack(id) {
     </div>
     <ul class="track-stops">${stops}</ul>
     <p class="track-note">Last ping: <strong>${esc(last.label)}</strong> · day ${last.day}<br>
-    <span class="dim">${esc(TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite)}</span></p>
+    <span class="dim">${esc(tr.hypothetical ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey." : tr.kind === "archival" ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (s.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "") : (TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite))}</span></p>
   `;
   $("trackOverlay").classList.remove("hidden");
 }
@@ -2003,7 +2915,217 @@ $("detailOverlay").addEventListener("click", (e) => {
 /* ---------- Hard progress reset ----------
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook"];
+/* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done"];
+
+/* v0.23.0: save export/import for the public beta. */
+function exportSave() {
+  const data = { version: VERSION, exportedAt: new Date().toISOString(), keys: {} };
+  RESET_KEYS.forEach(k => {
+    try {
+      const v = localStorage.getItem(k);
+      if (v !== null) data.keys[k] = v;
+    } catch {}
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const aEl = document.createElement("a");
+  aEl.href = url;
+  aEl.download = "tag-along-save-" + VERSION + ".json";
+  document.body.appendChild(aEl);
+  aEl.click();
+  setTimeout(() => { document.body.removeChild(aEl); URL.revokeObjectURL(url); }, 100);
+}
+/* v0.23.0 Mira review: safe import — validate everything BEFORE touching
+   storage, replace the complete key set (clear missing keys), and back up
+   the existing save first. */
+/* v0.23.0 Mira review: strict validation. Reject anything questionable —
+   this is player data going into a public beta. */
+const SAVE_KEY_ALLOWLIST = [...RESET_KEYS, "tyi-bruce", "tyi-bruce-done"];
+function validateSaveData(data) {
+  if (!data || typeof data !== "object") return { ok: false, reason: "not an object" };
+  if (!data.keys || typeof data.keys !== "object") return { ok: false, reason: "missing keys" };
+  const keyNames = Object.keys(data.keys);
+  // Must have at least one recognized key with actual content
+  if (keyNames.length === 0) return { ok: false, reason: "empty save (no keys)" };
+  // Reject ALL unknown keys
+  const unknown = keyNames.filter(k => !SAVE_KEY_ALLOWLIST.includes(k));
+  if (unknown.length > 0) return { ok: false, reason: "unrecognized keys: " + unknown.slice(0, 3).join(", ") };
+  // Validate shapes, not just JSON parsing
+  for (const [k, v] of Object.entries(data.keys)) {
+    if (typeof v !== "string") return { ok: false, reason: "non-string value for " + k };
+    if (k === "tyi-collection" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-collection" }; }
+      if (typeof parsed !== "object" || Array.isArray(parsed) || parsed === null)
+        return { ok: false, reason: "tyi-collection must be an object" };
+      // Each record must be a proper shark entry (protects migrateIds())
+      for (const [sid, rec] of Object.entries(parsed)) {
+        if (rec === null || typeof rec !== "object" || Array.isArray(rec))
+          return { ok: false, reason: "tyi-collection[" + sid + "] is not a shark record" };
+        if (rec.tagged === true && (typeof rec.researchId !== "string" || !rec.researchId))
+          return { ok: false, reason: "tyi-collection[" + sid + "] missing researchId" };
+      }
+    }
+    if (k === "tyi-logbook" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-logbook" }; }
+      if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-logbook must be an array" };
+      for (let i = 0; i < parsed.length; i++) {
+        const t = parsed[i];
+        if (t === null || typeof t !== "object")
+          return { ok: false, reason: "tyi-logbook[" + i + "] is not a trip record" };
+        // Essential fields the rendering path depends on
+        if (!Array.isArray(t.encounters))
+          return { ok: false, reason: "tyi-logbook[" + i + "] missing encounters" };
+        for (let j = 0; j < t.encounters.length; j++) {
+          const e = t.encounters[j];
+          if (e === null || typeof e !== "object")
+            return { ok: false, reason: "tyi-logbook[" + i + "].encounters[" + j + "] invalid" };
+        }
+      }
+    }
+    if (k === "tyi-messages" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-messages" }; }
+      // saveMsgs() stores an object with a messages array inside
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))
+        return { ok: false, reason: "tyi-messages must be an object" };
+      if (!Array.isArray(parsed.messages))
+        return { ok: false, reason: "tyi-messages.messages must be an array" };
+      // Each thread: modern { ts, msgs } object OR legacy bare-array (normThread handles both)
+      for (let i = 0; i < parsed.messages.length; i++) {
+        const t = parsed.messages[i];
+        let msgs;
+        if (Array.isArray(t)) msgs = t;  // legacy bare-array thread
+        else if (t !== null && typeof t === "object" && Array.isArray(t.msgs)) msgs = t.msgs;
+        else return { ok: false, reason: "tyi-messages.messages[" + i + "] invalid" };
+        // Each message entry must be an object
+        for (let j = 0; j < msgs.length; j++) {
+          if (msgs[j] === null || typeof msgs[j] !== "object")
+            return { ok: false, reason: "tyi-messages.messages[" + i + "][" + j + "] invalid" };
+        }
+      }
+    }
+    if (k === "tyi-stats" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-stats" }; }
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))
+        return { ok: false, reason: "tyi-stats must be an object" };
+      // regionsVisited is used with .includes() — must be array or absent
+      if ("regionsVisited" in parsed && !Array.isArray(parsed.regionsVisited))
+        return { ok: false, reason: "tyi-stats.regionsVisited must be an array" };
+    }
+  }
+  // Version: must be a recognized Tag Along version, else reject
+  const fv = data.version || "unknown";
+  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
+  if (!supported) return { ok: false, reason: "unsupported version: " + fv };
+  // Progress-bearing payload: importing tyi-pace alone would wipe the collection
+  const hasProgress = ["tyi-collection", "tyi-logbook", "tyi-won"].some(k => {
+    const v = data.keys[k];
+    return typeof v === "string" && v.length > 2 && v !== "{}" && v !== "[]" && v !== "null";
+  });
+  if (!hasProgress) return { ok: false, reason: "no actual progress in save" };
+  return { ok: true, version: fv };
+}
+/* v0.23.0 Mira review: snapshot returns the data AND whether it worked.
+   We verify the backup before claiming it exists. */
+function snapshotCurrentSave() {
+  const snap = {};
+  try {
+    SAVE_KEY_ALLOWLIST.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) snap[k] = v;
+    });
+    return { ok: true, snap };
+  } catch (e) {
+    return { ok: false };
+  }
+}
+function restoreSnapshot(snap, storage) {
+  const s = storage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!s) return false;
+  try {
+    SAVE_KEY_ALLOWLIST.forEach(k => {
+      if (k in snap) s.setItem(k, snap[k]);
+      else s.removeItem(k);
+    });
+    return true;
+  } catch { return false; }
+}
+/* v0.23.0 Mira review: storage replacement as a testable unit.
+   storage defaults to localStorage but tests can inject a failing stub. */
+function replaceSaveKeys(keys, storage) {
+  const s = storage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!s) throw new Error("no storage");
+  SAVE_KEY_ALLOWLIST.forEach(k => {
+    if (k in keys) s.setItem(k, keys[k]);
+    else s.removeItem(k);
+  });
+}
+function importSave(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); }
+    catch { alert("Couldn't read that file. Is it a valid Tag Along save?"); return; }
+    // Validate BEFORE touching storage
+    const check = validateSaveData(data);
+    if (!check.ok) {
+      alert("That save file looks incompatible (" + check.reason + "). Nothing was changed.");
+      return;
+    }
+    let msg = "Import this save? Your current progress will be replaced.\n\n";
+    msg += "File version: " + check.version + "\nCurrent version: " + VERSION;
+    msg += "\n\nYou'll be offered a backup download first.";
+    if (!confirm(msg)) return;
+    // Snapshot current progress BEFORE touching anything
+    const before = snapshotCurrentSave();
+    if (!before.ok) {
+      alert("Couldn't read your current save. Import cancelled — nothing was changed.");
+      return;
+    }
+    // Offer backup download (accessible recovery, not just a hidden key)
+    const backupBlob = new Blob([JSON.stringify({ version: VERSION, exportedAt: new Date().toISOString(), keys: before.snap }, null, 2)], { type: "application/json" });
+    const backupUrl = URL.createObjectURL(backupBlob);
+    const backupA = document.createElement("a");
+    backupA.href = backupUrl;
+    backupA.download = "tag-along-backup-" + VERSION + ".json";
+    document.body.appendChild(backupA);
+    backupA.click();
+    setTimeout(() => { document.body.removeChild(backupA); URL.revokeObjectURL(backupUrl); }, 100);
+    // Also keep a hidden copy
+    try { localStorage.setItem("tyi-backup", JSON.stringify({ version: VERSION, keys: before.snap })); } catch {}
+    // Replace complete key set with true rollback on failure
+    try {
+      replaceSaveKeys(data.keys);
+    } catch (e) {
+      // Roll back to the snapshot
+      const restored = restoreSnapshot(before.snap);
+      alert(restored
+        ? "Import failed — your previous save has been restored."
+        : "Import failed and rollback also failed. If the backup download completed, that file has your data — otherwise your previous progress may be lost.");
+      return;
+    }
+    location.reload();
+  };
+  reader.readAsText(file);
+}
+// Wire up buttons (after DOM ready — these run at script load, elements exist)
+(function initSaveButtons() {
+  const ex = document.getElementById("exportBtn");
+  if (ex) ex.addEventListener("click", exportSave);
+  const im = document.getElementById("importBtn");
+  const fi = document.getElementById("importFile");
+  if (im && fi) {
+    im.addEventListener("click", () => fi.click());
+    fi.addEventListener("change", () => {
+      if (fi.files && fi.files[0]) importSave(fi.files[0]);
+      fi.value = ""; // reset so the same file can be picked again
+    });
+  }
+})();
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -2028,36 +3150,62 @@ function renderAll() {
   renderLogbook();
   renderMessages();
   updateMsgBadge();
+  updateArchiveTab();
+  if (state.archiveUnlocked) renderArchive();
+  renderSarahAsk();
+  renderAchievements(); // v0.18.0
+  renderExpeditionPin(); // v0.20.0
+  renderPinHint(); // v0.22.0
+  /* v0.20.0: restore quick-pace preference (the change listener is bound
+     once at init — Mira review fix: binding it here accumulated listeners
+     on every renderAll). */
+  const qp = $("quickPace");
+  if (qp) {
+    let saved = false;
+    try { saved = localStorage.getItem("tyi-pace") === "quick"; } catch {}
+    qp.checked = saved;
+    if (saved) setPace(true);
+  }
 }
 
+/* v0.20.0: Wild Archive UI lives in archive-ui.js (module split). */
+/* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
+   completed v0.14 save boots with won=true, a full roster, and no archive
+   unlock. Backfill the unlock they already earned.
+   v0.24.0 Mira review: ANY returning player with ≥1 tag gets Archive access,
+   not just winners. New players get the Sarah intro on their first tag;
+   returning players get quiet access (no first-tag message). */
+function migrateArchiveUnlock() {
+  try {
+    const taggedCount = Object.keys(state.tagged).length;
+    if (taggedCount >= 1 && !state.archiveUnlocked) {
+      state.archiveUnlocked = true;
+      localStorage.setItem("tyi-archive", "1");
+    }
+  } catch {}
+}
+/* v0.22.0 Mira review: capture pre-migration storage state for What's New.
+   Migrations write keys (e.g. tyi-collection) even for new players, so we
+   snapshot before they run. */
+const preMigrationHadSave = (() => {
+  try {
+    const log = localStorage.getItem("tyi-logbook");
+    const col = localStorage.getItem("tyi-collection");
+    // Meaningful data: non-empty logbook, or collection with actual sharks
+    if (log && log !== "[]") return true;
+    if (col && col !== "{}" && col !== "null") {
+      try { return Object.keys(JSON.parse(col)).length > 0; } catch { return false; }
+    }
+    return !!localStorage.getItem("tyi-stats");
+  } catch { return false; }
+})();
 migrateIds();
 migrateTracks();
 migrateWinV07();
+migrateArchiveUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
-/* v0.9.1: live icon strips under each planner row. One small visual echo
-   of the current pick per select, in the game's emoji style. The ray gets
-   a simple styled oval ("dot:ray") — no honest emoji exists for it. Pure
-   decoration; the selects remain the source of truth. */
-const PICK_ICONS = {
-  regionSelect: {
-    "caribbean": "🏝️", "north-carolina": "⚓", "philippines": "🐠",
-    "maldives": "🏖️", "japan": "🗾", "open-atlantic": "🌊",
-    "cornwall": "🐦", "papua-new-guinea": "🪸",
-    "galapagos": "🐢", "south-africa": "🦭"
-  },
-  depthSelect: { "surface": "☀️", "reef": "🪸", "twilight": "🌅", "deep": "🌑" },
-  baitSelect: {
-    "crustaceans": "🦀", "squid": "🦑", "schooling-fish": "🐠",
-    "plankton": "🦐", "tuna": "🐟", "ray": "dot:ray", "urchins": "🐚"
-  },
-  methodSelect: { "attract": "🪣", "aggregation": "🔍", "": "" },
-  methodOptSelect: {
-    "none": "–", "chum": "🪣", "seal": "🦭",
-    "boat": "🚤", "plane": "✈️", "network": "📻"
-  }
-};
 function updateVisual(selectId) {
   const el = document.getElementById(selectId.replace(/Select$/, "Visual"));
   if (!el) return;
@@ -2102,12 +3250,18 @@ function updateAllVisuals() {
     });
     updateVisual("methodOptSelect");
   };
-  mSel.addEventListener("change", () => { fillOpts(); updateVisual("methodSelect"); });
+  mSel.addEventListener("change", () => { fillOpts(); updateVisual("methodSelect"); renderPinHint(); });
   oSel.addEventListener("change", () => updateVisual("methodOptSelect"));
   ["regionSelect", "depthSelect", "baitSelect"].forEach(id =>
-    $(id).addEventListener("change", () => updateVisual(id)));
+    $(id).addEventListener("change", () => { updateVisual(id); renderPinHint(); }));
   fillOpts();
   updateAllVisuals();
+})();
+/* v0.22.0: re-render the pin hint when the Expedition tab opens (plan may
+   have been restored via repeat-plan) and when pinning changes. */
+(function initPinHint() {
+  const tab = document.querySelector('[data-tab="expedition"]');
+  if (tab) tab.addEventListener("click", () => setTimeout(renderPinHint, 50));
 })();
 /* v0.10.0: map toolbar — zoom controls + currents toggle (static HTML).
    Guarded lookups: if this script ever loads against older HTML, the game
@@ -2257,13 +3411,85 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
+    if (pts.size === 0) {
+      if (movedMax > 10) suppressMarkerClick = true;
+    } else if (pts.size === 1) {
+      // A lifted finger during an (unsupported) two-finger touch collapses
+      // back into a normal one-finger pan: re-anchor the remaining finger
+      // so the map doesn't jump from its older position.
+      const p = [...pts.values()][0];
+      downX = panX = p.x;
+      downY = panY = p.y;
+      movedMax = 0;
+    }
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
 })();
 $("buildTag").textContent = VERSION;
-$("phoneTime").textContent =
-  new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+/* v0.22.0: What's New — show once per version update for returning players. */
+/* v0.23.0: Bruce chain can also advance on game load (time-based). */
+setTimeout(() => { try { advanceBruceChain(); } catch {} }, 5000);
+(function initWhatsNew() {
+  const notes = WHATS_NEW[VERSION];
+  if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, preMigrationHadSave)) {
+    markWhatsNewSeen();
+    return;
+  }
+  const c = $("whatsNewContent");
+  c.innerHTML = `
+    <div class="cert-trophy" style="font-size:40px">🎉</div>
+    <h3 style="margin:6px 0 0">What's new in ${esc(VERSION)}</h3>
+    <p class="latin">Tag Along — field program updates</p>
+    <ul class="whats-new-list">
+      ${notes.map(n => `<li>${n}</li>`).join("")}
+    </ul>`;
+  $("whatsNewOverlay").classList.remove("hidden");
+  $("whatsNewClose").addEventListener("click", () => {
+    $("whatsNewOverlay").classList.add("hidden");
+    markWhatsNewSeen();
+  });
+})();
+const tickPhoneClock = () => {
+  $("phoneTime").textContent =
+    new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+};
+tickPhoneClock();
+/* v0.17.1: the phone clock ticks — refresh every 30s so it never goes stale
+   next to message timestamps. */
+setInterval(tickPhoneClock, 30000);
+/* v0.19.0: field-guide database controls. */
+(function initGuideTools() {
+  const search = $("guideSearch");
+  if (search) search.addEventListener("input", () => {
+    guideFilters.q = search.value.trim();
+    renderResearch();
+  });
+  const toggle = $("filterToggle");
+  const panel = $("filterPanel");
+  const closeSheet = () => {
+    panel.classList.add("hidden");
+    panel.classList.remove("open-sheet");
+    toggle.setAttribute("aria-expanded", "false");
+  };
+  if (toggle && panel) toggle.addEventListener("click", () => {
+    const open = panel.classList.toggle("hidden");
+    toggle.setAttribute("aria-expanded", String(!open));
+    /* Mobile bottom sheet. */
+    panel.classList.toggle("open-sheet", !open && window.innerWidth <= 640);
+  });
+  const sheetClose = $("sheetClose");
+  if (sheetClose) sheetClose.addEventListener("click", closeSheet);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && panel && !panel.classList.contains("hidden")) closeSheet();
+  });
+  const clr = $("guideClear");
+  if (clr) clr.addEventListener("click", clearGuideFilters);
+  /* v0.20.0: quick-pace listener bound once at init (never in renderAll). */
+  const qp = $("quickPace");
+  if (qp) qp.addEventListener("change", () => setPace(qp.checked));
+})();
 initCreatureArt(); // v0.26.0: fill CREATURE_ART with WebP shadow sprites
 renderAll();
+/* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
+checkAchievements();
