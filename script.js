@@ -2926,8 +2926,17 @@ function validateSaveData(data) {
     if (k === "tyi-messages" && v) {
       let parsed;
       try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-messages" }; }
-      // Game calls .map() on messages — must be an array
-      if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-messages must be an array" };
+      // saveMsgs() stores an object with a messages array inside
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))
+        return { ok: false, reason: "tyi-messages must be an object" };
+      if (!Array.isArray(parsed.messages))
+        return { ok: false, reason: "tyi-messages.messages must be an array" };
+      // Each thread must be an object with a msgs array
+      for (let i = 0; i < parsed.messages.length; i++) {
+        const t = parsed.messages[i];
+        if (t === null || typeof t !== "object" || !Array.isArray(t.msgs))
+          return { ok: false, reason: "tyi-messages.messages[" + i + "] invalid" };
+      }
     }
     if (k === "tyi-stats" && v) {
       let parsed;
