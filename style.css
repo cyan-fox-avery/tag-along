@@ -238,15 +238,20 @@ select option:disabled { color: #7a8a9e; }
 
 .dive-shark {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 78%; animation: swim 5s ease-in-out infinite;
+  width: 78%; max-height: 88%;
+  display: flex; align-items: center; justify-content: center;
+  animation: swim 5s ease-in-out infinite;
 }
-.dive-shark svg { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+/* v0.26.1: keep the full shark inside the 190px dive scene — wide
+   illustrations overflowed and got clipped at the bottom. Cap the height
+   and preserve aspect ratio, for both silhouette and reveal phases. */
+.dive-shark svg { max-width: 100%; max-height: 160px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 /* v0.26.0: tap-to-reveal encounter. The silhouette is tappable; tapping
    crossfades to the full-colour illustration. */
-.dive-shark img { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+.dive-shark img { max-width: 100%; max-height: 160px; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 /* v0.26.0: generic mystery silhouette shown if a silhouette WebP fails to
    load — sized like the real silhouette, never reveals the species. */
-.dive-shark .mystery-silhouette { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+.dive-shark .mystery-silhouette { max-width: 100%; max-height: 160px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 .shark-silhouette { cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
@@ -586,6 +591,10 @@ select option:disabled { color: #7a8a9e; }
 .ambient img { height: 100%; width: auto; display: block; }
 .bg-creature-img { height: 100%; width: auto; }
 @keyframes drift { from { left: -30%; } to { left: 112%; } }
+/* v0.26.1: ambient creatures swim both ways — .swim-left reverses the drift
+   so creatures can travel right-to-left, facing their direction of travel. */
+.ambient.swim-left { animation-name: driftLeft; }
+@keyframes driftLeft { from { left: 112%; } to { left: -30%; } }
 
 /* v0.7.0: field-guide database — compact roster rows, expandable entries */
 .guide-row {
