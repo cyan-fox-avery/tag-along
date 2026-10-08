@@ -44,18 +44,19 @@
     position: absolute; z-index: 3;
     top: 38%; left: 0;
     width: 62vw; max-width: 520px; min-width: 280px;
-    transform: translateX(-110%);
+    transform: translateX(110vw);
     animation: swim-across 9s linear infinite;
     pointer-events: none;
-    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.55));
+    /* Restrained underwater edge highlight for contrast against dark water */
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.55)) drop-shadow(0 0 12px rgba(120,170,220,0.28));
   }
   .silhouette-wrap img {
     width: 100%; height: auto; display: block;
     animation: bob 3.2s ease-in-out infinite;
   }
   @keyframes swim-across {
-    0% { transform: translateX(-110%); }
-    100% { transform: translateX(190vw); }
+    0% { transform: translateX(110vw); }
+    100% { transform: translateX(-90vw); }
   }
   @keyframes bob {
     0%, 100% { transform: translateY(-8px) rotate(-1.2deg); }
@@ -148,7 +149,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .silhouette-wrap, .silhouette-wrap img, .rays, .snow, .prompt p { animation: none !important; }
-    .silhouette-wrap { transform: translateX(20vw); }
+    .silhouette-wrap { transform: translateX(55vw); }
     .reveal { transition: opacity 0.3s ease; }
   }
 </style>
