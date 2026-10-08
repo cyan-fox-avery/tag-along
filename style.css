@@ -680,7 +680,7 @@ select option:disabled { color: #7a8a9e; }
   font-size: 0.95rem; cursor: pointer; user-select: none;
 }
 .pace-toggle input { width: 22px; height: 22px; accent-color: var(--teal); flex: none; }
-.guide-row-body .guide-sketch { margin: 12px auto; }
+.guide-row-body .guide-sketch { margin: 12px auto; width: 100%; max-width: 100%; }
 .guide-row-body .research-text { margin-top: 4px; }
 
 /* v0.7.0: sightings log */
@@ -984,7 +984,7 @@ video.archive-media { max-height: 420px; }
   border-radius: 6px; padding: 10px 12px;
 }
 .info-card .info-label {
-  display: block; font-size: 10px; letter-spacing: 2px;
+  display: block; font-size: 12px; letter-spacing: 1px;
   text-transform: uppercase; color: var(--teal);
   font-weight: 700; margin-bottom: 4px;
 }
