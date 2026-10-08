@@ -252,13 +252,15 @@ select option:disabled { color: #7a8a9e; }
 /* v0.26.0: generic mystery silhouette shown if a silhouette WebP fails to
    load — sized like the real silhouette, never reveals the species. */
 .dive-shark .mystery-silhouette { max-width: 100%; max-height: 160px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
-.shark-silhouette { cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
+.shark-silhouette { position: relative; cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
 .tap-hint {
-  text-align: center; margin-top: 8px; font-size: 15px; font-weight: 600;
+  position: absolute; bottom: 2px; left: 0; right: 0;
+  text-align: center; font-size: 15px; font-weight: 600;
   color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.6);
   animation: tapPulse 1.6s ease-in-out infinite;
+  pointer-events: none;
 }
 @keyframes tapPulse { 0%,100% { opacity: 0.75; } 50% { opacity: 1; } }
 .shark-reveal { animation: revealIn 0.4s ease; }
