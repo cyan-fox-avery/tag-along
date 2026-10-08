@@ -587,9 +587,31 @@ code += `
            testUnlock(35, "arctic", true);
   })());
   ok('mira: genTrack computes honest distances', (() => {
-    var local = haversineKm([33.4, -118.4], [33.45, -118.6]);
-    var far = haversineKm([72.0, -65.0], [65.0, -58.0]);
-    return local < 50 && local > 0 && far > 500 && far < 1500;
+    // Deterministic: call the actual genTrack(), verify distances
+    const savedState = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      const species = SHARKS.find(s => s.id === 'catshark');
+      const rec = { location: "Cornwall", nick: "Test" };
+      const track = genTrack(species, rec);
+      // 1. First position matches the species anchor
+      const env = TRACK_ENVELOPES['catshark'];
+      if (track.points[0].label !== env.tagAnchor) return false;
+      // 2. Consecutive coordinates produce recorded distances
+      for (let i = 1; i < track.points.length; i++) {
+        const prev = MAP_COORDS[track.points[i-1].label];
+        const curr = MAP_COORDS[track.points[i].label];
+        if (prev && curr) {
+          const expected = Math.round(haversineKm(prev, curr) * 10) / 10;
+          if (Math.abs(track.points[i].km - expected) > 0.1) return false;
+        }
+      }
+      // 3. totalKm equals sum of legs
+      const sum = track.points.slice(1).reduce((s, p) => s + p.km, 0);
+      if (Math.abs(track.totalKm - Math.round(sum * 10) / 10) > 0.1) return false;
+      return true;
+    } finally {
+      state.tagged = savedState;
+    }
   })());
   ok('mira: resident envelopes stay local', (() => {
     function maxHop(id) {
