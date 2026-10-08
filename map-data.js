@@ -318,8 +318,8 @@ const TRACK_ENVELOPES = {
   },
   wobbegong: {
     start: "Rocky reef ledge off Byron Bay",
-    areas: ["Byron Bay", "Solitary Islands", "Port Stephens", "Sydney reefs", "Jervis Bay", "Montague Island", "Eden"],
-    hop: [1, 10], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
+    areas: ["Byron Bay", "Julian Rocks", "Wategos reef", "Byron Bay north wall", "Byron Bay south ledge"],
+    hop: [1, 8], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
     corridor: "Spotted wobbegongs show strong site fidelity; photo-identification and acoustic studies have recorded individuals remaining on the same reef for years, so movements are short hops between neighbouring ledges."
   },
   leopard: {
@@ -330,8 +330,8 @@ const TRACK_ENVELOPES = {
   },
   horn: {
     start: "Kelp forest off Santa Catalina Island",
-    areas: ["Santa Catalina Island", "San Clemente Island", "Anacapa Channel", "La Jolla", "Palos Verdes", "Santa Cruz Island"],
-    hop: [1, 15], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
+    areas: ["Santa Catalina Island", "Catalina west end", "Catalina isthmus", "Catalina east end", "Catalina back side"],
+    hop: [1, 12], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
     corridor: "Horn sharks show strong site fidelity and documented homing; classic displacement studies recorded individuals navigating back to their home reef from kilometres away, so the track stays tight around one reef complex."
   },
   portjackson: {
@@ -359,21 +359,21 @@ const TRACK_ENVELOPES = {
     corridor: "Common sawsharks are bottom-associated residents of the continental shelf; tagged individuals show limited horizontal movement with occasional shifts along the shelf, staying near soft-sediment feeding grounds."
   },
   greenland: {
-    start: "Tagged in deep Arctic water",
-    areas: ["Greenland shelf", "Baffin Bay", "Davis Strait", "Norwegian Sea", "Svalbard", "Canadian Arctic Archipelago"],
-    hop: [20, 300], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
+    start: "Tagged in deep Baffin Bay water",
+    areas: ["Baffin Bay", "Davis Strait", "Greenland shelf", "Baffin Bay deep basin", "Davis Strait slope"],
+    hop: [40, 350], dayStep: [14, 60], nPoints: [5, 7], kind: "satellite",
     corridor: "Greenland sharks are wide-ranging deep-water roamers of the Arctic; tagging studies show slow, far-reaching movements across deep basins, consistent with their extremely low metabolism and centuries-long lifespans."
   },
   cookiecutter: {
     start: "Tagged at night in open Atlantic twilight waters",
     areas: ["Sargasso Sea", "Mid-Atlantic Ridge", "Azores", "Gulf Stream", "Bermuda", "Madeira"],
-    hop: [30, 250], dayStep: [3, 14], nPoints: [5, 7], kind: "satellite",
+    hop: [30, 250], dayStep: [3, 14], nPoints: [5, 7], kind: "archival",
     corridor: "Cookiecutter sharks are vertical migrators, spending days at mesopelagic depths and rising hundreds of metres at night to feed — tagged individuals would be expected to drift with oceanic currents and vertical-migration prey layers."
   },
   sixgill: {
-    start: "Tagged in deep water off the continental slope",
-    areas: ["Mid-Atlantic Ridge", "Azores", "Gulf of Cadiz", "Porcupine Seabight", "Canary Islands", "Blake Plateau"],
-    hop: [30, 300], dayStep: [5, 21], nPoints: [5, 7], kind: "satellite",
+    start: "Tagged in deep water off the Porcupine slope",
+    areas: ["Porcupine Seabight", "Porcupine Bank", "Rockall Trough", "Porcupine slope", "Western Approaches deep"],
+    hop: [30, 250], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
     corridor: "Bluntnose sixgills are wide-ranging deep-slope residents; tagging and submersible studies show slow movements along continental slopes and seamounts, with some individuals undertaking diel vertical migrations into shallower water at night."
   },
   velvetbelly: {
@@ -385,7 +385,7 @@ const TRACK_ENVELOPES = {
   dwarflantern: {
     start: "Upper continental slope, Caribbean Sea off Colombia",
     areas: ["Upper slope off Colombia", "Upper slope off Venezuela", "Cariaco Basin slope", "Grenada Basin", "Lesser Antilles volcanic arc slope", "Aves Ridge slope"],
-    hop: [5, 40], dayStep: [3, 12], nPoints: [5, 7], kind: "acoustic",
+    hop: [5, 40], dayStep: [3, 12], nPoints: [5, 7], kind: "archival",
     corridor: "A slope resident — small home range along the upper continental slope of the southern Caribbean, drifting between canyon systems with deep currents."
   },
   kitefin: {
@@ -395,10 +395,10 @@ const TRACK_ENVELOPES = {
     corridor: "Wanders the deep Atlantic along continental slopes and seamount chains, following deep currents and seasonal aggregations of prey fish."
   },
   pacificsleeper: {
-    start: "Pacific slope off northern Japan",
-    areas: ["Pacific coast of Hokkaido", "Kuril Islands slope", "Sea of Okhotsk", "Kuril-Kamchatka Trench margin", "Bering Sea slope", "Aleutian arc", "Oyashio current region"],
-    hop: [100, 500], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
-    corridor: "A slow, long-distance wanderer of the deep North Pacific — rides the Oyashio current between Japanese waters, the Okhotsk Sea, and the Bering slope, rising shallower at night to feed."
+    start: "Tagged in Sagami Bay deep water",
+    areas: ["Sagami Bay deep", "Izu Peninsula slope", "Pacific coast of Hokkaido", "Kuril Islands slope", "Oyashio current region"],
+    hop: [100, 500], dayStep: [14, 45], nPoints: [5, 7], kind: "satellite",
+    corridor: "A slow, long-distance wanderer — tagged in southern Japan, this track follows a northward drift with the Oyashio current toward Hokkaido and the Kuril slope, consistent with the species' basin-wide deep-water range."
   },
   spinydogfish: {
     start: "Coastal waters off Cornwall",
@@ -465,7 +465,18 @@ const SPECIES_COLORS = {
   lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da",
   blue: "#3b6ea5", porbeagle: "#8fa8bf", silky: "#a08b62",
   oceanic: "#c9b458", sevengill: "#8a7f70", bronze: "#c98a3d",
-  frilled: "#7a6f9e", zebra: "#d9a441"
+  frilled: "#7a6f9e", zebra: "#d9a441",
+  /* v0.21.0 sharknado: distinguishable markers for the 18 new species. */
+  silvertip: "#e8e8e8", spinner: "#ff6b6b", wobbegong: "#c9a86a",
+  leopard: "#d4a574", horn: "#a67c52", portjackson: "#8b6914",
+  angelshark: "#deb887", megamouth: "#4a4a5a", sawshark: "#7a8a7a",
+  greenland: "#5a6a6a", cookiecutter: "#3a4a5a", sixgill: "#6a5a4a",
+  velvetbelly: "#2a2a3a", dwarflantern: "#1a1a2a", kitefin: "#4a5a6a",
+  pacificsleeper: "#5a6a7a", spinydogfish: "#8a9aaa", catshark: "#b8935a",
+  salmon: "#fa8072", dusky: "#6a7a8a",
+  /* v0.18.0 seven-shark wave (were falling back to white). */
+  scalloped: "#e07a5f", smooth: "#d4a373", bonnethead: "#c8b6a0",
+  bull: "#9a8c5a", greyreef: "#7a8a9a", caribbean: "#5a9aaa", sandbar: "#b8a67a"
 };
 
 /* Every label a track point can carry: region names (tag sites and
@@ -792,7 +803,23 @@ const MAP_COORDS = {
   "Western Approaches": [49.5, -8.0],
   "Wilsons Promontory": [-39.0, 146.4],
   "Yucatán Channel": [21.8, -85.8],
-  "northern Tasmania": [-40.9, 146.5],};
+  "northern Tasmania": [-40.9, 146.5],
+  /* v0.21.0 Mira review: local waypoint clusters for resident species. */
+  "Catalina west end": [33.45, -118.6],
+  "Catalina isthmus": [33.45, -118.5],
+  "Catalina east end": [33.4, -118.35],
+  "Catalina back side": [33.42, -118.55],
+  "Julian Rocks": [-28.61, 153.63],
+  "Wategos reef": [-28.63, 153.64],
+  "Byron Bay north wall": [-28.62, 153.65],
+  "Byron Bay south ledge": [-28.65, 153.62],
+  "Baffin Bay deep basin": [72.5, -64.0],
+  "Davis Strait slope": [65.5, -57.5],
+  "Porcupine slope": [51.2, -13.2],
+  "Western Approaches deep": [49.3, -8.5],
+
+  "Sagami Bay deep": [35.0, 139.5],
+  "Izu Peninsula slope": [34.7, 139.0],};
 
 const MAP_W = 1000, MAP_H = 500;
 
