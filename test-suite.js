@@ -923,6 +923,26 @@ code += `
            RESET_KEYS.includes("tyi-collection") &&
            RESET_KEYS.includes("tyi-bruce");
   })());
+  ok('v0.23.0: validateSaveData accepts good save', (() => {
+    const good = { version: "v0.23.0", keys: { "tyi-collection": "{}", "tyi-logbook": "[]" } };
+    const r = validateSaveData(good);
+    return r.ok === true && r.supported === true;
+  })());
+  ok('v0.23.0: validateSaveData rejects bad save', (() => {
+    return validateSaveData(null).ok === false &&
+           validateSaveData({}).ok === false &&
+           validateSaveData({ keys: "not-object" }).ok === false &&
+           validateSaveData({ keys: { "tyi-collection": "{bad json" } }).ok === false;
+  })());
+  ok('v0.23.0: validateSaveData flags unknown version', (() => {
+    const r = validateSaveData({ version: "v9.99.9", keys: {} });
+    return r.ok === true && r.supported === false;
+  })());
+  ok('v0.23.0: whatsnew v0.23.0 entry exists', (() => {
+    const notes = WHATS_NEW["v0.23.0"];
+    return Array.isArray(notes) && notes.length >= 3 &&
+           notes.join(" ").toLowerCase().indexOf("bruce") === -1; // no spoiler
+  })());
 
   // v0.22.0: conservation notes on all 50
   ok('v0.22.0: all 50 sharks have conservation notes', SHARKS.every(s => typeof s.conservation === 'string' && s.conservation.length > 40));
