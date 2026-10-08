@@ -162,6 +162,23 @@ const REGION_UNLOCK_THREAD = [
   { who: "me", text: "I have a feeling I'm going to. 🦈" }
 ];
 
+/* v0.21.0 sharknado: unlock threads for the three new regions. */
+const EAST_AUS_UNLOCK_THREAD = [
+  { who: "them", text: "Fifteen sharks! The institute just cleared Eastern Australia for us." },
+  { who: "me", text: "Wobbegongs and Port Jackson sharks. Reef country." },
+  { who: "them", text: "I've wanted to see a wobbegong my whole life. They look like someone dropped a shark on a carpet. 😂" }
+];
+const CALIFORNIA_UNLOCK_THREAD = [
+  { who: "them", text: "Twenty-five! California Coast is open now." },
+  { who: "me", text: "Leopard sharks in the bays, horn sharks on the reefs." },
+  { who: "them", text: "Horn sharks have those little brow ridges. They look permanently unimpressed. I love them." }
+];
+const ARCTIC_UNLOCK_THREAD = [
+  { who: "them", text: "Thirty-five sharks. The institute cleared... the Arctic?" },
+  { who: "me", text: "Greenland sharks. The cold dark. The long-lived ones." },
+  { who: "them", text: "Be careful out there. And bring back stories. 🩵" }
+];
+
 /* World-map + tracking data lives in map-data.js (loaded before this file). */
 
 function mapProj(lat, lon) {
@@ -349,7 +366,7 @@ function showMapPopup(sid) {
   const pts = mapPoints(t);
   const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
   const kindNote = t.track.kind === "archival"
-    ? "Archival track — goblin sharks have never carried satellite tags; this route is reconstructed from capture records."
+    ? "Archival track — this species has never carried a tracking tag; this route is reconstructed from capture records and published depth ranges, not live pings."
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
       : t.track.kind === "acoustic"
@@ -929,6 +946,11 @@ function fillRegions() {
 function applyRegions() {
   if (!state.regionsUnlocked) return;
   for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+  /* v0.21.0 sharknado: three more regions unlock by tag count. */
+  const n = Object.keys(state.tagged).length;
+  if (n >= 15) REGIONS["east-australia"].locked = false;
+  if (n >= 25) REGIONS["california"].locked = false;
+  if (n >= 35) REGIONS["arctic"].locked = false;
 }
 
 /* v0.7.0 migration: v0.6.0 winners had tyi-won=1 at 6/6, but the win is
@@ -1976,6 +1998,28 @@ function checkMilestones() {
     pushThread(REGION_UNLOCK_THREAD.map(m => ({ ...m })));
     showRegionUnlock();
   }
+  /* v0.21.0 sharknado: progressive region unlocks by tag count. */
+  const n = taggedIds.length;
+  if (state.regionsUnlocked) {
+    if (n >= 15 && REGIONS["east-australia"].locked) {
+      REGIONS["east-australia"].locked = false;
+      fillRegions();
+      pushThread(EAST_AUS_UNLOCK_THREAD.map(m => ({ ...m })));
+      showRegionUnlockSingle("east-australia", "Eastern Australia", "wobbegongs hide in the reef ledges here.");
+    }
+    if (n >= 25 && REGIONS["california"].locked) {
+      REGIONS["california"].locked = false;
+      fillRegions();
+      pushThread(CALIFORNIA_UNLOCK_THREAD.map(m => ({ ...m })));
+      showRegionUnlockSingle("california", "California Coast", "leopard sharks cruise the bays and kelp.");
+    }
+    if (n >= 35 && REGIONS["arctic"].locked) {
+      REGIONS["arctic"].locked = false;
+      fillRegions();
+      pushThread(ARCTIC_UNLOCK_THREAD.map(m => ({ ...m })));
+      showRegionUnlockSingle("arctic", "Arctic Waters", "the Greenland shark waits in the cold dark.");
+    }
+  }
   if (taggedIds.length >= SHARKS.length && !state.won) {
     /* The ceremony waits for day's end — the trip always finishes first. */
     state.pendingWin = true;
@@ -1991,6 +2035,23 @@ function showRegionUnlock() {
       <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
       <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
       <p class="latin">Six successful tags. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+    </div>
+    <button id="winNext" class="primary-button" type="button">Back to the water</button>
+  </div>`;
+  $("winNext").addEventListener("click", () => {
+    ov.classList.add("hidden");
+  });
+}
+
+/* v0.21.0 sharknado: single-region unlock overlay. */
+function showRegionUnlockSingle(regionId, regionName, flavor) {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  ov.innerHTML = `<div class="phone">
+    <div class="phone-head">🗺️ New waters surveyed</div>
+    <div class="cert-body">
+      <p><strong>${regionName}</strong> — ${flavor}</p>
+      <p class="latin">The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
     </div>
     <button id="winNext" class="primary-button" type="button">Back to the water</button>
   </div>`;
