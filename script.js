@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.26.3";
+const VERSION = "v0.27.0";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -1078,6 +1078,12 @@ function renderResearch() {
       </div>
       <div class="guide-row-body hidden">
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
+        <div class="info-grid">
+          <div class="info-card"><span class="info-label">Habitat</span><span class="info-value">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region}</span></div>
+          <div class="info-card"><span class="info-label">Depth</span><span class="info-value">${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span></div>
+          <div class="info-card"><span class="info-label">Size</span><span class="info-value">${s.sizeRange ? s.sizeRange[0] + "–" + s.sizeRange[1] + " m" : "—"}</span></div>
+          <div class="info-card"><span class="info-label">IUCN Status</span><span class="info-value">${s.status}</span></div>
+        </div>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
