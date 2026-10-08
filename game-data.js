@@ -29,7 +29,12 @@ const REGIONS = {
      not given. v0.7.0: real species live here now, so they are selectable,
      not teasers. */
   "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
-  "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true }
+  "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true },
+  /* v0.21.0: three new regions for the 18-shark wave. All locked — new waters
+     earned, not given. Placements are draft (pending Mira review): */
+  "east-australia": { name: "Eastern Australia",  note: "Humpbacks breach beyond the headland.", locked: true },
+  "california":   { name: "California Coast",     note: "Sea lions porpoise through the kelp beds.", locked: true },
+  "arctic":       { name: "Arctic Waters",        note: "Icebergs drift past, impossibly blue at the waterline.", locked: true }
 };
 
 const DEPTHS = {
@@ -121,7 +126,8 @@ const PICK_ICONS = {
     "caribbean": "🏝️", "north-carolina": "⚓", "philippines": "🐠",
     "maldives": "🏖️", "japan": "🗾", "open-atlantic": "🌊",
     "cornwall": "🐦", "papua-new-guinea": "🪸",
-    "galapagos": "🐢", "south-africa": "🦭"
+    "galapagos": "🐢", "south-africa": "🦭",
+    "east-australia": "🪸", "california": "🌊", "arctic": "🧊"
   },
   depthSelect: { "surface": "☀️", "reef": "🪸", "twilight": "🌅", "deep": "🌑" },
   baitSelect: {
