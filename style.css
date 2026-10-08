@@ -244,6 +244,9 @@ select option:disabled { color: #7a8a9e; }
 /* v0.26.0: tap-to-reveal encounter. The silhouette is tappable; tapping
    crossfades to the full-colour illustration. */
 .dive-shark img { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+/* v0.26.0: generic mystery silhouette shown if a silhouette WebP fails to
+   load — sized like the real silhouette, never reveals the species. */
+.dive-shark .mystery-silhouette { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 .shark-silhouette { cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
