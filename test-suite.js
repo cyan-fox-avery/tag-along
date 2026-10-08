@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.22.0', VERSION === 'v0.22.0');
+  ok('version v0.23.0', VERSION === 'v0.23.0');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -285,9 +285,9 @@ code += `
     !!state.achievements['first-tag'] && !!state.achievements['old-friend']);
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
-    ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }) &&
-    !ACHIEVEMENTS.some(a => a.id === 'bruce'));
-  ok('18 live achievements', ACHIEVEMENTS.length === 18);
+    ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
+  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -824,6 +824,104 @@ code += `
   })());
   ok('v0.22.0: whatsnew has v0.22.0 notes', (() => {
     return Array.isArray(WHATS_NEW['v0.22.0']) && WHATS_NEW['v0.22.0'].length === 4;
+  })());
+  // v0.23.0: easter eggs
+  ok('v0.23.0: Mary Lee thread exists and mentions OCEARCH', (() => {
+    return typeof MARY_LEE_THREAD !== "undefined" &&
+           MARY_LEE_THREAD.length >= 3 &&
+           MARY_LEE_THREAD.some(m => /OCEARCH/i.test(m.text)) &&
+           MARY_LEE_THREAD.some(m => /Matriarch/i.test(m.text));
+  })());
+  ok('v0.23.0: Nicole thread exists and mentions the journey', (() => {
+    return typeof NICOLE_THREAD !== "undefined" &&
+           NICOLE_THREAD.length >= 3 &&
+           NICOLE_THREAD.some(m => /11,?000/i.test(m.text)) &&
+           NICOLE_THREAD.some(m => /Science/i.test(m.text));
+  })());
+  ok('v0.23.0: Bruce chain has 5 stages', (() => {
+    return typeof BRUCE_CHAIN !== "undefined" &&
+           BRUCE_CHAIN.length === 5 &&
+           BRUCE_CHAIN.every(stage => stage.length >= 2);
+  })());
+  ok('v0.23.0: Bruce achievement is hidden', (() => {
+    const b = ACHIEVEMENTS.find(a => a.id === "bruce");
+    return b && b.hidden === true && b.name === "You Named Him WHAT?";
+  })());
+  ok('v0.23.0: maybeNameEgg triggers Mary Lee for great white', (() => {
+    const rec = { name: "Mary Lee" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveSave = store.save;
+    store.save = () => {};
+    try {
+      maybeNameEgg("greatwhite", rec);
+      return rec.maryLeeEgg === true && pushed && pushed.length >= 3;
+    } finally {
+      pushThread = savePush;
+      store.save = saveSave;
+    }
+  })());
+  ok('v0.23.0: maybeNameEgg triggers Nicole for great white', (() => {
+    const rec = { name: "NICOLE" }; // case-insensitive
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveSave = store.save;
+    store.save = () => {};
+    try {
+      maybeNameEgg("greatwhite", rec);
+      return rec.nicoleEgg === true && pushed && pushed.length >= 3;
+    } finally {
+      pushThread = savePush;
+      store.save = saveSave;
+    }
+  })());
+  ok('v0.23.0: maybeNameEgg does NOT trigger Mary Lee for other sharks', (() => {
+    const rec = { name: "Mary Lee" };
+    let pushed = null;
+    const origPush = global.pushThread;
+    global.pushThread = (msgs) => { pushed = msgs; };
+    const origStore = global.store;
+    global.store = { save: () => {} };
+    const origSharkById = global.sharkById;
+    global.sharkById = (id) => ({ id, name: "Tiger Shark" });
+    try {
+      maybeNameEgg("tiger", rec);
+      return rec.maryLeeEgg !== true && pushed === null;
+    } finally {
+      global.pushThread = origPush;
+      global.store = origStore;
+      global.sharkById = origSharkById;
+    }
+  })());
+  ok('v0.23.0: Bruce starts chain silently (no immediate message)', (() => {
+    const rec = { name: "Bruce" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    // Save and mock Bruce state
+    const saveBruce = state.bruceEgg;
+    const saveDone = state.bruceChainComplete;
+    state.bruceEgg = null;
+    state.bruceChainComplete = false;
+    try {
+      maybeNameEgg("nurse", rec);
+      return state.bruceEgg !== null &&
+             state.bruceEgg.stage === 0 &&
+             pushed === null; // NO immediate message!
+    } finally {
+      pushThread = savePush;
+      state.bruceEgg = saveBruce;
+      state.bruceChainComplete = saveDone;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('v0.23.0: export captures RESET_KEYS', (() => {
+    return typeof exportSave === "function" &&
+           typeof importSave === "function" &&
+           RESET_KEYS.includes("tyi-collection") &&
+           RESET_KEYS.includes("tyi-bruce");
   })());
 
   // v0.22.0: conservation notes on all 50
