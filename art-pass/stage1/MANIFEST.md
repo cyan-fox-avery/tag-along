@@ -1,6 +1,6 @@
 # Tag Along Art Pass — Production Manifest
 
-**Total species:** 51
+**Total species:** 51 (50 playable + 1 bonus)
 
 | # | Species | Scientific name | Illustration | Silhouette | Status |
 |---|---------|-----------------|--------------|------------|--------|
@@ -63,3 +63,5 @@
 - Sand tiger illustration: dorsal fins need correction (first still too large)
 - Lanternshark illustration: dorsal proportions need correction (second should be larger)
 - Wobbegong illustration: first dorsal slightly tall (minor, on polish list)
+
+⭐ = bonus/extra species (not counted in the 50 playable roster)
