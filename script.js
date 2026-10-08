@@ -2931,11 +2931,18 @@ function validateSaveData(data) {
         return { ok: false, reason: "tyi-messages must be an object" };
       if (!Array.isArray(parsed.messages))
         return { ok: false, reason: "tyi-messages.messages must be an array" };
-      // Each thread must be an object with a msgs array
+      // Each thread: modern { ts, msgs } object OR legacy bare-array (normThread handles both)
       for (let i = 0; i < parsed.messages.length; i++) {
         const t = parsed.messages[i];
-        if (t === null || typeof t !== "object" || !Array.isArray(t.msgs))
-          return { ok: false, reason: "tyi-messages.messages[" + i + "] invalid" };
+        let msgs;
+        if (Array.isArray(t)) msgs = t;  // legacy bare-array thread
+        else if (t !== null && typeof t === "object" && Array.isArray(t.msgs)) msgs = t.msgs;
+        else return { ok: false, reason: "tyi-messages.messages[" + i + "] invalid" };
+        // Each message entry must be an object
+        for (let j = 0; j < msgs.length; j++) {
+          if (msgs[j] === null || typeof msgs[j] !== "object")
+            return { ok: false, reason: "tyi-messages.messages[" + i + "][" + j + "] invalid" };
+        }
       }
     }
     if (k === "tyi-stats" && v) {
