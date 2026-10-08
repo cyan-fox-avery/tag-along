@@ -23,10 +23,23 @@ function whatsNewSeen() {
 function markWhatsNewSeen() {
   try { localStorage.setItem("tyi-last-seen-version", VERSION); } catch {}
 }
-/* Pure: should the What's New screen show? Only on version change for
-   returning players (not first run). Testable. */
-function shouldShowWhatsNew(lastSeen, current) {
-  return !!lastSeen && lastSeen !== current;
+/* Pure: should the What's New screen show?
+   v0.22.0 Mira review: distinguish brand-new players from v0.21.0 upgraders.
+   - No save data at all → first run, don't show.
+   - Has save data but no version → v0.21.0 upgrader, show.
+   - Version differs → show. Same version → don't. */
+function shouldShowWhatsNew(lastSeen, current, hasSaveData) {
+  if (!hasSaveData) return false; // brand new player
+  if (!lastSeen) return true; // v0.21.0 upgrader (no version key yet)
+  return lastSeen !== current;
+}
+function playerHasSaveData() {
+  try {
+    // Any of these indicates an existing player
+    return !!(localStorage.getItem("tyi-logbook") ||
+              localStorage.getItem("tyi-collection") ||
+              localStorage.getItem("tyi-stats"));
+  } catch { return false; }
 }
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
@@ -164,14 +177,46 @@ const SEA_CONDITIONS = [
   "Morning fog burns off by nine, leaving the water silver-green.",
   "Choppy and bright — spray on the bow, gulls screaming overhead."
 ];
-const FIELD_NOTES = [
-  "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
-  "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
-  "Field notes: a sea turtle surfaced beside the boat and regarded us with ancient indifference.",
-  "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
-  "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
-  "Field notes: a manta ray passed underneath, huge and unhurried. Not a shark, but nobody's complaining."
-];
+/* v0.22.0 Mira review: wildlife sightings are region-appropriate.
+   No mantas in the Arctic! */
+const FIELD_NOTES = {
+  tropical: [
+    "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
+    "Field notes: a sea turtle surfaced beside the boat and regarded us with ancient indifference.",
+    "Field notes: a manta ray passed underneath, huge and unhurried. Not a shark, but nobody's complaining.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+  ],
+  temperate: [
+    "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
+    "Field notes: a seal watched us from a nearby rock, unimpressed by our sharklessness."
+  ],
+  polar: [
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: an iceberg drifted past, impossibly blue underneath. The sharks are down there somewhere.",
+    "Field notes: logged three seabird species. The Arctic terns seemed to pity us.",
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today."
+  ],
+  generic: [
+    "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+  ]
+};
+/* Map regions to climate zones for wildlife notes. */
+function regionClimate(regionId) {
+  const tropical = ["caribbean", "maldives", "philippines", "galapagos", "south-africa"];
+  const polar = ["arctic"];
+  if (tropical.includes(regionId)) return "tropical";
+  if (polar.includes(regionId)) return "polar";
+  return "temperate";
+}
+function pickFieldNote(regionId) {
+  const zone = regionClimate(regionId);
+  const notes = FIELD_NOTES[zone] || FIELD_NOTES.generic;
+  return pick(notes);
+}
 
 /* v0.7.0: the day is the expedition. Quiet beats for when the water
    holds its sharks back a while — waiting is most of the job. */
@@ -909,40 +954,44 @@ const PIN_HINTS = {
 
 /* Pure: given a plan and a pinned shark id, return {dimension, hint} when
    exactly 3 of 4 dimensions match, else null. Testable. */
-function pinHintForPlan(plan, pinnedId) {
-  if (!pinnedId || !plan) return null;
+/* v0.22.0 Mira review: hints are grounded in COMPLETED expeditions, not the
+   live planner. The logbook helps interpret evidence; it doesn't reveal
+   answers by trial-and-error clicking.
+   Distinguishes: conditions that make encounter POSSIBLE (region/depth/bait)
+   from methods that improve ODDS (method/methodOpt boost only). */
+function pinHintForTrip(trip, pinnedId) {
+  if (!pinnedId || !trip) return null;
   const s = SHARKS.find(x => x.id === pinnedId);
-  if (!s || state.tagged[pinnedId]) return null; // no hints for tagged sharks
-  const match = {
-    region: s.combo.region === plan.region,
-    depth: (s.depths || []).includes(plan.depth),
-    bait: baitList(s).includes(plan.bait),
-    method: !!(s.methods && plan.method && s.methods[plan.method])
-  };
-  const keys = Object.keys(match);
-  const n = keys.filter(k => match[k]).length;
-  if (n !== 3) return null;
-  const odd = keys.find(k => !match[k]);
-  return { dimension: odd, hint: PIN_HINTS[odd] };
+  if (!s || state.tagged[pinnedId]) return null;
+  // Did this trip's conditions make the pinned shark's appearance possible?
+  const baitOk = Array.isArray(s.combo.bait) ? s.combo.bait.includes(trip.bait) : s.combo.bait === trip.bait;
+  const possible = s.combo.region === trip.region &&
+    (s.depths || []).includes(trip.depth) && baitOk;
+  // Did the player encounter (or tag) the pinned shark this trip?
+  const encountered = (trip.encounters || []).some(e => e.speciesId === pinnedId);
+  if (possible && !encountered) {
+    // Conditions were right, shark just wasn't there — "you're warm"
+    return { kind: "warm", hint: "The water felt right for " + s.name.toLowerCase() + " today. Sometimes they're just not there." };
+  }
+  if (!possible && !encountered) {
+    // Which dimension was off? Observational only.
+    const off = [];
+    if (s.combo.region !== trip.region) off.push("region");
+    if (!(s.depths || []).includes(trip.depth)) off.push("depth");
+    if (!baitOk) off.push("bait");
+    if (off.length === 1) {
+      return { kind: "hint", dimension: off[0], hint: PIN_HINTS[off[0]] };
+    }
+  }
+  return null;
 }
 
-/* v0.22.0: render the pin hint in the expedition planner. Called whenever
-   the planner selects change and when the pinned shark changes. */
+/* v0.22.0 Mira review: live planner hints removed. Hints now appear in the
+   logbook after completed expeditions (pinHintForTrip), preserving the
+   research puzzle. This function is kept as a no-op for compatibility. */
 function renderPinHint() {
   const el = $("pinHint");
-  if (!el) return;
-  if (!state.pinned) { el.classList.add("hidden"); el.innerHTML = ""; return; }
-  const plan = {
-    region: $("regionSelect") ? $("regionSelect").value : "",
-    depth: $("depthSelect") ? $("depthSelect").value : "",
-    bait: $("baitSelect") ? $("baitSelect").value : "",
-    method: $("methodSelect") ? $("methodSelect").value : ""
-  };
-  const h = pinHintForPlan(plan, state.pinned);
-  if (!h) { el.classList.add("hidden"); el.innerHTML = ""; return; }
-  el.classList.remove("hidden");
-  el.innerHTML = `<span class="pin-hint-icon">📓</span> <em>${esc(h.hint)}</em>
-    <span class="latin">— your logbook notes, on the shark you're researching</span>`;
+  if (el) { el.classList.add("hidden"); el.innerHTML = ""; }
 }
 
 /* v0.20.0: show the pinned shark on the Expedition tab — a research focus
@@ -1534,8 +1583,11 @@ async function runExpedition(plan) {
     state.failures += 1;
     logLine(`<span class="miss">No sharks today. The sea keeps its counsel.</span>`, "miss");
     await wait(1200);
-    /* v0.22.0: failed trips feel like fieldwork — warm, never punishing. */
-    logLine(`📓 <em>${pick(FIELD_NOTES)}</em>`);
+    /* v0.22.0: failed trips feel like fieldwork — warm, never punishing.
+       v0.22.0 Mira review: persist the note so it survives in the logbook. */
+    const fieldNote = pickFieldNote(plan.region);
+    logLine(`📓 <em>${fieldNote}</em>`);
+    if (tripLog) tripLog.fieldNote = fieldNote;
   } else {
     state.failures = 0;
   }
@@ -1544,8 +1596,13 @@ async function runExpedition(plan) {
   saveStats();
   checkAchievements();
 
-  /* v0.8.0: close the logbook page for this trip. */
+  /* v0.8.0: close the logbook page for this trip.
+     v0.22.0 Mira review: attach pin hint grounded in this completed expedition. */
   if (tripLog) {
+    if (state.pinned) {
+      const hint = pinHintForTrip(tripLog, state.pinned);
+      if (hint) tripLog.pinHint = hint.hint;
+    }
     state.logbook.unshift(tripLog);
     logStore.save(state.logbook);
     tripLog = null;
@@ -1728,13 +1785,19 @@ function maybeCheckinThread() {
 const logbookFilters = { outcome: "all", region: "all", species: "all" };
 
 /* Pure: does a logbook trip entry match the given filters? Testable. */
+/* v0.22.0 Mira review: filters represent EVENTS within the expedition.
+   - "tagged": any tagged encounter (trip may also have others)
+   - "resighted": any re-sighted encounter
+   - "watched": any watched (just watch) encounter
+   - "missed": no shark encounters at all
+   A trip with multiple outcomes appears in each relevant filter. */
 function logbookTripMatches(t, f) {
   if (f.outcome !== "all") {
     const enc = t.encounters || [];
-    const hasTag = enc.some(e => e.result === "tagged");
-    const hasResight = enc.some(e => e.result === "resighted");
-    const outcome = hasTag ? "tagged" : hasResight ? "resighted" : "missed";
-    if (outcome !== f.outcome) return false;
+    if (f.outcome === "tagged" && !enc.some(e => e.result === "tagged")) return false;
+    if (f.outcome === "resighted" && !enc.some(e => e.result === "resighted")) return false;
+    if (f.outcome === "watched" && !enc.some(e => e.result === "watched")) return false;
+    if (f.outcome === "missed" && enc.length > 0) return false;
   }
   if (f.region !== "all" && t.region !== f.region) return false;
   if (f.species !== "all" && !(t.encounters || []).some(e => e.speciesId === f.species)) return false;
@@ -1823,7 +1886,9 @@ function renderLogbook() {
       <div class="logbook-date">🛥️ ${esc(t.date)}</div>
       <div class="logbook-plan">${planBits.map(esc).join(" · ")}</div>
       ${t.conditions ? `<div class="logbook-conditions latin">🌤️ ${esc(t.conditions)}</div>` : ""}
+      ${t.fieldNote ? `<div class="logbook-fieldnote latin">🔭 ${esc(t.fieldNote)}</div>` : ""}
       <div class="logbook-enc">${enc}</div>
+      ${t.pinHint ? `<div class="logbook-pinhint"><span class="pin-hint-icon">📓</span> <em>${esc(t.pinHint)}</em></div>` : ""}
       <button type="button" class="repeat-btn" data-repeat>🔁 Repeat this plan</button>`;
     const rb = div.querySelector("[data-repeat]");
     if (rb) rb.addEventListener("click", () => repeatPlan(t));
@@ -2989,7 +3054,7 @@ $("buildTag").textContent = VERSION;
 /* v0.22.0: What's New — show once per version update for returning players. */
 (function initWhatsNew() {
   const notes = WHATS_NEW[VERSION];
-  if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION)) {
+  if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, playerHasSaveData())) {
     markWhatsNewSeen();
     return;
   }
