@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tag Along — Art Pass Encounter Prototype</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #020610;
+    color: #eaf6fb;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Underwater scene */
+  .scene {
+    position: fixed; inset: 0;
+    background: linear-gradient(180deg, #0a1a33 0%, #020610 100%);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .rays {
+    position: absolute; inset: -40px; opacity: 0.12; z-index: 1;
+    background: repeating-linear-gradient(115deg, transparent 0 26px, rgba(255,255,255,0.25) 26px 34px);
+    animation: sway 7s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
+
+  /* Marine snow */
+  .snow {
+    position: absolute; top: -6px; border-radius: 50%;
+    background: rgba(255,255,255,0.5); z-index: 1;
+    animation: snowfall linear infinite; pointer-events: none;
+  }
+  @keyframes snowfall { from { transform: translateY(0); } to { transform: translateY(110vh); } }
+
+  /* Silhouette: swims across */
+  .silhouette-wrap {
+    position: absolute; z-index: 3;
+    top: 38%; left: 0;
+    width: 62vw; max-width: 520px; min-width: 280px;
+    transform: translateX(-110%);
+    animation: swim-across 9s linear infinite;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.55));
+  }
+  .silhouette-wrap img {
+    width: 100%; height: auto; display: block;
+    animation: bob 3.2s ease-in-out infinite;
+  }
+  @keyframes swim-across {
+    0% { transform: translateX(-110%); }
+    100% { transform: translateX(190vw); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(-8px) rotate(-1.2deg); }
+    50% { transform: translateY(10px) rotate(1.2deg); }
+  }
+
+  /* Prompt text */
+  .prompt {
+    position: absolute; z-index: 5;
+    bottom: 26%; left: 0; right: 0;
+    text-align: center; pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .prompt p {
+    font-size: clamp(17px, 4.5vw, 24px);
+    font-weight: 600; letter-spacing: 0.04em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  .prompt .sub {
+    margin-top: 8px; font-size: clamp(13px, 3.5vw, 16px);
+    font-weight: 400; opacity: 0.75; animation: none;
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.65; } 50% { opacity: 1; } }
+
+  /* Reveal: full-colour illustration */
+  .reveal {
+    position: absolute; z-index: 4;
+    top: 50%; left: 50%;
+    width: 86vw; max-width: 640px;
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    filter: drop-shadow(0 14px 34px rgba(0,0,0,0.6));
+  }
+  .reveal img { width: 100%; height: auto; display: block; }
+  .reveal .caption {
+    text-align: center; margin-top: 10px;
+    opacity: 0; transition: opacity 0.8s ease 0.5s;
+  }
+  .reveal .caption .common {
+    font-size: clamp(20px, 5.5vw, 30px); font-weight: 800; letter-spacing: 0.02em;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+  }
+  .reveal .caption .latin {
+    font-size: clamp(14px, 3.8vw, 18px); font-style: italic; opacity: 0.8; margin-top: 4px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.85);
+  }
+
+  /* Revealed state */
+  .scene.revealed .silhouette-wrap { animation-play-state: paused; opacity: 0; transition: opacity 0.6s ease; }
+  .scene.revealed .prompt { opacity: 0; }
+  .scene.revealed .reveal { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+  .scene.revealed .reveal .caption { opacity: 1; }
+
+  /* Flash on reveal */
+  .flash {
+    position: absolute; inset: 0; z-index: 6;
+    background: radial-gradient(ellipse at center, rgba(180,220,255,0.35) 0%, transparent 65%);
+    opacity: 0; pointer-events: none;
+  }
+  .scene.revealed .flash { animation: flash 1.2s ease-out; }
+  @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+  /* Controls */
+  .controls {
+    position: fixed; z-index: 10;
+    bottom: max(18px, env(safe-area-inset-bottom)); left: 0; right: 0;
+    display: flex; gap: 10px; justify-content: center; padding: 0 16px;
+  }
+  .controls button {
+    flex: 1; max-width: 220px;
+    padding: 15px 18px; font-size: 16px; font-weight: 700;
+    border: 2px solid rgba(255,255,255,0.28); border-radius: 16px;
+    background: rgba(10, 26, 51, 0.72); color: #eaf6fb;
+    font-family: inherit; cursor: pointer;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    min-height: 52px;
+  }
+  .controls button:active { transform: scale(0.97); background: rgba(20, 44, 80, 0.85); }
+
+  .badge {
+    position: fixed; z-index: 10;
+    top: max(12px, env(safe-area-inset-top)); left: 14px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    background: rgba(10,26,51,0.7); padding: 8px 12px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .silhouette-wrap, .silhouette-wrap img, .rays, .snow, .prompt p { animation: none !important; }
+    .silhouette-wrap { transform: translateX(20vw); }
+    .reveal { transition: opacity 0.3s ease; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <div class="rays"></div>
+  <div id="snow"></div>
+
+  <div class="silhouette-wrap" id="silWrap">
+    <img id="silImg" src="" alt="Shark silhouette">
+  </div>
+
+  <div class="prompt" id="prompt">
+    <p>Something moves in the dark water…</p>
+    <p class="sub">Tap anywhere to shine your light</p>
+  </div>
+
+  <div class="flash"></div>
+
+  <div class="reveal" id="reveal">
+    <img id="revealImg" src="" alt="Revealed shark">
+    <div class="caption">
+      <div class="common" id="capCommon"></div>
+      <div class="latin" id="capLatin"></div>
+    </div>
+  </div>
+</div>
+
+<div class="badge">ART PASS · ENCOUNTER PROTOTYPE</div>
+
+<div class="controls">
+  <button id="btnHammer">🔨 Hammerhead</button>
+  <button id="btnSaw">🪚 Sawshark</button>
+  <button id="btnReset">↺ Reset</button>
+</div>
+
+<script>
+const SPECIES = {
+  hammer: {
+    sil: '../stage1/hammerhead-silhouette.png',
+    art: '../stage1/hammerhead-illustration.png',
+    common: 'Great Hammerhead',
+    latin: 'Sphyrna mokarran'
+  },
+  saw: {
+    sil: '../stage1/sawshark-silhouette.png',
+    art: '../stage1/sawshark-illustration.png',
+    common: 'Common Sawshark',
+    latin: 'Pristiophorus cirratus'
+  }
+};
+
+const scene = document.getElementById('scene');
+const silImg = document.getElementById('silImg');
+const silWrap = document.getElementById('silWrap');
+const revealImg = document.getElementById('revealImg');
+
+function loadSpecies(key) {
+  const s = SPECIES[key];
+  // Restart swim animation for the new silhouette
+  silWrap.style.animation = 'none';
+  silImg.src = s.sil;
+  revealImg.src = s.art;
+  document.getElementById('capCommon').textContent = s.common;
+  document.getElementById('capLatin').textContent = s.latin;
+  scene.classList.remove('revealed');
+  // Force reflow, restart swim
+  void silWrap.offsetWidth;
+  silWrap.style.animation = '';
+  silWrap.style.opacity = '';
+}
+
+function reveal() {
+  if (!scene.classList.contains('revealed')) {
+    scene.classList.add('revealed');
+  }
+}
+
+scene.addEventListener('click', reveal);
+scene.addEventListener('touchend', (e) => {
+  // Avoid double-firing with click
+  if (e.cancelable) e.preventDefault();
+  reveal();
+}, { passive: false });
+
+document.getElementById('btnHammer').addEventListener('click', (e) => { e.stopPropagation(); loadSpecies('hammer'); });
+document.getElementById('btnSaw').addEventListener('click', (e) => { e.stopPropagation(); loadSpecies('saw'); });
+document.getElementById('btnReset').addEventListener('click', (e) => {
+  e.stopPropagation();
+  scene.classList.remove('revealed');
+  void silWrap.offsetWidth;
+  silWrap.style.animation = 'none';
+  void silWrap.offsetWidth;
+  silWrap.style.animation = '';
+  silWrap.style.opacity = '';
+});
+
+// Marine snow
+(function() {
+  const holder = document.getElementById('snow');
+  for (let i = 0; i < 28; i++) {
+    const s = document.createElement('div');
+    s.className = 'snow';
+    const size = 2 + Math.random() * 4;
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDuration = (6 + Math.random() * 9) + 's';
+    s.style.animationDelay = (-Math.random() * 12) + 's';
+    s.style.opacity = 0.25 + Math.random() * 0.4;
+    holder.appendChild(s);
+  }
+})();
+
+// Start with hammerhead
+loadSpecies('hammer');
+</script>
+</body>
+</html>
