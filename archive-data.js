@@ -779,7 +779,7 @@ const ARCHIVE_MEDIA = {
  },
  "silvertip": {
   "scientific": "Carcharhinus albimarginatus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -794,7 +794,7 @@ const ARCHIVE_MEDIA = {
  },
  "spinner": {
   "scientific": "Carcharhinus brevipinna",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -820,7 +820,7 @@ const ARCHIVE_MEDIA = {
  },
  "wobbegong": {
   "scientific": "Orectolobus maculatus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -844,7 +844,7 @@ const ARCHIVE_MEDIA = {
  },
  "leopard": {
   "scientific": "Triakis semifasciata",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -868,7 +868,7 @@ const ARCHIVE_MEDIA = {
  },
  "horn": {
   "scientific": "Heterodontus francisci",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -892,7 +892,7 @@ const ARCHIVE_MEDIA = {
  },
  "portjackson": {
   "scientific": "Heterodontus portusjacksoni",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -916,7 +916,7 @@ const ARCHIVE_MEDIA = {
  },
  "angelshark": {
   "scientific": "Squatina squatina",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -940,7 +940,7 @@ const ARCHIVE_MEDIA = {
  },
  "megamouth": {
   "scientific": "Megachasma pelagios",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -964,7 +964,7 @@ const ARCHIVE_MEDIA = {
  },
  "sawshark": {
   "scientific": "Pristiophorus cirratus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -991,7 +991,7 @@ const ARCHIVE_MEDIA = {
  },
  "greenland": {
   "scientific": "Somniosus microcephalus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1015,7 +1015,7 @@ const ARCHIVE_MEDIA = {
  },
  "cookiecutter": {
   "scientific": "Isistius brasiliensis",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1039,7 +1039,7 @@ const ARCHIVE_MEDIA = {
  },
  "sixgill": {
   "scientific": "Hexanchus griseus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1063,7 +1063,7 @@ const ARCHIVE_MEDIA = {
  },
  "velvetbelly": {
   "scientific": "Etmopterus spinax",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1087,7 +1087,7 @@ const ARCHIVE_MEDIA = {
  },
  "dwarflantern": {
   "scientific": "Etmopterus perryi",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1111,7 +1111,7 @@ const ARCHIVE_MEDIA = {
  },
  "kitefin": {
   "scientific": "Dalatias licha",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1126,7 +1126,7 @@ const ARCHIVE_MEDIA = {
  },
  "pacificsleeper": {
   "scientific": "Somniosus pacificus",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1151,7 +1151,7 @@ const ARCHIVE_MEDIA = {
  },
  "spinydogfish": {
   "scientific": "Squalus acanthias",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",
@@ -1175,7 +1175,7 @@ const ARCHIVE_MEDIA = {
  },
  "catshark": {
   "scientific": "Scyliorhinus canicula",
-  "future": true,
+  "future": false,
   "assets": [
    {
     "type": "photo",

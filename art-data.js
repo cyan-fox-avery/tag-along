@@ -507,8 +507,270 @@ const ART = {
       <line x1="80" y1="49" x2="78" y2="65"/>
       <line x1="86" y1="49" x2="84" y2="65"/>
     </g>
-  </svg>`
+  </svg>`,
 
+
+
+  silvertip: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Silvertip shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#6e6e66"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#e4e2d8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#6e6e66"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <polygon points="104,42 114,22 126,42" fill="#e8e8e8"/>
+    <polygon points="160,54 200,36 198,84" fill="#e8e8e8"/>
+   </g>
+  </svg>`,
+  spinner: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Spinner shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#707a80"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#e8e8e2" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#707a80"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <polygon points="38,58 20,54 20,62" fill="#707a80"/>
+   </g>
+  </svg>`,
+  wobbegong: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Spotted wobbegong">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#8a6f4d"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#d8c9a8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#8a6f4d"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <ellipse cx="48" cy="58" rx="26" ry="12" fill="#8a6f4d"/>
+    <g stroke="#5a4632" stroke-width="1.5"><line x1="30" y1="52" x2="22" y2="48"/><line x1="30" y1="64" x2="22" y2="68"/></g>
+   </g>
+  </svg>`,
+  leopard: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Leopard shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#7a7a6a"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#e4e2d8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#7a7a6a"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <g fill="#3a3a32"><ellipse cx="80" cy="52" rx="8" ry="5"/><ellipse cx="110" cy="50" rx="10" ry="6"/><ellipse cx="140" cy="54" rx="7" ry="5"/><ellipse cx="95" cy="60" rx="6" ry="4"/></g>
+   </g>
+  </svg>`,
+  horn: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Horn shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#8a7355"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#d8c9a8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#8a7355"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <polygon points="104,42 110,28 118,42" fill="#6a5a42"/>
+    <rect x="36" y="50" width="20" height="6" rx="3" fill="#6a5a42"/>
+   </g>
+  </svg>`,
+  portjackson: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Port Jackson shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#8a7355"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#d8c9a8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#8a7355"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <path d="M70,44 Q90,58 110,44" stroke="#3a3226" stroke-width="4" fill="none"/>
+    <path d="M100,66 Q120,78 140,64" stroke="#3a3226" stroke-width="4" fill="none"/>
+   </g>
+  </svg>`,
+  angelshark: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Common angelshark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#9a8a6a"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#d8c9a8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#9a8a6a"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="70" ry="10" fill="#9a8a6a"/>
+    <polygon points="30,58 50,52 50,64" fill="#9a8a6a"/>
+   </g>
+  </svg>`,
+  megamouth: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Megamouth shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#4a4a52"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#8a8a92" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#4a4a52"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <ellipse cx="48" cy="62" rx="14" ry="8" fill="#1a1a20"/>
+    <ellipse cx="48" cy="60" rx="10" ry="4" fill="#3a3a42"/>
+   </g>
+  </svg>`,
+  sawshark: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Common sawshark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#707a72"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#e4e2d8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#707a72"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <g stroke="#5a5a52" stroke-width="1.5"><rect x="8" y="55" width="34" height="5" fill="#8a8a82"/><line x1="12" y1="55" x2="12" y2="50"/><line x1="17" y1="55" x2="17" y2="50"/><line x1="22" y1="55" x2="22" y2="50"/><line x1="27" y1="55" x2="27" y2="50"/><line x1="32" y1="55" x2="32" y2="50"/><line x1="37" y1="55" x2="37" y2="50"/></g>
+   </g>
+  </svg>`,
+  greenland: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Greenland shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#4e5a5a"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#8a9292" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#4e5a5a"/>
+    <circle cx="48" cy="54" r="2.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    
+   </g>
+  </svg>`,
+  cookiecutter: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Cookiecutter shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#3e4a52"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#c8d0d0" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#3e4a52"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <rect x="60" y="48" width="10" height="20" fill="#a8d8d8" opacity="0.7"/>
+    <polygon points="40,60 52,58 52,66" fill="#ffffff"/>
+   </g>
+  </svg>`,
+  sixgill: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Bluntnose sixgill shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#6a6258"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#b8ac98" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#6a6258"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <g stroke="#46463f" stroke-width="1.4"><line x1="70" y1="50" x2="68" y2="64"/><line x1="76" y1="50" x2="74" y2="64"/><line x1="82" y1="50" x2="80" y2="64"/><line x1="88" y1="50" x2="86" y2="64"/><line x1="94" y1="50" x2="92" y2="64"/><line x1="100" y1="50" x2="98" y2="64"/></g>
+   </g>
+  </svg>`,
+  velvetbelly: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Velvet-belly lanternshark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#3a3a42"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#7a7a82" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#3a3a42"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    
+   </g>
+  </svg>`,
+  dwarflantern: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Dwarf lanternshark">
+   <g transform="translate(55,27) scale(0.5)">
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#3a3a42"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#6a6a72" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#3a3a42"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    
+   </g>
+  </svg>`,
+  kitefin: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Kitefin shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#52525a"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#8a8a92" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#52525a"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    
+   </g>
+  </svg>`,
+  pacificsleeper: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Pacific sleeper shark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#4a5252"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#8a9292" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#4a5252"/>
+    <circle cx="48" cy="54" r="2.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    
+   </g>
+  </svg>`,
+  spinydogfish: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Spiny dogfish">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#6e7276"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#e0e0d8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#6e7276"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <g fill="#e8e8e0"><circle cx="80" cy="54" r="2.5"/><circle cx="105" cy="52" r="2.5"/><circle cx="130" cy="56" r="2.5"/><circle cx="95" cy="62" r="2"/></g>
+    <polygon points="104,42 110,26 118,42" fill="#5a5a52"/>
+   </g>
+  </svg>`,
+  catshark: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Small-spotted catshark">
+   <g>
+    <polygon points="160,54 200,36 198,84" fill="#5e5e58"/>
+    <ellipse cx="102" cy="58" rx="62" ry="18" fill="#8a7a5a"/>
+    <ellipse cx="102" cy="65" rx="54" ry="10" fill="#d8c9a8" opacity="0.85"/>
+    <polygon points="38,58 58,50 58,66" fill="#8a7a5a"/>
+    <circle cx="48" cy="54" r="3.2" fill="#1c2733"/>
+    <circle cx="49.2" cy="52.8" r="1.1" fill="#ffffff"/>
+    <polygon points="104,42 114,22 126,42" fill="#5e5e58"/>
+    <polygon points="90,74 80,94 102,75" fill="#5e5e58"/>
+    <g fill="#4a3a28"><circle cx="80" cy="54" r="2"/><circle cx="100" cy="51" r="2.5"/><circle cx="120" cy="55" r="2"/><circle cx="140" cy="53" r="2"/><circle cx="90" cy="62" r="1.8"/></g>
+   </g>
+  </svg>`
 };
 
 /* Field-guide sketches: rough pencil-style drawings of one distinctive
@@ -803,6 +1065,188 @@ const SKETCH = {
       <path d="M124,40 Q138,36 142,42" stroke-dasharray="4 3"/>
       <path d="M165,56 L198,40 L196,80 Z"/>
     </g>
-  </svg>`
+  </svg>`,
 
+
+
+  silvertip: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: white-edged fins">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">white-edged fins</text>
+    </g>
+  </svg>`,
+  spinner: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: long pointed snout">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">long pointed snout</text>
+    </g>
+  </svg>`,
+  wobbegong: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: barbels and lobes">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">barbels and lobes</text>
+    </g>
+  </svg>`,
+  leopard: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: dark saddles and spots">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">dark saddles and spots</text>
+    </g>
+  </svg>`,
+  horn: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: blunt head and brow ridges">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">blunt head and brow ridges</text>
+    </g>
+  </svg>`,
+  portjackson: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: dark harness markings">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">dark harness markings</text>
+    </g>
+  </svg>`,
+  angelshark: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: flattened ray-like body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">flattened ray-like body</text>
+    </g>
+  </svg>`,
+  megamouth: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: enormous cavernous mouth">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">enormous cavernous mouth</text>
+    </g>
+  </svg>`,
+  sawshark: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: saw-like rostrum">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">saw-like rostrum</text>
+    </g>
+  </svg>`,
+  greenland: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: tiny eyes, stout body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">tiny eyes, stout body</text>
+    </g>
+  </svg>`,
+  cookiecutter: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: glowing collar and big teeth">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">glowing collar and big teeth</text>
+    </g>
+  </svg>`,
+  sixgill: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: six gill slits">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">six gill slits</text>
+    </g>
+  </svg>`,
+  velvetbelly: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: velvety dark skin">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">velvety dark skin</text>
+    </g>
+  </svg>`,
+  dwarflantern: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: one of the smallest sharks">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">one of the smallest sharks</text>
+    </g>
+  </svg>`,
+  kitefin: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: heavy deep-water body">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">heavy deep-water body</text>
+    </g>
+  </svg>`,
+  pacificsleeper: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: slow deep-sea giant">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">slow deep-sea giant</text>
+    </g>
+  </svg>`,
+  spinydogfish: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: white spots and dorsal spines">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">white spots and dorsal spines</text>
+    </g>
+  </svg>`,
+  catshark: `
+  <svg viewBox="0 0 220 110" role="img" aria-label="Field sketch: small dark spots">
+    <g fill="none" stroke="#9fb8cc" stroke-width="2.5" stroke-linecap="round">
+      <path d="M40,55 Q70,40 120,44 Q170,48 200,42"/>
+      <path d="M40,55 Q70,66 120,64 Q170,62 200,58" stroke-dasharray="7 5"/>
+      <circle cx="52" cy="52" r="3"/>
+      <path d="M104,44 L114,28 L124,44"/>
+      <text x="110" y="100" text-anchor="middle" font-size="11" fill="#9fb8cc" stroke="none">small dark spots</text>
+    </g>
+  </svg>`
 };

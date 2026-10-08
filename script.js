@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.20.0";
+const VERSION = "v0.21.0";
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
 
@@ -160,6 +160,23 @@ const REGION_UNLOCK_THREAD = [
   { who: "me", text: "Six for six. The institute just cleared two new survey regions for us." },
   { who: "them", text: "The Galápagos and South Africa. I've read everything about those waters. Ask me anything — I mean it." },
   { who: "me", text: "I have a feeling I'm going to. 🦈" }
+];
+
+/* v0.21.0 sharknado: unlock threads for the three new regions. */
+const EAST_AUS_UNLOCK_THREAD = [
+  { who: "them", text: "Fifteen sharks! The institute just cleared Eastern Australia for us." },
+  { who: "me", text: "Wobbegongs and Port Jackson sharks. Reef country." },
+  { who: "them", text: "I've wanted to see a wobbegong my whole life. They look like someone dropped a shark on a carpet. 😂" }
+];
+const CALIFORNIA_UNLOCK_THREAD = [
+  { who: "them", text: "Twenty-five! California Coast is open now." },
+  { who: "me", text: "Leopard sharks in the bays, horn sharks on the reefs." },
+  { who: "them", text: "Horn sharks have those little brow ridges. They look permanently unimpressed. I love them." }
+];
+const ARCTIC_UNLOCK_THREAD = [
+  { who: "them", text: "Thirty-five sharks. The institute cleared... the Arctic?" },
+  { who: "me", text: "Greenland sharks. The cold dark. The long-lived ones." },
+  { who: "them", text: "Be careful out there. And bring back stories. 🩵" }
 ];
 
 /* World-map + tracking data lives in map-data.js (loaded before this file). */
@@ -348,8 +365,10 @@ function showMapPopup(sid) {
   const s = sharkById(sid), t = state.tagged[sid];
   const pts = mapPoints(t);
   const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
-  const kindNote = t.track.kind === "archival"
-    ? "Archival track — goblin sharks have never carried satellite tags; this route is reconstructed from capture records."
+  const kindNote = t.track.hypothetical
+    ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey."
+    : t.track.kind === "archival"
+    ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (s.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "")
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
       : t.track.kind === "acoustic"
@@ -570,8 +589,44 @@ function migrateIds() {
 function migrateTracks() {
   let changed = false;
   Object.entries(state.tagged).forEach(([sid, t]) => {
-    if (!t.track) {
+    /* v0.21.0 Mira final: regenerate tracks that predate the tag-anchor fix.
+       Old tracks start at generic regional centers and teleport to the envelope.
+       v0.21.0 Mira re-review: preserve player re-sighting points. */
+    if (!t.track || t.track.v !== 2) {
+      /* v0.21.0 Mira: legacy tracks lack the resighting flag. Reconstruct
+         from t.resightings records if no flagged points exist. */
+      let resightPoints = (t.track && t.track.points || []).filter(p => p.resighting);
+      const resightRecords = t.resightings || [];
+      if (resightPoints.length === 0 && resightRecords.length > 0 && t.track && t.track.points) {
+        // Legacy: reconstruct from resightings records. Old points lack the flag,
+        // so we treat points beyond the typical generated count as re-sightings.
+        // Each resighting record corresponds to a point appended after generation.
+        const genCount = t.track.points.length - resightRecords.length;
+        if (genCount >= 0 && resightRecords.length > 0) {
+          resightPoints = t.track.points.slice(genCount).map((p) => ({
+            label: p.label, day: p.day, km: p.km, resighting: true
+          }));
+        }
+      }
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+      t.track.v = 2;
+      const species = sharkById(sid);
+      const env = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id]) || null;
+      resightPoints.forEach((rp) => {
+        const anchorLabel = (env && env.tagAnchor) || rp.label;
+        const last = t.track.points[t.track.points.length - 1];
+        const lastCoord = MAP_COORDS[last.label];
+        const newCoord = MAP_COORDS[anchorLabel];
+        let km = 0;
+        if (lastCoord && newCoord && typeof haversineKm === "function") {
+          km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
+        }
+        t.track.points.push({ label: anchorLabel, day: rp.day, km, resighting: true });
+        t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
+        // Ensure day count agrees with final point (legacy points may be newer)
+        if (rp.day > t.track.days) t.track.days = rp.day;
+      });
+      if (resightRecords.length) t.resightings = resightRecords;
       changed = true;
     }
   });
@@ -871,7 +926,7 @@ function renderResearch() {
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
-            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the first six sharks to unlock them.</p>`
+            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the six original species (nurse, thresher, whale, goblin, tiger, sandtiger) to unlock them.</p>`
             : ``}
       </div>
     `;
@@ -911,7 +966,16 @@ function fillRegions() {
     const o = document.createElement("option");
     o.value = id;
     if (v.locked) {
-      o.textContent = `🔒 ${v.name} — unlocks after six successful tags`;
+      const unlockText = id === "galapagos" || id === "south-africa"
+        ? `🔒 ${v.name} — tag the six original species to unlock`
+        : id === "east-australia"
+          ? `🔒 ${v.name} — unlocks at 15 tags`
+          : id === "california"
+            ? `🔒 ${v.name} — unlocks at 25 tags`
+            : id === "arctic"
+              ? `🔒 ${v.name} — unlocks at 35 tags`
+              : `🔒 ${v.name} — locked`;
+      o.textContent = unlockText;
       o.disabled = true;
     } else {
       o.textContent = v.name;
@@ -927,8 +991,15 @@ function fillRegions() {
    - Tagging the full roster wins the game (Master Shark Tagger).
      v0.11.0: the win keeps moving up with the roster — always SHARKS.length. */
 function applyRegions() {
-  if (!state.regionsUnlocked) return;
-  for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+  /* v0.21.0 Mira review: 15/25/35 milestones are genuinely count-based,
+     independent of the original-six unlock. */
+  const n = Object.keys(state.tagged).length;
+  if (state.regionsUnlocked) {
+    for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+  }
+  if (n >= 15) REGIONS["east-australia"].locked = false;
+  if (n >= 25) REGIONS["california"].locked = false;
+  if (n >= 35) REGIONS["arctic"].locked = false;
 }
 
 /* v0.7.0 migration: v0.6.0 winners had tyi-won=1 at 6/6, but the win is
@@ -1483,8 +1554,17 @@ function recordResighting(species, plan) {
     const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
     const last = t.track.points[t.track.points.length - 1];
     const day = last.day + env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
-    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
-    t.track.points.push({ label: entry.location, day, km });
+    /* v0.21.0 Mira review: compute real distance from coordinates, not random hop. */
+    const anchorLabel = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id] && TRACK_ENVELOPES[species.id].tagAnchor) || entry.location;
+    const lastCoord = MAP_COORDS[last.label];
+    const newCoord = MAP_COORDS[anchorLabel];
+    let km;
+    if (lastCoord && newCoord && typeof haversineKm === "function") {
+      km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
+    } else {
+      km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    }
+    t.track.points.push({ label: anchorLabel, day, km, resighting: true });
     t.track.days = day;
     t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
   }
@@ -1976,6 +2056,27 @@ function checkMilestones() {
     pushThread(REGION_UNLOCK_THREAD.map(m => ({ ...m })));
     showRegionUnlock();
   }
+  /* v0.21.0 sharknado: progressive region unlocks by tag count.
+     v0.21.0 Mira review: independent of original-six unlock. */
+  const n = taggedIds.length;
+  if (n >= 15 && REGIONS["east-australia"].locked) {
+    REGIONS["east-australia"].locked = false;
+    fillRegions();
+    pushThread(EAST_AUS_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("east-australia", "Eastern Australia", "wobbegongs hide in the reef ledges here.");
+  }
+  if (n >= 25 && REGIONS["california"].locked) {
+    REGIONS["california"].locked = false;
+    fillRegions();
+    pushThread(CALIFORNIA_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("california", "California Coast", "leopard sharks cruise the bays and kelp.");
+  }
+  if (n >= 35 && REGIONS["arctic"].locked) {
+    REGIONS["arctic"].locked = false;
+    fillRegions();
+    pushThread(ARCTIC_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("arctic", "Arctic Waters", "the Greenland shark waits in the cold dark.");
+  }
   if (taggedIds.length >= SHARKS.length && !state.won) {
     /* The ceremony waits for day's end — the trip always finishes first. */
     state.pendingWin = true;
@@ -1990,7 +2091,24 @@ function showRegionUnlock() {
     <div class="cert-body">
       <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
       <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
-      <p class="latin">Six successful tags. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+      <p class="latin">The six original species. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+    </div>
+    <button id="winNext" class="primary-button" type="button">Back to the water</button>
+  </div>`;
+  $("winNext").addEventListener("click", () => {
+    ov.classList.add("hidden");
+  });
+}
+
+/* v0.21.0 sharknado: single-region unlock overlay. */
+function showRegionUnlockSingle(regionId, regionName, flavor) {
+  const ov = $("winOverlay");
+  ov.classList.remove("hidden");
+  ov.innerHTML = `<div class="phone">
+    <div class="phone-head">🗺️ New waters surveyed</div>
+    <div class="cert-body">
+      <p><strong>${regionName}</strong> — ${flavor}</p>
+      <p class="latin">The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
     </div>
     <button id="winNext" class="primary-button" type="button">Back to the water</button>
   </div>`;
@@ -2392,7 +2510,7 @@ function openTrack(id) {
     </div>
     <ul class="track-stops">${stops}</ul>
     <p class="track-note">Last ping: <strong>${esc(last.label)}</strong> · day ${last.day}<br>
-    <span class="dim">${esc(TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite)}</span></p>
+    <span class="dim">${esc(tr.hypothetical ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey." : tr.kind === "archival" ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (s.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "") : (TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite))}</span></p>
   `;
   $("trackOverlay").classList.remove("hidden");
 }

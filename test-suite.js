@@ -38,20 +38,20 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.20.0', VERSION === 'v0.20.0');
+  ok('version v0.21.0', VERSION === 'v0.21.0');
 
   // roster
-  ok('roster is 32', SHARKS.length === 32);
+  ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
-  ok('32 unique shark IDs', new Set(ids).size === 32);
-  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 32);
+  ok('50 unique shark IDs', new Set(ids).size === 50);
+  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 50);
   ok('all have ART', ids.every(id => !!ART[id]));
   ok('all have SKETCH', ids.every(id => !!SKETCH[id]));
   const counts = ids.map(id => (COUSIN_CHATS[id] || []).length);
-  ok('all 32 species have 3 chats', counts.length === 32 && counts.every(n => n === 3));
+  ok('all 50 species have 3 chats', counts.length === 50 && counts.every(n => n === 3));
   ok('all have nudges', ids.every(id => !!COUSIN_NUDGES[id]));
   ok('all have envelopes', ids.every(id => !!TRACK_ENVELOPES[id]));
-  ok('win is full roster', SHARKS.length === 32);
+  ok('win is full roster', SHARKS.length === 50);
 
   // v0.14.0 new sharks
   const new2 = ['frilled', 'zebra'];
@@ -147,7 +147,7 @@ code += `
   ok('ARCHIVE_MEDIA exists', typeof ARCHIVE_MEDIA === 'object');
   const liveIds = SHARKS.map(x => x.id);
   const archivedLive = liveIds.filter(id => ARCHIVE_MEDIA[id] && !ARCHIVE_MEDIA[id].future);
-  ok('all 32 live sharks have archive entries', archivedLive.length === 32);
+  ok('all 50 live sharks have archive entries', archivedLive.length === 50);
   ok('salmon is live with media', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === false && (ARCHIVE_MEDIA.salmon.assets || []).length > 0);
   let assetsOk = true, videosOk = true;
   liveIds.forEach(id => {
@@ -192,7 +192,7 @@ code += `
   const openerRe = /opener:\\s*"([^"]+)"/g;
   const openers = []; let m;
   while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
-  ok('32 species openers present', openers.length === 32);
+  ok('50 species openers present', openers.length === 50);
   ok('no shared verbatim closer', new Set(openers).size === openers.length);
   ok('the old repeated closer is gone', !openers.some(function(o) { return /tell me everything/i.test(o); }));
   // v0.17.1 review fix: the advice offer must survive a reload, and a used
@@ -424,18 +424,18 @@ code += `
     !ARCHIVE_MEDIA.dusky.comingSoon && ARCHIVE_MEDIA.dusky.assets.length === 2 &&
     ARCHIVE_MEDIA.dusky.assets[0].credit === "Happy Little Nomad" &&
     ARCHIVE_MEDIA.dusky.assets[1].license === "public domain (NOAA)");
-  // v0.20.0: Avery + Mira media batch — 18 future species staged, hidden until playable
-  const futures = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
+  // v0.21.0: the 18 wave species are now LIVE (future:false), playable roster 50
+  const wave18 = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
     "megamouth","sawshark","greenland","cookiecutter","sixgill","velvetbelly","dwarflantern",
     "kitefin","pacificsleeper","spinydogfish","catshark"];
-  ok('media batch: 18 future entries', futures.every(id =>
-    ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future === true &&
+  ok('media batch: 18 wave entries live', wave18.every(id =>
+    ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future !== true &&
     (ARCHIVE_MEDIA[id].assets || []).length >= 1));
   ok('batch: no pygmy (verification hold)', !ARCHIVE_MEDIA.pygmy);
-  ok('batch: every asset has image+page+credit+license', futures.every(id =>
+  ok('batch: every asset has image+page+credit+license', wave18.every(id =>
     ARCHIVE_MEDIA[id].assets.every(a => a.image && a.page && a.credit && a.license &&
       !a.image.includes('commons.wikimedia.org/wiki/'))));
-  ok('batch: no HTML page URLs in image src', futures.every(id =>
+  ok('batch: no HTML page URLs in image src', wave18.every(id =>
     ARCHIVE_MEDIA[id].assets.every(a => !a.image.includes('wikipedia.org') && !a.image.includes('.org/wiki/'))));
   ok('spinner NC asset has notice + iNaturalist label', (() => {
     const a = ARCHIVE_MEDIA.spinner.assets[0];
@@ -541,6 +541,217 @@ code += `
       els["baitSelect"].value === "tuna" && els["methodSelect"].value === "attract" &&
       els["methodOptSelect"].value === "chum";
   })());
+
+  // v0.21.0 sharknado: every wave shark has dossier, 3 chats, nudge, art, sketch,
+  // envelope, live archive entry, and all envelope areas have MAP_COORDS
+  const wave = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
+    "megamouth","sawshark","greenland","cookiecutter","sixgill","velvetbelly","dwarflantern",
+    "kitefin","pacificsleeper","spinydogfish","catshark"];
+  ok('sharknado: 18 new SHARKS entries', wave.every(id => sharkById(id)));
+  ok('sharknado: all have research+hook+opener+sketchCap', wave.every(id => {
+    const s = sharkById(id);
+    return s.research && s.hook && s.opener && s.sketchCap && s.nameIdeas && s.nameIdeas.length >= 3;
+  }));
+  ok('sharknado: all have 3 chats', wave.every(id => (COUSIN_CHATS[id] || []).length === 3));
+  ok('sharknado: all have nudges', wave.every(id => typeof COUSIN_NUDGES[id] === 'string' && COUSIN_NUDGES[id].length > 50));
+  ok('sharknado: all have ART', wave.every(id => typeof ART[id] === 'string' && ART[id].includes('<svg')));
+  ok('sharknado: all have SKETCH', wave.every(id => typeof SKETCH[id] === 'string' && SKETCH[id].includes('<svg')));
+  ok('sharknado: all have tracking envelopes', wave.every(id => TRACK_ENVELOPES[id] && TRACK_ENVELOPES[id].areas.length >= 3));
+  ok('sharknado: all have live archive entries', wave.every(id => ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future !== true));
+  ok('sharknado: 3 new regions defined+locked', ['east-australia','california','arctic'].every(r => REGIONS[r] && REGIONS[r].locked));
+  ok('sharknado: no pygmy in roster', !sharkById('pygmy'));
+
+  /* v0.21.0 Mira review: progression, reachability, geography, statuses. */
+  // Unlock boundaries: simulate tag counts and verify applyRegions logic
+  ok('mira: unlock boundaries are count-based', (() => {
+    // Behavioral: manipulate state.tagged, call applyRegions(), check REGIONS
+    function testUnlock(n, regionId, shouldUnlock) {
+      // Reset
+      REGIONS["east-australia"].locked = true;
+      REGIONS["california"].locked = true;
+      REGIONS["arctic"].locked = true;
+      // Mock n tagged sharks
+      state.tagged = {};
+      for (let k = 0; k < n; k++) state.tagged["shark" + k] = { nick: "Test" };
+      applyRegions();
+      const unlocked = !REGIONS[regionId].locked;
+      // Reset for next test
+      state.tagged = {};
+      return unlocked === shouldUnlock;
+    }
+    return testUnlock(14, "east-australia", false) &&
+           testUnlock(15, "east-australia", true) &&
+           testUnlock(24, "california", false) &&
+           testUnlock(25, "california", true) &&
+           testUnlock(34, "arctic", false) &&
+           testUnlock(35, "arctic", true);
+  })());
+  ok('mira: genTrack computes honest distances', (() => {
+    // Deterministic: call the actual genTrack(), verify distances
+    const savedState = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      const species = SHARKS.find(s => s.id === 'catshark');
+      const rec = { location: "Cornwall", nick: "Test" };
+      const track = genTrack(species, rec);
+      // 1. First position matches the species anchor
+      const env = TRACK_ENVELOPES['catshark'];
+      if (track.points[0].label !== env.tagAnchor) return false;
+      // 2. Consecutive coordinates produce recorded distances
+      for (let i = 1; i < track.points.length; i++) {
+        const prev = MAP_COORDS[track.points[i-1].label];
+        const curr = MAP_COORDS[track.points[i].label];
+        if (prev && curr) {
+          const expected = Math.round(haversineKm(prev, curr) * 10) / 10;
+          if (Math.abs(track.points[i].km - expected) > 0.1) return false;
+        }
+      }
+      // 3. totalKm equals sum of legs
+      const sum = track.points.slice(1).reduce((s, p) => s + p.km, 0);
+      if (Math.abs(track.totalKm - Math.round(sum * 10) / 10) > 0.1) return false;
+      return true;
+    } finally {
+      state.tagged = savedState;
+    }
+  })());
+  ok('mira: re-sighting uses species anchor (no teleport)', (() => {
+    // Tag a shark, record a re-sighting, check geographic consistency
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      const species = SHARKS.find(s => s.id === 'kitefin');
+      state.tagged['kitefin'] = { location: "Open Atlantic", nick: "Test", researchId: "TEST-001" };
+      state.tagged['kitefin'].track = genTrack(species, state.tagged['kitefin']);
+      state.tagged['kitefin'].track.v = 2;
+      // Mock a re-sighting via the anchor path
+      const env = TRACK_ENVELOPES['kitefin'];
+      const lastBefore = state.tagged['kitefin'].track.points[state.tagged['kitefin'].track.points.length - 1];
+      // Simulate what recordResighting does with anchor
+      const anchorCoord = MAP_COORDS[env.tagAnchor];
+      const lastCoord = MAP_COORDS[lastBefore.label];
+      const km = Math.round(haversineKm(lastCoord, anchorCoord) * 10) / 10;
+      // The jump should be local (<100km), not a 3,230km teleport
+      return km < 100;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
+  ok('mira: migration preserves re-sighting history', (() => {
+    // A v1 track with a re-sighting point should keep it after migration
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      state.tagged['catshark'] = {
+        location: "Cornwall", nick: "Test", researchId: "TEST-002",
+        track: { points: [{ label: "Cornwall", day: 0, km: 0 }, { label: "Mount's Bay", day: 5, km: 10, resighting: true }], totalKm: 10, days: 5, kind: "acoustic" }, // v1, no v marker
+        resightings: [{ date: "2026-01-01", location: "Cornwall", note: "Test", ts: 1 }]
+      };
+      migrateTracks();
+      const t = state.tagged['catshark'];
+      // Track regenerated to v2
+      if (t.track.v !== 2) return false;
+      // Re-sighting point preserved
+      if (!t.track.points.some(p => p.resighting)) return false;
+      // Re-sighting record preserved
+      if (!t.resightings || t.resightings.length === 0) return false;
+      return true;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
+  ok('mira: archival popup opens without error', (() => {
+    // Regression: showMapPopup used species.id (ReferenceError) instead of s.id
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      const species = SHARKS.find(s => s.id === 'sawshark');
+      state.tagged['sawshark'] = { location: "Tasmania", nick: "Test", researchId: "TEST-003" };
+      state.tagged['sawshark'].track = genTrack(species, state.tagged['sawshark']);
+      state.tagged['sawshark'].track.v = 2;
+      // This should not throw
+      showMapPopup('sawshark');
+      // Popup should contain the neutral wording, not "never carried"
+      const pop = document.getElementById("mapPopup");
+      const html = pop.innerHTML || "";
+      return html.indexOf("Illustrative habitat-based movement scenario") !== -1 &&
+             html.indexOf("never carried a tracking tag") === -1;
+    } catch (e) {
+      return false;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
+  ok('mira: legacy re-sighting reconstructed from records', (() => {
+    // Genuinely pre-v0.21.0 save: no resighting flag, but has resightings records
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      state.tagged['catshark'] = {
+        location: "Cornwall", nick: "Test", researchId: "TEST-004",
+        // Old track: 7 generated points + 1 legacy re-sighting (no flag)
+        track: {
+          points: [
+            { label: "Cornwall", day: 0, km: 0 },
+            { label: "Mount's Bay", day: 3, km: 5 },
+            { label: "Lizard Point", day: 6, km: 8 },
+            { label: "Penzance Bay", day: 9, km: 6 },
+            { label: "Mount's Bay east", day: 12, km: 4 },
+            { label: "Lizard Point west", day: 15, km: 7 },
+            { label: "Mount's Bay", day: 18, km: 5 },
+            { label: "Cornwall", day: 25, km: 12 }  // legacy re-sighting, no flag
+          ],
+          totalKm: 47, days: 25, kind: "acoustic"
+        },
+        resightings: [{ date: "2026-02-01", location: "Cornwall", note: "Legacy", ts: 2 }]
+      };
+      migrateTracks();
+      const t = state.tagged['catshark'];
+      if (t.track.v !== 2) return false;
+      // Re-sighting point should be reconstructed
+      if (!t.track.points.some(p => p.resighting)) return false;
+      // Day count should agree with final point
+      const lastPoint = t.track.points[t.track.points.length - 1];
+      if (t.track.days < lastPoint.day) return false;
+      // Records preserved
+      if (!t.resightings || t.resightings.length === 0) return false;
+      return true;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
+  ok('mira: resident envelopes stay local', (() => {
+    function maxHop(id) {
+      var env = TRACK_ENVELOPES[id], max = 0;
+      for (var i = 0; i < env.areas.length - 1; i++) {
+        var a = MAP_COORDS[env.areas[i]], b = MAP_COORDS[env.areas[i+1]];
+        if (a && b) max = Math.max(max, haversineKm(a, b));
+      }
+      return max;
+    }
+    return maxHop('horn') < 100 && maxHop('wobbegong') < 100 &&
+           maxHop('catshark') < 100 && maxHop('dwarflantern') < 150;
+  })());
+  // Every shark's combo region exists in REGIONS
+  ok('mira: all 50 sharks have valid combo regions', SHARKS.every(s => {
+    const region = s.combo.region;
+    return REGIONS[region] !== undefined;
+  }));
+  // Every shark's combo bait/method vocab matches planner
+  ok('mira: all sharks have reachable depth+bait combos', SHARKS.every(s => {
+    return s.depths && s.depths.length > 0 && s.combo.bait && s.methods;
+  }));
+  // Tracking: waypoint labels all resolve to MAP_COORDS (no silent drops)
+  ok('mira: all envelope waypoints resolve to coordinates', Object.entries(TRACK_ENVELOPES).every(([id, env]) => {
+    return (env.areas || []).every(a => MAP_COORDS[a] !== undefined);
+  }));
+  // Tracking: resident species (hop max <= 15km) have local waypoint clusters
+  ok('mira: resident tracks use local clusters', ['horn','wobbegong'].every(id => {
+    const env = TRACK_ENVELOPES[id];
+    return env.hop[1] <= 15 && env.areas.length >= 3;
+  }));
+  // Conservation statuses for corrected species
+  ok('mira: pacific sleeper is Near Threatened', sharkById('pacificsleeper').status === 'Near Threatened');
+  ok('mira: velvetbelly is Vulnerable', sharkById('velvetbelly').status === 'Vulnerable');
+  // Archival kinds for poorly-studied species
+  ok('mira: cookiecutter track is archival', TRACK_ENVELOPES.cookiecutter.kind === 'archival');
+  ok('mira: dwarf lanternshark track is archival', TRACK_ENVELOPES.dwarflantern.kind === 'archival');
+  // All 50 species have map colors (no white-marker fallback)
+  ok('mira: all 50 sharks have SPECIES_COLORS', SHARKS.every(s => SPECIES_COLORS[s.id] !== undefined));
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

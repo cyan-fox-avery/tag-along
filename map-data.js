@@ -301,15 +301,143 @@ const TRACK_ENVELOPES = {
     areas: ["Tag-site coast", "Sardine Run corridor", "Mozambique coast", "Cape waters", "Offshore Agulhas", "Nursery bays"],
     hop: [80, 500], dayStep: [7, 21], nPoints: [5, 7], kind: "satellite",
     corridor: "strongly migratory — up to 3,800 km recorded, seasonal poleward shifts; females show natal site fidelity, keeping local populations distinct"
+  },
 
-  }
 
-};
+  silvertip: {
+    start: "Outer reef slope off South Malé Atoll",
+    areas: ["South Malé Atoll", "South Malé outer slope", "South Malé channel", "Malé Atoll south", "South Malé drop-off"],
+    tagAnchor: "South Malé Atoll",
+    hop: [5, 40], dayStep: [3, 14], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Silvertips show fidelity to outer reef slopes, patrolling the same drop-offs repeatedly; acoustic tagging in the western Indian Ocean has documented individuals returning to the same reef sites over months."
+  },
+  spinner: {
+    start: "Edge of the Great Bahama Bank",
+    areas: ["Caribbean Sea", "Caribbean reef edge", "Caribbean channel", "Caribbean Sea north", "Caribbean bank"],
+    tagAnchor: "Caribbean Sea",
+    hop: [20, 150], dayStep: [4, 21], nPoints: [5, 7], kind: "satellite",
+    corridor: "Spinners migrate seasonally along the western Atlantic shelf following baitfish movements, with well-documented winter-spring aggregations off southeast Florida; satellite tagging shows long north-south coastal movements."
+  },
+  wobbegong: {
+    start: "Rocky reef ledge off Byron Bay",
+    areas: ["Byron Bay", "Julian Rocks", "Wategos reef", "Byron Bay north wall", "Byron Bay south ledge"],
+    tagAnchor: "Byron Bay",
+    hop: [1, 8], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Spotted wobbegongs show strong site fidelity; photo-identification and acoustic studies have recorded individuals remaining on the same reef for years, so movements are short hops between neighbouring ledges."
+  },
+  leopard: {
+    start: "Eelgrass bed in Tomales Bay",
+    areas: ["Monterey Bay", "Monterey Canyon edge", "Elkhorn Slough mouth", "Monterey Bay south", "Cannery Row reef"],
+    tagAnchor: "Monterey Bay",
+    hop: [5, 60], dayStep: [3, 14], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Leopard sharks move seasonally between bays and along the California coast; large-scale tagging programs, including long-running work in San Francisco Bay, document site fidelity with seasonal shifts between estuaries."
+  },
+  horn: {
+    start: "Kelp forest off Santa Catalina Island",
+    areas: ["Santa Catalina Island", "Catalina west end", "Catalina isthmus", "Catalina east end", "Catalina back side"],
+    tagAnchor: "Santa Catalina Island",
+    hop: [1, 12], dayStep: [7, 30], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Horn sharks show strong site fidelity and documented homing; classic displacement studies recorded individuals navigating back to their home reef from kilometres away, so the track stays tight around one reef complex."
+  },
+  portjackson: {
+    start: "Rocky reef off Sydney",
+    areas: ["Sydney", "Sydney north", "Sydney south", "Sydney offshore", "Sydney harbor mouth"],
+    tagAnchor: "Sydney",
+    hop: [10, 80], dayStep: [14, 45], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Port Jacksons make a seasonal southern migration along the east Australian coast to lay eggs in summer, returning north in winter; tagging programs have documented long-distance movements of hundreds of kilometres between New South Wales and Tasmanian waters."
+  },
+  angelshark: {
+    start: "Buried in sandy reef shallows off Cornwall",
+    areas: ["Mount's Bay", "Mount's Bay east", "Penzance Bay", "Lizard Point reefs", "Mount's Bay west"],
+    tagAnchor: "Mount's Bay",
+    hop: [2, 40], dayStep: [1, 14], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Common angelsharks are strongly site-attached ambush predators; tagging studies show individuals barely move, sitting buried for days on the same sand patch. Movements are short shuffles between nearby sandy grounds, not migrations."
+  },
+  megamouth: {
+    start: "Tagged at the surface at night off the Izu Peninsula",
+    areas: ["Izu Peninsula", "Sagami Bay", "Izu Peninsula south", "Sagami Bay offshore", "Izu Peninsula east"],
+    tagAnchor: "Izu Peninsula",
+    hop: [50, 400], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
+    corridor: "Megamouths are vertical migrators, spending days deep in the twilight zone and rising at night to feed — tagged individuals have shown long horizontal movements following currents and plankton, consistent with other large filter-feeding sharks."
+  },
+  sawshark: {
+    start: "Tagged over soft sediment off Tasmania", // v0.21.0 Mira: Burke et al. 2020, pop-up archival tags
+    areas: ["Tasman Sea shelf", "Tasman shelf north", "Tasman shelf south", "NSW shelf edge", "Tasman Sea shelf east"],
+    tagAnchor: "Tasman Sea shelf",
+    hop: [10, 100], dayStep: [3, 14], nPoints: [5, 7], kind: "archival",
+    corridor: "Common sawsharks are bottom-associated residents of the continental shelf; tagged individuals show limited horizontal movement with occasional shifts along the shelf, staying near soft-sediment feeding grounds."
+  },
+  greenland: {
+    start: "Tagged in deep Baffin Bay water",
+    areas: ["Baffin Bay", "Davis Strait", "Greenland shelf", "Baffin Bay deep basin", "Davis Strait slope"],
+    tagAnchor: "Baffin Bay",
+    hop: [40, 350], dayStep: [14, 60], nPoints: [5, 7], kind: "satellite",
+    hypothetical: true,
+    corridor: "Greenland sharks are wide-ranging deep-water roamers of the Arctic; tagging studies show slow, far-reaching movements across deep basins, consistent with their extremely low metabolism and centuries-long lifespans."
+  },
+  cookiecutter: {
+    start: "Tagged at night in Sargasso Sea twilight waters",
+    areas: ["Sargasso Sea", "Sargasso Sea west", "Sargasso Sea east", "Sargasso Sea south", "Sargasso Sea north"],
+    tagAnchor: "Sargasso Sea",
+    hop: [30, 200], dayStep: [3, 14], nPoints: [5, 7], kind: "archival",
+    corridor: "Cookiecutter sharks are vertical migrators, spending days at mesopelagic depths and rising hundreds of metres at night to feed — tagged individuals would be expected to drift with oceanic currents and vertical-migration prey layers."
+  },
+  sixgill: {
+    start: "Tagged in deep water off the Porcupine slope",
+    areas: ["Porcupine Seabight", "Porcupine Bank", "Rockall Trough", "Porcupine slope", "Western Approaches deep"],
+    tagAnchor: "Porcupine Seabight",
+    hop: [30, 250], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
+    hypothetical: true,
+    corridor: "Bluntnose sixgills are wide-ranging deep-slope residents; tagging and submersible studies show slow movements along continental slopes and seamounts, with some individuals undertaking diel vertical migrations into shallower water at night."
+  },
+  velvetbelly: {
+    start: "Celtic Sea shelf break, Cornwall",
+    areas: ["Porcupine Seabight", "Porcupine slope", "Porcupine Seabight east", "Porcupine Bank edge", "Porcupine Seabight west"],
+    tagAnchor: "Porcupine Seabight",
+    hop: [10, 80], dayStep: [2, 9], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Stays on the NE Atlantic continental slope, riding the deep scattering layer up and down the water column on its nightly feeding migrations."
+  },
+  dwarflantern: {
+    start: "Upper continental slope, Caribbean Sea off Colombia",
+    areas: ["Upper slope off Colombia", "Colombian slope north", "Colombian slope south", "Colombian canyon", "Upper slope off Colombia east"],
+    tagAnchor: "Upper slope off Colombia",
+    hop: [5, 35], dayStep: [3, 12], nPoints: [5, 7], kind: "archival",
+    corridor: "A slope resident — small home range along the upper continental slope of the southern Caribbean, drifting between canyon systems with deep currents."
+  },
+  kitefin: {
+    start: "Continental slope, Porcupine Seabight",
+    areas: ["Porcupine Seabight", "Porcupine slope", "Porcupine Seabight east", "Porcupine Bank edge", "Porcupine Seabight west"],
+    tagAnchor: "Porcupine Seabight",
+    hop: [20, 150], dayStep: [14, 45], nPoints: [5, 7], kind: "satellite",
+    corridor: "Wanders the deep Atlantic along continental slopes and seamount chains, following deep currents and seasonal aggregations of prey fish."
+  },
+  pacificsleeper: {
+    start: "Tagged in Sagami Bay deep water",
+    areas: ["Sagami Bay deep", "Izu Peninsula slope", "Pacific coast of Hokkaido", "Kuril Islands slope", "Oyashio current region"],
+    tagAnchor: "Sagami Bay deep",
+    hop: [100, 500], dayStep: [14, 45], nPoints: [5, 7], kind: "satellite",
+    hypothetical: true,
+    corridor: "A slow, long-distance wanderer — tagged in southern Japan, this track follows a northward drift with the Oyashio current toward Hokkaido and the Kuril slope, consistent with the species' basin-wide deep-water range."
+  },
+  spinydogfish: {
+    start: "Coastal waters off Cornwall",
+    areas: ["English Channel central", "English Channel east", "English Channel west", "English Channel central north", "English Channel central south"],
+    tagAnchor: "English Channel central",
+    hop: [20, 150], dayStep: [2, 10], nPoints: [5, 7], kind: "acoustic",
+    corridor: "Moves with its school along the shelf — following schooling fish through the Celtic Sea and English Channel, shifting depth with the seasons."
+  },
+  catshark: {
+    start: "Reef off Cornwall",
+    areas: ["Mount's Bay", "Lizard Point reefs", "Penzance Bay", "Mount's Bay east", "Lizard Point west"],
+    tagAnchor: "Mount's Bay",
+    hop: [2, 20], dayStep: [1, 7], nPoints: [5, 7], kind: "acoustic",
+    corridor: "A coastal homebody — small hops between reef patches and kelp beds off Cornwall, sheltering deep by day and foraging shallow at night."
+  },};
 
 /* How each track kind is framed to the player — honesty first. */
 const TRACK_KIND_NOTES = {
-  satellite: "Illustrative track — real satellite tags ping just like this. 🛰️",
-  archival: "Sparse illustrative track — reconstructed from capture records, not live satellite or acoustic tracking.",
+  satellite: "Illustrative track — inspired by satellite telemetry. Note: pop-up archival tags transmit stored data after detachment, not live pings. 🛰️",
+  archival: "Illustrative habitat-based scenario — this species has never carried a tracking tag. Drawn from capture records and published depth ranges, not an individual's movements.",
   resightings: "Illustrative track — built from reef survey re-sightings, not a satellite tag. This shark barely leaves its reef flat.",
   acoustic: "Illustrative track based on acoustic-tag detections from reef receiver arrays."
 };
@@ -320,21 +448,48 @@ const TRACK_KIND_NOTES = {
    whale sharks cross basins. v0.9.0: the areas list runs in corridor
    order, so legs are walked forward (never shuffled into nonsense);
    the start index varies so tracks differ. */
+/* v0.21.0 Mira review: haversine distance (km) between two [lat, lon] pairs.
+   Used by genTrack() so reported hop distances match the plotted coordinates. */
+function haversineKm(a, b) {
+  const R = 6371;
+  const dLat = (b[0] - a[0]) * Math.PI / 180;
+  const dLon = (b[1] - a[1]) * Math.PI / 180;
+  const la1 = a[0] * Math.PI / 180, la2 = b[0] * Math.PI / 180;
+  const h = Math.sin(dLat/2)**2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
 function genTrack(species, rec) {
   const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
   const n = env.nPoints[0] + Math.floor(Math.random() * (env.nPoints[1] - env.nPoints[0] + 1));
-  const points = [{ label: rec.location, day: 0, km: 0 }];
+  /* v0.21.0 Mira final: use species-specific tag anchor for the starting
+     position, not the generic regional center. The player's record keeps
+     the broad region name, but plotting uses the local anchor. */
+  const anchorLabel = env.tagAnchor || rec.location;
+  const points = [{ label: anchorLabel, day: 0, km: 0 }];
   let day = 0, totalKm = 0;
   const maxStart = Math.max(0, env.areas.length - (n - 1));
   const startIdx = Math.floor(Math.random() * (maxStart + 1));
   const legs = env.areas.slice(startIdx, startIdx + n - 1);
+  /* v0.21.0 Mira review: km is computed from MAP_COORDS via haversine,
+     not random within hop. The hop range is now a sanity bound — if the
+     real distance exceeds it, we use the real distance anyway (honest)
+     and the envelope should be redesigned to be local. */
+  let prevCoord = MAP_COORDS[anchorLabel];
   legs.forEach(area => {
     day += env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
-    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    const coord = MAP_COORDS[area];
+    let km;
+    if (prevCoord && coord) {
+      km = Math.round(haversineKm(prevCoord, coord) * 10) / 10;
+    } else {
+      km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    }
     totalKm = Math.round((totalKm + km) * 10) / 10;
     points.push({ label: area, day, km });
+    if (coord) prevCoord = coord;
   });
-  return { points, totalKm, days: day, kind: env.kind || "satellite" };
+  return { points, totalKm, days: day, kind: env.kind || "satellite", v: 2, hypothetical: !!env.hypothetical };
 }
 
 function hashStr(s) {
@@ -358,7 +513,18 @@ const SPECIES_COLORS = {
   lemon: "#e9c46a", blacktip: "#5c6770", whitetip: "#ced4da",
   blue: "#3b6ea5", porbeagle: "#8fa8bf", silky: "#a08b62",
   oceanic: "#c9b458", sevengill: "#8a7f70", bronze: "#c98a3d",
-  frilled: "#7a6f9e", zebra: "#d9a441"
+  frilled: "#7a6f9e", zebra: "#d9a441",
+  /* v0.21.0 sharknado: distinguishable markers for the 18 new species. */
+  silvertip: "#e8e8e8", spinner: "#ff6b6b", wobbegong: "#c9a86a",
+  leopard: "#d4a574", horn: "#a67c52", portjackson: "#8b6914",
+  angelshark: "#deb887", megamouth: "#4a4a5a", sawshark: "#7a8a7a",
+  greenland: "#5a6a6a", cookiecutter: "#3a4a5a", sixgill: "#6a5a4a",
+  velvetbelly: "#2a2a3a", dwarflantern: "#1a1a2a", kitefin: "#4a5a6a",
+  pacificsleeper: "#5a6a7a", spinydogfish: "#8a9aaa", catshark: "#b8935a",
+  salmon: "#fa8072", dusky: "#6a7a8a",
+  /* v0.18.0 seven-shark wave (were falling back to white). */
+  scalloped: "#e07a5f", smooth: "#d4a373", bonnethead: "#c8b6a0",
+  bull: "#9a8c5a", greyreef: "#7a8a9a", caribbean: "#5a9aaa", sandbar: "#b8a67a"
 };
 
 /* Every label a track point can carry: region names (tag sites and
@@ -376,6 +542,9 @@ const MAP_COORDS = {
   "Papua New Guinea": [-6.0, 147.0],
   "Galápagos Islands": [-0.5, -90.8],
   "South Africa": [-34.0, 20.0],
+  "Eastern Australia": [-27.0, 153.5],
+  "California Coast": [34.0, -120.0],
+  "Arctic Waters": [72.0, -40.0],
   "Baja California": [28.0, -113.0],
   "Dry Tortugas mating ground": [24.6, -82.9],
   "Marquesas Keys": [24.6, -82.1],
@@ -592,9 +761,164 @@ const MAP_COORDS = {
   "Coral garden": [12.05, 122.15],
   "Sand flat": [11.95, 122.05],
   "Lagoon patch reef": [12.15, 122.0],
-  "Reef channel": [12.0, 121.95]
+  "Reef channel": [12.0, 121.95],
 
-};
+
+  "Aleutian arc": [52.0, -175.0],
+  "Anacapa Channel": [34.0, -119.5],
+  "Ari Atoll": [3.8, 72.9],
+  "Aves Ridge slope": [13.5, -63.5],
+  "Azores seamount chain": [38.0, -28.0],
+  "Baa Atoll": [5.2, 73.0],
+  "Baffin Bay": [73.0, -65.0],
+  "Bass Strait": [-39.5, 147.0],
+  "Bay of Biscay slope": [45.0, -5.0],
+  "Bering Sea slope": [58.0, -175.0],
+  "Bermuda": [32.3, -64.8],
+  "Blake Plateau": [30.5, -78.5],
+  "Bristol Channel": [51.3, -4.5],
+  "Brittany coast": [48.4, -4.8],
+  "Brittany continental slope": [47.5, -6.0],
+  "Byron Bay": [-28.6, 153.6],
+  "Canadian Arctic Archipelago": [73.0, -95.0],
+  "Canary Islands slope": [28.0, -16.0],
+  "Cardigan Bay": [52.5, -4.8],
+  "Cariaco Basin slope": [10.8, -64.5],
+  "Celtic Sea shallows": [50.5, -7.0],
+  "Cuba shelf edge": [22.5, -79.5],
+  "Davis Strait": [65.0, -58.0],
+  "East China Sea": [30.0, 126.0],
+  "Eden": [-37.1, 149.9],
+  "Elkhorn Slough": [36.8, -121.8],
+  "English Channel": [50.2, -1.0],
+  "Great Australian Bight": [-33.5, 130.0],
+  "Great Bahama Bank": [24.5, -79.0],
+  "Greenland shelf": [68.0, -55.0],
+  "Grenada Basin": [12.5, -62.5],
+  "Gulf Stream": [35.0, -70.0],
+  "Gulf of Cadiz": [36.0, -8.0],
+  "Irish Sea margin": [53.5, -5.5],
+  "Isles of Scilly": [49.9, -6.3],
+  "Izu Peninsula": [34.9, 138.9],
+  "Jervis Bay": [-35.1, 150.8],
+  "Kuril Islands slope": [46.0, 152.0],
+  "Kuril-Kamchatka Trench margin": [50.0, 158.0],
+  "Kuroshio Current": [33.0, 138.0],
+  "La Jolla": [32.8, -117.3],
+  "Lesser Antilles volcanic arc slope": [14.0, -61.0],
+  "Little Bahama Bank": [26.8, -78.5],
+  "Lizard Point": [49.96, -5.2],
+  "Lizard Point reefs": [49.96, -5.2],
+  "Lord Howe Island": [-31.6, 159.1],
+  "Madeira Abyssal slope": [32.0, -18.0],
+  "Mid-Atlantic Ridge seamounts": [40.0, -30.0],
+  "Montague Island": [-36.2, 150.2],
+  "Monterey Bay": [36.8, -121.9],
+  "Mount's Bay": [50.1, -5.5],
+  "New South Wales coast": [-33.0, 152.5],
+  "Norwegian Sea": [68.0, 5.0],
+  "Ogasawara Islands": [27.1, 142.2],
+  "Oyashio current region": [43.0, 146.0],
+  "Pacific coast of Hokkaido": [42.0, 144.0],
+  "Palos Verdes": [33.7, -118.4],
+  "Penzance Bay": [50.1, -5.5],
+  "Phillip Island": [-38.5, 145.2],
+  "Plymouth Sound reefs": [50.3, -4.1],
+  "Porcupine Bank": [53.5, -13.5],
+  "Porcupine Seabight": [51.0, -13.0],
+  "Port Stephens": [-32.7, 152.2],
+  "Rasdhoo Atoll": [4.3, 73.0],
+  "Rockall Trough": [55.0, -14.0],
+  "San Clemente Island": [32.9, -118.5],
+  "San Francisco Bay": [37.8, -122.4],
+  "Santa Cruz Island": [34.0, -119.7],
+  "Santa Monica Bay": [33.9, -118.5],
+  "Sargasso Sea": [30.0, -60.0],
+  "Scilly Isles": [49.9, -6.3],
+  "Shikoku Basin": [31.0, 135.0],
+  "Solitary Islands": [-30.2, 153.3],
+  "South Malé Atoll": [3.9, 73.5],
+  "Svalbard": [78.0, 16.0],
+  "Sydney": [-33.9, 151.2],
+  "Sydney reefs": [-33.9, 151.3],
+  "Tasman Sea shelf": [-28.7, 153.7],
+  "Tomales Bay": [38.2, -123.0],
+  "Turks and Caicos": [21.8, -71.8],
+  "Upper slope off Colombia": [12.5, -72.5],
+  "Upper slope off Venezuela": [11.5, -64.0],
+  "Vaavu Atoll": [3.5, 73.5],
+  "Victoria shelf": [-38.5, 144.5],
+  "Western Approaches": [49.5, -8.0],
+  "Wilsons Promontory": [-39.0, 146.4],
+  "Yucatán Channel": [21.8, -85.8],
+  "northern Tasmania": [-40.9, 146.5],
+  /* v0.21.0 Mira review: local waypoint clusters for resident species. */
+  "Catalina west end": [33.45, -118.6],
+  "Catalina isthmus": [33.45, -118.5],
+  "Catalina east end": [33.4, -118.35],
+  "Catalina back side": [33.42, -118.55],
+  "Julian Rocks": [-28.61, 153.63],
+  "Wategos reef": [-28.63, 153.64],
+  "Byron Bay north wall": [-28.62, 153.65],
+  "Byron Bay south ledge": [-28.65, 153.62],
+  "Baffin Bay deep basin": [72.5, -64.0],
+  "Davis Strait slope": [65.5, -57.5],
+  "Porcupine slope": [51.02, -13.1],
+  "Western Approaches deep": [49.3, -8.5],
+
+  "Sagami Bay deep": [35.0, 139.5],
+  "Izu Peninsula slope": [34.7, 139.0],
+  /* v0.21.0 Mira re-review: local clusters for plausibility. */
+  "Mount's Bay east": [50.08, -5.45],
+  "Lizard Point west": [49.95, -5.25],
+  "Colombian slope north": [12.7, -72.3],
+  "Colombian slope south": [12.3, -72.7],
+  "Colombian canyon": [12.5, -72.5],
+  "Upper slope off Colombia east": [12.6, -72.0],
+  "Tasman shelf north": [-28.6, 153.75],
+  "Tasman shelf south": [-28.8, 153.65],
+  "NSW shelf edge": [-28.65, 153.8],
+  "Sargasso Sea west": [30.1, -60.2],
+  "Sargasso Sea east": [29.9, -59.8],
+  "Sargasso Sea north": [30.3, -60.1],
+
+  /* v0.21.0 final audit: local clusters. */
+  "South Malé outer slope": [3.95, 73.55],
+  "South Malé channel": [3.88, 73.48],
+  "Malé Atoll south": [3.85, 73.52],
+  "South Malé drop-off": [3.92, 73.58],
+  "Monterey Canyon edge": [36.75, -121.95],
+  "Elkhorn Slough mouth": [36.82, -121.78],
+  "Monterey Bay south": [36.65, -121.85],
+  "Cannery Row reef": [36.62, -121.92],
+  "Mount's Bay west": [50.05, -5.60],
+  "Tasman Sea shelf east": [-28.7, 153.85],
+  "Porcupine Seabight east": [51.05, -13.05],
+  "Porcupine Bank edge": [51.08, -13.15],
+  "Porcupine Seabight west": [50.95, -13.25],
+  "English Channel east": [50.22, -1.0],
+  "English Channel west": [50.18, -1.4],
+  "English Channel central north": [50.25, -1.2],
+  "English Channel central south": [50.15, -1.2],
+  "English Channel central": [50.2, -1.2],
+  "Caribbean reef edge": [15.2, -70.2],
+  "Caribbean channel": [14.8, -69.8],
+  "Caribbean Sea north": [15.5, -70.5],
+  "Caribbean bank": [14.5, -70.0],
+
+  "Sydney north": [-33.8, 151.3],
+  "Sydney south": [-34.0, 151.2],
+  "Sydney offshore": [-33.9, 151.4],
+  "Sydney harbor mouth": [-33.85, 151.25],
+  "Sargasso Sea south": [29.7, -60.0],
+  "Taiwan east coast": [23.9, 121.7],
+  "Taiwan east offshore": [23.8, 122.0],
+  "Taiwan east deep": [23.7, 122.3],
+  "Ryukyu Trench north": [24.2, 122.5],
+  "Taiwan east slope": [24.0, 121.9],
+  "Izu Peninsula south": [34.6, 139.1],
+  "Sagami Bay offshore": [35.0, 139.5],
+  "Izu Peninsula east": [34.8, 139.2],};
 
 const MAP_W = 1000, MAP_H = 500;
 
