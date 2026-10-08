@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.26.0";
+const VERSION = "v0.26.1";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -1310,7 +1310,15 @@ function spawnCreature(type, background) {
   el.style.height = background
     ? Math.round(10 + Math.random() * 8) + "px"
     : Math.round(24 + Math.random() * 26) + "px";
-  if (Math.random() < 0.4) el.style.transform = "scaleX(-1)";
+  /* v0.26.1: ambient creatures swim both ways — 50/50 per spawn. The art
+     faces left by default, so leftward swimmers need no flip; rightward
+     swimmers are mirrored to face their direction of travel. (Replaces the
+     old 40%-flip, which left most creatures swimming backwards.) */
+  if (Math.random() < 0.5) {
+    el.style.transform = "scaleX(-1)"; // face right, drift left-to-right
+  } else {
+    el.classList.add("swim-left"); // face left, drift right-to-left
+  }
   el.addEventListener("animationend", () => el.remove());
   scene.appendChild(el);
   setTimeout(() => el.remove(), 25000); // safety net
