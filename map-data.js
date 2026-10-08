@@ -354,9 +354,9 @@ const TRACK_ENVELOPES = {
     corridor: "Common angelsharks are strongly site-attached ambush predators; tagging studies show individuals barely move, sitting buried for days on the same sand patch. Movements are short shuffles between nearby sandy grounds, not migrations."
   },
   megamouth: {
-    start: "Tagged at the surface at night east of Taiwan",
-    areas: ["Taiwan east coast", "Taiwan east offshore", "Taiwan east deep", "Ryukyu Trench north", "Taiwan east slope"],
-    tagAnchor: "Taiwan east coast",
+    start: "Tagged at the surface at night off the Izu Peninsula",
+    areas: ["Izu Peninsula", "Sagami Bay", "Izu Peninsula south", "Sagami Bay offshore", "Izu Peninsula east"],
+    tagAnchor: "Izu Peninsula",
     hop: [50, 400], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
     corridor: "Megamouths are vertical migrators, spending days deep in the twilight zone and rising at night to feed — tagged individuals have shown long horizontal movements following currents and plankton, consistent with other large filter-feeding sharks."
   },
@@ -915,7 +915,10 @@ const MAP_COORDS = {
   "Taiwan east offshore": [23.8, 122.0],
   "Taiwan east deep": [23.7, 122.3],
   "Ryukyu Trench north": [24.2, 122.5],
-  "Taiwan east slope": [24.0, 121.9],};
+  "Taiwan east slope": [24.0, 121.9],
+  "Izu Peninsula south": [34.6, 139.1],
+  "Sagami Bay offshore": [35.0, 139.5],
+  "Izu Peninsula east": [34.8, 139.2],};
 
 const MAP_W = 1000, MAP_H = 500;
 
