@@ -38,20 +38,20 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.20.0', VERSION === 'v0.20.0');
+  ok('version v0.21.0', VERSION === 'v0.21.0');
 
   // roster
-  ok('roster is 32', SHARKS.length === 32);
+  ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
-  ok('32 unique shark IDs', new Set(ids).size === 32);
-  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 32);
+  ok('50 unique shark IDs', new Set(ids).size === 50);
+  ok('no duplicate research codes', new Set(SHARKS.map(s => s.code)).size === 50);
   ok('all have ART', ids.every(id => !!ART[id]));
   ok('all have SKETCH', ids.every(id => !!SKETCH[id]));
   const counts = ids.map(id => (COUSIN_CHATS[id] || []).length);
-  ok('all 32 species have 3 chats', counts.length === 32 && counts.every(n => n === 3));
+  ok('all 50 species have 3 chats', counts.length === 50 && counts.every(n => n === 3));
   ok('all have nudges', ids.every(id => !!COUSIN_NUDGES[id]));
   ok('all have envelopes', ids.every(id => !!TRACK_ENVELOPES[id]));
-  ok('win is full roster', SHARKS.length === 32);
+  ok('win is full roster', SHARKS.length === 50);
 
   // v0.14.0 new sharks
   const new2 = ['frilled', 'zebra'];
@@ -147,7 +147,7 @@ code += `
   ok('ARCHIVE_MEDIA exists', typeof ARCHIVE_MEDIA === 'object');
   const liveIds = SHARKS.map(x => x.id);
   const archivedLive = liveIds.filter(id => ARCHIVE_MEDIA[id] && !ARCHIVE_MEDIA[id].future);
-  ok('all 32 live sharks have archive entries', archivedLive.length === 32);
+  ok('all 50 live sharks have archive entries', archivedLive.length === 50);
   ok('salmon is live with media', ARCHIVE_MEDIA.salmon && ARCHIVE_MEDIA.salmon.future === false && (ARCHIVE_MEDIA.salmon.assets || []).length > 0);
   let assetsOk = true, videosOk = true;
   liveIds.forEach(id => {
@@ -192,7 +192,7 @@ code += `
   const openerRe = /opener:\\s*"([^"]+)"/g;
   const openers = []; let m;
   while ((m = openerRe.exec(fileCode)) !== null) openers.push(m[1]);
-  ok('32 species openers present', openers.length === 32);
+  ok('50 species openers present', openers.length === 50);
   ok('no shared verbatim closer', new Set(openers).size === openers.length);
   ok('the old repeated closer is gone', !openers.some(function(o) { return /tell me everything/i.test(o); }));
   // v0.17.1 review fix: the advice offer must survive a reload, and a used
@@ -424,18 +424,18 @@ code += `
     !ARCHIVE_MEDIA.dusky.comingSoon && ARCHIVE_MEDIA.dusky.assets.length === 2 &&
     ARCHIVE_MEDIA.dusky.assets[0].credit === "Happy Little Nomad" &&
     ARCHIVE_MEDIA.dusky.assets[1].license === "public domain (NOAA)");
-  // v0.20.0: Avery + Mira media batch — 18 future species staged, hidden until playable
-  const futures = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
+  // v0.21.0: the 18 wave species are now LIVE (future:false), playable roster 50
+  const wave18 = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
     "megamouth","sawshark","greenland","cookiecutter","sixgill","velvetbelly","dwarflantern",
     "kitefin","pacificsleeper","spinydogfish","catshark"];
-  ok('media batch: 18 future entries', futures.every(id =>
-    ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future === true &&
+  ok('media batch: 18 wave entries live', wave18.every(id =>
+    ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future !== true &&
     (ARCHIVE_MEDIA[id].assets || []).length >= 1));
   ok('batch: no pygmy (verification hold)', !ARCHIVE_MEDIA.pygmy);
-  ok('batch: every asset has image+page+credit+license', futures.every(id =>
+  ok('batch: every asset has image+page+credit+license', wave18.every(id =>
     ARCHIVE_MEDIA[id].assets.every(a => a.image && a.page && a.credit && a.license &&
       !a.image.includes('commons.wikimedia.org/wiki/'))));
-  ok('batch: no HTML page URLs in image src', futures.every(id =>
+  ok('batch: no HTML page URLs in image src', wave18.every(id =>
     ARCHIVE_MEDIA[id].assets.every(a => !a.image.includes('wikipedia.org') && !a.image.includes('.org/wiki/'))));
   ok('spinner NC asset has notice + iNaturalist label', (() => {
     const a = ARCHIVE_MEDIA.spinner.assets[0];
@@ -541,6 +541,25 @@ code += `
       els["baitSelect"].value === "tuna" && els["methodSelect"].value === "attract" &&
       els["methodOptSelect"].value === "chum";
   })());
+
+  // v0.21.0 sharknado: every wave shark has dossier, 3 chats, nudge, art, sketch,
+  // envelope, live archive entry, and all envelope areas have MAP_COORDS
+  const wave = ["silvertip","spinner","wobbegong","leopard","horn","portjackson","angelshark",
+    "megamouth","sawshark","greenland","cookiecutter","sixgill","velvetbelly","dwarflantern",
+    "kitefin","pacificsleeper","spinydogfish","catshark"];
+  ok('sharknado: 18 new SHARKS entries', wave.every(id => sharkById(id)));
+  ok('sharknado: all have research+hook+opener+sketchCap', wave.every(id => {
+    const s = sharkById(id);
+    return s.research && s.hook && s.opener && s.sketchCap && s.nameIdeas && s.nameIdeas.length >= 3;
+  }));
+  ok('sharknado: all have 3 chats', wave.every(id => (COUSIN_CHATS[id] || []).length === 3));
+  ok('sharknado: all have nudges', wave.every(id => typeof COUSIN_NUDGES[id] === 'string' && COUSIN_NUDGES[id].length > 50));
+  ok('sharknado: all have ART', wave.every(id => typeof ART[id] === 'string' && ART[id].includes('<svg')));
+  ok('sharknado: all have SKETCH', wave.every(id => typeof SKETCH[id] === 'string' && SKETCH[id].includes('<svg')));
+  ok('sharknado: all have tracking envelopes', wave.every(id => TRACK_ENVELOPES[id] && TRACK_ENVELOPES[id].areas.length >= 3));
+  ok('sharknado: all have live archive entries', wave.every(id => ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future !== true));
+  ok('sharknado: 3 new regions locked', ['east-australia','california','arctic'].every(r => REGIONS[r] && REGIONS[r].locked));
+  ok('sharknado: no pygmy in roster', !sharkById('pygmy'));
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
