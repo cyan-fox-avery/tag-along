@@ -3,11 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b2237" />
+  <meta name="theme-color" content="#17517e" />
   <title>Tag Along — a shark research game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="ocean-decor" aria-hidden="true">
+    <div class="surface-shimmer"></div>
+    <div class="god-rays"><span></span><span></span><span></span><span></span></div>
+    <div class="bubbles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <svg class="seafloor" viewBox="0 0 1440 140" preserveAspectRatio="none">
+      <path d="M0,90 C120,60 240,110 360,95 C480,80 600,40 720,55 C840,70 960,110 1080,100 C1200,90 1320,60 1440,80 L1440,140 L0,140 Z"/>
+      <path class="kelp" d="M180,95 C175,70 185,50 178,30 C176,24 182,22 184,28 C190,48 182,68 188,95 Z"/>
+      <path class="kelp" d="M1250,100 C1246,78 1254,60 1249,42 C1247,36 1253,34 1255,40 C1260,58 1253,76 1258,100 Z"/>
+    </svg>
+  </div>
   <div class="build-tag" id="buildTag" title="Build version"></div>
   <div class="app">
     <header class="topbar">
@@ -23,6 +33,8 @@
       <button class="tab" data-tab="map" type="button">🗺️ Map</button>
       <button class="tab" data-tab="logbook" type="button">📓 Logbook</button>
       <button class="tab" data-tab="phone" type="button">📱 Phone <span id="msgBadge" class="count-badge hidden">0</span></button>
+      <button class="tab hidden" data-tab="archive" type="button">📸 Archive<span class="tab-badge hidden" aria-label="new photo">●</span></button>
+      <button class="tab" data-tab="achievements" type="button">🏆 <span id="achieveBadge" class="count-badge hidden">0/0</span></button>
     </nav>
 
     <main>
@@ -31,6 +43,45 @@
         <div class="section-head">
           <h2>Field guide</h2>
           <p>Study the notes and sketches. You'll see the real thing when you tag one.</p>
+        </div>
+        <!-- v0.19.0: field-guide database — search + stacked filters -->
+        <div class="guide-tools">
+          <input id="guideSearch" type="search" class="guide-search"
+            placeholder="Search sharks by name…" aria-label="Search sharks by name" autocomplete="off">
+          <button id="filterToggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filterPanel">
+            🔍 Filters <span id="filterCount" class="count-badge hidden">0</span>
+          </button>
+        </div>
+        <div id="activeChips" class="active-chips"></div>
+        <div class="guide-meta">
+          <span id="guideCount" class="latin"></span>
+          <button id="guideClear" class="hidden" type="button">Clear all</button>
+        </div>
+        <div id="filterPanel" class="filter-panel hidden">
+          <div class="sheet-head">
+            <h2>Filters</h2>
+            <button id="sheetClose" class="sheet-close" type="button" aria-label="Close filters">Done</button>
+          </div>
+          <div class="filter-group" data-group="tagged">
+            <h3>Status</h3>
+            <div class="chip-row" id="filterTagged"></div>
+          </div>
+          <div class="filter-group" data-group="region">
+            <h3>Location</h3>
+            <div class="chip-row" id="filterRegion"></div>
+          </div>
+          <div class="filter-group" data-group="depth">
+            <h3>Depth</h3>
+            <div class="chip-row" id="filterDepth"></div>
+          </div>
+          <div class="filter-group" data-group="methodOpt">
+            <h3>Method</h3>
+            <div class="chip-row" id="filterMethod"></div>
+          </div>
+          <div class="filter-group" data-group="bait">
+            <h3>Bait / diet</h3>
+            <div class="chip-row" id="filterBait"></div>
+          </div>
         </div>
         <div id="researchList" class="guide-list"></div>
       </section>
@@ -41,6 +92,9 @@
           <h2>Plan an expedition</h2>
           <p>Choose the water — region, depth, bait, and method. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
         </div>
+        <div id="expeditionPin" class="expedition-pin hidden"></div>
+        <!-- v0.22.0: pin-gated soft hint -->
+        <div id="pinHint" class="pin-hint hidden" aria-live="polite"></div>
 
         <div id="planner" class="planner-card">
           <label class="field">
@@ -69,6 +123,10 @@
             <div class="pick-visual" id="methodOptVisual" aria-hidden="true"></div>
           </label>
           <button id="launchBtn" class="primary-button" type="button">🚀 Launch expedition</button>
+          <label class="pace-toggle">
+            <input type="checkbox" id="quickPace">
+            <span>⚡ Quick pace <span class="latin">— shorter beats between log lines</span></span>
+          </label>
         </div>
 
         <div id="diveView" class="dive-view hidden" aria-live="polite">
@@ -122,6 +180,29 @@
           <h2>Expedition logbook</h2>
           <p>A scientist's notebook — every trip, plan and outcome. Compare your attempts; the pattern is the answer.</p>
         </div>
+        <!-- v0.22.0: logbook filters -->
+        <div class="logbook-filters" id="logbookFilters">
+          <label class="filter-label">Outcome
+            <select id="logFilterOutcome" class="filter-select">
+              <option value="all">All trips</option>
+              <option value="tagged">Successful tags</option>
+              <option value="resighted">Re-sightings</option>
+              <option value="watched">Watched</option>
+              <option value="missed">No sharks</option>
+            </select>
+          </label>
+          <label class="filter-label">Region
+            <select id="logFilterRegion" class="filter-select">
+              <option value="all">All regions</option>
+            </select>
+          </label>
+          <label class="filter-label">Species
+            <select id="logFilterSpecies" class="filter-select">
+              <option value="all">All species</option>
+            </select>
+          </label>
+          <button type="button" id="logFilterClear" class="secondary-button hidden">Clear</button>
+        </div>
         <div id="logbookList" class="logbook-list"></div>
       </section>
 
@@ -137,13 +218,41 @@
             </div>
           </div>
           <div id="messagesList" class="phone-convo"></div>
+          <div id="sarahAsk" class="sarah-ask hidden">
+            <p>💡 <strong>Ask Sarah:</strong> pick a shark and she'll share her notes.</p>
+            <div class="sarah-ask-row">
+              <select id="sarahAskSelect" aria-label="Choose a shark to ask Sarah about"></select>
+              <button id="sarahAskBtn" class="secondary-button" type="button">Ask</button>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <!-- WILD ARCHIVE — real-world media, unlocked by completing the roster -->
+      <section id="tab-archive" class="panel">
+        <div class="section-head">
+          <h2>Wild Archive</h2>
+          <p>You know these sharks now. Here they really are — real photographs and footage of the animals you tagged and released, hand-picked for this archive.</p>
+        </div>
+        <div id="archiveList" class="guide-list"></div>
+      </section>
+      <section id="tab-achievements" class="panel">
+        <div class="section-head" id="achieveHead">
+          <h2>Achievements</h2>
+          <p>0 of 0 unlocked</p>
+        </div>
+        <div id="achieveList" class="guide-list"></div>
       </section>
     </main>
 
     <footer class="foot">
       <p>Tag responsibly — every shark released healthy. 🦈</p>
       <p><button id="resetBtn" class="link-button" type="button">Reset all progress</button></p>
+      <p class="latin">
+        <button id="exportBtn" class="link-button" type="button">💾 Export save</button> ·
+        <button id="importBtn" class="link-button" type="button">📂 Import save</button>
+        <input id="importFile" type="file" accept=".json,application/json" class="hidden" />
+      </p>
     </footer>
   </div>
 
@@ -178,6 +287,7 @@
         <div id="healthArt" class="tag-art"></div>
         <div id="healthInfo" class="tag-info"></div>
         <button id="releaseBtn" class="primary-button" type="button">🌊 Release & keep diving</button>
+        <button id="releaseShipBtn" class="secondary-button" type="button">⛵ Release & return to ship</button>
       </div>
     </div>
   </div>
@@ -198,14 +308,28 @@
     </div>
   </div>
 
+  <!-- v0.22.0: What's New screen -->
+  <div id="whatsNewOverlay" class="overlay hidden">
+    <div class="phone">
+      <div id="whatsNewContent"></div>
+      <button id="whatsNewClose" class="primary-button" type="button">Let's go diving 🤿</button>
+    </div>
+  </div>
+
   <!-- Win state overlay: content is staged by winStep() in script.js -->
   <div id="winOverlay" class="overlay hidden"></div>
+  <div id="achieveOverlay" class="overlay hidden"></div>
 
   <script src="map-data.js"></script>
   <script src="art-data.js"></script>
   <script src="sarah-data.js"></script>
   <script src="sharks-data.js"></script>
+  <script src="archive-data.js"></script>
+  <script src="archive-ui.js"></script>
+  <script src="achievements-data.js"></script>
+  <script src="game-data.js"></script>
   <script src="assets/art-loader.js"></script>
   <script src="script.js"></script>
+  <!-- Avery + Mira + Roman — the ones who built this little ocean. 🦈 -->
 </body>
 </html>
