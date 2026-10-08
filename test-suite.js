@@ -937,6 +937,32 @@ code += `
            validateSaveData({ version: "v0.23.0", keys: { "tyi-messages": '{"messages":"hello"}' } }).ok === false &&
            validateSaveData({ version: "v0.23.0", keys: { "tyi-stats": '{"regionsVisited":null}' } }).ok === false;
   })());
+  ok('v0.23.0: validateSaveData accepts real saveMsgs() shape', (() => {
+    // Actual saveMsgs() serialization: object with messages array of thread objects
+    const real = { version: "v0.23.0", keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
+      "tyi-messages": JSON.stringify({
+        messages: [{ ts: 1234567890, msgs: [{ who: "them", text: "Hi!" }] }],
+        unread: 1, chatIdx: 0, lastRegion: "caribbean", chatSeen: true, sarahAdviceOffered: false
+      })
+    } };
+    return validateSaveData(real).ok === true;
+  })());
+  ok('v0.23.0: full realistic export validates', (() => {
+    // Realistic complete save: collection, logbook, stats, messages
+    const full = { version: "v0.23.0", exportedAt: new Date().toISOString(), keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true,"name":"Testy"}}',
+      "tyi-logbook": '[{"encounters":[{"result":"tagged","speciesId":"nurse"}],"region":"caribbean"}]',
+      "tyi-stats": '{"regionsVisited":["caribbean"],"expeditions":5}',
+      "tyi-messages": JSON.stringify({
+        messages: [{ ts: 1234567890, msgs: [{ who: "them", text: "Nice!" }] }],
+        unread: 0, chatIdx: 0, lastRegion: "caribbean", chatSeen: true, sarahAdviceOffered: true
+      }),
+      "tyi-pace": "steady"
+    } };
+    const r = validateSaveData(full);
+    return r.ok === true;
+  })());
   ok('v0.23.0: validateSaveData rejects bad save', (() => {
     return validateSaveData(null).ok === false &&
            validateSaveData({}).ok === false &&
