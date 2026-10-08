@@ -112,9 +112,9 @@ body { overflow-x: clip; }
 .subtitle { margin: 0; color: var(--ink-dim); font-size: 14px; }
 
 .tabs {
-  display: flex; gap: 8px; margin: 14px 0;
+  display: flex; gap: 8px; margin: 14px -14px;
   position: sticky; top: 0; z-index: 5;
-  background: rgba(11, 34, 55, 0.92); padding: 8px 0;
+  background: rgba(11, 34, 55, 0.92); padding: 8px 14px;
   backdrop-filter: blur(4px);
 }
 .tab {
