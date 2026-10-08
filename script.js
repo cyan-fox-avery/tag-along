@@ -888,7 +888,7 @@ function renderResearch() {
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
-            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the first six sharks to unlock them.</p>`
+            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the six original species (nurse, thresher, whale, goblin, tiger, sandtiger) to unlock them.</p>`
             : ``}
       </div>
     `;
@@ -928,7 +928,16 @@ function fillRegions() {
     const o = document.createElement("option");
     o.value = id;
     if (v.locked) {
-      o.textContent = `🔒 ${v.name} — unlocks after six successful tags`;
+      const unlockText = id === "galapagos" || id === "south-africa"
+        ? `🔒 ${v.name} — tag the six original species to unlock`
+        : id === "east-australia"
+          ? `🔒 ${v.name} — unlocks at 15 tags`
+          : id === "california"
+            ? `🔒 ${v.name} — unlocks at 25 tags`
+            : id === "arctic"
+              ? `🔒 ${v.name} — unlocks at 35 tags`
+              : `🔒 ${v.name} — locked`;
+      o.textContent = unlockText;
       o.disabled = true;
     } else {
       o.textContent = v.name;
@@ -944,10 +953,12 @@ function fillRegions() {
    - Tagging the full roster wins the game (Master Shark Tagger).
      v0.11.0: the win keeps moving up with the roster — always SHARKS.length. */
 function applyRegions() {
-  if (!state.regionsUnlocked) return;
-  for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
-  /* v0.21.0 sharknado: three more regions unlock by tag count. */
+  /* v0.21.0 Mira review: 15/25/35 milestones are genuinely count-based,
+     independent of the original-six unlock. */
   const n = Object.keys(state.tagged).length;
+  if (state.regionsUnlocked) {
+    for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
+  }
   if (n >= 15) REGIONS["east-australia"].locked = false;
   if (n >= 25) REGIONS["california"].locked = false;
   if (n >= 35) REGIONS["arctic"].locked = false;
@@ -1505,7 +1516,15 @@ function recordResighting(species, plan) {
     const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
     const last = t.track.points[t.track.points.length - 1];
     const day = last.day + env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
-    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    /* v0.21.0 Mira review: compute real distance from coordinates, not random hop. */
+    const lastCoord = MAP_COORDS[last.label];
+    const newCoord = MAP_COORDS[entry.location];
+    let km;
+    if (lastCoord && newCoord && typeof haversineKm === "function") {
+      km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
+    } else {
+      km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    }
     t.track.points.push({ label: entry.location, day, km });
     t.track.days = day;
     t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
@@ -1998,27 +2017,26 @@ function checkMilestones() {
     pushThread(REGION_UNLOCK_THREAD.map(m => ({ ...m })));
     showRegionUnlock();
   }
-  /* v0.21.0 sharknado: progressive region unlocks by tag count. */
+  /* v0.21.0 sharknado: progressive region unlocks by tag count.
+     v0.21.0 Mira review: independent of original-six unlock. */
   const n = taggedIds.length;
-  if (state.regionsUnlocked) {
-    if (n >= 15 && REGIONS["east-australia"].locked) {
-      REGIONS["east-australia"].locked = false;
-      fillRegions();
-      pushThread(EAST_AUS_UNLOCK_THREAD.map(m => ({ ...m })));
-      showRegionUnlockSingle("east-australia", "Eastern Australia", "wobbegongs hide in the reef ledges here.");
-    }
-    if (n >= 25 && REGIONS["california"].locked) {
-      REGIONS["california"].locked = false;
-      fillRegions();
-      pushThread(CALIFORNIA_UNLOCK_THREAD.map(m => ({ ...m })));
-      showRegionUnlockSingle("california", "California Coast", "leopard sharks cruise the bays and kelp.");
-    }
-    if (n >= 35 && REGIONS["arctic"].locked) {
-      REGIONS["arctic"].locked = false;
-      fillRegions();
-      pushThread(ARCTIC_UNLOCK_THREAD.map(m => ({ ...m })));
-      showRegionUnlockSingle("arctic", "Arctic Waters", "the Greenland shark waits in the cold dark.");
-    }
+  if (n >= 15 && REGIONS["east-australia"].locked) {
+    REGIONS["east-australia"].locked = false;
+    fillRegions();
+    pushThread(EAST_AUS_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("east-australia", "Eastern Australia", "wobbegongs hide in the reef ledges here.");
+  }
+  if (n >= 25 && REGIONS["california"].locked) {
+    REGIONS["california"].locked = false;
+    fillRegions();
+    pushThread(CALIFORNIA_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("california", "California Coast", "leopard sharks cruise the bays and kelp.");
+  }
+  if (n >= 35 && REGIONS["arctic"].locked) {
+    REGIONS["arctic"].locked = false;
+    fillRegions();
+    pushThread(ARCTIC_UNLOCK_THREAD.map(m => ({ ...m })));
+    showRegionUnlockSingle("arctic", "Arctic Waters", "the Greenland shark waits in the cold dark.");
   }
   if (taggedIds.length >= SHARKS.length && !state.won) {
     /* The ceremony waits for day's end — the trip always finishes first. */
