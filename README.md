@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.21.0** — *a shark research game*
+**v0.22.0** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,15 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.22.0 changes — field notes 📓
+
+- **📓 Logbook filters.** Filter your expedition log by outcome (successful tag / re-sighting / no sharks), region, or species — with a clear button. Filters narrow the notebook; they never solve the expedition.
+- **📌 Pin-gated soft hints.** Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan matches 3 of its 4 needs (region, depth, bait, method). Wording is observational only — "Maybe we'll find them elsewhere?", "They didn't seem to like the food we were offering." — never "correct"/"wrong". The pinned card and Expedition tab explain that pinning switches hints on. This intentionally evolves the old rule that failed trips give no signal: the logbook now means "you're warm", while Sarah remains the stronger help after repeated failures.
+- **🎉 "What's new?" screen.** Returning players see a one-time summary of each version's changes on first load after an update.
+- **🎣 Failed trips feel like fieldwork.** Expeditions now open with sea conditions (weather, chop, fog), close misses get a warm field-notes line (dolphins on the bow wave, a manta passing underneath), and the logbook records conditions for every trip.
+- **🌊 Conservation-science notes.** Every collection card now carries a 1–2 sentence conservation note — IUCN context, specific threats, and the protection efforts making a difference.
+- 177 tests passing, including new regression coverage for pin-hint logic, logbook filters, and version comparison.
 
 ## v0.21.0 changes — the sharknado 🦈🌪️
 

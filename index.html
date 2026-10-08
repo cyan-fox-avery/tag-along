@@ -93,6 +93,8 @@
           <p>Choose the water — region, depth, bait, and method. Your research is your targeting: the right combination brings the right sharks. No target species; the sea decides who shows up.</p>
         </div>
         <div id="expeditionPin" class="expedition-pin hidden"></div>
+        <!-- v0.22.0: pin-gated soft hint -->
+        <div id="pinHint" class="pin-hint hidden" aria-live="polite"></div>
 
         <div id="planner" class="planner-card">
           <label class="field">
@@ -177,6 +179,28 @@
         <div class="section-head">
           <h2>Expedition logbook</h2>
           <p>A scientist's notebook — every trip, plan and outcome. Compare your attempts; the pattern is the answer.</p>
+        </div>
+        <!-- v0.22.0: logbook filters -->
+        <div class="logbook-filters" id="logbookFilters">
+          <label class="filter-label">Outcome
+            <select id="logFilterOutcome" class="filter-select">
+              <option value="all">All trips</option>
+              <option value="tagged">Successful tags</option>
+              <option value="resighted">Re-sightings</option>
+              <option value="missed">No sharks</option>
+            </select>
+          </label>
+          <label class="filter-label">Region
+            <select id="logFilterRegion" class="filter-select">
+              <option value="all">All regions</option>
+            </select>
+          </label>
+          <label class="filter-label">Species
+            <select id="logFilterSpecies" class="filter-select">
+              <option value="all">All species</option>
+            </select>
+          </label>
+          <button type="button" id="logFilterClear" class="secondary-button hidden">Clear</button>
         </div>
         <div id="logbookList" class="logbook-list"></div>
       </section>
@@ -275,6 +299,14 @@
     <div class="phone">
       <div id="trackContent"></div>
       <button id="trackClose" class="secondary-button" type="button">Close</button>
+    </div>
+  </div>
+
+  <!-- v0.22.0: What's New screen -->
+  <div id="whatsNewOverlay" class="overlay hidden">
+    <div class="phone">
+      <div id="whatsNewContent"></div>
+      <button id="whatsNewClose" class="primary-button" type="button">Let's go diving 🤿</button>
     </div>
   </div>
 

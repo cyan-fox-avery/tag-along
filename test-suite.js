@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.21.0', VERSION === 'v0.21.0');
+  ok('version v0.22.0', VERSION === 'v0.22.0');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -752,6 +752,61 @@ code += `
   ok('mira: dwarf lanternshark track is archival', TRACK_ENVELOPES.dwarflantern.kind === 'archival');
   // All 50 species have map colors (no white-marker fallback)
   ok('mira: all 50 sharks have SPECIES_COLORS', SHARKS.every(s => SPECIES_COLORS[s.id] !== undefined));
+
+  // v0.22.0: pin-gated soft hints
+  ok('v0.22.0: pin hint triggers at 3/4 correct', (() => {
+    const s = sharkById('nurse'); // caribbean, surface/reef, crustaceans/urchins, attract
+    const plan3 = { region: 'caribbean', depth: 'reef', bait: 'crustaceans', method: 'aggregation' };
+    const h = pinHintForPlan(plan3, 'nurse');
+    return h && h.dimension === 'method' && /different approach/.test(h.hint);
+  })());
+  ok('v0.22.0: pin hint silent at 2/4 or 4/4', (() => {
+    const plan2 = { region: 'caribbean', depth: 'deep', bait: 'plankton', method: 'aggregation' };
+    const plan4 = { region: 'caribbean', depth: 'reef', bait: 'crustaceans', method: 'attract' };
+    return pinHintForPlan(plan2, 'nurse') === null && pinHintForPlan(plan4, 'nurse') === null;
+  })());
+  ok('v0.22.0: pin hint needs a pinned shark', (() => {
+    const plan = { region: 'caribbean', depth: 'reef', bait: 'crustaceans', method: 'aggregation' };
+    return pinHintForPlan(plan, null) === null;
+  })());
+  ok('v0.22.0: pin hint wording is observational', (() => {
+    return Object.values(PIN_HINTS).every(h => !/correct|wrong|right answer/i.test(h));
+  })());
+
+  // v0.22.0: logbook filters
+  ok('v0.22.0: logbook filter by outcome', (() => {
+    const t1 = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'tagged' }] };
+    const t2 = { region: 'caribbean', encounters: [] };
+    const t3 = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'resighted' }] };
+    return logbookTripMatches(t1, { outcome: 'tagged', region: 'all', species: 'all' }) &&
+           !logbookTripMatches(t2, { outcome: 'tagged', region: 'all', species: 'all' }) &&
+           logbookTripMatches(t2, { outcome: 'missed', region: 'all', species: 'all' }) &&
+           logbookTripMatches(t3, { outcome: 'resighted', region: 'all', species: 'all' });
+  })());
+  ok('v0.22.0: logbook filter by region and species', (() => {
+    const t = { region: 'caribbean', encounters: [{ speciesId: 'nurse', result: 'tagged' }] };
+    return logbookTripMatches(t, { outcome: 'all', region: 'caribbean', species: 'all' }) &&
+           !logbookTripMatches(t, { outcome: 'all', region: 'arctic', species: 'all' }) &&
+           logbookTripMatches(t, { outcome: 'all', region: 'all', species: 'nurse' }) &&
+           !logbookTripMatches(t, { outcome: 'all', region: 'all', species: 'tiger' });
+  })());
+
+  // v0.22.0: What's New version comparison
+  ok('v0.22.0: whatsnew shows on version change only', (() => {
+    return shouldShowWhatsNew('v0.21.0', 'v0.22.0') === true &&
+           shouldShowWhatsNew('v0.22.0', 'v0.22.0') === false &&
+           shouldShowWhatsNew(null, 'v0.22.0') === false &&
+           shouldShowWhatsNew('', 'v0.22.0') === false;
+  })());
+  ok('v0.22.0: whatsnew has v0.22.0 notes', (() => {
+    return Array.isArray(WHATS_NEW['v0.22.0']) && WHATS_NEW['v0.22.0'].length === 4;
+  })());
+
+  // v0.22.0: conservation notes on all 50
+  ok('v0.22.0: all 50 sharks have conservation notes', SHARKS.every(s => typeof s.conservation === 'string' && s.conservation.length > 40));
+
+  // v0.22.0: fieldwork constants exist
+  ok('v0.22.0: sea conditions and field notes exist', SEA_CONDITIONS.length >= 4 && FIELD_NOTES.length >= 4);
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
