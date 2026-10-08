@@ -656,6 +656,64 @@ code += `
       state.tagged = savedTagged;
     }
   })());
+  ok('mira: archival popup opens without error', (() => {
+    // Regression: showMapPopup used species.id (ReferenceError) instead of s.id
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      const species = SHARKS.find(s => s.id === 'sawshark');
+      state.tagged['sawshark'] = { location: "Tasmania", nick: "Test", researchId: "TEST-003" };
+      state.tagged['sawshark'].track = genTrack(species, state.tagged['sawshark']);
+      state.tagged['sawshark'].track.v = 2;
+      // This should not throw
+      showMapPopup('sawshark');
+      // Popup should contain the neutral wording, not "never carried"
+      const pop = document.getElementById("mapPopup");
+      const html = pop.innerHTML || "";
+      return html.indexOf("Illustrative habitat-based movement scenario") !== -1 &&
+             html.indexOf("never carried a tracking tag") === -1;
+    } catch (e) {
+      return false;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
+  ok('mira: legacy re-sighting reconstructed from records', (() => {
+    // Genuinely pre-v0.21.0 save: no resighting flag, but has resightings records
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      state.tagged['catshark'] = {
+        location: "Cornwall", nick: "Test", researchId: "TEST-004",
+        // Old track: 7 generated points + 1 legacy re-sighting (no flag)
+        track: {
+          points: [
+            { label: "Cornwall", day: 0, km: 0 },
+            { label: "Mount's Bay", day: 3, km: 5 },
+            { label: "Lizard Point", day: 6, km: 8 },
+            { label: "Penzance Bay", day: 9, km: 6 },
+            { label: "Mount's Bay east", day: 12, km: 4 },
+            { label: "Lizard Point west", day: 15, km: 7 },
+            { label: "Mount's Bay", day: 18, km: 5 },
+            { label: "Cornwall", day: 25, km: 12 }  // legacy re-sighting, no flag
+          ],
+          totalKm: 47, days: 25, kind: "acoustic"
+        },
+        resightings: [{ date: "2026-02-01", location: "Cornwall", note: "Legacy", ts: 2 }]
+      };
+      migrateTracks();
+      const t = state.tagged['catshark'];
+      if (t.track.v !== 2) return false;
+      // Re-sighting point should be reconstructed
+      if (!t.track.points.some(p => p.resighting)) return false;
+      // Day count should agree with final point
+      const lastPoint = t.track.points[t.track.points.length - 1];
+      if (t.track.days < lastPoint.day) return false;
+      // Records preserved
+      if (!t.resightings || t.resightings.length === 0) return false;
+      return true;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
   ok('mira: resident envelopes stay local', (() => {
     function maxHop(id) {
       var env = TRACK_ENVELOPES[id], max = 0;

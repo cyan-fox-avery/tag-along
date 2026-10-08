@@ -368,7 +368,7 @@ function showMapPopup(sid) {
   const kindNote = t.track.hypothetical
     ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey."
     : t.track.kind === "archival"
-    ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (species.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "")
+    ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (s.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "")
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
       : t.track.kind === "acoustic"
@@ -593,8 +593,21 @@ function migrateTracks() {
        Old tracks start at generic regional centers and teleport to the envelope.
        v0.21.0 Mira re-review: preserve player re-sighting points. */
     if (!t.track || t.track.v !== 2) {
-      const resightPoints = (t.track && t.track.points || []).filter(p => p.resighting);
+      /* v0.21.0 Mira: legacy tracks lack the resighting flag. Reconstruct
+         from t.resightings records if no flagged points exist. */
+      let resightPoints = (t.track && t.track.points || []).filter(p => p.resighting);
       const resightRecords = t.resightings || [];
+      if (resightPoints.length === 0 && resightRecords.length > 0 && t.track && t.track.points) {
+        // Legacy: reconstruct from resightings records. Old points lack the flag,
+        // so we treat points beyond the typical generated count as re-sightings.
+        // Each resighting record corresponds to a point appended after generation.
+        const genCount = t.track.points.length - resightRecords.length;
+        if (genCount >= 0 && resightRecords.length > 0) {
+          resightPoints = t.track.points.slice(genCount).map((p) => ({
+            label: p.label, day: p.day, km: p.km, resighting: true
+          }));
+        }
+      }
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
       t.track.v = 2;
       const species = sharkById(sid);
@@ -610,6 +623,8 @@ function migrateTracks() {
         }
         t.track.points.push({ label: anchorLabel, day: rp.day, km, resighting: true });
         t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
+        // Ensure day count agrees with final point (legacy points may be newer)
+        if (rp.day > t.track.days) t.track.days = rp.day;
       });
       if (resightRecords.length) t.resightings = resightRecords;
       changed = true;
@@ -2495,7 +2510,7 @@ function openTrack(id) {
     </div>
     <ul class="track-stops">${stops}</ul>
     <p class="track-note">Last ping: <strong>${esc(last.label)}</strong> · day ${last.day}<br>
-    <span class="dim">${esc(TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite)}</span></p>
+    <span class="dim">${esc(tr.hypothetical ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey." : tr.kind === "archival" ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (s.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "") : (TRACK_KIND_NOTES[tr.kind] || TRACK_KIND_NOTES.satellite))}</span></p>
   `;
   $("trackOverlay").classList.remove("hidden");
 }
