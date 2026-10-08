@@ -926,10 +926,16 @@ code += `
   ok('v0.23.0: validateSaveData accepts good save', (() => {
     const good = { version: "v0.23.0", keys: {
       "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
-      "tyi-logbook": '[{"trip":"done"}]'
+      "tyi-logbook": '[{"encounters":[{"result":"tagged","speciesId":"nurse"}],"region":"caribbean"}]',
+      "tyi-stats": '{"regionsVisited":["caribbean"],"expeditions":5}'
     } };
     const r = validateSaveData(good);
     return r.ok === true;
+  })());
+  ok('v0.23.0: validateSaveData rejects malformed structures', (() => {
+    return validateSaveData({ version: "v0.23.0", keys: { "tyi-logbook": "[{}]" } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-messages": '{"messages":"hello"}' } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-stats": '{"regionsVisited":null}' } }).ok === false;
   })());
   ok('v0.23.0: validateSaveData rejects bad save', (() => {
     return validateSaveData(null).ok === false &&
@@ -953,26 +959,40 @@ code += `
     // tyi-pace alone would wipe the collection
     return validateSaveData({ version: "v0.23.0", keys: { "tyi-pace": "quick" } }).ok === false;
   })());
-  ok('v0.23.0: rollback restores on mid-import failure', (() => {
-    // Failing stub storage: throws after 2 writes
-    let writes = 0, failNow = false;
-    const failing = {
-      data: { "tyi-collection": '{"nurse":{"researchId":"NS-001"}}', "tyi-pace": "slow" },
-      setItem(k, v) { if (failNow) throw new Error("quota"); this.data[k] = v; writes++; },
-      removeItem(k) { delete this.data[k]; }
+  ok('v0.23.0: rollback restores partial import', (() => {
+    // True partial import: some keys change, then storage throws mid-way
+    let opCount = 0, shouldFail = true;
+    const mem = {
+      data: { "tyi-collection": '{"nurse":{"researchId":"NS-001"}}', "tyi-pace": "slow", "tyi-last-seen-version": "v0.22.0" },
+      _op() { opCount++; if (shouldFail && opCount === 4) throw new Error("quota exceeded"); },
+      setItem(k, v) { this._op(); this.data[k] = v; },
+      removeItem(k) { this._op(); delete this.data[k]; }
     };
-    const snapshot = { ...failing.data };
-    failNow = true;
+    const snapshot = { ...mem.data };
     let threw = false;
-    try { replaceSaveKeys({ "tyi-collection": '{"tiger":{"researchId":"NS-002"}}' }, failing); }
+    try { replaceSaveKeys({ "tyi-collection": '{"tiger":{"researchId":"NS-002"}}', "tyi-pace": "quick" }, mem); }
     catch { threw = true; }
     if (!threw) return false;
-    // Rollback restores every original key, including ones absent before import
-    failNow = false;
-    const restored = restoreSnapshot(snapshot, failing);
+    // Storage writable again for rollback
+    shouldFail = false;
+    const restored = restoreSnapshot(snapshot, mem);
     if (!restored) return false;
-    return failing.data["tyi-collection"] === snapshot["tyi-collection"] &&
-           failing.data["tyi-pace"] === snapshot["tyi-pace"];
+    // Complete final key set must exactly equal the original snapshot
+    const finalKeys = Object.keys(mem.data).sort().join(",");
+    const origKeys = Object.keys(snapshot).sort().join(",");
+    if (finalKeys !== origKeys) return false;
+    return Object.entries(snapshot).every(([k, v]) => mem.data[k] === v);
+  })());
+  ok('v0.23.0: exported save validates', (() => {
+    // Real export shape round-trip: build what exportSave produces, validate it
+    const fakeStorage = {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true,"name":"Testy"}}',
+      "tyi-logbook": '[{"encounters":[{"result":"tagged","speciesId":"nurse"}],"region":"caribbean"}]',
+      "tyi-pace": "steady"
+    };
+    const exported = { version: "v0.23.0", exportedAt: new Date().toISOString(), keys: fakeStorage };
+    const r = validateSaveData(exported);
+    return r.ok === true;
   })());
   ok('v0.23.0: replaceSaveKeys swaps full key set', (() => {
     const mem = { data: { "tyi-collection": "old", "tyi-pace": "old" },
