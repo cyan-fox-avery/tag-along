@@ -14,6 +14,11 @@ const WHATS_NEW = {
     "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
     "🎣 <strong>Failed trips feel like fieldwork.</strong> Richer expedition narratives: weather, sea state, wildlife sightings, and proper field notes in the logbook.",
     "🌊 <strong>Conservation notes.</strong> Every collection card now carries a conservation-science note — status context, threats, and the protection efforts making a difference."
+  ],
+  "v0.23.0": [
+    "🦈 <strong>Real-shark stories.</strong> Name a great white Mary Lee or Nicole, and Sarah will tell you about the real sharks behind the names — their extraordinary journeys.",
+    "🤫 <strong>A secret swims in these waters.</strong> There's a new hidden surprise for curious researchers. We won't spoil it here.",
+    "💾 <strong>Save export/import.</strong> Back up your research as a JSON file, or bring a save to a new device. Find it in the footer."
   ]
 };
 
@@ -2605,7 +2610,7 @@ function maybeNameEgg(speciesId, rec) {
   }
   // Bruce: ANY shark. No immediate message — the slow chain begins silently.
   if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
-    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0 };
+    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
     try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
     // Deliberately no pushThread here. Sarah will notice... eventually.
   }
@@ -2641,6 +2646,17 @@ function advanceBruceChain() {
   state.bruceEgg.stage = stage + 1;
   state.bruceEgg.lastAdvance = now;
   state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
+  // If that was the final stage, complete the chain NOW (not on a later call)
+  if (state.bruceEgg.stage >= BRUCE_CHAIN.length) {
+    state.bruceChainComplete = true;
+    try {
+      localStorage.setItem("tyi-bruce-done", "1");
+      localStorage.removeItem("tyi-bruce");
+    } catch {}
+    state.bruceEgg = null;
+    checkAchievements();
+    return;
+  }
   try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
 }
 
@@ -2858,33 +2874,70 @@ function exportSave() {
   aEl.click();
   setTimeout(() => { document.body.removeChild(aEl); URL.revokeObjectURL(url); }, 100);
 }
+/* v0.23.0 Mira review: safe import — validate everything BEFORE touching
+   storage, replace the complete key set (clear missing keys), and back up
+   the existing save first. */
+function validateSaveData(data) {
+  if (!data || typeof data !== "object") return { ok: false, reason: "not an object" };
+  if (!data.keys || typeof data.keys !== "object") return { ok: false, reason: "missing keys" };
+  // Only recognized keys
+  const unknown = Object.keys(data.keys).filter(k => !RESET_KEYS.includes(k) && k !== "tyi-bruce" && k !== "tyi-bruce-done");
+  if (unknown.length > 5) return { ok: false, reason: "too many unknown keys: " + unknown.slice(0, 3).join(", ") };
+  // Validate JSON fields parse
+  for (const [k, v] of Object.entries(data.keys)) {
+    if (typeof v !== "string") return { ok: false, reason: "non-string value for " + k };
+    if ((k === "tyi-collection" || k === "tyi-logbook") && v) {
+      try { JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in " + k }; }
+    }
+  }
+  // Version: supported if it's a known v0.x version, else warn
+  const fv = data.version || "unknown";
+  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
+  return { ok: true, version: fv, supported };
+}
+function backupCurrentSave() {
+  const backup = { version: VERSION, exportedAt: new Date().toISOString(), keys: {} };
+  RESET_KEYS.forEach(k => {
+    try { const v = localStorage.getItem(k); if (v !== null) backup.keys[k] = v; } catch {}
+  });
+  try { localStorage.setItem("tyi-backup", JSON.stringify(backup)); } catch {}
+}
 function importSave(file) {
   const reader = new FileReader();
   reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      // Validate shape
-      if (!data || typeof data !== "object" || !data.keys || typeof data.keys !== "object") {
-        alert("That doesn't look like a Tag Along save file.");
-        return;
-      }
-      // Version check (warn but allow)
-      const fileVersion = data.version || "unknown";
-      let msg = "Import this save? Your current progress will be overwritten.\n\n";
-      msg += "File version: " + fileVersion + "\nCurrent version: " + VERSION;
-      if (fileVersion !== VERSION) {
-        msg += "\n\n⚠️ Version mismatch — things might look odd, but we'll do our best.";
-      }
-      if (!confirm(msg)) return;
-      // Apply
-      Object.entries(data.keys).forEach(([k, v]) => {
-        try { localStorage.setItem(k, v); } catch {}
-      });
-      // Reload to pick up the new save
-      location.reload();
-    } catch (e) {
-      alert("Couldn't read that file. Is it a valid Tag Along save?");
+    let data;
+    try { data = JSON.parse(reader.result); }
+    catch { alert("Couldn't read that file. Is it a valid Tag Along save?"); return; }
+    // Validate BEFORE touching storage
+    const check = validateSaveData(data);
+    if (!check.ok) {
+      alert("That save file looks incompatible (" + check.reason + "). Nothing was changed.");
+      return;
     }
+    let msg = "Import this save? Your current progress will be replaced.\n\n";
+    msg += "File version: " + check.version + "\nCurrent version: " + VERSION;
+    if (!check.supported) {
+      msg += "\n\n⚠️ This version isn't recognized — import may not work correctly.";
+    }
+    msg += "\n\nA backup of your current save will be kept.";
+    if (!confirm(msg)) return;
+    // Backup, then replace complete key set (clear keys missing from import)
+    backupCurrentSave();
+    try {
+      RESET_KEYS.forEach(k => {
+        if (k in data.keys) localStorage.setItem(k, data.keys[k]);
+        else localStorage.removeItem(k);
+      });
+      // Also handle bruce keys if present
+      ["tyi-bruce", "tyi-bruce-done"].forEach(k => {
+        if (k in data.keys) localStorage.setItem(k, data.keys[k]);
+        else localStorage.removeItem(k);
+      });
+    } catch (e) {
+      alert("Import failed partway — your backup is safe. Nothing was half-applied.");
+      return;
+    }
+    location.reload();
   };
   reader.readAsText(file);
 }
