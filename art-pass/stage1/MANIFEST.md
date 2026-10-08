@@ -11,7 +11,7 @@
 | 5 | Sand tiger shark | *Carcharias taurus* | ✅ | ✅ | approved |
 | 6 | Common angelshark | *Squatina squatina* | ✅ | ✅ | approved |
 | 7 | Spotted wobbegong | *Orectolobus maculatus* | ✅ | ✅ | approved |
-| 8 | Dwarf lanternshark | *Etmopterus perryi* | ✅ | ✅ | revision-needed |
+| 8 | Dwarf lanternshark | *Etmopterus perryi* | ✅ | ✅ | approved |
 | 9 | Common thresher shark | *Alopias vulpinus* | ✅ | ✅ | approved |
 | 10 | Whale shark | *Rhincodon typus* | ✅ | ✅ | approved |
 | 11 | Goblin shark | *Mitsukurina owstoni* | ✅ | ✅ | approved |
@@ -59,8 +59,8 @@
 **Status key:** approved = Mira-approved final production art; generated = awaiting Mira's review; revision-needed = targeted corrections queued
 
 **Notes:**
-- 49/50 playable species approved by Mira as of 2026-10-08
-- Dwarf lanternshark: final dorsal-fin correction in progress (exactly 2 dorsals, second larger)
+- ✅ ALL 50 playable species approved by Mira as of 2026-10-08
 - Spotted wobbegong accepted as-is per Mira (minor dorsal height, not worth regenerating)
+- Art review phase complete; ready for integration and mobile QA
 
 ⭐ = bonus/extra species (not counted in the 50 playable roster)
