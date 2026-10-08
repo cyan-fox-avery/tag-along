@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.0.2-beta";
+const VERSION = "v1.0.3-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -549,6 +549,18 @@ const pinStore = {
     } catch {}
   }
 };
+/* v1.0.3-beta: collapsible pinned explainer. Tracks whether the player has
+   ever pinned a shark — after the first pin, the empty pinned card shows a
+   single line ("Pinned sharks appear here.") instead of the full explanation. */
+const pinHistoryStore = {
+  load() {
+    try { return localStorage.getItem("tyi-pinned-before") === "1"; }
+    catch { return false; }
+  },
+  save() {
+    try { localStorage.setItem("tyi-pinned-before", "1"); } catch {}
+  }
+};
 
 /* v0.6.0: threads are {ts, msgs}. Migrate legacy bare-array threads. */
 function normThread(t) {
@@ -590,6 +602,7 @@ const state = {
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
   pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
+  hasPinnedBefore: pinHistoryStore.load(), // v1.0.3-beta: player has pinned at least once
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })()
@@ -901,6 +914,10 @@ function clearGuideFilters() {
    pinned shark unpins it. One pin at a time — a focus, not a collection. */
 function togglePin(id) {
   state.pinned = (state.pinned === id) ? null : id;
+  if (state.pinned) { // v1.0.3-beta: remember the first pin to collapse the explainer later
+    state.hasPinnedBefore = true;
+    pinHistoryStore.save();
+  }
   pinStore.save(state.pinned);
   renderResearch();
   renderExpeditionPin();
@@ -931,7 +948,9 @@ function renderPinnedCard(list) {
   const card = document.createElement("div");
   card.className = "pinned-card" + (s ? "" : " pinned-empty");
   if (!s) {
-    card.innerHTML = `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
+    card.innerHTML = state.hasPinnedBefore
+      ? `<p class="latin">📌 <em>Pinned sharks appear here.</em></p>`
+      : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
   } else {
     const done = !!state.tagged[s.id];
     card.innerHTML = `
