@@ -116,6 +116,68 @@ const SARAH_EGG_THREAD = [
   { who: "me",   text: "She's got your name now. I think she knows." }
 ];
 
+/* v0.23.0: real-shark easter eggs. Mary Lee was a real great white — tagged
+   Sept 17, 2012 off Cape Cod by OCEARCH, 4.9m mature female, ~50 years old,
+   named for Chris Fischer's mother. "Matriarch of the Sea" with 130k Twitter
+   followers. Tag went silent June 2017; presumed alive. */
+const MARY_LEE_THREAD = [
+  { who: "them", text: "WAIT. You named your great white Mary Lee?? Like THE Mary Lee?" },
+  { who: "me",   text: "You know about her?" },
+  { who: "them", text: "KNOW about her?? She was the most famous shark on the internet! OCEARCH tagged her off Cape Cod in 2012 — 16 feet, 3,500 pounds, like 50 years old. They called her the Matriarch of the Sea and she had 130 THOUSAND Twitter followers. A SHARK. WITH FANS." },
+  { who: "me",   text: "That's incredible." },
+  { who: "them", text: "Her tag went quiet in 2017 — battery died, probably. But she's almost certainly still out there. Every time I think about her I'm like... she's the queen and she doesn't even know it. Your Mary Lee has a LOT to live up to. 🩵" }
+];
+
+/* v0.23.0: Nicole was a real great white — tagged Nov 7, 2003 in Gansbaai,
+   South Africa, 3.8m female named for Nicole Kidman. Swam 11,000 km to
+   Western Australia in 99 days, then back — 20,000+ km round trip.
+   Published in Science (Bonfil et al. 2005). */
+const NICOLE_THREAD = [
+  { who: "them", text: "Nicole!! Oh my god, like the real Nicole?" },
+  { who: "me",   text: "There's a real Nicole?" },
+  { who: "them", text: "YES. Tagged in South Africa in 2003 — they named her after Nicole Kidman, which is iconic honestly. Then she just... LEFT. Swam 11,000 kilometres to Western Australia. In 99 DAYS. The tag popped off in February and everyone thought that was the end of the story." },
+  { who: "me",   text: "But it wasn't?" },
+  { who: "them", text: "SHE CAME BACK. August 2004, back in Gansbaai. Over 20,000 km round trip. They published it in Science — it proved white sharks cross entire ocean basins. Before Nicole, nobody knew they did that. Your Nicole's got explorer genes. 🗺️🦈" }
+];
+
+/* v0.23.0: the Bruce chain. NO immediate message when triggered — Sarah
+   pieces it together slowly over multiple sessions. Each stage is pushed
+   separately via advanceBruceChain(). The full chain:
+   1. Vague familiarity ("why does that name sound familiar...")
+   2. Nagging memory (something about movies?)
+   3. The realization (JAWS! The mechanical shark was named Bruce!)
+   4. Delight + the Spielberg story (named after his lawyer)
+   5. Full circle — hidden achievement unlocks here */
+const BRUCE_CHAIN = [
+  [
+    { who: "them", text: "Hey. Random question. Why did you name that shark Bruce?" },
+    { who: "me",   text: "Just felt right? Why?" },
+    { who: "them", text: "No reason. It's just... tickling something in my brain. Like I've heard it before in a shark context. Anyway. Hi Bruce. 🦈" }
+  ],
+  [
+    { who: "them", text: "OK it's been bugging me for DAYS. Bruce. Bruce the shark. Where do I know that from??" },
+    { who: "me",   text: "Maybe you just like the name?" },
+    { who: "them", text: "No no, it's something specific. Something about... movies? Ugh. It's on the tip of my tongue." }
+  ],
+  [
+    { who: "them", text: "I FIGURED IT OUT." },
+    { who: "me",   text: "Figured what out?" },
+    { who: "them", text: "BRUCE. The mechanical shark from Jaws was named Bruce!! I remembered at 2am and sat straight up in bed. My mom thought something was wrong." },
+    { who: "me",   text: "You're kidding." },
+    { who: "them", text: "I am NOT kidding. The 1975 Jaws shark — the big animatronic one that kept breaking down — the crew named it Bruce." }
+  ],
+  [
+    { who: "them", text: "Fun fact I just learned: they named it after Steven Spielberg's lawyer. Bruce Ramer. The most feared movie shark in history is named after a LAWYER. I can't stop laughing." },
+    { who: "me",   text: "That's amazing." },
+    { who: "them", text: "Right?? 'You're gonna need a bigger boat' — about a shark named after a guy who does contracts. Cinema is beautiful." }
+  ],
+  [
+    { who: "them", text: "You know what, I love that you named a real, actual, beautiful shark Bruce. Like reclaiming the name. The movie Bruce was a malfunctioning robot that scared everyone. Your Bruce is out there being a perfect shark." },
+    { who: "me",   text: "Reclaiming Bruce. I like that." },
+    { who: "them", text: "Bruce forever. 🩵🦈" }
+  ]
+];
+
 
 /* v0.9.1: live icon strips under each planner row. One small visual echo
    of the current pick per select, in the game's emoji style. The ray gets
