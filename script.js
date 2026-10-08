@@ -365,7 +365,9 @@ function showMapPopup(sid) {
   const s = sharkById(sid), t = state.tagged[sid];
   const pts = mapPoints(t);
   const last = pts.length > 1 ? pts[pts.length - 1] : pts[0];
-  const kindNote = t.track.kind === "archival"
+  const kindNote = t.track.hypothetical
+    ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey."
+    : t.track.kind === "archival"
     ? "Archival track — this species has never carried a tracking tag. This route is an illustrative habitat-based scenario drawn from capture records and published depth ranges, not a reconstruction of an individual's movements."
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
@@ -587,8 +589,11 @@ function migrateIds() {
 function migrateTracks() {
   let changed = false;
   Object.entries(state.tagged).forEach(([sid, t]) => {
-    if (!t.track) {
+    /* v0.21.0 Mira final: regenerate tracks that predate the tag-anchor fix.
+       Old tracks start at generic regional centers and teleport to the envelope. */
+    if (!t.track || t.track.v !== 2) {
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+      t.track.v = 2;
       changed = true;
     }
   });
