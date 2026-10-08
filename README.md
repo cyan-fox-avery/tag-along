@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.19.0** — *a shark research game*
+**v0.21.0** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,13 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v0.21.0 changes — the sharknado 🦈🌪️
+
+- **18 new sharks join the roster (32 → 50).** The entire staged Wild Archive batch graduates to playable: silvertip, spinner, spotted wobbegong, leopard, horn, Port Jackson, common angelshark, megamouth, common sawshark, Greenland, cookiecutter, bluntnose sixgill, velvet-belly lanternshark, dwarf lanternshark, kitefin, Pacific sleeper, spiny dogfish, and small-spotted catshark — each with full research dossier, 3 Sarah chats, contextual nudge, derpy art, field-guide sketch, tracking envelope, and live Wild Archive entry.
+- **Three new locked regions.** Eastern Australia, California Coast, and Arctic Waters join the expedition map, each with its own unlock breadcrumb. Placements are draft pending Mira's science review.
+- The pygmy shark stays on its verification hold (image rights unconfirmed).
+- Win threshold moves with the roster, as always: tag all 50.
 
 ## v0.20.0 changes — expedition flow + two-shark wave
 
