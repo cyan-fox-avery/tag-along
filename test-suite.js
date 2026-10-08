@@ -807,6 +807,21 @@ code += `
            shouldShowWhatsNew(null, 'v0.22.0', true) === true &&        // v0.21.0 upgrader
            shouldShowWhatsNew('', 'v0.22.0', false) === false;
   })());
+  ok('v0.22.0: pre-migration snapshot detects new vs returning', (() => {
+    // Simulate: empty storage (new player) vs v0.21.0 save (upgrader)
+    // preMigrationHadSave checks for meaningful data, not just key existence
+    function snapHasSave(logbook, collection, stats) {
+      if (logbook && logbook !== "[]") return true;
+      if (collection && collection !== "{}" && collection !== "null") {
+        try { return Object.keys(JSON.parse(collection)).length > 0; } catch { return false; }
+      }
+      return !!stats;
+    }
+    return snapHasSave(null, null, null) === false &&                    // brand new
+           snapHasSave("[]", "{}", null) === false &&                    // migrated empty
+           snapHasSave('[{"ts":1}]', "{}", null) === true &&              // has logbook
+           snapHasSave("[]", '{"nurse":{}}', null) === true;              // has sharks
+  })());
   ok('v0.22.0: whatsnew has v0.22.0 notes', (() => {
     return Array.isArray(WHATS_NEW['v0.22.0']) && WHATS_NEW['v0.22.0'].length === 4;
   })());
