@@ -747,6 +747,11 @@ document.querySelectorAll(".tab").forEach(btn => {
     if (btn.dataset.tab === "map") renderMap(); // v0.9.0: tracking map renders on open
     if (btn.dataset.tab === "expedition") renderExpeditionPin(); // v0.20.0: pinned shark line
     if (btn.dataset.tab in tabScroll) window.scrollTo(0, tabScroll[btn.dataset.tab]);
+    /* v0.24.0: clear the Archive new-photo badge on visit. */
+    if (btn.dataset.tab === "archive") {
+      const badge = btn.querySelector(".tab-badge");
+      if (badge) badge.classList.add("hidden");
+    }
     if (btn.dataset.tab === "phone") {
       /* v0.12.0: like a real phone — the conversation opens pinned to the
          newest message. renderMessages' own scroll can't do this: it runs
@@ -2243,6 +2248,26 @@ function confirmTag(name) {
   ]);
   maybeSarahEgg(s.id, rec);
   maybeNameEgg(s.id, rec); // v0.23.0
+  /* v0.24.0: progressive Wild Archive unlock (Mira approved). First tag
+     reveals the Archive tab with a Sarah intro; later tags add entries
+     quietly. Existing winners keep full access via migrateArchiveUnlock. */
+  const wasFirstTag = Object.keys(state.tagged).length === 1;
+  if (!state.archiveUnlocked && wasFirstTag) {
+    state.archiveUnlocked = true;
+    try { localStorage.setItem("tyi-archive", "1"); } catch {}
+    pushThread([
+      { who: "them", text: "WAIT. I have something for you 📸" },
+      { who: "them", text: "Every shark you tag, I'm going to find you a real photo of their species. The actual animal. Check the new 🖼️ Archive tab!" },
+      { who: "me", text: "Real photos? Of the actual species?" },
+      { who: "them", text: "The real deal! Your field-guide art is for ID work — the Archive is for meeting them. Every tag adds another face to the collection 🩵" }
+    ]);
+  } else if (state.archiveUnlocked && !wasFirstTag) {
+    // Quiet notification: Archive tab gets a badge
+    try {
+      const tab = document.querySelector('.tab[data-tab="archive"] .tab-badge');
+      if (tab) { tab.textContent = "•"; tab.classList.remove("hidden"); }
+    } catch {}
+  }
   checkMilestones();
   checkAchievements(); // v0.18.0
   renderAll();
@@ -2470,11 +2495,9 @@ function winStep(n) {
     winMapFinale();
 
   } else {
-    /* Beat 4: the acknowledgement — it lives here now, not on the Research tab.
-       The Wild Archive unlock was already persisted in doWin(); this beat is
-       where the player is told about it. The set below is idempotent. */
-    state.archiveUnlocked = true;
-    try { localStorage.setItem("tyi-archive", "1"); } catch {}
+    /* Beat 4: the acknowledgement. v0.24.0: the Archive is no longer a
+       win-gated reward — it's been growing all game. This beat celebrates
+       the completed collection instead. */
     updateArchiveTab();
     renderArchive();
     box(`
@@ -2482,6 +2505,7 @@ function winStep(n) {
         <p class="eyebrow">ACKNOWLEDGEMENTS</p>
         <p class="ack-name">For <span>Sarah</span></p>
         <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
+        <p style="margin-top:8px">🖼️ Your Wild Archive is complete — every species you tagged, face to face with the real animal.</p>
       </div>
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
     $("winNext").addEventListener("click", () => {
@@ -3109,11 +3133,14 @@ function renderAll() {
 /* v0.20.0: Wild Archive UI lives in archive-ui.js (module split). */
 /* v0.16.0 review fix: pre-v0.16 winners never run doWin() again, so a
    completed v0.14 save boots with won=true, a full roster, and no archive
-   unlock. Backfill the unlock they already earned. */
+   unlock. Backfill the unlock they already earned.
+   v0.24.0 Mira review: ANY returning player with ≥1 tag gets Archive access,
+   not just winners. New players get the Sarah intro on their first tag;
+   returning players get quiet access (no first-tag message). */
 function migrateArchiveUnlock() {
   try {
     const taggedCount = Object.keys(state.tagged).length;
-    if (state.won && taggedCount >= SHARKS.length && !state.archiveUnlocked) {
+    if (taggedCount >= 1 && !state.archiveUnlocked) {
       state.archiveUnlocked = true;
       localStorage.setItem("tyi-archive", "1");
     }

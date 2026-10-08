@@ -1,9 +1,9 @@
 /* Tag Along — Wild Archive UI (v0.20.0 module split).
    Extracted from script.js (push size limit). Loaded after archive-data.js,
    before script.js. Owns the Archive tab renderer + license URL registry. */
-/* ---------- Wild Archive (v0.17.0) ----------
-   Post-win reward: real-world photography and footage of every tagged
-   species. All media was hand-curated by Avery + Mira — mostly Wikimedia
+/* ---------- Wild Archive (v0.17.0, progressive since v0.24.0) ----------
+   Real-world photography and footage of every tagged species. Unlocks
+   per-tag from the first tag (Mira-approved v0.24.0); previously win-gated. All media was hand-curated by Avery + Mira — mostly Wikimedia
    Commons (CC BY / CC BY-SA / CC0 / public domain), plus select iNaturalist
    photographs (CC BY-NC, with the project non-commercial notice);
    attribution is shown per asset, with the true source labeled.

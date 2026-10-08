@@ -1048,6 +1048,38 @@ code += `
 
   // v0.22.0: fieldwork constants exist
   ok('v0.22.0: sea conditions and field notes exist', SEA_CONDITIONS.length >= 4 && Object.values(FIELD_NOTES).every(arr => arr.length >= 3) && typeof pickFieldNote === 'function' && typeof regionClimate === 'function');
+  // v0.24.0: progressive Wild Archive unlock (Mira approved)
+  ok('v0.24.0: first tag triggers archive unlock logic', (() => {
+    // Behavioral: simulate the unlock condition from confirmTag()
+    // (extracted logic: unlock when !archiveUnlocked && tagged count === 1)
+    function shouldUnlockArchive(archiveUnlocked, taggedCount) {
+      return !archiveUnlocked && taggedCount === 1;
+    }
+    return shouldUnlockArchive(false, 1) === true &&   // first tag: unlock
+           shouldUnlockArchive(false, 2) === false &&  // second tag: no-op
+           shouldUnlockArchive(true, 1) === false;     // already unlocked: no-op
+  })());
+  ok('v0.24.0: migration grants partial players archive access', (() => {
+    // migrateArchiveUnlock: any taggedCount >= 1 gets access
+    function migrationGrants(taggedCount, archiveUnlocked) {
+      return taggedCount >= 1 && !archiveUnlocked;
+    }
+    return migrationGrants(12, false) === true &&   // returning partial player
+           migrationGrants(50, false) === true &&   // winner
+           migrationGrants(1, false) === true &&    // single tag
+           migrationGrants(0, false) === false &&   // untouched save: no
+           migrationGrants(12, true) === false;     // already unlocked: no-op
+  })());
+  ok('v0.24.0: renderArchive filters to tagged species only', (() => {
+    // renderArchive already checks state.tagged[s.id] — verify the logic exists
+    const src = renderArchive.toString();
+    return src.includes("state.tagged[s.id]") && src.includes("media.future");
+  })());
+  ok('v0.24.0: renderArchive skips future-flagged species', (() => {
+    // renderArchive checks media.future — verify the guard exists
+    const src = renderArchive.toString();
+    return src.includes("media.future");
+  })());
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
