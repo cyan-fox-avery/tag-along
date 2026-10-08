@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.0.4-beta', VERSION === 'v1.0.4-beta');
+  ok('version v1.0.5-beta', VERSION === 'v1.0.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
