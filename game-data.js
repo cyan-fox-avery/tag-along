@@ -125,7 +125,7 @@ const MARY_LEE_THREAD = [
   { who: "me",   text: "You know about her?" },
   { who: "them", text: "KNOW about her?? She was the most famous shark on the internet! OCEARCH tagged her off Cape Cod in 2012 — 16 feet, 3,500 pounds, like 50 years old. They called her the Matriarch of the Sea and she had 130 THOUSAND Twitter followers. A SHARK. WITH FANS." },
   { who: "me",   text: "That's incredible." },
-  { who: "them", text: "Her tag went quiet in 2017 — battery died, probably. Her tag went quiet, so nobody knows for sure — but I like to think she's still out there. Every time I think about her I'm like... she's the queen and she doesn't even know it. Your Mary Lee has a LOT to live up to. 🩵" }
+  { who: "them", text: "Her tag went quiet in 2017 — battery died, probably. Nobody knows for sure where she is now, but I like to think she's still out there. Every time I think about her I'm like... she's the queen and she doesn't even know it. Your Mary Lee has a LOT to live up to. 🩵" }
 ];
 
 /* v0.23.0: Nicole was a real great white — tagged Nov 7, 2003 in Gansbaai,
