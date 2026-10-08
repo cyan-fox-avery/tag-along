@@ -11,6 +11,14 @@ science.
 
 Built for sarah, who loves sharks. 🦈
 
+## v0.23.0 changes — easter eggs 🥚🦈
+
+- **🦈 Mary Lee.** Name a great white "Mary Lee" and Sarah will tell you about the real one — OCEARCH's 16-foot Matriarch of the Sea with 130k Twitter followers.
+- **🗺️ Nicole.** Name a great white "Nicole" and hear about the 20,000 km round trip that proved white sharks cross ocean basins (Bonfil et al. 2005, *Science*).
+- **🎬 Bruce.** Name ANY shark "Bruce"... and say nothing. Sarah will piece it together slowly, over multiple sessions. A hidden achievement awaits at the end of the rabbit hole.
+- **💾 Save export/import.** Export your save as JSON from the footer; import it back on any device. Version mismatches warn but don't block.
+- 187 tests passing.
+
 ## v0.22.0 changes — field notes 📓
 
 - **📓 Logbook filters.** Filter your expedition log by outcome (successful tag / re-sighting / no sharks), region, or species — with a clear button. Filters narrow the notebook; they never solve the expedition.

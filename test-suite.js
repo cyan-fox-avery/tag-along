@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.22.0', VERSION === 'v0.22.0');
+  ok('version v0.23.0', VERSION === 'v0.23.0');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -285,9 +285,9 @@ code += `
     !!state.achievements['first-tag'] && !!state.achievements['old-friend']);
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
-    ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }) &&
-    !ACHIEVEMENTS.some(a => a.id === 'bruce'));
-  ok('18 live achievements', ACHIEVEMENTS.length === 18);
+    ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
+  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -824,6 +824,223 @@ code += `
   })());
   ok('v0.22.0: whatsnew has v0.22.0 notes', (() => {
     return Array.isArray(WHATS_NEW['v0.22.0']) && WHATS_NEW['v0.22.0'].length === 4;
+  })());
+  // v0.23.0: easter eggs
+  ok('v0.23.0: Mary Lee thread exists and mentions OCEARCH', (() => {
+    return typeof MARY_LEE_THREAD !== "undefined" &&
+           MARY_LEE_THREAD.length >= 3 &&
+           MARY_LEE_THREAD.some(m => /OCEARCH/i.test(m.text)) &&
+           MARY_LEE_THREAD.some(m => /Matriarch/i.test(m.text));
+  })());
+  ok('v0.23.0: Nicole thread exists and mentions the journey', (() => {
+    return typeof NICOLE_THREAD !== "undefined" &&
+           NICOLE_THREAD.length >= 3 &&
+           NICOLE_THREAD.some(m => /11,?000/i.test(m.text)) &&
+           NICOLE_THREAD.some(m => /Science/i.test(m.text));
+  })());
+  ok('v0.23.0: Bruce chain has 5 stages', (() => {
+    return typeof BRUCE_CHAIN !== "undefined" &&
+           BRUCE_CHAIN.length === 5 &&
+           BRUCE_CHAIN.every(stage => stage.length >= 2);
+  })());
+  ok('v0.23.0: Bruce achievement is hidden', (() => {
+    const b = ACHIEVEMENTS.find(a => a.id === "bruce");
+    return b && b.hidden === true && b.name === "You Named Him WHAT?";
+  })());
+  ok('v0.23.0: maybeNameEgg triggers Mary Lee for great white', (() => {
+    const rec = { name: "Mary Lee" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveSave = store.save;
+    store.save = () => {};
+    try {
+      maybeNameEgg("greatwhite", rec);
+      return rec.maryLeeEgg === true && pushed && pushed.length >= 3;
+    } finally {
+      pushThread = savePush;
+      store.save = saveSave;
+    }
+  })());
+  ok('v0.23.0: maybeNameEgg triggers Nicole for great white', (() => {
+    const rec = { name: "NICOLE" }; // case-insensitive
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveSave = store.save;
+    store.save = () => {};
+    try {
+      maybeNameEgg("greatwhite", rec);
+      return rec.nicoleEgg === true && pushed && pushed.length >= 3;
+    } finally {
+      pushThread = savePush;
+      store.save = saveSave;
+    }
+  })());
+  ok('v0.23.0: maybeNameEgg does NOT trigger Mary Lee for other sharks', (() => {
+    const rec = { name: "Mary Lee" };
+    let pushed = null;
+    const origPush = global.pushThread;
+    global.pushThread = (msgs) => { pushed = msgs; };
+    const origStore = global.store;
+    global.store = { save: () => {} };
+    const origSharkById = global.sharkById;
+    global.sharkById = (id) => ({ id, name: "Tiger Shark" });
+    try {
+      maybeNameEgg("tiger", rec);
+      return rec.maryLeeEgg !== true && pushed === null;
+    } finally {
+      global.pushThread = origPush;
+      global.store = origStore;
+      global.sharkById = origSharkById;
+    }
+  })());
+  ok('v0.23.0: Bruce starts chain silently (no immediate message)', (() => {
+    const rec = { name: "Bruce" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    // Save and mock Bruce state
+    const saveBruce = state.bruceEgg;
+    const saveDone = state.bruceChainComplete;
+    state.bruceEgg = null;
+    state.bruceChainComplete = false;
+    try {
+      maybeNameEgg("nurse", rec);
+      return state.bruceEgg !== null &&
+             state.bruceEgg.stage === 0 &&
+             pushed === null; // NO immediate message!
+    } finally {
+      pushThread = savePush;
+      state.bruceEgg = saveBruce;
+      state.bruceChainComplete = saveDone;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('v0.23.0: export captures RESET_KEYS', (() => {
+    return typeof exportSave === "function" &&
+           typeof importSave === "function" &&
+           RESET_KEYS.includes("tyi-collection") &&
+           RESET_KEYS.includes("tyi-bruce");
+  })());
+  ok('v0.23.0: validateSaveData accepts good save', (() => {
+    const good = { version: "v0.23.0", keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
+      "tyi-logbook": '[{"encounters":[{"result":"tagged","speciesId":"nurse"}],"region":"caribbean"}]',
+      "tyi-stats": '{"regionsVisited":["caribbean"],"expeditions":5}'
+    } };
+    const r = validateSaveData(good);
+    return r.ok === true;
+  })());
+  ok('v0.23.0: validateSaveData rejects malformed structures', (() => {
+    return validateSaveData({ version: "v0.23.0", keys: { "tyi-logbook": "[{}]" } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-messages": '{"messages":"hello"}' } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-stats": '{"regionsVisited":null}' } }).ok === false;
+  })());
+  ok('v0.23.0: validateSaveData accepts real saveMsgs() shape', (() => {
+    // Actual saveMsgs() serialization: object with messages array of thread objects
+    const real = { version: "v0.23.0", keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
+      "tyi-messages": JSON.stringify({
+        messages: [{ ts: 1234567890, msgs: [{ who: "them", text: "Hi!" }] }],
+        unread: 1, chatIdx: 0, lastRegion: "caribbean", chatSeen: true, sarahAdviceOffered: false
+      })
+    } };
+    return validateSaveData(real).ok === true;
+  })());
+  ok('v0.23.0: validateSaveData accepts legacy bare-array threads', (() => {
+    // normThread() supports legacy: if (Array.isArray(t)) return { ts: 0, msgs: t };
+    const legacy = { version: "v0.23.0", keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
+      "tyi-messages": JSON.stringify({
+        messages: [[{ who: "them", text: "Old format!" }]],  // bare array, no ts wrapper
+        unread: 0, chatIdx: 0
+      })
+    } };
+    return validateSaveData(legacy).ok === true;
+  })());
+  ok('v0.23.0: full realistic export validates', (() => {
+    // Realistic complete save: collection, logbook, stats, messages
+    const full = { version: "v0.23.0", exportedAt: new Date().toISOString(), keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true,"name":"Testy"}}',
+      "tyi-logbook": '[{"encounters":[{"result":"tagged","speciesId":"nurse"}],"region":"caribbean"}]',
+      "tyi-stats": '{"regionsVisited":["caribbean"],"expeditions":5}',
+      "tyi-messages": JSON.stringify({
+        messages: [{ ts: 1234567890, msgs: [{ who: "them", text: "Nice!" }] }],
+        unread: 0, chatIdx: 0, lastRegion: "caribbean", chatSeen: true, sarahAdviceOffered: true
+      }),
+      "tyi-pace": "steady"
+    } };
+    const r = validateSaveData(full);
+    return r.ok === true;
+  })());
+  ok('v0.23.0: validateSaveData rejects bad save', (() => {
+    return validateSaveData(null).ok === false &&
+           validateSaveData({}).ok === false &&
+           validateSaveData({ keys: {} }).ok === false &&                    // empty keys
+           validateSaveData({ keys: "not-object" }).ok === false &&
+           validateSaveData({ keys: { "tyi-collection": "{bad json" } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-collection": "[]" } }).ok === false &&  // wrong shape
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-logbook": "{}" } }).ok === false &&     // wrong shape
+           validateSaveData({ version: "v0.23.0", keys: { "evil-key": "x" } }).ok === false;           // unknown key
+  })());
+  ok('v0.23.0: validateSaveData rejects unknown version', (() => {
+    const r = validateSaveData({ version: "v9.99.9", keys: { "tyi-collection": "{}" } });
+    return r.ok === false;  // rejected, not just warned
+  })());
+  ok('v0.23.0: validateSaveData rejects null records', (() => {
+    return validateSaveData({ version: "v0.23.0", keys: { "tyi-collection": '{"nurse":null}' } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-logbook": "[null]" } }).ok === false;
+  })());
+  ok('v0.23.0: validateSaveData rejects progress-less save', (() => {
+    // tyi-pace alone would wipe the collection
+    return validateSaveData({ version: "v0.23.0", keys: { "tyi-pace": "quick" } }).ok === false;
+  })());
+  ok('v0.23.0: rollback restores partial import', (() => {
+    // True partial import: some keys change, then storage throws mid-way
+    let opCount = 0, shouldFail = true;
+    const mem = {
+      data: { "tyi-collection": '{"nurse":{"researchId":"NS-001"}}', "tyi-pace": "slow", "tyi-last-seen-version": "v0.22.0" },
+      _op() { opCount++; if (shouldFail && opCount === 4) throw new Error("quota exceeded"); },
+      setItem(k, v) { this._op(); this.data[k] = v; },
+      removeItem(k) { this._op(); delete this.data[k]; }
+    };
+    const snapshot = { ...mem.data };
+    let threw = false;
+    try { replaceSaveKeys({ "tyi-collection": '{"tiger":{"researchId":"NS-002"}}', "tyi-pace": "quick" }, mem); }
+    catch { threw = true; }
+    if (!threw) return false;
+    // Storage writable again for rollback
+    shouldFail = false;
+    const restored = restoreSnapshot(snapshot, mem);
+    if (!restored) return false;
+    // Complete final key set must exactly equal the original snapshot
+    const finalKeys = Object.keys(mem.data).sort().join(",");
+    const origKeys = Object.keys(snapshot).sort().join(",");
+    if (finalKeys !== origKeys) return false;
+    return Object.entries(snapshot).every(([k, v]) => mem.data[k] === v);
+  })());
+  ok('v0.23.0: exported save validates', (() => {
+    // Real export shape round-trip: build what exportSave produces, validate it
+    const fakeStorage = {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true,"name":"Testy"}}',
+      "tyi-logbook": '[{"encounters":[{"result":"tagged","speciesId":"nurse"}],"region":"caribbean"}]',
+      "tyi-pace": "steady"
+    };
+    const exported = { version: "v0.23.0", exportedAt: new Date().toISOString(), keys: fakeStorage };
+    const r = validateSaveData(exported);
+    return r.ok === true;
+  })());
+  ok('v0.23.0: replaceSaveKeys swaps full key set', (() => {
+    const mem = { data: { "tyi-collection": "old", "tyi-pace": "old" },
+      setItem(k, v) { this.data[k] = v; }, removeItem(k) { delete this.data[k]; } };
+    replaceSaveKeys({ "tyi-collection": "new" }, mem);
+    return mem.data["tyi-collection"] === "new" && !("tyi-pace" in mem.data);
+  })());
+  ok('v0.23.0: whatsnew v0.23.0 entry exists', (() => {
+    const notes = WHATS_NEW["v0.23.0"];
+    return Array.isArray(notes) && notes.length >= 3 &&
+           notes.join(" ").toLowerCase().indexOf("bruce") === -1; // no spoiler
   })());
 
   // v0.22.0: conservation notes on all 50

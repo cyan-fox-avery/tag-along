@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.22.0";
+const VERSION = "v0.23.0";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -14,6 +14,11 @@ const WHATS_NEW = {
     "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
     "🎣 <strong>Failed trips feel like fieldwork.</strong> Richer expedition narratives: weather, sea state, wildlife sightings, and proper field notes in the logbook.",
     "🌊 <strong>Conservation notes.</strong> Every collection card now carries a conservation-science note — status context, threats, and the protection efforts making a difference."
+  ],
+  "v0.23.0": [
+    "🦈 <strong>Real-shark stories.</strong> Name a great white Mary Lee or Nicole, and Sarah will tell you about the real sharks behind the names — their extraordinary journeys.",
+    "🤫 <strong>A secret swims in these waters.</strong> There's a new hidden surprise for curious researchers. We won't spoil it here.",
+    "💾 <strong>Save export/import.</strong> Back up your research as a JSON file, or bring a save to a new device. Find it in the footer."
   ]
 };
 
@@ -584,7 +589,10 @@ const state = {
   bruceChainComplete: false, // v0.18.0: the Bruce chain isn't built yet
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
-  pinned: pinStore.load() // v0.20.0: "currently researching" shark id, or null
+  pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
+  /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
+  bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
+  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })()
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -1595,6 +1603,7 @@ async function runExpedition(plan) {
   state.stats.expeditions = (state.stats.expeditions || 0) + 1;
   saveStats();
   checkAchievements();
+  advanceBruceChain(); // v0.23.0: slow-burn easter egg
 
   /* v0.8.0: close the logbook page for this trip.
      v0.22.0 Mira review: attach pin hint grounded in this completed expedition. */
@@ -2111,11 +2120,13 @@ function showNextAchievement() {
 function renderAchievements() {
   const list = $("achieveList");
   if (!list || typeof ACHIEVEMENTS === "undefined") return;
-  const unlockedCount = ACHIEVEMENTS.filter(a => state.achievements[a.id]).length;
+  /* v0.23.0: hidden achievements (e.g. Bruce) don't appear until unlocked. */
+  const visible = ACHIEVEMENTS.filter(a => !a.hidden || state.achievements[a.id]);
+  const unlockedCount = visible.filter(a => state.achievements[a.id]).length;
   const head = $("achieveHead");
-  if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${ACHIEVEMENTS.length} unlocked</p>`;
+  if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${visible.length} unlocked</p>`;
   list.innerHTML = "";
-  ACHIEVEMENTS.forEach(a => {
+  visible.forEach(a => {
     const unlocked = !!state.achievements[a.id];
     const row = document.createElement("div");
     row.className = "guide-row" + (unlocked ? "" : " locked");
@@ -2129,7 +2140,7 @@ function renderAchievements() {
   });
   const badge = $("achieveBadge");
   if (badge) {
-    badge.textContent = `${unlockedCount}/${ACHIEVEMENTS.length}`;
+    badge.textContent = `${unlockedCount}/${visible.length}`;
     badge.classList.toggle("hidden", unlockedCount === 0);
   }
 }
@@ -2231,6 +2242,7 @@ function confirmTag(name) {
     { who: "them", text: s.cheer }
   ]);
   maybeSarahEgg(s.id, rec);
+  maybeNameEgg(s.id, rec); // v0.23.0
   checkMilestones();
   checkAchievements(); // v0.18.0
   renderAll();
@@ -2574,6 +2586,80 @@ function maybeSarahEgg(speciesId, rec) {
   }
 }
 
+/* v0.23.0: real-shark easter eggs. Called on rename/tag.
+   - Mary Lee / Nicole: great white + matching name → Sarah thread (immediate)
+   - Bruce: any shark + "bruce" → starts SLOW chain (no immediate message!) */
+function maybeNameEgg(speciesId, rec) {
+  if (!rec || !rec.name) return;
+  const name = rec.name.trim().toLowerCase();
+  const s = sharkById(speciesId);
+
+  // Mary Lee: great white only
+  if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
+    rec.maryLeeEgg = true;
+    store.save(state.tagged);
+    pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
+    return;
+  }
+  // Nicole: great white only
+  if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
+    rec.nicoleEgg = true;
+    store.save(state.tagged);
+    pushThread(NICOLE_THREAD.map(m => ({ ...m })));
+    return;
+  }
+  // Bruce: ANY shark. No immediate message — the slow chain begins silently.
+  if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
+    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+    try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+    // Deliberately no pushThread here. Sarah will notice... eventually.
+  }
+}
+
+/* v0.23.0: advance the Bruce chain. Called on expedition completion and game
+   load. Stages are spaced: at least 2 expeditions OR 12 hours between stages,
+   so it unfolds slowly over multiple sessions. */
+function advanceBruceChain() {
+  if (!state.bruceEgg || state.bruceChainComplete) return;
+  if (typeof BRUCE_CHAIN === "undefined") return;
+  const now = Date.now();
+  const expeditionsSince = (state.stats.expeditions || 0) - (state.bruceEgg.expeditionsAtStage || 0);
+  const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
+  // Need either 2+ expeditions or 12+ hours since last stage
+  if (expeditionsSince < 2 && hoursSince < 12) return;
+
+  const stage = state.bruceEgg.stage;
+  if (stage >= BRUCE_CHAIN.length) {
+    // Chain complete — unlock hidden achievement
+    state.bruceChainComplete = true;
+    try {
+      localStorage.setItem("tyi-bruce-done", "1");
+      localStorage.removeItem("tyi-bruce");
+    } catch {}
+    state.bruceEgg = null;
+    checkAchievements(); // Bruce achievement check uses st.bruceChainComplete
+    return;
+  }
+
+  // Push this stage's messages
+  pushThread(BRUCE_CHAIN[stage].map(m => ({ ...m })));
+  state.bruceEgg.stage = stage + 1;
+  state.bruceEgg.lastAdvance = now;
+  state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
+  // If that was the final stage, complete the chain NOW (not on a later call)
+  if (state.bruceEgg.stage >= BRUCE_CHAIN.length) {
+    state.bruceChainComplete = true;
+    try {
+      localStorage.setItem("tyi-bruce-done", "1");
+      localStorage.removeItem("tyi-bruce");
+    } catch {}
+    state.bruceEgg = null;
+    checkAchievements();
+    return;
+  }
+  try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+}
+
 $("tagConfirm").addEventListener("click", () => confirmTag($("sharkName").value.trim()));
 
 /* ---------- Collection book: compact grid, tap for detail ---------- */
@@ -2697,6 +2783,7 @@ function openDetail(id) {
     t.name = $("renameInput").value.trim();
     store.save(state.tagged);
     maybeSarahEgg(id, t);
+    maybeNameEgg(id, t); // v0.23.0: Mary Lee / Nicole / Bruce
     renderCollection();
     renderResearch();
     openDetail(id);
@@ -2767,7 +2854,216 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done"];
+
+/* v0.23.0: save export/import for the public beta. */
+function exportSave() {
+  const data = { version: VERSION, exportedAt: new Date().toISOString(), keys: {} };
+  RESET_KEYS.forEach(k => {
+    try {
+      const v = localStorage.getItem(k);
+      if (v !== null) data.keys[k] = v;
+    } catch {}
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const aEl = document.createElement("a");
+  aEl.href = url;
+  aEl.download = "tag-along-save-" + VERSION + ".json";
+  document.body.appendChild(aEl);
+  aEl.click();
+  setTimeout(() => { document.body.removeChild(aEl); URL.revokeObjectURL(url); }, 100);
+}
+/* v0.23.0 Mira review: safe import — validate everything BEFORE touching
+   storage, replace the complete key set (clear missing keys), and back up
+   the existing save first. */
+/* v0.23.0 Mira review: strict validation. Reject anything questionable —
+   this is player data going into a public beta. */
+const SAVE_KEY_ALLOWLIST = [...RESET_KEYS, "tyi-bruce", "tyi-bruce-done"];
+function validateSaveData(data) {
+  if (!data || typeof data !== "object") return { ok: false, reason: "not an object" };
+  if (!data.keys || typeof data.keys !== "object") return { ok: false, reason: "missing keys" };
+  const keyNames = Object.keys(data.keys);
+  // Must have at least one recognized key with actual content
+  if (keyNames.length === 0) return { ok: false, reason: "empty save (no keys)" };
+  // Reject ALL unknown keys
+  const unknown = keyNames.filter(k => !SAVE_KEY_ALLOWLIST.includes(k));
+  if (unknown.length > 0) return { ok: false, reason: "unrecognized keys: " + unknown.slice(0, 3).join(", ") };
+  // Validate shapes, not just JSON parsing
+  for (const [k, v] of Object.entries(data.keys)) {
+    if (typeof v !== "string") return { ok: false, reason: "non-string value for " + k };
+    if (k === "tyi-collection" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-collection" }; }
+      if (typeof parsed !== "object" || Array.isArray(parsed) || parsed === null)
+        return { ok: false, reason: "tyi-collection must be an object" };
+      // Each record must be a proper shark entry (protects migrateIds())
+      for (const [sid, rec] of Object.entries(parsed)) {
+        if (rec === null || typeof rec !== "object" || Array.isArray(rec))
+          return { ok: false, reason: "tyi-collection[" + sid + "] is not a shark record" };
+        if (rec.tagged === true && (typeof rec.researchId !== "string" || !rec.researchId))
+          return { ok: false, reason: "tyi-collection[" + sid + "] missing researchId" };
+      }
+    }
+    if (k === "tyi-logbook" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-logbook" }; }
+      if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-logbook must be an array" };
+      for (let i = 0; i < parsed.length; i++) {
+        const t = parsed[i];
+        if (t === null || typeof t !== "object")
+          return { ok: false, reason: "tyi-logbook[" + i + "] is not a trip record" };
+        // Essential fields the rendering path depends on
+        if (!Array.isArray(t.encounters))
+          return { ok: false, reason: "tyi-logbook[" + i + "] missing encounters" };
+        for (let j = 0; j < t.encounters.length; j++) {
+          const e = t.encounters[j];
+          if (e === null || typeof e !== "object")
+            return { ok: false, reason: "tyi-logbook[" + i + "].encounters[" + j + "] invalid" };
+        }
+      }
+    }
+    if (k === "tyi-messages" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-messages" }; }
+      // saveMsgs() stores an object with a messages array inside
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))
+        return { ok: false, reason: "tyi-messages must be an object" };
+      if (!Array.isArray(parsed.messages))
+        return { ok: false, reason: "tyi-messages.messages must be an array" };
+      // Each thread: modern { ts, msgs } object OR legacy bare-array (normThread handles both)
+      for (let i = 0; i < parsed.messages.length; i++) {
+        const t = parsed.messages[i];
+        let msgs;
+        if (Array.isArray(t)) msgs = t;  // legacy bare-array thread
+        else if (t !== null && typeof t === "object" && Array.isArray(t.msgs)) msgs = t.msgs;
+        else return { ok: false, reason: "tyi-messages.messages[" + i + "] invalid" };
+        // Each message entry must be an object
+        for (let j = 0; j < msgs.length; j++) {
+          if (msgs[j] === null || typeof msgs[j] !== "object")
+            return { ok: false, reason: "tyi-messages.messages[" + i + "][" + j + "] invalid" };
+        }
+      }
+    }
+    if (k === "tyi-stats" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-stats" }; }
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))
+        return { ok: false, reason: "tyi-stats must be an object" };
+      // regionsVisited is used with .includes() — must be array or absent
+      if ("regionsVisited" in parsed && !Array.isArray(parsed.regionsVisited))
+        return { ok: false, reason: "tyi-stats.regionsVisited must be an array" };
+    }
+  }
+  // Version: must be a recognized Tag Along version, else reject
+  const fv = data.version || "unknown";
+  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
+  if (!supported) return { ok: false, reason: "unsupported version: " + fv };
+  // Progress-bearing payload: importing tyi-pace alone would wipe the collection
+  const hasProgress = ["tyi-collection", "tyi-logbook", "tyi-won"].some(k => {
+    const v = data.keys[k];
+    return typeof v === "string" && v.length > 2 && v !== "{}" && v !== "[]" && v !== "null";
+  });
+  if (!hasProgress) return { ok: false, reason: "no actual progress in save" };
+  return { ok: true, version: fv };
+}
+/* v0.23.0 Mira review: snapshot returns the data AND whether it worked.
+   We verify the backup before claiming it exists. */
+function snapshotCurrentSave() {
+  const snap = {};
+  try {
+    SAVE_KEY_ALLOWLIST.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) snap[k] = v;
+    });
+    return { ok: true, snap };
+  } catch (e) {
+    return { ok: false };
+  }
+}
+function restoreSnapshot(snap, storage) {
+  const s = storage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!s) return false;
+  try {
+    SAVE_KEY_ALLOWLIST.forEach(k => {
+      if (k in snap) s.setItem(k, snap[k]);
+      else s.removeItem(k);
+    });
+    return true;
+  } catch { return false; }
+}
+/* v0.23.0 Mira review: storage replacement as a testable unit.
+   storage defaults to localStorage but tests can inject a failing stub. */
+function replaceSaveKeys(keys, storage) {
+  const s = storage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!s) throw new Error("no storage");
+  SAVE_KEY_ALLOWLIST.forEach(k => {
+    if (k in keys) s.setItem(k, keys[k]);
+    else s.removeItem(k);
+  });
+}
+function importSave(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); }
+    catch { alert("Couldn't read that file. Is it a valid Tag Along save?"); return; }
+    // Validate BEFORE touching storage
+    const check = validateSaveData(data);
+    if (!check.ok) {
+      alert("That save file looks incompatible (" + check.reason + "). Nothing was changed.");
+      return;
+    }
+    let msg = "Import this save? Your current progress will be replaced.\n\n";
+    msg += "File version: " + check.version + "\nCurrent version: " + VERSION;
+    msg += "\n\nYou'll be offered a backup download first.";
+    if (!confirm(msg)) return;
+    // Snapshot current progress BEFORE touching anything
+    const before = snapshotCurrentSave();
+    if (!before.ok) {
+      alert("Couldn't read your current save. Import cancelled — nothing was changed.");
+      return;
+    }
+    // Offer backup download (accessible recovery, not just a hidden key)
+    const backupBlob = new Blob([JSON.stringify({ version: VERSION, exportedAt: new Date().toISOString(), keys: before.snap }, null, 2)], { type: "application/json" });
+    const backupUrl = URL.createObjectURL(backupBlob);
+    const backupA = document.createElement("a");
+    backupA.href = backupUrl;
+    backupA.download = "tag-along-backup-" + VERSION + ".json";
+    document.body.appendChild(backupA);
+    backupA.click();
+    setTimeout(() => { document.body.removeChild(backupA); URL.revokeObjectURL(backupUrl); }, 100);
+    // Also keep a hidden copy
+    try { localStorage.setItem("tyi-backup", JSON.stringify({ version: VERSION, keys: before.snap })); } catch {}
+    // Replace complete key set with true rollback on failure
+    try {
+      replaceSaveKeys(data.keys);
+    } catch (e) {
+      // Roll back to the snapshot
+      const restored = restoreSnapshot(before.snap);
+      alert(restored
+        ? "Import failed — your previous save has been restored."
+        : "Import failed and rollback also failed. If the backup download completed, that file has your data — otherwise your previous progress may be lost.");
+      return;
+    }
+    location.reload();
+  };
+  reader.readAsText(file);
+}
+// Wire up buttons (after DOM ready — these run at script load, elements exist)
+(function initSaveButtons() {
+  const ex = document.getElementById("exportBtn");
+  if (ex) ex.addEventListener("click", exportSave);
+  const im = document.getElementById("importBtn");
+  const fi = document.getElementById("importFile");
+  if (im && fi) {
+    im.addEventListener("click", () => fi.click());
+    fi.addEventListener("change", () => {
+      if (fi.files && fi.files[0]) importSave(fi.files[0]);
+      fi.value = ""; // reset so the same file can be picked again
+    });
+  }
+})();
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -3067,6 +3363,8 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
 })();
 $("buildTag").textContent = VERSION;
 /* v0.22.0: What's New — show once per version update for returning players. */
+/* v0.23.0: Bruce chain can also advance on game load (time-based). */
+setTimeout(() => { try { advanceBruceChain(); } catch {} }, 5000);
 (function initWhatsNew() {
   const notes = WHATS_NEW[VERSION];
   if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, preMigrationHadSave)) {
