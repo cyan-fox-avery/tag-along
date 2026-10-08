@@ -7,17 +7,33 @@
 "use strict";
 
 /* v0.26.0: art slug mapping. Most species IDs map directly to their art
-   filename slug, but four use more specific common names in the art set:
+   filename slug, but twelve use more specific common names in the art set:
    - blacktip (Blacktip Reef Shark) -> blacktip-reef
    - greatwhite (Great White Shark) -> great-white
    - oceanic (Oceanic Whitetip) -> oceanic-whitetip
    - whitetip (Whitetip Reef Shark) -> whitetip-reef
+   - scalloped (Scalloped Hammerhead) -> scalloped-hammerhead
+   - smooth (Smooth Hammerhead) -> smooth-hammerhead
+   - greyreef (Grey Reef Shark) -> grey-reef
+   - caribbean (Caribbean Reef Shark) -> caribbean-reef
+   - portjackson (Port Jackson Shark) -> port-jackson
+   - velvetbelly (Velvet Belly Lanternshark) -> velvet-belly
+   - pacificsleeper (Pacific Sleeper Shark) -> pacific-sleeper
+   - spinydogfish (Spiny Dogfish) -> spiny-dogfish
    The pygmy art exists but has no game ID (bonus species) — it is skipped. */
 const ART_SLUG_MAP = {
   "blacktip": "blacktip-reef",
   "greatwhite": "great-white",
   "oceanic": "oceanic-whitetip",
-  "whitetip": "whitetip-reef"
+  "whitetip": "whitetip-reef",
+  "scalloped": "scalloped-hammerhead",
+  "smooth": "smooth-hammerhead",
+  "greyreef": "grey-reef",
+  "caribbean": "caribbean-reef",
+  "portjackson": "port-jackson",
+  "velvetbelly": "velvet-belly",
+  "pacificsleeper": "pacific-sleeper",
+  "spinydogfish": "spiny-dogfish"
 };
 
 function artSlug(id) {
@@ -59,9 +75,28 @@ function sharkArtImg(id, type, alt) {
     `onerror="sharkArtFallback(this)" />`;
 }
 
+/* Generic steel-blue mystery silhouette (RGB 52,80,125), used when a
+   silhouette image fails to load. A failed silhouette must NOT fall back
+   to the full-colour SVG — that would spoil the mystery by revealing the
+   species. This neutral shape keeps the encounter mysterious. */
+const MYSTERY_SILHOUETTE_SVG =
+  `<svg viewBox="0 0 220 110" role="img" aria-label="Mystery shark silhouette" class="mystery-silhouette">` +
+  `<path fill="#344E7D" d="M10,64 C28,52 55,45 88,45 L100,26 L113,44 ` +
+  `C136,46 158,52 176,60 L204,46 L191,61 L205,76 L178,68 ` +
+  `C158,77 132,82 106,81 L98,98 L89,80 C60,79 32,73 12,68 Z"/></svg>`;
+
 /* Global fallback handler (called from the inline onerror above). */
 function sharkArtFallback(img) {
   const id = img.getAttribute("data-shark-art");
+  const type = img.getAttribute("data-art-type");
+  /* Silhouette failure: show the generic mystery shape, never the
+     species' full-colour SVG. */
+  if (type === "silhouette") {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = MYSTERY_SILHOUETTE_SVG;
+    img.replaceWith(wrapper.firstChild);
+    return;
+  }
   /* ART is defined in art-data.js, loaded before this module's callers. */
   if (typeof ART !== "undefined" && ART[id]) {
     const wrapper = document.createElement("div");
@@ -72,9 +107,12 @@ function sharkArtFallback(img) {
   }
 }
 
-/* Returns an <img> HTML string for a background creature shadow. */
+/* Returns an <img> HTML string for a background creature shadow.
+   Background creatures are ambient decoration — if a sprite fails to
+   load, hide it gracefully rather than showing a broken image. */
 function bgCreatureImg(name, alt) {
   const url = BG_URL(name);
   const safeAlt = (alt || name).replace(/"/g, "&quot;");
-  return `<img src="${url}" alt="${safeAlt}" loading="lazy" class="bg-creature-img" />`;
+  return `<img src="${url}" alt="${safeAlt}" loading="lazy" class="bg-creature-img" ` +
+    `onerror="this.style.display='none'" />`;
 }
