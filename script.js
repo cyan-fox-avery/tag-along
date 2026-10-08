@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.22.0";
+const VERSION = "v0.23.0";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -584,7 +584,10 @@ const state = {
   bruceChainComplete: false, // v0.18.0: the Bruce chain isn't built yet
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
-  pinned: pinStore.load() // v0.20.0: "currently researching" shark id, or null
+  pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
+  /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
+  bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
+  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })()
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -1595,6 +1598,7 @@ async function runExpedition(plan) {
   state.stats.expeditions = (state.stats.expeditions || 0) + 1;
   saveStats();
   checkAchievements();
+  advanceBruceChain(); // v0.23.0: slow-burn easter egg
 
   /* v0.8.0: close the logbook page for this trip.
      v0.22.0 Mira review: attach pin hint grounded in this completed expedition. */
@@ -2111,11 +2115,13 @@ function showNextAchievement() {
 function renderAchievements() {
   const list = $("achieveList");
   if (!list || typeof ACHIEVEMENTS === "undefined") return;
-  const unlockedCount = ACHIEVEMENTS.filter(a => state.achievements[a.id]).length;
+  /* v0.23.0: hidden achievements (e.g. Bruce) don't appear until unlocked. */
+  const visible = ACHIEVEMENTS.filter(a => !a.hidden || state.achievements[a.id]);
+  const unlockedCount = visible.filter(a => state.achievements[a.id]).length;
   const head = $("achieveHead");
-  if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${ACHIEVEMENTS.length} unlocked</p>`;
+  if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${visible.length} unlocked</p>`;
   list.innerHTML = "";
-  ACHIEVEMENTS.forEach(a => {
+  visible.forEach(a => {
     const unlocked = !!state.achievements[a.id];
     const row = document.createElement("div");
     row.className = "guide-row" + (unlocked ? "" : " locked");
@@ -2129,7 +2135,7 @@ function renderAchievements() {
   });
   const badge = $("achieveBadge");
   if (badge) {
-    badge.textContent = `${unlockedCount}/${ACHIEVEMENTS.length}`;
+    badge.textContent = `${unlockedCount}/${visible.length}`;
     badge.classList.toggle("hidden", unlockedCount === 0);
   }
 }
@@ -2231,6 +2237,7 @@ function confirmTag(name) {
     { who: "them", text: s.cheer }
   ]);
   maybeSarahEgg(s.id, rec);
+  maybeNameEgg(s.id, rec); // v0.23.0
   checkMilestones();
   checkAchievements(); // v0.18.0
   renderAll();
@@ -2574,6 +2581,69 @@ function maybeSarahEgg(speciesId, rec) {
   }
 }
 
+/* v0.23.0: real-shark easter eggs. Called on rename/tag.
+   - Mary Lee / Nicole: great white + matching name → Sarah thread (immediate)
+   - Bruce: any shark + "bruce" → starts SLOW chain (no immediate message!) */
+function maybeNameEgg(speciesId, rec) {
+  if (!rec || !rec.name) return;
+  const name = rec.name.trim().toLowerCase();
+  const s = sharkById(speciesId);
+
+  // Mary Lee: great white only
+  if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
+    rec.maryLeeEgg = true;
+    store.save(state.tagged);
+    pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
+    return;
+  }
+  // Nicole: great white only
+  if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
+    rec.nicoleEgg = true;
+    store.save(state.tagged);
+    pushThread(NICOLE_THREAD.map(m => ({ ...m })));
+    return;
+  }
+  // Bruce: ANY shark. No immediate message — the slow chain begins silently.
+  if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
+    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0 };
+    try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+    // Deliberately no pushThread here. Sarah will notice... eventually.
+  }
+}
+
+/* v0.23.0: advance the Bruce chain. Called on expedition completion and game
+   load. Stages are spaced: at least 2 expeditions OR 12 hours between stages,
+   so it unfolds slowly over multiple sessions. */
+function advanceBruceChain() {
+  if (!state.bruceEgg || state.bruceChainComplete) return;
+  if (typeof BRUCE_CHAIN === "undefined") return;
+  const now = Date.now();
+  const expeditionsSince = (state.stats.expeditions || 0) - (state.bruceEgg.expeditionsAtStage || 0);
+  const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
+  // Need either 2+ expeditions or 12+ hours since last stage
+  if (expeditionsSince < 2 && hoursSince < 12) return;
+
+  const stage = state.bruceEgg.stage;
+  if (stage >= BRUCE_CHAIN.length) {
+    // Chain complete — unlock hidden achievement
+    state.bruceChainComplete = true;
+    try {
+      localStorage.setItem("tyi-bruce-done", "1");
+      localStorage.removeItem("tyi-bruce");
+    } catch {}
+    state.bruceEgg = null;
+    checkAchievements(); // Bruce achievement check uses st.bruceChainComplete
+    return;
+  }
+
+  // Push this stage's messages
+  pushThread(BRUCE_CHAIN[stage].map(m => ({ ...m })));
+  state.bruceEgg.stage = stage + 1;
+  state.bruceEgg.lastAdvance = now;
+  state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
+  try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+}
+
 $("tagConfirm").addEventListener("click", () => confirmTag($("sharkName").value.trim()));
 
 /* ---------- Collection book: compact grid, tap for detail ---------- */
@@ -2697,6 +2767,7 @@ function openDetail(id) {
     t.name = $("renameInput").value.trim();
     store.save(state.tagged);
     maybeSarahEgg(id, t);
+    maybeNameEgg(id, t); // v0.23.0: Mary Lee / Nicole / Bruce
     renderCollection();
     renderResearch();
     openDetail(id);
@@ -2767,7 +2838,70 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done"];
+
+/* v0.23.0: save export/import for the public beta. */
+function exportSave() {
+  const data = { version: VERSION, exportedAt: new Date().toISOString(), keys: {} };
+  RESET_KEYS.forEach(k => {
+    try {
+      const v = localStorage.getItem(k);
+      if (v !== null) data.keys[k] = v;
+    } catch {}
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const aEl = document.createElement("a");
+  aEl.href = url;
+  aEl.download = "tag-along-save-" + VERSION + ".json";
+  document.body.appendChild(aEl);
+  aEl.click();
+  setTimeout(() => { document.body.removeChild(aEl); URL.revokeObjectURL(url); }, 100);
+}
+function importSave(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      // Validate shape
+      if (!data || typeof data !== "object" || !data.keys || typeof data.keys !== "object") {
+        alert("That doesn't look like a Tag Along save file.");
+        return;
+      }
+      // Version check (warn but allow)
+      const fileVersion = data.version || "unknown";
+      let msg = "Import this save? Your current progress will be overwritten.\n\n";
+      msg += "File version: " + fileVersion + "\nCurrent version: " + VERSION;
+      if (fileVersion !== VERSION) {
+        msg += "\n\n⚠️ Version mismatch — things might look odd, but we'll do our best.";
+      }
+      if (!confirm(msg)) return;
+      // Apply
+      Object.entries(data.keys).forEach(([k, v]) => {
+        try { localStorage.setItem(k, v); } catch {}
+      });
+      // Reload to pick up the new save
+      location.reload();
+    } catch (e) {
+      alert("Couldn't read that file. Is it a valid Tag Along save?");
+    }
+  };
+  reader.readAsText(file);
+}
+// Wire up buttons (after DOM ready — these run at script load, elements exist)
+(function initSaveButtons() {
+  const ex = document.getElementById("exportBtn");
+  if (ex) ex.addEventListener("click", exportSave);
+  const im = document.getElementById("importBtn");
+  const fi = document.getElementById("importFile");
+  if (im && fi) {
+    im.addEventListener("click", () => fi.click());
+    fi.addEventListener("change", () => {
+      if (fi.files && fi.files[0]) importSave(fi.files[0]);
+      fi.value = ""; // reset so the same file can be picked again
+    });
+  }
+})();
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -3067,6 +3201,8 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
 })();
 $("buildTag").textContent = VERSION;
 /* v0.22.0: What's New — show once per version update for returning players. */
+/* v0.23.0: Bruce chain can also advance on game load (time-based). */
+setTimeout(() => { try { advanceBruceChain(); } catch {} }, 5000);
 (function initWhatsNew() {
   const notes = WHATS_NEW[VERSION];
   if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, preMigrationHadSave)) {
