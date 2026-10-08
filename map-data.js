@@ -427,6 +427,17 @@ const TRACK_KIND_NOTES = {
    whale sharks cross basins. v0.9.0: the areas list runs in corridor
    order, so legs are walked forward (never shuffled into nonsense);
    the start index varies so tracks differ. */
+/* v0.21.0 Mira review: haversine distance (km) between two [lat, lon] pairs.
+   Used by genTrack() so reported hop distances match the plotted coordinates. */
+function haversineKm(a, b) {
+  const R = 6371;
+  const dLat = (b[0] - a[0]) * Math.PI / 180;
+  const dLon = (b[1] - a[1]) * Math.PI / 180;
+  const la1 = a[0] * Math.PI / 180, la2 = b[0] * Math.PI / 180;
+  const h = Math.sin(dLat/2)**2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
 function genTrack(species, rec) {
   const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
   const n = env.nPoints[0] + Math.floor(Math.random() * (env.nPoints[1] - env.nPoints[0] + 1));
@@ -435,11 +446,23 @@ function genTrack(species, rec) {
   const maxStart = Math.max(0, env.areas.length - (n - 1));
   const startIdx = Math.floor(Math.random() * (maxStart + 1));
   const legs = env.areas.slice(startIdx, startIdx + n - 1);
+  /* v0.21.0 Mira review: km is computed from MAP_COORDS via haversine,
+     not random within hop. The hop range is now a sanity bound — if the
+     real distance exceeds it, we use the real distance anyway (honest)
+     and the envelope should be redesigned to be local. */
+  let prevCoord = MAP_COORDS[rec.location];
   legs.forEach(area => {
     day += env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
-    const km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    const coord = MAP_COORDS[area];
+    let km;
+    if (prevCoord && coord) {
+      km = Math.round(haversineKm(prevCoord, coord) * 10) / 10;
+    } else {
+      km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
+    }
     totalKm = Math.round((totalKm + km) * 10) / 10;
     points.push({ label: area, day, km });
+    if (coord) prevCoord = coord;
   });
   return { points, totalKm, days: day, kind: env.kind || "satellite" };
 }
