@@ -183,18 +183,19 @@ const ACHIEVEMENTS = [
       }));
       return statuses.length > 0 && statuses.every(s => taggedStatuses.has(s));
     }
-  }
+  },
+  {
+    id: "bruce",
+    name: "You Named Him WHAT?",
+    icon: "🎬",
+    breadcrumb: "???",
+    description: "Named a shark Bruce and let Sarah piece together why that's hilarious. She's still laughing.",
+    hidden: true,
+    check: (st) => !!st.bruceChainComplete
+  },
 ];
 
 /* v0.18.0 review: the Bruce chain isn't built yet, so this stays out of the
    live list until it is. Every advertised achievement must be earnable. */
 const FUTURE_ACHIEVEMENTS = [
-  {
-    id: "bruce",
-    name: "You Named Him WHAT?",
-    icon: "🎬",
-    breadcrumb: "name a shark the most popular shark name",
-    description: "Named a shark Bruce and followed the rabbit hole all the way down.",
-    check: (st) => !!st.bruceChainComplete
-  }
 ];
