@@ -368,7 +368,7 @@ function showMapPopup(sid) {
   const kindNote = t.track.hypothetical
     ? "Hypothetical movement scenario — this route illustrates plausible long-range movement for a migratory species, not a reconstruction of this individual's tracked journey."
     : t.track.kind === "archival"
-    ? "Archival track — this species has never carried a tracking tag. This route is an illustrative habitat-based scenario drawn from capture records and published depth ranges, not a reconstruction of an individual's movements."
+    ? "Illustrative habitat-based movement scenario. These plotted positions are not actual detections of this individual." + (species.id === "sawshark" ? " (Pop-up satellite archival tags have been deployed on common sawsharks off Tasmania — Burke et al. 2020.)" : "")
     : t.track.kind === "resightings"
       ? "Built from reef survey re-sightings, not a satellite tag — this shark barely leaves its reef flat. Every ping falls within about 2 km."
       : t.track.kind === "acoustic"
@@ -590,10 +590,28 @@ function migrateTracks() {
   let changed = false;
   Object.entries(state.tagged).forEach(([sid, t]) => {
     /* v0.21.0 Mira final: regenerate tracks that predate the tag-anchor fix.
-       Old tracks start at generic regional centers and teleport to the envelope. */
+       Old tracks start at generic regional centers and teleport to the envelope.
+       v0.21.0 Mira re-review: preserve player re-sighting points. */
     if (!t.track || t.track.v !== 2) {
+      const resightPoints = (t.track && t.track.points || []).filter(p => p.resighting);
+      const resightRecords = t.resightings || [];
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
       t.track.v = 2;
+      const species = sharkById(sid);
+      const env = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id]) || null;
+      resightPoints.forEach((rp) => {
+        const anchorLabel = (env && env.tagAnchor) || rp.label;
+        const last = t.track.points[t.track.points.length - 1];
+        const lastCoord = MAP_COORDS[last.label];
+        const newCoord = MAP_COORDS[anchorLabel];
+        let km = 0;
+        if (lastCoord && newCoord && typeof haversineKm === "function") {
+          km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
+        }
+        t.track.points.push({ label: anchorLabel, day: rp.day, km, resighting: true });
+        t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
+      });
+      if (resightRecords.length) t.resightings = resightRecords;
       changed = true;
     }
   });
@@ -1522,15 +1540,16 @@ function recordResighting(species, plan) {
     const last = t.track.points[t.track.points.length - 1];
     const day = last.day + env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
     /* v0.21.0 Mira review: compute real distance from coordinates, not random hop. */
+    const anchorLabel = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id] && TRACK_ENVELOPES[species.id].tagAnchor) || entry.location;
     const lastCoord = MAP_COORDS[last.label];
-    const newCoord = MAP_COORDS[entry.location];
+    const newCoord = MAP_COORDS[anchorLabel];
     let km;
     if (lastCoord && newCoord && typeof haversineKm === "function") {
       km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
     } else {
       km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
     }
-    t.track.points.push({ label: entry.location, day, km });
+    t.track.points.push({ label: anchorLabel, day, km, resighting: true });
     t.track.days = day;
     t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
   }
