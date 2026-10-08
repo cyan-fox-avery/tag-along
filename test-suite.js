@@ -948,6 +948,17 @@ code += `
     } };
     return validateSaveData(real).ok === true;
   })());
+  ok('v0.23.0: validateSaveData accepts legacy bare-array threads', (() => {
+    // normThread() supports legacy: if (Array.isArray(t)) return { ts: 0, msgs: t };
+    const legacy = { version: "v0.23.0", keys: {
+      "tyi-collection": '{"nurse":{"researchId":"NS-2026-014","tagged":true}}',
+      "tyi-messages": JSON.stringify({
+        messages: [[{ who: "them", text: "Old format!" }]],  // bare array, no ts wrapper
+        unread: 0, chatIdx: 0
+      })
+    } };
+    return validateSaveData(legacy).ok === true;
+  })());
   ok('v0.23.0: full realistic export validates', (() => {
     // Realistic complete save: collection, logbook, stats, messages
     const full = { version: "v0.23.0", exportedAt: new Date().toISOString(), keys: {
