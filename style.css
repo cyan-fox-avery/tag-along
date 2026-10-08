@@ -128,6 +128,9 @@ body { overflow-x: clip; }
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
 }
 .tab.active .count-badge { background: rgba(0,0,0,0.15); color: var(--accent-ink); }
+/* v0.24.0: Archive new-photo indicator — a dot plus aria-label, not color alone. */
+.tab-badge { color: var(--accent); font-size: 12px; margin-left: 4px; vertical-align: super; }
+.tab-badge.hidden { display: none; }
 /* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
    so they used to overflow the page and leave a dead strip on the right.
    Two rows of three keeps every tab visible and tappable with no overflow.
