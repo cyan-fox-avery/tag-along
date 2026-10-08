@@ -21,9 +21,8 @@
   <div class="build-tag" id="buildTag" title="Build version"></div>
   <div class="app">
     <header class="topbar">
-      <p class="eyebrow">PROTOTYPE</p>
-      <h1>Tag Along</h1>
-      <p class="subtitle">a shark research game 🦈</p>
+      <span class="logo-mark" aria-hidden="true">🦈</span>
+      <h1>TAG ALONG</h1>
     </header>
 
     <nav class="tabs" aria-label="Game sections">
@@ -46,6 +45,7 @@
         </div>
         <!-- v0.19.0: field-guide database — search + stacked filters -->
         <div class="guide-tools">
+          <label class="find-label" for="guideSearch">FIND RECORD</label>
           <input id="guideSearch" type="search" class="guide-search"
             placeholder="Search sharks by name…" aria-label="Search sharks by name" autocomplete="off">
           <button id="filterToggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filterPanel">
