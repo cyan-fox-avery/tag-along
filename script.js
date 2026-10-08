@@ -2052,7 +2052,7 @@ function showRegionUnlock() {
     <div class="cert-body">
       <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
       <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
-      <p class="latin">Six successful tags. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+      <p class="latin">The six original species. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
     </div>
     <button id="winNext" class="primary-button" type="button">Back to the water</button>
   </div>`;
