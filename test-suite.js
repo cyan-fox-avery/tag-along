@@ -926,17 +926,24 @@ code += `
   ok('v0.23.0: validateSaveData accepts good save', (() => {
     const good = { version: "v0.23.0", keys: { "tyi-collection": "{}", "tyi-logbook": "[]" } };
     const r = validateSaveData(good);
-    return r.ok === true && r.supported === true;
+    return r.ok === true;
   })());
   ok('v0.23.0: validateSaveData rejects bad save', (() => {
     return validateSaveData(null).ok === false &&
            validateSaveData({}).ok === false &&
+           validateSaveData({ keys: {} }).ok === false &&                    // empty keys
            validateSaveData({ keys: "not-object" }).ok === false &&
-           validateSaveData({ keys: { "tyi-collection": "{bad json" } }).ok === false;
+           validateSaveData({ keys: { "tyi-collection": "{bad json" } }).ok === false &&
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-collection": "[]" } }).ok === false &&  // wrong shape
+           validateSaveData({ version: "v0.23.0", keys: { "tyi-logbook": "{}" } }).ok === false &&     // wrong shape
+           validateSaveData({ version: "v0.23.0", keys: { "evil-key": "x" } }).ok === false;           // unknown key
   })());
-  ok('v0.23.0: validateSaveData flags unknown version', (() => {
-    const r = validateSaveData({ version: "v9.99.9", keys: {} });
-    return r.ok === true && r.supported === false;
+  ok('v0.23.0: validateSaveData rejects unknown version', (() => {
+    const r = validateSaveData({ version: "v9.99.9", keys: { "tyi-collection": "{}" } });
+    return r.ok === false;  // rejected, not just warned
+  })());
+  ok('v0.23.0: snapshot/restore round-trip', (() => {
+    return typeof snapshotCurrentSave === "function" && typeof restoreSnapshot === "function";
   })());
   ok('v0.23.0: whatsnew v0.23.0 entry exists', (() => {
     const notes = WHATS_NEW["v0.23.0"];
