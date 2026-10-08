@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'assets/art-loader.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v0.23.0', VERSION === 'v0.23.0');
+  ok('version v0.26.0', VERSION === 'v0.26.0');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1079,6 +1079,42 @@ code += `
     // renderArchive checks media.future — verify the guard exists
     const src = renderArchive.toString();
     return src.includes("media.future");
+  })());
+
+  // v0.26.0: art integration — WebP illustrations + silhouettes, tap-to-reveal
+  ok('v0.26.0: ART_SLUG_MAP resolves all 50 species to WebP on disk', (() => {
+    // Every playable species ID must map (directly or via ART_SLUG_MAP)
+    // to an existing illustration AND silhouette WebP file.
+    return SHARKS.every(s =>
+      fs.existsSync(path.join(DIR, ART_URL(s.id, 'illustration'))) &&
+      fs.existsSync(path.join(DIR, ART_URL(s.id, 'silhouette')))
+    );
+  })());
+  ok('v0.26.0: background creature sprites exist on disk', (() => {
+    return ['bg-sea-turtle', 'bg-dolphin', 'bg-fish-school',
+            'bg-ray', 'bg-seal', 'bg-jellyfish']
+      .every(name => fs.existsSync(path.join(DIR, BG_URL(name))));
+  })());
+  ok('v0.26.0: tap-to-reveal hides actions until silhouette is tapped', (() => {
+    // Phase 1 shows the silhouette with actions hidden; the reveal
+    // swaps in the illustration and only then shows Watch/Tag buttons.
+    const src = doEncounter.toString();
+    return src.includes('.shark-silhouette') &&              // phase 1: silhouette
+           src.includes('actions.classList.add("hidden")') && // actions hidden pre-tap
+           src.includes('sharkArtImg(species.id, "illustration"') && // phase 2: reveal
+           src.includes('showEncounterActions()') &&          // reveal shows buttons
+           src.includes('actions.classList.remove("hidden")');
+  })());
+  ok('v0.26.0: silhouette fallback does not spoil the mystery', (() => {
+    // A failed silhouette must NOT fall back to the full-colour SVG.
+    const src = sharkArtFallback.toString();
+    return src.includes('MYSTERY_SILHOUETTE_SVG') &&
+           src.includes('data-art-type') &&
+           src.includes('"silhouette"');
+  })());
+  ok('v0.26.0: background creatures hide gracefully on load failure', (() => {
+    // bgCreatureImg tags carry an onerror that hides broken sprites.
+    return bgCreatureImg('bg-seal', 'Seal').includes('onerror');
   })());
 
   console.log(out.join('\\n'));

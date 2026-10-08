@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.24.0";
+const VERSION = "v0.26.0";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -17,6 +17,11 @@ const WHATS_NEW = {
   ],
   "v0.24.0": [
     "🖼️ <strong>Progressive Wild Archive.</strong> Your Archive now grows with every tag — Sarah introduces it after your first shark, and each new species adds its real photo quietly.",
+  ],
+  "v0.26.0": [
+    "🎨 <strong>The sharks are here!</strong> Every species now has its own beautiful illustration — and encounters start with a mysterious silhouette. Tap it to reveal who's swimming toward you.",
+    "🌊 <strong>Living waters.</strong> Sea turtles, dolphins, rays, seals, jellyfish, and schools of fish now drift through your expeditions.",
+    "📖 <strong>Collection book glow-up.</strong> Your tagged sharks show their full-colour portraits in the collection — the field-guide sketches stay pencil-style until you've earned the real thing.",
   ],
   "v0.23.0": [
     "🦈 <strong>Real-shark stories.</strong> Name a great white Mary Lee or Nicole, and Sarah will tell you about the real sharks behind the names — their extraordinary journeys.",
@@ -55,38 +60,26 @@ function playerHasSaveData() {
 
 /* ---------- Ambient sea life: small silhouettes that drift through the dive ---------- */
 
+/* v0.26.0: background creatures are now Mira-approved WebP shadow sprites
+   (steel-blue silhouettes, transparent) instead of inline SVGs. The three
+   original creatures keep their keys; ray/seal/jellyfish are new. */
 const CREATURE_ART = {
-  turtle: `
-  <svg viewBox="0 0 90 50" role="img" aria-label="Sea turtle">
-    <ellipse cx="45" cy="25" rx="24" ry="15" fill="#3d5a52"/>
-    <ellipse cx="45" cy="22" rx="17" ry="10" fill="#4f7568"/>
-    <polygon points="22,25 4,12 8,28" fill="#3d5a52"/>
-    <polygon points="22,27 4,40 8,26" fill="#3d5a52"/>
-    <polygon points="68,25 86,14 82,28" fill="#3d5a52"/>
-    <polygon points="68,27 86,38 82,26" fill="#3d5a52"/>
-    <circle cx="66" cy="22" r="2.4" fill="#22332e"/>
-  </svg>`,
-  fish: `
-  <svg viewBox="0 0 110 50" role="img" aria-label="School of fish">
-    <g fill="#41637a">
-      <polygon points="18,25 34,17 34,33"/>
-      <ellipse cx="26" cy="25" rx="12" ry="5"/>
-      <polygon points="58,14 74,6 74,22"/>
-      <ellipse cx="66" cy="14" rx="12" ry="5"/>
-      <polygon points="84,32 100,24 100,40"/>
-      <ellipse cx="92" cy="32" rx="12" ry="5"/>
-      <polygon points="44,38 60,30 60,46"/>
-      <ellipse cx="52" cy="38" rx="12" ry="5"/>
-    </g>
-  </svg>`,
-  dolphin: `
-  <svg viewBox="0 0 100 50" role="img" aria-label="Dolphin">
-    <path d="M8,30 Q30,18 55,22 Q75,25 92,14 Q80,28 60,32 Q35,38 8,30 Z" fill="#4a6a84"/>
-    <polygon points="48,22 56,6 62,22" fill="#4a6a84"/>
-    <polygon points="30,32 22,44 38,34" fill="#4a6a84"/>
-    <circle cx="72" cy="24" r="2.2" fill="#22333f"/>
-  </svg>`
+  turtle: null, // set below via bgCreatureImg
+  fish: null,
+  dolphin: null,
+  ray: null,
+  seal: null,
+  jellyfish: null
 };
+/* Filled in at load: art-loader.js must be loaded before script.js. */
+function initCreatureArt() {
+  CREATURE_ART.turtle = bgCreatureImg("bg-sea-turtle", "Sea turtle");
+  CREATURE_ART.fish = bgCreatureImg("bg-fish-school", "School of fish");
+  CREATURE_ART.dolphin = bgCreatureImg("bg-dolphin", "Dolphin");
+  CREATURE_ART.ray = bgCreatureImg("bg-ray", "Ray");
+  CREATURE_ART.seal = bgCreatureImg("bg-seal", "Seal");
+  CREATURE_ART.jellyfish = bgCreatureImg("bg-jellyfish", "Jellyfish");
+}
 
 /* Flavour: the dive log describes the place, not just the mechanics.
    v0.6.0: depth sets the atmosphere — shallow flavour is bright and busy,
@@ -128,30 +121,34 @@ const SIGHTINGS = {
     { text: "A sea turtle glides past, unhurried, flippers moving like slow wings.", creature: "turtle" },
     { text: "A school of small silver fish wheels past in perfect unison.", creature: "fish" },
     { text: "A dolphin arcs through the blue in the distance, there and gone.", creature: "dolphin" },
-    { text: "A pair of flying fish skitter across the surface, touching down and lifting off again.", creature: "fish" }
+    { text: "A pair of flying fish skitter across the surface, touching down and lifting off again.", creature: "fish" },
+    { text: "A seal torpedoes past, sleek and curious, then vanishes into the blue.", creature: "seal" }
   ],
   reef: [
     { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle" },
     { text: "A shimmering school of fusiliers pours over the reef crest.", creature: "fish" },
     { text: "A hawksbill turtle works a sponge off the coral head, beak crunching steadily.", creature: "turtle" },
-    { text: "A small reef shark patrols the drop-off — not your target, just a colleague passing through.", creature: "fish" }
+    { text: "A small reef shark patrols the drop-off — not your target, just a colleague passing through.", creature: "fish" },
+    { text: "A spotted eagle ray glides over the sand flat, wings rippling like slow applause.", creature: "ray" }
   ],
   twilight: [
     { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish" },
     { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish" },
-    { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish" }
+    { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish" },
+    { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish" }
   ],
   deep: [
     { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish" },
     { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish" },
-    { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish" }
+    { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish" },
+    { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish" }
   ]
 };
 
 /* v0.13.0: the sighting deck is filtered against the region note so the
    trip doesn't echo it — the Caribbean note already mentions a green sea
    turtle, Japan's a lanternfish, the Maldives' dolphins. */
-const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin" };
+const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly" };
 function buildSightingDeck(depth, region) {
   const pool = SIGHTINGS[depth] || [];
   const note = ((REGIONS[region] && REGIONS[region].note) || "").toLowerCase();
@@ -1394,17 +1391,59 @@ function doEncounter(species, plan) {
   return new Promise(resolve => {
     const rec = state.tagged[species.id];
     const sharkEl = $("diveShark");
-    sharkEl.innerHTML = ART[species.id];
+    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
+       silhouette (mystery — the species is not named yet). Tapping
+       crossfades to the full-colour illustration and reveals the name.
+       The illustration is preloaded so the reveal is instant. */
+    preloadSharkArt(species.id);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sharkEl.innerHTML =
+      `<div class="shark-silhouette" role="button" tabindex="0" ` +
+      `aria-label="Something is out there — tap to reveal">` +
+      sharkArtImg(species.id, "silhouette", "Mysterious shark silhouette") +
+      `<div class="tap-hint">👆 Tap to reveal</div></div>`;
     sharkEl.classList.remove("hidden");
-    /* v0.17.1: the moment a shark appears, say whether it's already in the
-       book — no squinting at the small print under the buttons. */
-    const already = rec
-      ? ` — already in your book${rec.name ? ` as \u201c${esc(rec.name)}\u201d` : ""}!`
-      : ` — new to your book!`;
-    logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
+    logLine(`🦈 <span class="found">Something's out there...</span>`, "found");
     const actions = $("diveActions");
-    actions.classList.remove("hidden");
+    actions.classList.add("hidden");
     actions.innerHTML = "";
+
+    /* Phase 2: the reveal. Swaps silhouette for illustration, reveals
+       the species name (with v0.17.1 already-in-book info), then shows
+       the Watch/Tag buttons. */
+    const reveal = () => {
+      const sil = sharkEl.querySelector(".shark-silhouette");
+      if (!sil || sil.dataset.revealed) return;
+      sil.dataset.revealed = "true";
+      /* v0.17.1: the moment a shark appears, say whether it's already in the
+         book — no squinting at the small print under the buttons. */
+      const already = rec
+        ? ` — already in your book${rec.name ? ` as \u201c${esc(rec.name)}\u201d` : ""}!`
+        : ` — new to your book!`;
+      const showIllustration = () => {
+        sharkEl.innerHTML =
+          `<div class="shark-reveal">` +
+          sharkArtImg(species.id, "illustration", species.name) +
+          `</div>`;
+        logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
+        showEncounterActions();
+      };
+      if (reducedMotion) {
+        showIllustration();
+      } else {
+        sil.classList.add("revealing");
+        setTimeout(showIllustration, 350);
+      }
+    };
+
+    const silEl = sharkEl.querySelector(".shark-silhouette");
+    silEl.addEventListener("click", reveal);
+    silEl.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); reveal(); }
+    });
+
+    const showEncounterActions = () => {
+      actions.classList.remove("hidden");
     const finish = () => {
       /* The day doesn't end on its own — after each encounter the player
          chooses: keep diving, or head back to the ship. */
@@ -1475,6 +1514,7 @@ function doEncounter(species, plan) {
       });
       actions.appendChild(resightBtn);
     }
+    }; // end showEncounterActions
   });
 }
 
@@ -2194,7 +2234,7 @@ function openTagging(species, doneCb) {
   state.pendingTag._gen = { length, sex, researchId };
   $("tagForm").classList.remove("hidden");
   $("healthView").classList.add("hidden");
-  $("tagSharkArt").innerHTML = ART[species.id];
+  $("tagSharkArt").innerHTML = sharkArtImg(species.id, "illustration", species.name);
   $("tagInfo").innerHTML = `
     <strong>${species.name}</strong> <em>(${species.latin})</em><br>
     🔬 Research ID: <strong>${researchId}</strong> (assigned automatically)<br>
@@ -2281,7 +2321,7 @@ function showHealthCheck(s, rec) {
   state.healthSpecies = s;
   $("tagForm").classList.add("hidden");
   $("healthView").classList.remove("hidden");
-  $("healthArt").innerHTML = ART[s.id];
+  $("healthArt").innerHTML = sharkArtImg(s.id, "illustration", s.name);
   $("healthInfo").innerHTML = `
     <strong>${s.name}</strong> — ${esc(rec.researchId)}<br>
     🩺 Health check: ${rec.sex === "female" ? "♀ female" : "♂ male"}, ${rec.length} m.<br>
@@ -2732,7 +2772,7 @@ function renderCollection() {
     cell.className = "grid-cell";
     cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}`);
     cell.innerHTML = `
-      <div class="shark-art">${ART[s.id]}</div>
+      <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
       ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
       <div class="grid-id">${esc(t.researchId)}</div>
       <h3>${s.name}</h3>
@@ -2760,7 +2800,7 @@ function openDetail(id) {
   const t = state.tagged[id];
   const c = $("detailContent");
   c.innerHTML = `
-    <div class="shark-art">${ART[s.id]}</div>
+    <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
     ${t.name ? `<div class="given-name">“${esc(t.name)}”</div>` : ""}
     <div class="detail-name-row">
       ${idLine(t)}
@@ -3454,6 +3494,7 @@ setInterval(tickPhoneClock, 30000);
   const qp = $("quickPace");
   if (qp) qp.addEventListener("change", () => setPace(qp.checked));
 })();
+initCreatureArt(); // v0.26.0: fill CREATURE_ART with WebP shadow sprites
 renderAll();
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();
