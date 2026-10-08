@@ -43,8 +43,8 @@
 | 37 | Horn shark | *Heterodontus francisci* | ✅ | ✅ | generated |
 | 38 | Port Jackson shark | *Heterodontus portusjacksoni* | ✅ | ✅ | generated |
 | 39 | Broadnose sevengill shark | *Notorynchus cepedianus* | ✅ | ✅ | generated |
-| 40 | Basking shark | *Cetorhinus maximus* | ⏳ blocked | ✅ | generated |
-| 41 | Megamouth shark | *Megachasma pelagios* | ⏳ blocked | ✅ | generated |
+| 40 | Basking shark | *Cetorhinus maximus* | ✅ | ✅ | generated |
+| 41 | Megamouth shark | *Megachasma pelagios* | ✅ | ✅ | generated |
 | 42 | Greenland shark | *Somniosus microcephalus* | ✅ | ✅ | generated |
 | 43 | Frilled shark | *Chlamydoselachus anguineus* | ✅ | ✅ | generated |
 | 44 | Cookiecutter shark | *Isistius brasiliensis* | ✅ | ✅ | generated |
@@ -59,7 +59,7 @@
 **Status key:** approved = final production art; generated = awaiting Mira's review; revision-needed = targeted corrections queued
 
 **Notes:**
-- Basking shark and megamouth illustrations were blocked by the image system; silhouettes complete
+- Basking shark and megamouth illustrations completed on retry
 - Sand tiger illustration: dorsal fins need correction (first still too large)
 - Lanternshark illustration: dorsal proportions need correction (second should be larger)
 - Wobbegong illustration: first dorsal slightly tall (minor, on polish list)
