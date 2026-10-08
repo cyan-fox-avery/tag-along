@@ -18,6 +18,11 @@ const WHATS_NEW = {
   "v0.24.0": [
     "🖼️ <strong>Progressive Wild Archive.</strong> Your Archive now grows with every tag — Sarah introduces it after your first shark, and each new species adds its real photo quietly.",
   ],
+  "v0.26.0": [
+    "🎨 <strong>The sharks are here!</strong> Every species now has its own beautiful hand-drawn illustration — and encounters start with a mysterious silhouette. Tap it to reveal who's swimming toward you.",
+    "🌊 <strong>Living waters.</strong> Sea turtles, dolphins, rays, seals, jellyfish, and schools of fish now drift through your expeditions.",
+    "📖 <strong>Collection book glow-up.</strong> Your tagged sharks show their full-colour portraits in the collection — the field-guide sketches stay pencil-style until you've earned the real thing.",
+  ],
   "v0.23.0": [
     "🦈 <strong>Real-shark stories.</strong> Name a great white Mary Lee or Nicole, and Sarah will tell you about the real sharks behind the names — their extraordinary journeys.",
     "🤫 <strong>A secret swims in these waters.</strong> There's a new hidden surprise for curious researchers. We won't spoil it here.",
