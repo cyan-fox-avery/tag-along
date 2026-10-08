@@ -2897,17 +2897,34 @@ function validateSaveData(data) {
       try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-collection" }; }
       if (typeof parsed !== "object" || Array.isArray(parsed) || parsed === null)
         return { ok: false, reason: "tyi-collection must be an object" };
+      // Each record must be a proper shark entry (protects migrateIds())
+      for (const [sid, rec] of Object.entries(parsed)) {
+        if (rec === null || typeof rec !== "object" || Array.isArray(rec))
+          return { ok: false, reason: "tyi-collection[" + sid + "] is not a shark record" };
+        if (rec.tagged === true && (typeof rec.researchId !== "string" || !rec.researchId))
+          return { ok: false, reason: "tyi-collection[" + sid + "] missing researchId" };
+      }
     }
     if (k === "tyi-logbook" && v) {
       let parsed;
       try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-logbook" }; }
       if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-logbook must be an array" };
+      for (let i = 0; i < parsed.length; i++) {
+        if (parsed[i] === null || typeof parsed[i] !== "object")
+          return { ok: false, reason: "tyi-logbook[" + i + "] is not a trip record" };
+      }
     }
   }
   // Version: must be a recognized Tag Along version, else reject
   const fv = data.version || "unknown";
   const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
   if (!supported) return { ok: false, reason: "unsupported version: " + fv };
+  // Progress-bearing payload: importing tyi-pace alone would wipe the collection
+  const hasProgress = ["tyi-collection", "tyi-logbook", "tyi-won"].some(k => {
+    const v = data.keys[k];
+    return typeof v === "string" && v.length > 2 && v !== "{}" && v !== "[]" && v !== "null";
+  });
+  if (!hasProgress) return { ok: false, reason: "no actual progress in save" };
   return { ok: true, version: fv };
 }
 /* v0.23.0 Mira review: snapshot returns the data AND whether it worked.
@@ -2924,14 +2941,26 @@ function snapshotCurrentSave() {
     return { ok: false };
   }
 }
-function restoreSnapshot(snap) {
+function restoreSnapshot(snap, storage) {
+  const s = storage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!s) return false;
   try {
     SAVE_KEY_ALLOWLIST.forEach(k => {
-      if (k in snap) localStorage.setItem(k, snap[k]);
-      else localStorage.removeItem(k);
+      if (k in snap) s.setItem(k, snap[k]);
+      else s.removeItem(k);
     });
     return true;
   } catch { return false; }
+}
+/* v0.23.0 Mira review: storage replacement as a testable unit.
+   storage defaults to localStorage but tests can inject a failing stub. */
+function replaceSaveKeys(keys, storage) {
+  const s = storage || (typeof localStorage !== "undefined" ? localStorage : null);
+  if (!s) throw new Error("no storage");
+  SAVE_KEY_ALLOWLIST.forEach(k => {
+    if (k in keys) s.setItem(k, keys[k]);
+    else s.removeItem(k);
+  });
 }
 function importSave(file) {
   const reader = new FileReader();
@@ -2968,16 +2997,13 @@ function importSave(file) {
     try { localStorage.setItem("tyi-backup", JSON.stringify({ version: VERSION, keys: before.snap })); } catch {}
     // Replace complete key set with true rollback on failure
     try {
-      SAVE_KEY_ALLOWLIST.forEach(k => {
-        if (k in data.keys) localStorage.setItem(k, data.keys[k]);
-        else localStorage.removeItem(k);
-      });
+      replaceSaveKeys(data.keys);
     } catch (e) {
       // Roll back to the snapshot
       const restored = restoreSnapshot(before.snap);
       alert(restored
         ? "Import failed — your previous save has been restored."
-        : "Import failed and rollback also failed. Your backup file (downloaded above) has your data.");
+        : "Import failed and rollback also failed. If the backup download completed, that file has your data — otherwise your previous progress may be lost.");
       return;
     }
     location.reload();
