@@ -354,8 +354,8 @@ const TRACK_ENVELOPES = {
   },
   sawshark: {
     start: "Tagged over soft sediment off eastern Australia",
-    areas: ["Tasman Sea shelf", "Bass Strait", "New South Wales coast", "Great Australian Bight", "Victoria shelf", "Lord Howe Island"],
-    hop: [10, 120], dayStep: [3, 14], nPoints: [5, 7], kind: "acoustic",
+    areas: ["Tasman Sea shelf", "New South Wales coast", "Tasman shelf north", "Tasman shelf south", "NSW shelf edge"],
+    hop: [10, 100], dayStep: [3, 14], nPoints: [5, 7], kind: "acoustic",
     corridor: "Common sawsharks are bottom-associated residents of the continental shelf; tagged individuals show limited horizontal movement with occasional shifts along the shelf, staying near soft-sediment feeding grounds."
   },
   greenland: {
@@ -365,9 +365,9 @@ const TRACK_ENVELOPES = {
     corridor: "Greenland sharks are wide-ranging deep-water roamers of the Arctic; tagging studies show slow, far-reaching movements across deep basins, consistent with their extremely low metabolism and centuries-long lifespans."
   },
   cookiecutter: {
-    start: "Tagged at night in open Atlantic twilight waters",
-    areas: ["Sargasso Sea", "Mid-Atlantic Ridge", "Azores", "Gulf Stream", "Bermuda", "Madeira"],
-    hop: [30, 250], dayStep: [3, 14], nPoints: [5, 7], kind: "archival",
+    start: "Tagged at night in Sargasso Sea twilight waters",
+    areas: ["Sargasso Sea", "Sargasso Sea west", "Sargasso Sea east", "Bermuda", "Sargasso Sea north"],
+    hop: [30, 200], dayStep: [3, 14], nPoints: [5, 7], kind: "archival",
     corridor: "Cookiecutter sharks are vertical migrators, spending days at mesopelagic depths and rising hundreds of metres at night to feed — tagged individuals would be expected to drift with oceanic currents and vertical-migration prey layers."
   },
   sixgill: {
@@ -384,8 +384,8 @@ const TRACK_ENVELOPES = {
   },
   dwarflantern: {
     start: "Upper continental slope, Caribbean Sea off Colombia",
-    areas: ["Upper slope off Colombia", "Upper slope off Venezuela", "Cariaco Basin slope", "Grenada Basin", "Lesser Antilles volcanic arc slope", "Aves Ridge slope"],
-    hop: [5, 40], dayStep: [3, 12], nPoints: [5, 7], kind: "archival",
+    areas: ["Upper slope off Colombia", "Colombian slope north", "Colombian slope south", "Colombian canyon", "Upper slope off Colombia east"],
+    hop: [5, 35], dayStep: [3, 12], nPoints: [5, 7], kind: "archival",
     corridor: "A slope resident — small home range along the upper continental slope of the southern Caribbean, drifting between canyon systems with deep currents."
   },
   kitefin: {
@@ -408,8 +408,8 @@ const TRACK_ENVELOPES = {
   },
   catshark: {
     start: "Reef off Cornwall",
-    areas: ["Mount's Bay", "Lizard Point reefs", "Celtic Sea", "English Channel", "Bristol Channel", "Isles of Scilly", "Plymouth Sound reefs"],
-    hop: [2, 25], dayStep: [1, 7], nPoints: [5, 7], kind: "acoustic",
+    areas: ["Mount's Bay", "Lizard Point reefs", "Penzance Bay", "Mount's Bay east", "Lizard Point west"],
+    hop: [2, 20], dayStep: [1, 7], nPoints: [5, 7], kind: "acoustic",
     corridor: "A coastal homebody — small hops between reef patches and kelp beds off Cornwall, sheltering deep by day and foraging shallow at night."
   },};
 
@@ -842,7 +842,21 @@ const MAP_COORDS = {
   "Western Approaches deep": [49.3, -8.5],
 
   "Sagami Bay deep": [35.0, 139.5],
-  "Izu Peninsula slope": [34.7, 139.0],};
+  "Izu Peninsula slope": [34.7, 139.0],
+  /* v0.21.0 Mira re-review: local clusters for plausibility. */
+  "Mount's Bay east": [50.08, -5.45],
+  "Lizard Point west": [49.95, -5.25],
+  "Colombian slope north": [12.7, -72.3],
+  "Colombian slope south": [12.3, -72.7],
+  "Colombian canyon": [12.5, -72.5],
+  "Upper slope off Colombia east": [12.6, -72.0],
+  "Tasman shelf north": [-36.5, 154.5],
+  "Tasman shelf south": [-37.5, 155.5],
+  "NSW shelf edge": [-33.5, 153.0],
+  "Sargasso Sea west": [30.5, -62.0],
+  "Sargasso Sea east": [29.5, -58.0],
+  "Sargasso Sea north": [31.5, -60.0],
+};
 
 const MAP_W = 1000, MAP_H = 500;
 
