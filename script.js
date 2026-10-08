@@ -2910,9 +2910,33 @@ function validateSaveData(data) {
       try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-logbook" }; }
       if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-logbook must be an array" };
       for (let i = 0; i < parsed.length; i++) {
-        if (parsed[i] === null || typeof parsed[i] !== "object")
+        const t = parsed[i];
+        if (t === null || typeof t !== "object")
           return { ok: false, reason: "tyi-logbook[" + i + "] is not a trip record" };
+        // Essential fields the rendering path depends on
+        if (!Array.isArray(t.encounters))
+          return { ok: false, reason: "tyi-logbook[" + i + "] missing encounters" };
+        for (let j = 0; j < t.encounters.length; j++) {
+          const e = t.encounters[j];
+          if (e === null || typeof e !== "object")
+            return { ok: false, reason: "tyi-logbook[" + i + "].encounters[" + j + "] invalid" };
+        }
       }
+    }
+    if (k === "tyi-messages" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-messages" }; }
+      // Game calls .map() on messages — must be an array
+      if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-messages must be an array" };
+    }
+    if (k === "tyi-stats" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-stats" }; }
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed))
+        return { ok: false, reason: "tyi-stats must be an object" };
+      // regionsVisited is used with .includes() — must be array or absent
+      if ("regionsVisited" in parsed && !Array.isArray(parsed.regionsVisited))
+        return { ok: false, reason: "tyi-stats.regionsVisited must be an array" };
     }
   }
   // Version: must be a recognized Tag Along version, else reject
