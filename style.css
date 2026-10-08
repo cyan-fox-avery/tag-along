@@ -17,12 +17,80 @@
 body {
   margin: 0;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  background: linear-gradient(180deg, #0b2237 0%, #0e2c46 60%, #0b2237 100%);
+  /* v0.19.1: the descent — surface light at the top, deep dark below.
+     No background-attachment:fixed — the gradient belongs to the document,
+     so scrolling down genuinely takes you deeper. */
+  background: linear-gradient(180deg, #17517e 0%, #10395c 22%, #0b2740 48%, #071a2c 72%, #030e1a 100%);
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
 }
 
-.app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; }
+.app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
+/* v0.19.1: underwater ambience — sits behind the app, never interactive.
+   Document-positioned (not viewport-fixed): the surface, light, and seafloor
+   belong to actual depths, so scrolling feels like descending. */
+.ocean-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+/* The surface, just below the title card. */
+.surface-shimmer {
+  position: absolute; top: 0; left: 0; right: 0; height: 210px;
+  background:
+    radial-gradient(60% 90px at 20% 0%, rgba(170,220,255,0.28), transparent 70%),
+    radial-gradient(50% 70px at 70% 0%, rgba(170,220,255,0.20), transparent 70%),
+    linear-gradient(180deg, rgba(160,210,250,0.22) 0%, transparent 85%);
+  animation: shimmer-drift 14s ease-in-out infinite alternate;
+}
+@keyframes shimmer-drift {
+  from { transform: translateX(-2%); opacity: 0.85; }
+  to { transform: translateX(2%); opacity: 1; }
+}
+/* God rays slanting down from the surface — document-positioned in the upper water column. */
+.god-rays span {
+  position: absolute; top: 120px; width: 90px; height: 640px;
+  background: linear-gradient(180deg, rgba(180,225,255,0.10), transparent 80%);
+  transform: skewX(-12deg); filter: blur(6px);
+  animation: ray-sway 18s ease-in-out infinite alternate;
+}
+.god-rays span:nth-child(1) { left: 12%; animation-delay: -4s; }
+.god-rays span:nth-child(2) { left: 38%; width: 130px; animation-delay: -11s; }
+.god-rays span:nth-child(3) { left: 64%; width: 70px; animation-delay: -7s; }
+.god-rays span:nth-child(4) { left: 84%; animation-delay: -2s; }
+@keyframes ray-sway {
+  from { transform: skewX(-14deg) translateX(-12px); opacity: 0.7; }
+  to { transform: skewX(-9deg) translateX(12px); opacity: 1; }
+}
+/* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling. */
+.bubbles { position: fixed; inset: 0; pointer-events: none; }
+.bubbles span {
+  position: absolute; bottom: -20px; border-radius: 50%;
+  border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
+  animation: bubble-rise linear infinite;
+}
+.bubbles span:nth-child(1) { left: 8%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: -3s; }
+.bubbles span:nth-child(2) { left: 22%; width: 6px; height: 6px; animation-duration: 22s; animation-delay: -11s; }
+.bubbles span:nth-child(3) { left: 41%; width: 12px; height: 12px; animation-duration: 19s; animation-delay: -7s; }
+.bubbles span:nth-child(4) { left: 55%; width: 7px; height: 7px; animation-duration: 25s; animation-delay: -15s; }
+.bubbles span:nth-child(5) { left: 68%; width: 9px; height: 9px; animation-duration: 17s; animation-delay: -5s; }
+.bubbles span:nth-child(6) { left: 79%; width: 5px; height: 5px; animation-duration: 28s; animation-delay: -20s; }
+.bubbles span:nth-child(7) { left: 90%; width: 11px; height: 11px; animation-duration: 21s; animation-delay: -9s; }
+.bubbles span:nth-child(8) { left: 33%; width: 6px; height: 6px; animation-duration: 24s; animation-delay: -13s; }
+@keyframes bubble-rise {
+  from { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.6; }
+  to { transform: translateY(-105vh) translateX(24px); opacity: 0; }
+}
+/* Seafloor silhouette along the bottom. */
+.seafloor {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+  fill: #020a14; opacity: 0.9;
+}
+.seafloor .kelp { fill: #03141f; }
+/* Calm waters for those who need them. */
+@media (prefers-reduced-motion: reduce) {
+  .surface-shimmer, .god-rays span, .bubbles span { animation: none; }
+  .bubbles { display: none; }
+}
 /* v0.10.4: safety net — no flex row may ever widen the page again.
    `clip` (not `hidden`) keeps position:sticky working on the tab bar. */
 body { overflow-x: clip; }
@@ -60,6 +128,9 @@ body { overflow-x: clip; }
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
 }
 .tab.active .count-badge { background: rgba(0,0,0,0.15); color: var(--accent-ink); }
+/* v0.24.0: Archive new-photo indicator — a dot plus aria-label, not color alone. */
+.tab-badge { color: var(--accent); font-size: 12px; margin-left: 4px; vertical-align: super; }
+.tab-badge.hidden { display: none; }
 /* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
    so they used to overflow the page and leave a dead strip on the right.
    Two rows of three keeps every tab visible and tappable with no overflow.
@@ -93,6 +164,9 @@ body { overflow-x: clip; }
 .hook { font-size: 13px; color: var(--accent); margin: 6px 0 10px; }
 
 .shark-art { text-align: center; margin: 4px 0 8px; }
+/* v0.26.0: WebP illustrations in shark-art containers. */
+.shark-art img { width: 100%; max-width: 320px; height: auto; display: block; margin: 0 auto; }
+.grid-cell .shark-art img { max-width: 100%; }
 .shark-art svg { width: 100%; max-width: 320px; height: auto; }
 
 .field { display: block; margin: 10px 0; }
@@ -167,11 +241,9 @@ select option:disabled { color: #7a8a9e; }
   width: 78%; animation: swim 5s ease-in-out infinite;
 }
 .dive-shark svg { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
-.dive-shark img { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
-@keyframes swim { 0%,100% { transform: translate(-50%,-52%); } 50% { transform: translate(-50%,-46%); } }
-
 /* v0.26.0: tap-to-reveal encounter. The silhouette is tappable; tapping
    crossfades to the full-colour illustration. */
+.dive-shark img { width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 .shark-silhouette { cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
@@ -186,14 +258,7 @@ select option:disabled { color: #7a8a9e; }
 @media (prefers-reduced-motion: reduce) {
   .shark-silhouette, .shark-reveal, .tap-hint { transition: none; animation: none; }
 }
-
-/* v0.26.0: WebP illustrations in shark-art containers. */
-.shark-art img { width: 100%; max-width: 320px; height: auto; display: block; margin: 0 auto; }
-.grid-cell .shark-art img { max-width: 100%; }
-
-/* v0.26.0: background creature WebP shadows. */
-.ambient img { height: 100%; width: auto; display: block; }
-.bg-creature-img { height: 100%; width: auto; }
+@keyframes swim { 0%,100% { transform: translate(-50%,-52%); } 50% { transform: translate(-50%,-46%); } }
 
 .dive-log {
   background: rgba(0,0,0,0.35); border-radius: var(--radius);
@@ -240,8 +305,101 @@ select option:disabled { color: #7a8a9e; }
 }
 .phone-convo .empty-note { background: transparent; }
 
+/* v0.17.1: Ask Sarah panel — player-initiated advice after a tough trip. */
+.sarah-ask {
+  padding: 12px 14px; border-top: 1px solid #2c5364;
+  background: var(--bg-panel); border-radius: 0 0 26px 26px;
+}
+.sarah-ask p { margin: 0 0 8px; font-size: 13px; }
+.sarah-ask-row { display: flex; gap: 8px; }
+.sarah-ask-row select {
+  flex: 1; min-width: 0; font-size: 15px; padding: 10px 8px;
+  border-radius: 10px; border: 1px solid #2c5364;
+  background: var(--bg-soft); color: var(--ink);
+}
+.sarah-ask-row .secondary-button { flex: none; }
+
 /* v0.6.0: field guide entries */
 .guide-list { display: grid; gap: 14px; }
+/* v0.19.0: field-guide database tools. Large touch targets throughout. */
+.guide-tools { display: flex; gap: 10px; margin-bottom: 10px; }
+.guide-search {
+  flex: 1; min-height: 48px; padding: 10px 14px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.18); border-radius: 12px;
+  background: rgba(255,255,255,0.06); color: inherit;
+}
+.guide-search::placeholder { opacity: 0.55; }
+.filter-toggle {
+  min-height: 48px; padding: 10px 18px; font-size: 1rem; font-weight: 700;
+  border: 2px solid rgba(255,255,255,0.18); border-radius: 12px;
+  background: rgba(255,255,255,0.06); color: inherit; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+}
+.filter-toggle[aria-expanded="true"] { background: rgba(255,255,255,0.14); }
+.active-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.active-chips:empty { display: none; }
+.chip-active {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 6px 8px 6px 14px; border-radius: 999px;
+  background: rgba(140,200,255,0.18); border: 1px solid rgba(140,200,255,0.4);
+  font-size: 0.9rem;
+}
+.chip-remove {
+  min-width: 48px; min-height: 48px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.12); color: inherit; font-size: 1.3rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+/* v0.19.0 review: Clear all gets its own substantial target, not the tiny link-button. */
+#guideClear {
+  min-height: 48px; padding: 10px 20px; border-radius: 999px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06);
+  color: inherit; cursor: pointer; font-weight: 700;
+}
+.sheet-head { display: none; }
+/* Mobile: filter panel becomes a bottom sheet. */
+@media (max-width: 640px) {
+  .filter-panel.open-sheet .sheet-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .filter-panel.open-sheet .sheet-head h2 { margin: 0; font-size: 1.2rem; }
+  .sheet-close {
+    min-height: 52px; min-width: 96px; padding: 10px 24px; border-radius: 999px;
+    font-size: 1.05rem; font-weight: 800; cursor: pointer;
+    border: none; background: rgba(140,200,255,0.3); color: inherit;
+  }
+}
+.guide-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; min-height: 24px;
+}
+.filter-panel {
+  border: 2px solid rgba(255,255,255,0.14); border-radius: 14px;
+  padding: 14px; margin-bottom: 14px; background: rgba(255,255,255,0.04);
+  display: grid; gap: 14px;
+}
+.filter-group h3 { margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  min-height: 48px; padding: 10px 18px; border-radius: 999px; font-size: 1rem;
+  border: 2px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05);
+  color: inherit; cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: rgba(140,200,255,0.25); border-color: rgba(140,200,255,0.7);
+  font-weight: 700;
+}
+/* Mobile: filter panel becomes a bottom sheet. */
+@media (max-width: 640px) {
+  .filter-panel.open-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
+    max-height: 82vh; overflow-y: auto; margin: 0;
+    border-radius: 18px 18px 0 0; border-bottom: none;
+    background: #0f2233; padding: 18px 18px 28px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+  }
+  .chip { min-height: 52px; padding: 12px 22px; }
+}
 .guide-entry {
   background: var(--bg-card); border-radius: var(--radius);
   padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
@@ -292,8 +450,14 @@ select option:disabled { color: #7a8a9e; }
 /* Overlays */
 .overlay {
   position: fixed; inset: 0; background: rgba(2, 8, 16, 0.72);
-  display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 20;
+  display: flex; padding: 18px; z-index: 20;
+  /* v0.17.1: overlays must scroll when content exceeds the viewport —
+     beat 2's 10-bubble thread trapped short screens with the Continue
+     button below the fold. margin:auto centers when content fits and
+     scrolls when it doesn't (unlike align-items:center, which clips). */
+  overflow-y: auto; align-items: flex-start;
 }
+.overlay > * { margin: auto; }
 .phone {
   background: var(--bg-panel); border-radius: 22px; padding: 16px;
   width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
@@ -387,12 +551,12 @@ select option:disabled { color: #7a8a9e; }
    (Fixes the v0.5.0 contrast bug: dark fills at 0.55 opacity were
    invisible on deep backgrounds.) */
 .depth-midwater .ambient, .depth-deep .ambient { opacity: 0.8; }
-.depth-midwater .ambient svg [fill], .depth-deep .ambient svg [fill] { fill: #cfe6f7; }
-.depth-midwater .ambient svg, .depth-deep .ambient svg {
-  filter: drop-shadow(0 0 6px rgba(180, 220, 255, 0.5));
-}
 /* v0.26.0: same deep-water glow for WebP creature shadows. */
 .depth-midwater .ambient img, .depth-deep .ambient img {
+  filter: drop-shadow(0 0 6px rgba(180, 220, 255, 0.5));
+}
+.depth-midwater .ambient svg [fill], .depth-deep .ambient svg [fill] { fill: #cfe6f7; }
+.depth-midwater .ambient svg, .depth-deep .ambient svg {
   filter: drop-shadow(0 0 6px rgba(180, 220, 255, 0.5));
 }
 
@@ -415,6 +579,9 @@ select option:disabled { color: #7a8a9e; }
   animation-name: drift; animation-timing-function: linear; animation-fill-mode: forwards;
 }
 .ambient svg { height: 100%; width: auto; display: block; }
+/* v0.26.0: background creature WebP shadows. */
+.ambient img { height: 100%; width: auto; display: block; }
+.bg-creature-img { height: 100%; width: auto; }
 @keyframes drift { from { left: -30%; } to { left: 112%; } }
 
 /* v0.7.0: field-guide database — compact roster rows, expandable entries */
@@ -430,11 +597,68 @@ select option:disabled { color: #7a8a9e; }
 }
 .guide-row-head:active { background: rgba(255,255,255,0.04); }
 .guide-row-name { font-weight: 800; flex: none; }
+/* v0.18.0: locked achievements — dimmed, breadcrumb visible. */
+.guide-row.locked { opacity: 0.55; }
 .guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .guide-row-head .status-pill { margin-bottom: 0; flex: none; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
 .guide-row.open .guide-caret { transform: rotate(180deg); }
 .guide-row-body { padding: 0 14px 14px; border-top: 1px solid #2c5364; }
+/* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
+.guide-row-top { display: flex; align-items: stretch; }
+.guide-row-top .guide-row-head { flex: 1; min-width: 0; }
+.pin-btn {
+  flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
+  background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer; opacity: 0.45; transition: opacity 0.15s, transform 0.15s;
+}
+.pin-btn:hover { opacity: 0.9; }
+.pin-btn.pinned-on { opacity: 1; transform: scale(1.15); }
+.pinned-card {
+  background: linear-gradient(180deg, #1d3a56 0%, #16405f 100%);
+  border: 2px solid rgba(255,209,102,0.4); border-radius: var(--radius);
+  padding: 14px; margin-bottom: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
+.pinned-empty { border-style: dashed; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.03); }
+.pinned-empty .latin { margin: 0; }
+.pinned-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; margin-bottom: 10px; }
+.pinned-head .unpin {
+  width: 48px; min-height: 48px; border-radius: 12px; font-size: 1.1rem;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--ink); cursor: pointer;
+}
+.pinned-body { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.pinned-sketch { width: 96px; flex: none; }
+.pin-jump {
+  width: 100%; min-height: 48px; border-radius: 12px; font-size: 1rem; font-weight: 700;
+  background: rgba(255,209,102,0.15); border: 1px solid rgba(255,209,102,0.4);
+  color: var(--ink); cursor: pointer;
+}
+.pin-flash { animation: pin-flash 1.2s ease; }
+@keyframes pin-flash {
+  0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+  30% { box-shadow: 0 0 0 3px rgba(255,209,102,0.7); }
+}
+@media (prefers-reduced-motion: reduce) { .pin-flash { animation: none; } }
+/* v0.20.0: pinned-shark line on the Expedition tab. */
+.expedition-pin {
+  background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.3);
+  border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.95rem;
+}
+.expedition-pin .latin { display: block; margin-top: 2px; }
+/* v0.20.0: repeat-plan button on logbook entries. */
+.repeat-btn {
+  margin-top: 8px; min-height: 44px; padding: 8px 18px; border-radius: 999px;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  background: rgba(79,209,197,0.12); border: 1px solid rgba(79,209,197,0.4);
+  color: var(--ink);
+}
+/* v0.20.0: quick-pace toggle in the planner. */
+.pace-toggle {
+  display: flex; align-items: center; gap: 10px; margin-top: 10px;
+  font-size: 0.95rem; cursor: pointer; user-select: none;
+}
+.pace-toggle input { width: 22px; height: 22px; accent-color: var(--teal); flex: none; }
 .guide-row-body .guide-sketch { margin: 12px auto; }
 .guide-row-body .research-text { margin-top: 4px; }
 
@@ -514,9 +738,11 @@ select option:disabled { color: #7a8a9e; }
 .map-popup .latin { font-size: 13px; color: var(--ink-dim); margin: 0 0 6px; }
 .map-popup .map-meta { font-size: 13px; color: var(--ink-dim); margin: 0 0 8px; line-height: 1.6; }
 .map-popup .map-kind-note { font-size: 12px; color: var(--ink-dim); font-style: italic; margin: 0 0 8px; }
-.map-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+/* v0.17.1: two-column legend, taller chips (friendlier touch targets),
+   common name before the ID. */
+.map-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .map-chip {
-  font-size: 12px; padding: 3px 10px; border-radius: 999px;
+  font-size: 13px; padding: 10px 12px; border-radius: 999px;
   background: var(--bg-soft); border: 1px solid #2c5364; color: var(--ink-dim);
   display: inline-flex; align-items: center; gap: 6px;
   cursor: pointer; /* v0.11.0: chips focus the map, like markers */
@@ -533,3 +759,77 @@ select option:disabled { color: #7a8a9e; }
 .link-button:active { color: var(--ink); }
 
 .hidden { display: none !important; }
+
+/* v0.17.0: Wild Archive — real-world media dossiers */
+.archive-asset { margin: 0 0 18px; }
+.archive-asset.primary { margin-bottom: 22px; }
+.archive-media {
+  display: block; width: 100%; border-radius: 10px;
+  border: 1px solid #2c5364; background: #0d2f4d;
+}
+.archive-media.primary { border-width: 2px; }
+video.archive-media { max-height: 420px; }
+/* v0.17.1: the sand tiger GIF is 600x1067 portrait — full-width it fills
+   more than the screen. Crop the dead water above the nose (~35% from top)
+   and rotate 90deg into a landscape frame. The values below are tuned for
+   this specific GIF: frame ratio 693/600 matches the cropped+rotated content,
+   img width 86.5% gives exact cover, and the 17.5% shift puts the nose near
+   the frame's right edge. If the source GIF ever changes, re-derive these. */
+.gif-landscape-frame {
+  position: relative; width: 100%; aspect-ratio: 693/600;
+  overflow: hidden; border-radius: 10px; border: 1px solid #2c5364;
+  background: #000;
+}
+/* v0.20.0: genuine detail crop (sawshark rostrum) — background-positioned
+   from the source image; geometry comes from the asset's detailCrop. */
+.detail-crop-frame {
+  width: 100%; overflow: hidden; border-radius: 10px; border: 1px solid #2c5364;
+  background-repeat: no-repeat; background-color: #0a2a3f;
+}
+.gif-landscape-frame img {
+  position: absolute; top: 50%; left: 50%;
+  width: 86.5%; aspect-ratio: 600/1067;
+  transform: translate(-50%,-50%) rotate(90deg) translateY(17.5%);
+}
+.archive-asset figcaption { font-size: 14px; line-height: 1.55; margin: 8px 2px 4px; color: var(--ink); }
+.archive-credit { font-size: 12px; color: var(--ink-dim); margin: 0 2px; line-height: 1.5; }
+.archive-credit a { color: var(--ink-dim); }
+/* v0.20.0: non-commercial policy notice on NC-licensed assets. */
+.archive-nc { font-size: 11px; color: var(--ink-dim); font-style: italic; margin: 2px 2px 0; line-height: 1.4; }
+.archive-label {
+  display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #0d2f4d; background: #ffd166;
+  border-radius: 6px; padding: 3px 9px; margin-bottom: 8px;
+}
+
+/* v0.22.0: logbook filters */
+.logbook-filters {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+  margin-bottom: 12px; padding: 10px 12px;
+  background: var(--bg-soft); border-radius: 12px;
+}
+.filter-label { font-size: 12px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.filter-select {
+  font-size: 15px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  min-height: 44px; /* dyspraxia-friendly touch target */
+}
+.logbook-conditions { font-size: 12px; margin-top: 2px; opacity: 0.85; }
+
+/* v0.22.0: pin-gated soft hint */
+.pin-hint {
+  background: #fff8e1; border: 1px solid #ffd166; border-radius: 12px;
+  padding: 10px 14px; margin: 8px 0; font-size: 14px; line-height: 1.5;
+}
+.pin-hint .latin { display: block; font-size: 12px; margin-top: 2px; }
+
+/* v0.22.0: conservation note on collection cards */
+.conservation-note {
+  background: #e8f5e9; border-left: 3px solid #4caf50;
+  border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 8px 0;
+  font-size: 13px; line-height: 1.55;
+}
+
+/* v0.22.0: What's New screen */
+.whats-new-list { text-align: left; padding-left: 20px; line-height: 1.7; font-size: 14px; }
+.whats-new-list li { margin-bottom: 8px; }
