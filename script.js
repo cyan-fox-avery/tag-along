@@ -2877,30 +2877,61 @@ function exportSave() {
 /* v0.23.0 Mira review: safe import — validate everything BEFORE touching
    storage, replace the complete key set (clear missing keys), and back up
    the existing save first. */
+/* v0.23.0 Mira review: strict validation. Reject anything questionable —
+   this is player data going into a public beta. */
+const SAVE_KEY_ALLOWLIST = [...RESET_KEYS, "tyi-bruce", "tyi-bruce-done"];
 function validateSaveData(data) {
   if (!data || typeof data !== "object") return { ok: false, reason: "not an object" };
   if (!data.keys || typeof data.keys !== "object") return { ok: false, reason: "missing keys" };
-  // Only recognized keys
-  const unknown = Object.keys(data.keys).filter(k => !RESET_KEYS.includes(k) && k !== "tyi-bruce" && k !== "tyi-bruce-done");
-  if (unknown.length > 5) return { ok: false, reason: "too many unknown keys: " + unknown.slice(0, 3).join(", ") };
-  // Validate JSON fields parse
+  const keyNames = Object.keys(data.keys);
+  // Must have at least one recognized key with actual content
+  if (keyNames.length === 0) return { ok: false, reason: "empty save (no keys)" };
+  // Reject ALL unknown keys
+  const unknown = keyNames.filter(k => !SAVE_KEY_ALLOWLIST.includes(k));
+  if (unknown.length > 0) return { ok: false, reason: "unrecognized keys: " + unknown.slice(0, 3).join(", ") };
+  // Validate shapes, not just JSON parsing
   for (const [k, v] of Object.entries(data.keys)) {
     if (typeof v !== "string") return { ok: false, reason: "non-string value for " + k };
-    if ((k === "tyi-collection" || k === "tyi-logbook") && v) {
-      try { JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in " + k }; }
+    if (k === "tyi-collection" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-collection" }; }
+      if (typeof parsed !== "object" || Array.isArray(parsed) || parsed === null)
+        return { ok: false, reason: "tyi-collection must be an object" };
+    }
+    if (k === "tyi-logbook" && v) {
+      let parsed;
+      try { parsed = JSON.parse(v); } catch { return { ok: false, reason: "invalid JSON in tyi-logbook" }; }
+      if (!Array.isArray(parsed)) return { ok: false, reason: "tyi-logbook must be an array" };
     }
   }
-  // Version: supported if it's a known v0.x version, else warn
+  // Version: must be a recognized Tag Along version, else reject
   const fv = data.version || "unknown";
   const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
-  return { ok: true, version: fv, supported };
+  if (!supported) return { ok: false, reason: "unsupported version: " + fv };
+  return { ok: true, version: fv };
 }
-function backupCurrentSave() {
-  const backup = { version: VERSION, exportedAt: new Date().toISOString(), keys: {} };
-  RESET_KEYS.forEach(k => {
-    try { const v = localStorage.getItem(k); if (v !== null) backup.keys[k] = v; } catch {}
-  });
-  try { localStorage.setItem("tyi-backup", JSON.stringify(backup)); } catch {}
+/* v0.23.0 Mira review: snapshot returns the data AND whether it worked.
+   We verify the backup before claiming it exists. */
+function snapshotCurrentSave() {
+  const snap = {};
+  try {
+    SAVE_KEY_ALLOWLIST.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) snap[k] = v;
+    });
+    return { ok: true, snap };
+  } catch (e) {
+    return { ok: false };
+  }
+}
+function restoreSnapshot(snap) {
+  try {
+    SAVE_KEY_ALLOWLIST.forEach(k => {
+      if (k in snap) localStorage.setItem(k, snap[k]);
+      else localStorage.removeItem(k);
+    });
+    return true;
+  } catch { return false; }
 }
 function importSave(file) {
   const reader = new FileReader();
@@ -2916,25 +2947,37 @@ function importSave(file) {
     }
     let msg = "Import this save? Your current progress will be replaced.\n\n";
     msg += "File version: " + check.version + "\nCurrent version: " + VERSION;
-    if (!check.supported) {
-      msg += "\n\n⚠️ This version isn't recognized — import may not work correctly.";
-    }
-    msg += "\n\nA backup of your current save will be kept.";
+    msg += "\n\nYou'll be offered a backup download first.";
     if (!confirm(msg)) return;
-    // Backup, then replace complete key set (clear keys missing from import)
-    backupCurrentSave();
+    // Snapshot current progress BEFORE touching anything
+    const before = snapshotCurrentSave();
+    if (!before.ok) {
+      alert("Couldn't read your current save. Import cancelled — nothing was changed.");
+      return;
+    }
+    // Offer backup download (accessible recovery, not just a hidden key)
+    const backupBlob = new Blob([JSON.stringify({ version: VERSION, exportedAt: new Date().toISOString(), keys: before.snap }, null, 2)], { type: "application/json" });
+    const backupUrl = URL.createObjectURL(backupBlob);
+    const backupA = document.createElement("a");
+    backupA.href = backupUrl;
+    backupA.download = "tag-along-backup-" + VERSION + ".json";
+    document.body.appendChild(backupA);
+    backupA.click();
+    setTimeout(() => { document.body.removeChild(backupA); URL.revokeObjectURL(backupUrl); }, 100);
+    // Also keep a hidden copy
+    try { localStorage.setItem("tyi-backup", JSON.stringify({ version: VERSION, keys: before.snap })); } catch {}
+    // Replace complete key set with true rollback on failure
     try {
-      RESET_KEYS.forEach(k => {
-        if (k in data.keys) localStorage.setItem(k, data.keys[k]);
-        else localStorage.removeItem(k);
-      });
-      // Also handle bruce keys if present
-      ["tyi-bruce", "tyi-bruce-done"].forEach(k => {
+      SAVE_KEY_ALLOWLIST.forEach(k => {
         if (k in data.keys) localStorage.setItem(k, data.keys[k]);
         else localStorage.removeItem(k);
       });
     } catch (e) {
-      alert("Import failed partway — your backup is safe. Nothing was half-applied.");
+      // Roll back to the snapshot
+      const restored = restoreSnapshot(before.snap);
+      alert(restored
+        ? "Import failed — your previous save has been restored."
+        : "Import failed and rollback also failed. Your backup file (downloaded above) has your data.");
       return;
     }
     location.reload();
