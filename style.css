@@ -238,20 +238,24 @@ select option:disabled { color: #7a8a9e; }
 
 .dive-shark {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 78%; max-height: 88%;
+  width: 78%; height: 88%;
   display: flex; align-items: center; justify-content: center;
   animation: swim 5s ease-in-out infinite;
 }
+/* v0.26.2: the absolute-positioned flex container had no definite height,
+   so vertical centering failed and the shark stayed bottom-clipped. Give it
+   a real height, and drop the cap to 130px to leave room for the swim bob
+   and the overlaid tap-hint. */
 /* v0.26.1: keep the full shark inside the 190px dive scene — wide
    illustrations overflowed and got clipped at the bottom. Cap the height
    and preserve aspect ratio, for both silhouette and reveal phases. */
-.dive-shark svg { max-width: 100%; max-height: 160px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+.dive-shark svg { max-width: 100%; max-height: 130px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 /* v0.26.0: tap-to-reveal encounter. The silhouette is tappable; tapping
    crossfades to the full-colour illustration. */
-.dive-shark img { max-width: 100%; max-height: 160px; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+.dive-shark img { max-width: 100%; max-height: 130px; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 /* v0.26.0: generic mystery silhouette shown if a silhouette WebP fails to
    load — sized like the real silhouette, never reveals the species. */
-.dive-shark .mystery-silhouette { max-width: 100%; max-height: 160px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+.dive-shark .mystery-silhouette { max-width: 100%; max-height: 130px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 .shark-silhouette { position: relative; cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }

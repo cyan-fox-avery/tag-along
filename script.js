@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v0.26.1";
+const VERSION = "v0.26.2";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
