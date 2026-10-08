@@ -1,15 +1,16 @@
-# v0.24.0 — next batch (discussion)
+# v0.25.0 — next batch (discussion)
 
 Standing thread for the road to Beta 1.0.
 
-## In progress (Mira approved design, Avery authorized build)
-- **Progressive Wild Archive unlock** — per-tag photo unlock. First tag reveals tab + Sarah intro; later tags quiet badge; returning players migrated.
-
-## Queued
-- "Just watch" natural-history texture (beta roadmap #6)
-- Title language in-game (beta roadmap #9)
-- Real browser QA: export/import across devices
+## Queued (not authorized)
+- 🎣 "Just watch" natural-history texture (beta roadmap #6)
+- 💬 Title language in-game — "Tag along with [name]" moments (beta roadmap #9)
+- 🧪 Real browser QA: export/import across devices (Mira's pre-beta requirement)
 
 ## Post-beta ideas
-- "The ending is a treasure chest" — bigger win moment
-- Deep Blue easter egg (on hold)
+- 🏆 "The ending is a treasure chest" — bigger win moment
+- 🦈 Deep Blue easter egg (on hold)
+
+## Recently shipped
+- v0.24.0: progressive Wild Archive unlock 🖼️
+- v0.23.0: easter eggs (Mary Lee, Nicole, Bruce) + save export/import 🥚🦈
