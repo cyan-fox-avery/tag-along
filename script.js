@@ -2767,7 +2767,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version"];
 $("resetBtn").addEventListener("click", () => {
   $("resetOverlay").classList.remove("hidden");
 });
@@ -2823,6 +2823,21 @@ function migrateArchiveUnlock() {
     }
   } catch {}
 }
+/* v0.22.0 Mira review: capture pre-migration storage state for What's New.
+   Migrations write keys (e.g. tyi-collection) even for new players, so we
+   snapshot before they run. */
+const preMigrationHadSave = (() => {
+  try {
+    const log = localStorage.getItem("tyi-logbook");
+    const col = localStorage.getItem("tyi-collection");
+    // Meaningful data: non-empty logbook, or collection with actual sharks
+    if (log && log !== "[]") return true;
+    if (col && col !== "{}" && col !== "null") {
+      try { return Object.keys(JSON.parse(col)).length > 0; } catch { return false; }
+    }
+    return !!localStorage.getItem("tyi-stats");
+  } catch { return false; }
+})();
 migrateIds();
 migrateTracks();
 migrateWinV07();
@@ -3054,7 +3069,7 @@ $("buildTag").textContent = VERSION;
 /* v0.22.0: What's New — show once per version update for returning players. */
 (function initWhatsNew() {
   const notes = WHATS_NEW[VERSION];
-  if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, playerHasSaveData())) {
+  if (!notes || !shouldShowWhatsNew(whatsNewSeen(), VERSION, preMigrationHadSave)) {
     markWhatsNewSeen();
     return;
   }
