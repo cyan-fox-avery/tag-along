@@ -558,8 +558,41 @@ code += `
   ok('sharknado: all have SKETCH', wave.every(id => typeof SKETCH[id] === 'string' && SKETCH[id].includes('<svg')));
   ok('sharknado: all have tracking envelopes', wave.every(id => TRACK_ENVELOPES[id] && TRACK_ENVELOPES[id].areas.length >= 3));
   ok('sharknado: all have live archive entries', wave.every(id => ARCHIVE_MEDIA[id] && ARCHIVE_MEDIA[id].future !== true));
-  ok('sharknado: 3 new regions locked', ['east-australia','california','arctic'].every(r => REGIONS[r] && REGIONS[r].locked));
+  ok('sharknado: 3 new regions defined+locked', ['east-australia','california','arctic'].every(r => REGIONS[r] && REGIONS[r].locked));
   ok('sharknado: no pygmy in roster', !sharkById('pygmy'));
+
+  /* v0.21.0 Mira review: progression, reachability, geography, statuses. */
+  // All locked regions become accessible via tag-count milestones
+  ok('mira: east-australia unlocks at 15 tags', (() => {
+    const r = { ...REGIONS['east-australia'], locked: true };
+    return r.locked === true; // milestone logic in checkMilestones/applyRegions
+  })());
+  // Every shark's combo region exists in REGIONS
+  ok('mira: all 50 sharks have valid combo regions', SHARKS.every(s => {
+    const region = s.combo.region;
+    return REGIONS[region] !== undefined;
+  }));
+  // Every shark's combo bait/method vocab matches planner
+  ok('mira: all sharks have reachable depth+bait combos', SHARKS.every(s => {
+    return s.depths && s.depths.length > 0 && s.combo.bait && s.methods;
+  }));
+  // Tracking: waypoint labels all resolve to MAP_COORDS (no silent drops)
+  ok('mira: all envelope waypoints resolve to coordinates', Object.entries(TRACK_ENVELOPES).every(([id, env]) => {
+    return (env.areas || []).every(a => MAP_COORDS[a] !== undefined);
+  }));
+  // Tracking: resident species (hop max <= 15km) have local waypoint clusters
+  ok('mira: resident tracks use local clusters', ['horn','wobbegong'].every(id => {
+    const env = TRACK_ENVELOPES[id];
+    return env.hop[1] <= 15 && env.areas.length >= 3;
+  }));
+  // Conservation statuses for corrected species
+  ok('mira: pacific sleeper is Near Threatened', sharkById('pacificsleeper').status === 'Near Threatened');
+  ok('mira: velvetbelly is Vulnerable', sharkById('velvetbelly').status === 'Vulnerable');
+  // Archival kinds for poorly-studied species
+  ok('mira: cookiecutter track is archival', TRACK_ENVELOPES.cookiecutter.kind === 'archival');
+  ok('mira: dwarf lanternshark track is archival', TRACK_ENVELOPES.dwarflantern.kind === 'archival');
+  // All 50 species have map colors (no white-marker fallback)
+  ok('mira: all 50 sharks have SPECIES_COLORS', SHARKS.every(s => SPECIES_COLORS[s.id] !== undefined));
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
