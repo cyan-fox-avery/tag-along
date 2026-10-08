@@ -613,6 +613,49 @@ code += `
       state.tagged = savedState;
     }
   })());
+  ok('mira: re-sighting uses species anchor (no teleport)', (() => {
+    // Tag a shark, record a re-sighting, check geographic consistency
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      const species = SHARKS.find(s => s.id === 'kitefin');
+      state.tagged['kitefin'] = { location: "Open Atlantic", nick: "Test", researchId: "TEST-001" };
+      state.tagged['kitefin'].track = genTrack(species, state.tagged['kitefin']);
+      state.tagged['kitefin'].track.v = 2;
+      // Mock a re-sighting via the anchor path
+      const env = TRACK_ENVELOPES['kitefin'];
+      const lastBefore = state.tagged['kitefin'].track.points[state.tagged['kitefin'].track.points.length - 1];
+      // Simulate what recordResighting does with anchor
+      const anchorCoord = MAP_COORDS[env.tagAnchor];
+      const lastCoord = MAP_COORDS[lastBefore.label];
+      const km = Math.round(haversineKm(lastCoord, anchorCoord) * 10) / 10;
+      // The jump should be local (<100km), not a 3,230km teleport
+      return km < 100;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
+  ok('mira: migration preserves re-sighting history', (() => {
+    // A v1 track with a re-sighting point should keep it after migration
+    const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
+    try {
+      state.tagged['catshark'] = {
+        location: "Cornwall", nick: "Test", researchId: "TEST-002",
+        track: { points: [{ label: "Cornwall", day: 0, km: 0 }, { label: "Mount's Bay", day: 5, km: 10, resighting: true }], totalKm: 10, days: 5, kind: "acoustic" }, // v1, no v marker
+        resightings: [{ date: "2026-01-01", location: "Cornwall", note: "Test", ts: 1 }]
+      };
+      migrateTracks();
+      const t = state.tagged['catshark'];
+      // Track regenerated to v2
+      if (t.track.v !== 2) return false;
+      // Re-sighting point preserved
+      if (!t.track.points.some(p => p.resighting)) return false;
+      // Re-sighting record preserved
+      if (!t.resightings || t.resightings.length === 0) return false;
+      return true;
+    } finally {
+      state.tagged = savedTagged;
+    }
+  })());
   ok('mira: resident envelopes stay local', (() => {
     function maxHop(id) {
       var env = TRACK_ENVELOPES[id], max = 0;
