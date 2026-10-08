@@ -105,7 +105,7 @@ body { overflow-x: clip; }
 }
 
 .topbar { text-align: center; padding: 18px 8px 6px; }
-.site-logo { display: block; height: 48px; width: auto; margin: 0 auto 6px; }
+.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 6px; border-radius: 8px; }
 .eyebrow {
   margin: 0; font-size: 11px; letter-spacing: 3px; color: var(--ink-dim);
 }
