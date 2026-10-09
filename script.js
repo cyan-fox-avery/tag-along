@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.2.0-beta";
+const VERSION = "v1.3.0-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -33,6 +33,12 @@ const WHATS_NEW = {
     "🎉 <strong>Louder tag celebrations.</strong> Tagging now clearly announces whether it's your first of that species or your Nth — no more squinting at the small print.",
     "🖼️ <strong>Archive shows the locked ones.</strong> Species you haven't tagged yet appear as locked silhouettes — tag one to reveal its real-world photos.",
     "📱 <strong>iPad & desktop layouts.</strong> The game now uses wider screens properly — multi-column research, side-by-side dive views, a proper collection wall."
+  ],
+  "v1.3.0-beta": [
+    "👁️ <strong>Watch notes.</strong> 'Just watch' sometimes adds a natural-history observation to that shark's record.",
+    "📓 <strong>Logbook date filter.</strong> Filter trips by last 7 days, 30 days, or year — plus research IDs on tagged encounters.",
+    "🌊 <strong>Richer dive flavour.</strong> 24 new field observations and 8 new wildlife sightings across all waters.",
+    "💾 <strong>Save export/import</strong> is in the footer — back up your sharks as JSON, restore them anywhere."
   ]
 };
 
@@ -128,14 +134,20 @@ const SIGHTINGS = {
     { text: "A school of small silver fish wheels past in perfect unison.", creature: "fish" },
     { text: "A dolphin arcs through the blue in the distance, there and gone.", creature: "dolphin" },
     { text: "A pair of flying fish skitter across the surface, touching down and lifting off again.", creature: "fish" },
-    { text: "A seal torpedoes past, sleek and curious, then vanishes into the blue.", creature: "seal" }
+    { text: "A seal torpedoes past, sleek and curious, then vanishes into the blue.", creature: "seal" },
+    { text: "A manta ray breaches in the distance — a slow black wingspan against the sky, then gone.", creature: "ray" },
+    { text: "A loggerhead turtle surfaces to breathe, exhales with a sound like a sigh, and dives.", creature: "turtle" },
+    { text: "A pod of spotted dolphins hunts in formation, herding a bait ball into a glittering panic.", creature: "dolphin" }
   ],
   reef: [
     { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle" },
     { text: "A shimmering school of fusiliers pours over the reef crest.", creature: "fish" },
     { text: "A hawksbill turtle works a sponge off the coral head, beak crunching steadily.", creature: "turtle" },
     { text: "A small reef shark patrols the drop-off — not your target, just a colleague passing through.", creature: "fish" },
-    { text: "A spotted eagle ray glides over the sand flat, wings rippling like slow applause.", creature: "ray" }
+    { text: "A spotted eagle ray glides over the sand flat, wings rippling like slow applause.", creature: "ray" },
+    { text: "A green turtle rests on a coral bommie, tucked in like it's naptime. It probably is.", creature: "turtle" },
+    { text: "A school of barracuda hangs motionless in the blue, silver commas all facing the same way.", creature: "fish" },
+    { text: "A reef octopus flows across the coral, colour-shifting with every metre.", creature: "fish" }
   ],
   twilight: [
     { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish" },
@@ -203,7 +215,12 @@ const FIELD_NOTES = {
     "Field notes: found a turtle with a satellite tag from another project. Waved. It did not wave back.",
     "Field notes: remora attached itself to the hull for an hour. We named it Kevin. Kevin has left.",
     "Field notes: a school of jacks swirled under the boat, flashing silver. Beautiful. Not sharks.",
-    "Field notes: flying fish skittered across the surface at dusk, chased by something we'll never identify."
+    "Field notes: flying fish skittered across the surface at dusk, chased by something we'll never identify.",
+    "Field notes: a hawksbill turtle surfaced three times, each time a little closer. Curiosity is not just a mammal thing.",
+    "Field notes: the water is so clear you can see the anchor chain's shadow on the sand 20 metres down.",
+    "Field notes: frigatebirds hanging motionless overhead, waiting for flying fish to make a mistake.",
+    "Field notes: a spotted eagle ray cruised past the bow, wings beating slow as a heartbeat.",
+    "Field notes: coral spawning tonight — the water is full of pink snow. The whole reef is breathing."
   ],
   temperate: [
     "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
@@ -217,7 +234,12 @@ const FIELD_NOTES = {
     "Field notes: a sunfish drifted past like a lost dinner plate. Enormous. Serene. Not a shark.",
     "Field notes: bait untouched after six hours. Either the sharks are elsewhere or they're laughing at us.",
     "Field notes: spotted a ray's wingtip breaking the surface at distance — gone before the binoculars came up.",
-    "Field notes: the hydrophone picked up whale song, faint and far. The ocean is busy, just not with sharks."
+    "Field notes: the hydrophone picked up whale song, faint and far. The ocean is busy, just not with sharks.",
+    "Field notes: a harbour porpoise surfaced twice off the port side, rolled, and vanished. Blink and you miss everything.",
+    "Field notes: kelp fronds drifting past, whole floating islands of them. A whole ecosystem on the move.",
+    "Field notes: cormorants drying their wings on the buoy, looking like tiny gargoyles.",
+    "Field notes: the fog rolled in at noon and turned the whole ocean into a grey room. We listened more than watched.",
+    "Field notes: a mola mola drifted past the stern, huge and improbable, like the ocean's rough draft."
   ],
   polar: [
     "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
@@ -231,7 +253,12 @@ const FIELD_NOTES = {
     "Field notes: a polar bear watched from the ice edge for an hour. We maintained a respectful distance. It did not.",
     "Field notes: the bait line came up with ice crystals on it. The ocean is telling us something about our life choices.",
     "Field notes: narwhal clicks on the hydrophone, close enough to feel. Not a shark, but we'll take it.",
-    "Field notes: the sky went full aurora at 11pm. No sharks, but honestly? Worth it."
+    "Field notes: the sky went full aurora at 11pm. No sharks, but honestly? Worth it.",
+    "Field notes: brash ice tinkling against the hull all morning — the Arctic's wind chimes.",
+    "Field notes: a bearded seal hauled out on an ice floe and sang. The whole boat went quiet to listen.",
+    "Field notes: the water is -1°C and somehow still liquid. The ocean refuses to follow the rules here.",
+    "Field notes: kittiwakes wheeling around the cliffs, thousands of them, loud as a stadium.",
+    "Field notes: a Greenland shark could be directly below us right now and we'd never know. They are the ocean's best-kept secret."
   ],
   generic: [
     "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
@@ -245,7 +272,12 @@ const FIELD_NOTES = {
     "Field notes: the water went glassy calm at sunset. Beautiful. Sharkless, but beautiful.",
     "Field notes: jellyfish pulsing past in the hundreds, lit up by the deck lights. The ocean's lava lamps.",
     "Field notes: the depth sounder showed a bait ball at 40 metres, scattering. Something hunts here — just not today.",
-    "Field notes: salt spray, diesel, and kelp. The smell of a working day with nothing to show but the smell."
+    "Field notes: salt spray, diesel, and kelp. The smell of a working day with nothing to show but the smell.",
+    "Field notes: the moon rose over flat calm water and turned the whole sea to hammered silver.",
+    "Field notes: a lone albatross followed us for hours without a single wingbeat. Show-off.",
+    "Field notes: bioluminescence in the wake tonight — every wave breaks into cold fire.",
+    "Field notes: the barometer is falling and the gulls know something we don't. They're all heading in.",
+    "Field notes: counted eleven species of seabird today. The sharks get the glory, the birds do the paperwork."
   ]
 };
 /* Map regions to climate zones for wildlife notes. */
@@ -287,6 +319,24 @@ const SIGHTING_DOINES = [
   "patrolling, unhurried and thorough",
   "curious — circling back for a second look",
   "feeding, oblivious to the boat"
+];
+
+/* v1.3.0-beta: natural-history observations from "Just watch" encounters.
+   Optional flavor only — never a checklist, never an achievement trigger.
+   Stored per-species on the tagged record. */
+const WATCH_NOTES = [
+  "resting under a ledge, barely moving",
+  "feeding at dusk, quick and focused",
+  "cruising with a remora attached",
+  "circling a bait ball, patient",
+  "gliding through a thermocline",
+  "resting on the sandy bottom",
+  "following a current edge",
+  "hunting alone in the blue",
+  "drifting near the surface at dawn",
+  "investigating the boat, then losing interest",
+  "swimming with slow, deliberate tail beats",
+  "pausing mid-water, hanging motionless"
 ];
 
 /* v0.7.0: tagging the first six earns new waters. */
@@ -1548,7 +1598,20 @@ function doEncounter(species, plan) {
     watchBtn.addEventListener("click", () => {
       const entry = recordSighting(species, plan);
       logTripEncounter(species, "watched");
-      logLine(`👁️ You watch the ${species.name} ${entry.doing}. A good sighting, logged.`);
+      /* v1.3.0-beta: occasional natural-history note on tagged sharks.
+         ~35% chance, stored on the record, shown in the collection detail.
+         Pure flavor — not a checklist, no achievements attached. */
+      let noteLine = "";
+      if (rec && Math.random() < 0.35) {
+        const note = pick(WATCH_NOTES);
+        rec.notes = rec.notes || [];
+        if (!rec.notes.includes(note)) {
+          rec.notes.push(note);
+          store.save(state.tagged);
+          noteLine = ` 📓 <em>Noted: ${esc(note)}.</em>`;
+        }
+      }
+      logLine(`👁️ You watch the ${species.name} ${entry.doing}. A good sighting, logged.${noteLine}`);
       finish();
     });
     actions.appendChild(watchBtn);
@@ -1916,7 +1979,7 @@ function maybeCheckinThread() {
    encounters and outcome. Compare attempts; the pattern is the answer. */
 /* v0.22.0: logbook filters — outcome, region, species. Filters narrow the
    notebook; they never solve the expedition. */
-const logbookFilters = { outcome: "all", region: "all", species: "all" };
+const logbookFilters = { outcome: "all", region: "all", species: "all", dateRange: "all" };
 
 /* Pure: does a logbook trip entry match the given filters? Testable. */
 /* v0.22.0 Mira review: filters represent EVENTS within the expedition.
@@ -1935,6 +1998,13 @@ function logbookTripMatches(t, f) {
   }
   if (f.region !== "all" && t.region !== f.region) return false;
   if (f.species !== "all" && !(t.encounters || []).some(e => e.speciesId === f.species)) return false;
+  if (f.dateRange !== "all" && t.ts) {
+    const age = Date.now() - t.ts;
+    const day = 86400000;
+    if (f.dateRange === "7d" && age > 7 * day) return false;
+    if (f.dateRange === "30d" && age > 30 * day) return false;
+    if (f.dateRange === "1y" && age > 365 * day) return false;
+  }
   return true;
 }
 
@@ -1954,7 +2024,7 @@ function buildLogbookFilters() {
       ss.appendChild(o);
     });
   }
-  ["logFilterOutcome", "logFilterRegion", "logFilterSpecies"].forEach(id => {
+  ["logFilterOutcome", "logFilterRegion", "logFilterSpecies", "logFilterDate"].forEach(id => {
     const el = $(id);
     if (el && !el.dataset.bound) {
       el.dataset.bound = "1";
@@ -1962,6 +2032,7 @@ function buildLogbookFilters() {
         logbookFilters.outcome = $("logFilterOutcome").value;
         logbookFilters.region = $("logFilterRegion").value;
         logbookFilters.species = $("logFilterSpecies").value;
+        logbookFilters.dateRange = $("logFilterDate").value;
         renderLogbook();
       });
     }
@@ -1970,8 +2041,8 @@ function buildLogbookFilters() {
   if (clr && !clr.dataset.bound) {
     clr.dataset.bound = "1";
     clr.addEventListener("click", () => {
-      logbookFilters.outcome = "all"; logbookFilters.region = "all"; logbookFilters.species = "all";
-      $("logFilterOutcome").value = "all"; $("logFilterRegion").value = "all"; $("logFilterSpecies").value = "all";
+      logbookFilters.outcome = "all"; logbookFilters.region = "all"; logbookFilters.species = "all"; logbookFilters.dateRange = "all";
+      $("logFilterOutcome").value = "all"; $("logFilterRegion").value = "all"; $("logFilterSpecies").value = "all"; $("logFilterDate").value = "all";
       renderLogbook();
     });
   }
@@ -1983,7 +2054,7 @@ function renderLogbook() {
   buildLogbookFilters();
   list.innerHTML = "";
   const trips = state.logbook.filter(t => logbookTripMatches(t, logbookFilters));
-  const anyFilter = logbookFilters.outcome !== "all" || logbookFilters.region !== "all" || logbookFilters.species !== "all";
+  const anyFilter = logbookFilters.outcome !== "all" || logbookFilters.region !== "all" || logbookFilters.species !== "all" || logbookFilters.dateRange !== "all";
   const clr = $("logFilterClear");
   if (clr) clr.classList.toggle("hidden", !anyFilter);
   if (!state.logbook.length) {
@@ -2013,7 +2084,8 @@ function renderLogbook() {
     const enc = t.encounters.length
       ? t.encounters.map(e => {
           const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : "👁️";
-          return `${icon} ${esc(e.name)} <span class="dim">(${e.result})</span>`;
+          const idBit = e.researchId ? ` <span class="dim">🔬 ${esc(e.researchId)}</span>` : "";
+          return `${icon} ${esc(e.name)}${idBit} <span class="dim">(${e.result})</span>`;
         }).join("<br>")
       : `<span class="dim">No sharks today.</span>`;
     div.innerHTML = `
@@ -2293,9 +2365,9 @@ function deal(deck, pool) {
 
 /* v0.8.0: the trip currently being logged for the logbook. */
 let tripLog = null;
-function logTripEncounter(species, result) {
+function logTripEncounter(species, result, researchId) {
   if (!tripLog) return;
-  tripLog.encounters.push({ speciesId: species.id, name: species.name, result });
+  tripLog.encounters.push({ speciesId: species.id, name: species.name, result, researchId: researchId || null });
 }
 /* v1.2.0-beta: count how many individuals of a species the player has tagged,
    across all logbook trips. state.tagged only keeps the latest per species,
@@ -2375,7 +2447,7 @@ function confirmTag(name) {
   };
   state.tagged[s.id] = rec;
   state.taggedThisTrip = true;
-  logTripEncounter(s, "tagged");
+  logTripEncounter(s, "tagged", rec.researchId);
   store.save(state.tagged);
   /* v1.2.0-beta: prominent species-count announcement — no more squinting
      at the small print. First of species vs. Nth individual, loud and clear. */
@@ -2773,7 +2845,9 @@ function maybeSarahEgg(speciesId, rec) {
 
 /* v0.23.0: real-shark easter eggs. Called on rename/tag.
    - Mary Lee / Nicole: great white + matching name → Sarah thread (immediate)
-   - Bruce: any shark + "bruce" → starts SLOW chain (no immediate message!) */
+   - Bruce: any shark + "bruce" → starts SLOW chain (no immediate message!)
+   - Deep Blue: RETIRED per Avery's decision 2026-10-08 (was on hold per Mira).
+     Do not implement — the great-white naming easter eggs stay Mary Lee and Nicole only. */
 function maybeNameEgg(speciesId, rec) {
   if (!rec || !rec.name) return;
   const name = rec.name.trim().toLowerCase();
@@ -2954,6 +3028,13 @@ function openDetail(id) {
       <h4>🔁 Re-sightings (${t.resightings.length})</h4>
       <ul class="track-stops">
         ${t.resightings.map(r => `<li>📍 ${esc(r.date)} — ${esc(r.location)}<br><span class="dim">${esc(r.note)}</span></li>`).join("")}
+      </ul>
+    </div>` : ""}
+    ${t.notes && t.notes.length ? `
+    <div class="watch-notes-block">
+      <h4>📓 Field notes from watching (${t.notes.length})</h4>
+      <ul class="track-stops">
+        ${t.notes.map(n => `<li>👁️ ${esc(n)}</li>`).join("")}
       </ul>
     </div>` : ""}
     <p class="hook">💡 ${s.hook}</p>
