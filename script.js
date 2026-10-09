@@ -323,21 +323,42 @@ const SIGHTING_DOINES = [
 
 /* v1.3.0-beta: natural-history observations from "Just watch" encounters.
    Optional flavor only — never a checklist, never an achievement trigger.
-   Stored per-species on the tagged record. */
-const WATCH_NOTES = [
+   Stored per-species on the tagged record.
+   Mira review (v1.3.0): split by habitat so notes stay scientifically
+   coherent — a deep-sea shark doesn't rest on a reef, and a reef shark
+   doesn't hunt alone in the blue. */
+const WATCH_NOTES_REEF = [
   "resting under a ledge, barely moving",
+  "resting on the sandy bottom",
   "feeding at dusk, quick and focused",
+  "investigating the boat, then losing interest"
+];
+const WATCH_NOTES_PELAGIC = [
   "cruising with a remora attached",
   "circling a bait ball, patient",
-  "gliding through a thermocline",
-  "resting on the sandy bottom",
   "following a current edge",
   "hunting alone in the blue",
   "drifting near the surface at dawn",
-  "investigating the boat, then losing interest",
-  "swimming with slow, deliberate tail beats",
-  "pausing mid-water, hanging motionless"
+  "feeding at dusk, quick and focused",
+  "investigating the boat, then losing interest"
 ];
+const WATCH_NOTES_DEEP = [
+  "gliding through a thermocline",
+  "swimming with slow, deliberate tail beats",
+  "pausing mid-water, hanging motionless",
+  "feeding at dusk, quick and focused",
+  "investigating the boat, then losing interest"
+];
+/* Pick a habitat-appropriate pool from the species' depth bands.
+   Reef species -> reef notes; twilight/deep -> deep notes;
+   surface-only (open water) -> pelagic notes. */
+function pickWatchNote(species) {
+  const d = (species && species.depths) || [];
+  const pool = d.includes("reef") ? WATCH_NOTES_REEF
+    : (d.includes("deep") || d.includes("twilight")) ? WATCH_NOTES_DEEP
+    : WATCH_NOTES_PELAGIC;
+  return pick(pool);
+}
 
 /* v0.7.0: tagging the first six earns new waters. */
 const REGION_UNLOCK_THREAD = [
@@ -1603,7 +1624,7 @@ function doEncounter(species, plan) {
          Pure flavor — not a checklist, no achievements attached. */
       let noteLine = "";
       if (rec && Math.random() < 0.35) {
-        const note = pick(WATCH_NOTES);
+        const note = pickWatchNote(species);
         rec.notes = rec.notes || [];
         if (!rec.notes.includes(note)) {
           rec.notes.push(note);
@@ -1998,7 +2019,10 @@ function logbookTripMatches(t, f) {
   }
   if (f.region !== "all" && t.region !== f.region) return false;
   if (f.species !== "all" && !(t.encounters || []).some(e => e.speciesId === f.species)) return false;
-  if (f.dateRange !== "all" && t.ts) {
+  if (f.dateRange && f.dateRange !== "all") {
+    /* v1.3.0-beta Mira review: trips without a timestamp are excluded
+       when a date filter is active (they can't prove they're recent). */
+    if (!t.ts) return false;
     const age = Date.now() - t.ts;
     const day = 86400000;
     if (f.dateRange === "7d" && age > 7 * day) return false;
