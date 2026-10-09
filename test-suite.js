@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.3.1-beta', VERSION === 'v1.3.1-beta');
+  ok('version v1.3.2-beta', VERSION === 'v1.3.2-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1245,7 +1245,7 @@ code += `
   ok('date filter all keeps dateless trip', logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
 
   // v1.3.0-beta: What's New has current version entry
-  ok('WHATS_NEW has v1.3.1-beta', Array.isArray(WHATS_NEW['v1.3.1-beta']) && WHATS_NEW['v1.3.1-beta'].length > 0);
+  ok('WHATS_NEW has v1.3.2-beta', Array.isArray(WHATS_NEW['v1.3.2-beta']) && WHATS_NEW['v1.3.2-beta'].length > 0);
 
   // v1.3.0-beta: Deep Blue retired — naming a shark "Deep Blue" triggers NO easter egg
   ok('Deep Blue triggers no easter egg', (() => {
