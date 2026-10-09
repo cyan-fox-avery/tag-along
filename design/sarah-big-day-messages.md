@@ -16,14 +16,14 @@ When the player tags several *new species* during one expedition, `confirmTag()`
 | 1 | One existing species-specific opener + research-ID reply + cheer, unchanged in content (but delivered at trip end). |
 | 2 | One randomly selected **two-species** Big Day conversation. |
 | 3 | One randomly selected **three-species** Big Day conversation. |
-| 4+ | One randomly selected **four-plus** exuberant Big Day conversation, with the real count. |
+| 4 | One randomly selected **four-species** exuberant Big Day conversation. (Four is the maximum possible: expeditions have at most 4 encounters.) |
 
 - An **expedition** is one in-game trip, *not* all trips on the same real-world date.
 - Count **distinct species the player had not tagged before** the expedition. Do not count re-sightings, watching without tagging, or repeat individuals of an already discovered species.
 - The one selected conversation can contain several individual chat bubbles, but it creates **one Phone thread / one unread increment**, not N separate species-celebration threads.
 - Name the species involved naturally, preserving discovery order, and optionally reference named sharks / research IDs. Do not invent species, IDs, sexes, or shark behavior.
 - **Don't suppress the in-dive 'New species!' celebration**, tag records, logbook encounters, Archive unlock/badge, achievements, or milestones. This replaces only the *routine Sarah celebration threads*.
-- Randomness should feel authored and varied rather than a generated cut-and-paste template; avoid immediate repeats where practical. Suggested starting pool: **3 each for 2, 3, and 4+ tags (9 total)**, expandable to 8–12+ over time.
+- Randomness should feel authored and varied rather than a generated cut-and-paste template; avoid immediate repeats where practical. Suggested starting pool: **8 each for 2, 3, and 4 tags (24 total)**. A separate 8-conversation 5+ pool exists below as explicitly future-only stretch content (unreachable in the current game).
 
 ## Preserve Sarah's special moments
 
@@ -114,7 +114,7 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ## Acceptance tests
 
 - One first-time tag → exactly one existing species celebration, no Big Day thread.
-- Two / three / four+ **different new species** → exactly one corresponding Big Day Phone conversation; all species included correctly; one unread increment.
+- Two / three / four **different new species** → exactly one corresponding Big Day Phone conversation; all species included correctly; one unread increment.
 - Repeat or re-sighted sharks don't inflate the distinct-new-species count; normal game state, achievements, collection, and logbook continue to work.
 - The 'Head back' release path and the normal end-of-expedition path both deliver the queued conversation **once**.
 - Existing special cases (Mary Lee, Nicole, Bruce, named Sarah, first Archive unlock) still trigger normally and are not accidentally consumed by routine-message batching.
@@ -125,7 +125,7 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ## Scope and decisions
 
 - **This PR is a design handoff for Roman, not an implementation or approval to merge gameplay changes.**
-- Implement batching first with 9 normal Big Day dialogue options. Integrate the separately planned lemon-shark Easter egg deliberately, with the 'one celebration thread on a big day' rule respected.
+- Implement batching first with 24 normal Big Day dialogue options (8 per tier for 2, 3, and 4 new species). Integrate the separately planned lemon-shark Easter egg deliberately, with the 'one celebration thread on a big day' rule respected.
 - Avery should approve Sarah's final voice and perform final Phone/expedition playtesting before release.
 
 — Design notes from Mira with Avery 🦈💙
@@ -140,9 +140,9 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 
 ## Notes
 
-- **Tiers:** 8 variants each for 2, 3, 4, and 5+ new species tagged in a single expedition (32 total). Per Avery: 4 and 5+ are separate tiers.
+- **Tiers:** 8 variants each for 2, 3, and 4 new species (24 total) — these are the implementation tiers. A further 8 variants for 5+ exist below as **FUTURE-ONLY stretch content** (unreachable: expeditions max out at 4 encounters).
 - **2A–2C** are Mira's original starters, kept verbatim. Everything else is new.
-- **Placeholders:** `{speciesList}` (e.g. "a nurse shark and a lemon shark"), `{count}` (real number, 5+ tier), `{names}` (nicknames if set — available but unused below; implementation may substitute).
+- **Placeholders:** `{speciesList}` (e.g. "a nurse shark and a lemon shark"), `{count}` (real number — used only in the future-only 5+ tier), `{names}` (nicknames if set — available but unused below; implementation may substitute).
 - **Sarah's voice:** warm, precise, grounded, lowercase texting style. Younger cousin, autistic, sharks = special interest. Facts are universal (true for sharks generally) so they work with any species combination. Excitement is earned and escalates by tier.
 - Each conversation is 3–4 alternating chat bubbles, 1–2 sentences per bubble.
 
@@ -168,11 +168,11 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ### 2D
 - **Player:** trip report: {speciesList}. both tagged, both released.
 - **Sarah:** wait. both?? in ONE trip?
-- **Player:** The second one came in while I was still logging the first.
+- **Player:** Back to back. Barely had time to log the first one.
 - **Sarah:** okay that's genuinely excellent fieldwork. two new animals in the database means two more migration tracks to follow.
 
 ### 2E
-- **Sarah:** you know what's wild? most researchers go whole seasons hoping for one new species.
+- **Sarah:** you know what's wild? two new species for your collection in a single trip.
 - **Player:** And I got two before lunch.
 - **Sarah:** two! {speciesList}! sharks just keep making teeth — conveyor belt, forever.
 - **Player:** I'm choosing to take that as a compliment.
@@ -231,7 +231,7 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ### 3F
 - **Sarah:** I was literally just telling mom about your research and then the alerts started coming in.
 - **Player:** Sorry to interrupt the bragging?
-- **Sarah:** are you kidding, you IMPROVED the bragging. three new species, {speciesList}. some sharks live 70+ years — we could be following these three for decades.
+- **Sarah:** are you kidding, you IMPROVED the bragging. three new species, {speciesList}. some sharks live 70+ years — these three could be out there that whole time.
 - **Player:** Tell mom I said thanks. (The sharks don't say hi. But tell her.)
 
 ### 3G
@@ -283,7 +283,7 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ### 4F
 - **Sarah:** I'm going to say a number and you tell me if it's right. four.
 - **Player:** Four. It's right.
-- **Sarah:** FOUR new species in ONE trip. {speciesList}. also, countershading — dark on top, light below — means half of them were invisible until the last second. sneaky.
+- **Sarah:** FOUR new species in ONE trip. {speciesList}. also, countershading — dark on top, light below — breaks up their outline from every angle. they were probably watching you way before you saw them. sneaky.
 - **Player:** Rigorous as always.
 
 ### 4G
@@ -295,12 +295,14 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ### 4H
 - **Sarah:** four species. FOUR. I'm going to need you to walk me through this slowly because my brain is buffering.
 - **Player:** One at a time? {speciesList}.
-- **Sarah:** one at a time. yes. okay. each of these is an animal nobody knew as an individual until today. whale sharks have unique spot patterns, like fingerprints — and now we've got four new animals to tell apart.
+- **Sarah:** one at a time. yes. okay. each of these is an animal nobody knew as an individual until today. dorsal fins, scars, markings — four new animals to learn to tell apart.
 - **Player:** Take all the time you need.
 
 ---
 
 ## TIER 5+ — Five or more new species (full affectionate meltdown)
+
+> **⚠️ FUTURE-ONLY / STRETCH CONTENT — DO NOT IMPLEMENT.** Expeditions currently have at most 4 encounters (`runExpedition()`: `2 + Math.floor(Math.random() * 3)` slots), so 5+ first-time species in one trip is impossible. These 8 conversations are preserved for a hypothetical future where expeditions can be longer. Implementation tiers are **2 / 3 / 4** only.
 
 ### 5A
 - **Sarah:** {count} NEW SPECIES. IN ONE TRIP.
@@ -329,7 +331,7 @@ Use placeholders such as `{count}`, `{speciesList}`, and `{lemonSharkName}` reso
 ### 5E
 - **Sarah:** I'm looking at the expedition log and I keep losing count. {count}??
 - **Player:** {count}. I triple-checked.
-- **Sarah:** that's the most new species in a single trip we've EVER had. some sharks navigate by Earth's magnetic field — these animals might be following invisible maps.
+- **Sarah:** {count} new species in ONE trip. some sharks navigate by Earth's magnetic field — these animals might be following invisible maps.
 - **Player:** Full field notes tonight. Get some rest.
 
 ### 5F
