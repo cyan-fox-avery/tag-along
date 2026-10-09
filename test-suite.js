@@ -1271,11 +1271,12 @@ code += `
   })());
 
   // v1.3.1-beta: "Tag along" title language
-  // v1.3.1-beta Mira review: CTA must NOT appear pre-release (health check),
-  // only post-release (doRelease). The release choice is mandatory.
-  ok('tagAlongToMap exists', typeof tagAlongToMap === 'function');
+  // v1.4.0-beta Mira review (blocker 1): tagAlongToMap is RETIRED — the old
+  // post-release CTA violated the tag-along-ends-expedition contract. The
+  // health-check third release choice is now the single tag-along path.
+  ok('tagAlongToMap retired (v1.4.0)', typeof tagAlongToMap === 'undefined');
   ok('showHealthCheck does NOT reference tagAlongToMap (no pre-release CTA)', !showHealthCheck.toString().includes('tagAlongToMap'));
-  ok('doRelease references tagAlongToMap (post-release CTA)', doRelease.toString().includes('tagAlongToMap'));
+  ok('doRelease does NOT reference tagAlongToMap (old CTA retired)', !doRelease.toString().includes('tagAlongToMap'));
   // Behavioral: doRelease must clear state.encounterDone (resolves the expedition lifecycle)
   // v1.3.1-beta Mira review (blocking): the old pre-release CTA left encounterDone
   // pending, hanging runExpedition(). This verifies the lifecycle completes.
@@ -1392,6 +1393,69 @@ code += `
     ok("tagAlongToMap retired", typeof tagAlongToMap === "undefined");
     ok("doFollowTagged exists", typeof doFollowTagged === "function");
     ok("showTagAlongFact exists", typeof showTagAlongFact === "function");
+  })();
+  // v1.4.0-beta Mira review (blocker): already-tagged follow must resolve
+  // doEncounter's Promise via the passed callback — not via state.encounterDone
+  // (which is null when no tagging overlay was opened). Behavioral test drives
+  // the full already-tagged follow flow.
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origLog = logLine;
+    const origRender = renderAll;
+    const origSave = factStore.save;
+    const origDone = state.encounterDone;
+    const origTripLog = (typeof tripLog !== "undefined") ? tripLog : undefined;
+    const origFollowedFlag = state.followedThisTrip;
+    renderAll = () => {};
+    logLine = () => {};
+    factStore.save = () => {};
+    state.tagged = { nurse: { name: "Nora", researchId: "NS-2026-001" } };
+    state.unlockedFacts = {};
+    state.encounterDone = null; // already-tagged path: no tagging overlay opened
+    state.followedThisTrip = false;
+    tripLog = { encounters: [] };
+    let resolved = null;
+    let callCount = 0;
+    const cb = (r) => { callCount++; resolved = r; };
+    // Drive the flow: follow an already-tagged shark
+    doFollowTagged("nurse", cb);
+    ok("follow resolves via passed callback", resolved && resolved.tagAlong === "nurse");
+    ok("follow sets followedThisTrip", state.followedThisTrip === true);
+    ok("follow logs 'followed' encounter",
+      tripLog.encounters.some(e => e.speciesId === "nurse" && e.result === "followed"));
+    ok("follow does not fake a re-tag",
+      !tripLog.encounters.some(e => e.speciesId === "nurse" && e.result === "tagged"));
+    ok("follow does not touch collection record",
+      state.tagged.nurse && state.tagged.nurse.researchId === "NS-2026-001");
+    // Double-resolution guard: the one-shot wrapper in the button handler
+    // prevents this, but doFollowTagged itself must clear encounterDone
+    ok("follow clears encounterDone", state.encounterDone === null);
+    // Restore
+    renderAll = origRender;
+    logLine = origLog;
+    factStore.save = origSave;
+    state.tagged = origTagged;
+    state.unlockedFacts = origFacts;
+    state.encounterDone = origDone;
+    state.followedThisTrip = origFollowedFlag;
+    if (typeof origTripLog !== "undefined") tripLog = origTripLog;
+  })();
+  // v1.4.0-beta Mira review (win-path): tag-along defers past the win ceremony
+  (() => {
+    const origDeferred = state.deferredTagAlong;
+    state.deferredTagAlong = null;
+    // Simulate closeDive win branch stashing
+    state.deferredTagAlong = { speciesId: "nurse", factInfo: { speciesId: "nurse", fact: "x", exhausted: false } };
+    ok("deferredTagAlong stashes species", state.deferredTagAlong.speciesId === "nurse");
+    ok("deferredTagAlong stashes fact", state.deferredTagAlong.factInfo.fact === "x");
+    state.deferredTagAlong = origDeferred;
+  })();
+  // v1.4.0-beta Mira review: "followed" outcome in logbook filter
+  (() => {
+    const trip = { encounters: [{ speciesId: "nurse", result: "followed" }], region: "caribbean", ts: Date.now() };
+    ok("filter matches followed", logbookTripMatches(trip, { outcome: "followed", region: "all", species: "all", dateRange: "all" }) === true);
+    ok("filter rejects non-followed", logbookTripMatches({ encounters: [{ speciesId: "nurse", result: "watched" }], region: "caribbean", ts: Date.now() }, { outcome: "followed", region: "all", species: "all", dateRange: "all" }) === false);
   })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
 
