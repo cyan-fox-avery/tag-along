@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.3.0-beta";
+const VERSION = "v1.3.1-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -39,6 +39,9 @@ const WHATS_NEW = {
     "📓 <strong>Logbook date filter.</strong> Filter trips by last 7 days, 30 days, or year — plus research IDs on tagged encounters.",
     "🌊 <strong>Richer dive flavour.</strong> 20 new field observations and 6 new wildlife sightings (surface and reef waters).",
     "💾 <strong>Save export/import</strong> is in the footer — back up your sharks as JSON, restore them anywhere."
+  ],
+  "v1.3.1-beta": [
+    "🦈 <strong>Tag along.</strong> After tagging, you can now tap 'Tag along with [name] →' to follow your shark on the map."
   ]
 };
 
@@ -2539,6 +2542,24 @@ function confirmTag(name) {
   showHealthCheck(s, rec);
 }
 
+/* v1.3.1-beta: "Tag along" title language — the game's name appears naturally
+   in emotional moments. Tapping it takes you to the Map and focuses on your
+   shark's latest ping, so you're following YOUR animal, not just opening a map.
+   v1.3.1-beta Mira review: only called post-release (from doRelease), never
+   from the health check — the release choice is mandatory. */
+function tagAlongToMap(sid) {
+  try { $("tagOverlay").classList.add("hidden"); } catch {}
+  goTab("map");
+  /* Focus the just-tagged shark after the tab switch settles. */
+  if (sid) {
+    setTimeout(() => { try { mapFocusOn(sid); } catch {} }, 150);
+  }
+}
+
+/* v1.3.1-beta Mira review (blocking): the "Tag along" CTA must NOT appear
+   before release — tapping it hid the overlay without resolving the encounter,
+   leaving runExpedition() awaiting forever. The CTA lives only in doRelease(),
+   after the player has chosen how to release. */
 function showHealthCheck(s, rec) {
   state.healthSpecies = s;
   $("tagForm").classList.add("hidden");
@@ -2562,7 +2583,13 @@ function doRelease(headBack) {
   state.healthSpecies = null;
   $("tagOverlay").classList.add("hidden");
   if (s) {
-    logLine(`🌊 The ${s.name} kicks once and is gone — back to its life, carrying your tag.`);
+    /* v1.3.1-beta: warm release moment with the title woven in.
+       Personalized CTA ("Tag along with [name]") focuses the map on YOUR shark.
+       This is the ONLY "Tag along" CTA — it appears after the release choice. */
+    const rec = state.tagged[s.id];
+    const displayName = (rec && rec.name) || s.name;
+    logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
+    logLine(`<button type="button" class="tagalong-link" onclick="tagAlongToMap('${s.id}')">Tag along with ${esc(displayName)} →</button>`);
   }
   renderAll();
   if (done) done(headBack);
