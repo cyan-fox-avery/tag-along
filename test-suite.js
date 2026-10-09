@@ -1120,14 +1120,25 @@ code += `
     return bgCreatureImg('bg-seal', 'Seal').includes('onerror');
   })());
 
-  console.log(out.join('\\n'));
-  const fails = out.filter(l => l.startsWith('FAIL')).length;
-  console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');
-  process.exit(fails ? 1 : 0);
+
 
   // v1.2.0-beta: failed expedition observations
   ok('FIELD_NOTES has 12 per zone', Object.values(FIELD_NOTES).every(arr => arr.length >= 12));
-  ok('FIELD_NOTES never hints answers', !Object.values(FIELD_NOTES).flat().join(' ').match(/region|depth|bait|chum.*right|correct/i) || true);
+  ok('FIELD_NOTES never hints answers', (() => {
+    // No note may contain answer-revealing phrasing. Ordinary words like
+    // "bait" are fine — this targets disguised right/wrong signals.
+    const joined = Object.values(FIELD_NOTES).flat().join(' ');
+    return !/(correct|you should|wrong choice|right answer|should have picked)/i.test(joined);
+  })());
+  ok('FIELD_NOTES chum notes gated on chum use', (() => {
+    // Without a chum plan, no chum-slick note may ever be returned.
+    for (let i = 0; i < 50; i++) {
+      const n = pickFieldNote('caribbean', { region: 'caribbean', method: 'stalk', methodOpt: 'none' });
+      if (/chum slick/i.test(n)) return false;
+    }
+    return true;
+  })());
+  ok('ordinal words work', ordinal(1) === 'first' && ordinal(2) === 'second' && ordinal(3) === 'third' && ordinal(12) === 'twelfth' && ordinal(21) === '21th');
   ok('pickFieldNote returns a string', typeof pickFieldNote('caribbean') === 'string');
 
   // v1.2.0-beta: species tag counting
@@ -1147,6 +1158,11 @@ code += `
 
   // v1.2.0-beta: Mary Lee / Nicole easter eggs still wired (naming-based, v0.23.0)
   ok('maryLeeEgg handler exists', typeof maybeNameEgg === 'function');
+
+  console.log(out.join('\\n'));
+  const fails = out.filter(l => l.startsWith('FAIL')).length;
+  console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');
+  process.exit(fails ? 1 : 0);
 })();
 `;
 eval(code);
