@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.3.0-beta";
+const VERSION = "v1.3.2-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -39,6 +39,9 @@ const WHATS_NEW = {
     "📓 <strong>Logbook date filter.</strong> Filter trips by last 7 days, 30 days, or year — plus research IDs on tagged encounters.",
     "🌊 <strong>Richer dive flavour.</strong> 20 new field observations and 6 new wildlife sightings (surface and reef waters).",
     "💾 <strong>Save export/import</strong> is in the footer — back up your sharks as JSON, restore them anywhere."
+  ],
+  "v1.3.2-beta": [
+    "🌿 <strong>Conservation notes fixed.</strong> The green conservation box on collection cards is now dark and readable — no more white-on-white."
   ]
 };
 
