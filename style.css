@@ -922,3 +922,10 @@ video.archive-media { max-height: 420px; }
   .section-head h2 { font-size: 26px; }
   .research-text { font-size: 15px; }
 }
+
+/* v1.2.0-beta: locked archive placeholders (for Mira's review) */
+.archive-locked { text-align: center; padding: 18px 12px; }
+.archive-locked-art { opacity: 0.35; filter: grayscale(1); max-width: 220px; margin: 0 auto 10px; }
+.archive-locked-art svg { width: 100%; height: auto; }
+.locked-pill { background: rgba(255,255,255,0.08); }
+.archive-locked-row .guide-row-name { opacity: 0.75; }
