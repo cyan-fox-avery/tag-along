@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.3.0-beta";
+const VERSION = "v1.3.1-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -39,6 +39,9 @@ const WHATS_NEW = {
     "📓 <strong>Logbook date filter.</strong> Filter trips by last 7 days, 30 days, or year — plus research IDs on tagged encounters.",
     "🌊 <strong>Richer dive flavour.</strong> 20 new field observations and 6 new wildlife sightings (surface and reef waters).",
     "💾 <strong>Save export/import</strong> is in the footer — back up your sharks as JSON, restore them anywhere."
+  ],
+  "v1.3.1-beta": [
+    "🦈 <strong>Tag along.</strong> After tagging, you can now tap 'Tag along with [name] →' to follow your shark on the map."
   ]
 };
 
@@ -2539,16 +2542,25 @@ function confirmTag(name) {
   showHealthCheck(s, rec);
 }
 
+/* v1.3.1-beta: "Tag along" title language — the game's name appears naturally
+   in emotional moments. Tapping it takes you to the Map to follow your shark. */
+function tagAlongToMap() {
+  try { $("tagOverlay").classList.add("hidden"); } catch {}
+  goTab("map");
+}
+
 function showHealthCheck(s, rec) {
   state.healthSpecies = s;
   $("tagForm").classList.add("hidden");
   $("healthView").classList.remove("hidden");
   $("healthArt").innerHTML = sharkArtImg(s.id, "illustration", s.name);
+  const displayName = rec.name || s.name;
   $("healthInfo").innerHTML = `
     <strong>${s.name}</strong> — ${esc(rec.researchId)}<br>
     🩺 Health check: ${rec.sex === "female" ? "♀ female" : "♂ male"}, ${rec.length} m.<br>
     Tag seated well, swimming strongly, good body condition.<br>
-    <em>Every shark released healthy. 🦈</em>
+    <em>Every shark released healthy. 🦈</em><br>
+    <button type="button" class="tagalong-link" onclick="tagAlongToMap()">Tag along with ${esc(displayName)} →</button>
   `;
 }
 
@@ -2562,7 +2574,11 @@ function doRelease(headBack) {
   state.healthSpecies = null;
   $("tagOverlay").classList.add("hidden");
   if (s) {
-    logLine(`🌊 The ${s.name} kicks once and is gone — back to its life, carrying your tag.`);
+    /* v1.3.1-beta: warm release moment with the title woven in. */
+    const rec = state.tagged[s.id];
+    const displayName = (rec && rec.name) || s.name;
+    logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
+    logLine(`<button type="button" class="tagalong-link" onclick="tagAlongToMap()">Tag along on the map →</button>`);
   }
   renderAll();
   if (done) done(headBack);
