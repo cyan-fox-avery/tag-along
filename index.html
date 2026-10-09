@@ -329,6 +329,15 @@
   <!-- Win state overlay: content is staged by winStep() in script.js -->
   <div id="winOverlay" class="overlay hidden"></div>
   <div id="achieveOverlay" class="overlay hidden"></div>
+  <!-- v1.4.0-beta Mira review: tag-along fact overlay — shows the unlocked
+       insight on the Map with learned X/3 progression, so the reward is
+       readable even at quick pace. -->
+  <div id="tagAlongOverlay" class="overlay hidden">
+    <div class="phone">
+      <div id="tagAlongFactContent"></div>
+      <button id="tagAlongFactClose" class="primary-button" type="button">Continue following 🧭</button>
+    </div>
+  </div>
 
   <script src="map-data.js"></script>
   <script src="art-data.js"></script>
