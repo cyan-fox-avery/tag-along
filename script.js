@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.3.1-beta";
+const VERSION = "v1.3.2-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -42,6 +42,9 @@ const WHATS_NEW = {
   ],
   "v1.3.1-beta": [
     "🦈 <strong>Tag along.</strong> After tagging, you can now tap 'Tag along with [name] →' to follow your shark on the map."
+  ],
+  "v1.3.2-beta": [
+    "🌊 <strong>Conservation note readability.</strong> Fixed the conservation note background so the text is actually readable."
   ]
 };
 
