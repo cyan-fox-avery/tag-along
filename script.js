@@ -2735,8 +2735,17 @@ function advanceBruceChain() {
     return;
   }
 
-  // Push this stage's messages
-  pushThread(BRUCE_CHAIN[stage].map(m => ({ ...m })));
+  // Push this stage's messages. v0.23.0: personalize {species} with the
+  // player's Bruce, so the history attaches to THEIR shark, not a lecture.
+  let bruceSpecies = "shark";
+  try {
+    const bs = sharkById(state.bruceEgg.sharkId);
+    if (bs && bs.name) bruceSpecies = bs.name.toLowerCase();
+  } catch {}
+  pushThread(BRUCE_CHAIN[stage].map(m => ({
+    who: m.who,
+    text: String(m.text).split("{species}").join(bruceSpecies)
+  })));
   state.bruceEgg.stage = stage + 1;
   state.bruceEgg.lastAdvance = now;
   state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
