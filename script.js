@@ -2305,7 +2305,15 @@ function logTripEncounter(species, result) {
 function ordinal(n) {
   const words = ["first","second","third","fourth","fifth","sixth","seventh",
     "eighth","ninth","tenth","eleventh","twelfth"];
-  return n >= 1 && n <= words.length ? words[n - 1] : n + "th";
+  if (n >= 1 && n <= words.length) return words[n - 1];
+  // Teen exceptions and the 10-20 range always take "th"
+  const mod100 = n % 100;
+  if (mod100 >= 10 && mod100 <= 20) return n + "th";
+  const mod10 = n % 10;
+  if (mod10 === 1) return n + "st";
+  if (mod10 === 2) return n + "nd";
+  if (mod10 === 3) return n + "rd";
+  return n + "th";
 }
 function countSpeciesTags(speciesId) {
   let n = 0;
