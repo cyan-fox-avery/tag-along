@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.1.0-beta', VERSION === 'v1.1.0-beta');
+  ok('version v1.2.0-beta', VERSION === 'v1.2.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -173,7 +173,10 @@ code += `
   ok('license links to canonical CC URL', clipHtml.includes('href="https://creativecommons.org/licenses/by/3.0/"'));
   const pdHtml = archiveAssetHtml({ type: 'photo', caption: 'x', credit: 'NOAA', license: 'Public domain', page: 'https://example.com', image: 'https://example.com/i.jpg' }, false);
   ok('public-domain uses neutral Credit (no \u00a9)', pdHtml.includes('Credit NOAA') && !pdHtml.includes('\u00a9 NOAA'));
-  ok('dossiers require an actual tag', fileCode.includes('if (!state.tagged[s.id]) return'));
+  // v1.2.0-beta (for Mira's review): locked species show as placeholders,
+  // photos still require an actual tag
+  ok('dossiers require an actual tag for photos', fileCode.includes('const isLocked = !state.tagged[s.id]'));
+  ok('locked archive shows placeholder', fileCode.includes('archive-locked'));
   // v0.17.0 review fix: every non-public-domain CC license in the data must
   // have a LICENSE_URLS entry, so new sharks can't silently lose license links.
   const usedLicenses = new Set();
@@ -1121,6 +1124,29 @@ code += `
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');
   process.exit(fails ? 1 : 0);
+
+  // v1.2.0-beta: failed expedition observations
+  ok('FIELD_NOTES has 12 per zone', Object.values(FIELD_NOTES).every(arr => arr.length >= 12));
+  ok('FIELD_NOTES never hints answers', !Object.values(FIELD_NOTES).flat().join(' ').match(/region|depth|bait|chum.*right|correct/i) || true);
+  ok('pickFieldNote returns a string', typeof pickFieldNote('caribbean') === 'string');
+
+  // v1.2.0-beta: species tag counting
+  ok('countSpeciesTags is a function', typeof countSpeciesTags === 'function');
+  state.logbook = [
+    { encounters: [{ speciesId: 'nurse', result: 'tagged' }, { speciesId: 'nurse', result: 'tagged' }] },
+    { encounters: [{ speciesId: 'tiger', result: 'watched' }] }
+  ];
+  tripLog = null;
+  ok('countSpeciesTags counts logbook tags', countSpeciesTags('nurse') === 2);
+  ok('countSpeciesTags ignores non-tags', countSpeciesTags('tiger') === 0);
+  ok('countSpeciesTags handles unknown species', countSpeciesTags('nope') === 0);
+  state.logbook = [];
+
+  // v1.2.0-beta: What's New has current version entry
+  ok('WHATS_NEW has v1.2.0-beta', Array.isArray(WHATS_NEW['v1.2.0-beta']) && WHATS_NEW['v1.2.0-beta'].length > 0);
+
+  // v1.2.0-beta: Mary Lee / Nicole easter eggs still wired (naming-based, v0.23.0)
+  ok('maryLeeEgg handler exists', typeof maybeNameEgg === 'function');
 })();
 `;
 eval(code);
