@@ -140,42 +140,48 @@ const NICOLE_THREAD = [
   { who: "them", text: "SHE CAME BACK. August 2004, back in Gansbaai. Over 20,000 km round trip. They published it in Science — it proved white sharks cross entire ocean basins. Before Nicole, nobody knew they did that. Your Nicole's got explorer genes. 🗺️🦈" }
 ];
 
-/* v0.23.0: the Bruce chain. NO immediate message when triggered — Sarah
-   pieces it together slowly over multiple sessions. Each stage is pushed
-   separately via advanceBruceChain(). The full chain:
-   1. Vague familiarity ("why does that name sound familiar...")
-   2. Nagging memory (something about movies?)
-   3. The realization (JAWS! The mechanical shark was named Bruce!)
-   4. Delight + the Spielberg story (named after his lawyer)
-   5. Full circle — hidden achievement unlocks here */
+/* v0.23.0: BRUCE easter egg chain — LOCKED DESIGN (2026-10-06).
+   Trigger: player names any tagged shark "Bruce" (maybeNameEgg in script.js).
+   Nothing happens immediately — no popup, no toast. Stages unfold slowly via
+   advanceBruceChain (2+ expeditions or 12+ hours apart), so Sarah "notices"
+   on her own time. {species} is replaced at push time with the Bruce shark's
+   species (lowercase). The hidden achievement unlocks after the final stage.
+   Voice: Sarah texting — casual, lowercase, warm; precise where facts matter.
+   Facts: the Jaws mechanical shark was nicknamed Bruce after Spielberg's
+   lawyer; it malfunctioned constantly in salt water; Spielberg showed it
+   less than planned; Finding Nemo's Bruce is a deliberate Jaws reference. */
 const BRUCE_CHAIN = [
+  /* Stage 1 — the opening + the nickname reveal. */
   [
-    { who: "them", text: "Hey. Random question. Why did you name that shark Bruce?" },
-    { who: "me",   text: "Just felt right? Why?" },
-    { who: "them", text: "No reason. It's just... tickling something in my brain. Like I've heard it before in a shark context. Anyway. Hi Bruce. 🦈" }
+    { who: "them", text: "bruce huh" },
+    { who: "them", text: "okay. do you know how deep this rabbit hole goes" },
+    { who: "me", text: "It's from Jaws. I figured you'd notice eventually." },
+    { who: "them", text: "you named a REAL {species} after a robot. the jaws shark was mechanical — built for the movie — and the crew nicknamed it bruce. after spielberg's lawyer. the bruce you named is out there actually swimming and his namesake was a machine." },
   ],
+  /* Stage 2 — the notorious technical problems. */
   [
-    { who: "them", text: "OK it's been bugging me for DAYS. Bruce. Bruce the shark. Where do I know that from??" },
-    { who: "me",   text: "Maybe you just like the name?" },
-    { who: "them", text: "No no, it's something specific. Something about... movies? Ugh. It's on the tip of my tongue." }
+    { who: "them", text: "and when i say machine i mean a machine that barely worked. salt water kept breaking it — hydraulics, buoyancy, everything. the ocean won every round." },
+    { who: "me", text: "A shark that can't handle the ocean. That's brutal." },
+    { who: "them", text: "right?? they built this enormous complicated thing and spent half the shoot just trying to keep it functioning." },
   ],
+  /* Stage 3 — the failures forced restraint, and restraint made it scarier. */
   [
-    { who: "them", text: "I FIGURED IT OUT." },
-    { who: "me",   text: "Figured what out?" },
-    { who: "them", text: "BRUCE. The mechanical shark from Jaws was named Bruce!! I remembered at 2am and sat straight up in bed. My mom thought something was wrong." },
-    { who: "me",   text: "You're kidding." },
-    { who: "them", text: "I am NOT kidding. The 1975 Jaws shark — the big animatronic one that kept breaking down — the crew named it Bruce." }
+    { who: "them", text: "so spielberg had a problem: no working shark. his fix was to barely show it. most of the movie you never SEE the thing — it's the pov shot, the barrels on the surface, the fin, the music." },
+    { who: "me", text: "duh-duh. duh-duh." },
+    { who: "them", text: "exactly. and it made the movie SCARIER. not seeing it was worse than seeing it. the broken robot accidentally proved that holding back beats showing everything." },
   ],
+  /* Stage 4 — Nemo's Bruce + Jaws' cultural effect on real sharks. */
   [
-    { who: "them", text: "Fun fact I just learned: they named it after Steven Spielberg's lawyer. Bruce Ramer. The most feared movie shark in history is named after a LAWYER. I can't stop laughing." },
-    { who: "me",   text: "That's amazing." },
-    { who: "them", text: "Right?? 'You're gonna need a bigger boat' — about a shark named after a guy who does contracts. Cinema is beautiful." }
+    { who: "them", text: "years later finding nemo names their great white bruce. on purpose — it's a jaws reference. 'fish are friends, not food.' the nicest shark in movies is named after the scariest one." },
+    { who: "me", text: "Okay that's actually perfect." },
+    { who: "them", text: "the un-funny part: jaws genuinely terrified people. it put the mindless-monster idea in everyone's head, and real sharks have been paying for it ever since." },
   ],
+  /* Stage 5 — the contrast: the player's actual Bruce. The punchline. */
   [
-    { who: "them", text: "You know what, I love that you named a real, actual, beautiful shark Bruce. Like reclaiming the name. The movie Bruce was a malfunctioning robot that scared everyone. Your Bruce is out there being a perfect shark." },
-    { who: "me",   text: "Reclaiming Bruce. I like that." },
-    { who: "them", text: "Bruce forever. 🩵🦈" }
-  ]
+    { who: "them", text: "and then there's the bruce you named. a real {species}. you found it, tagged it, let it go. you know what it actually does all day." },
+    { who: "me", text: "It's got a research ID and everything." },
+    { who: "them", text: "exactly. they needed a monster so they built one out of metal. you went and met the real animal instead. bruce the robot, bruce the joke — and bruce, just a shark, doing shark things. anyway. 10/10 name." },
+  ],
 ];
 
 
