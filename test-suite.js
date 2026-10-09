@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.3.2-beta', VERSION === 'v1.3.2-beta');
+  ok('version v1.4.0-beta', VERSION === 'v1.4.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1245,7 +1245,7 @@ code += `
   ok('date filter all keeps dateless trip', logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
 
   // v1.3.0-beta: What's New has current version entry
-  ok('WHATS_NEW has v1.3.2-beta', Array.isArray(WHATS_NEW['v1.3.2-beta']) && WHATS_NEW['v1.3.2-beta'].length > 0);
+  ok('WHATS_NEW has v1.4.0-beta', Array.isArray(WHATS_NEW['v1.4.0-beta']) && WHATS_NEW['v1.4.0-beta'].length > 0);
 
   // v1.3.0-beta: Deep Blue retired — naming a shark "Deep Blue" triggers NO easter egg
   ok('Deep Blue triggers no easter egg', (() => {
@@ -1299,7 +1299,51 @@ code += `
     }
   })());
 
-  console.log(out.join('\\n'));
+  
+
+
+  // v1.4.0-beta: secret facts cover all 50 species
+  ok("SECRET_FACTS has 50 species", Object.keys(SECRET_FACTS).length === 50);
+  ok("SECRET_FACTS 1-3 facts each", Object.keys(SECRET_FACTS).every(id => {
+    const f = SECRET_FACTS[id];
+    return Array.isArray(f) && f.length >= 1 && f.length <= 3;
+  }));
+  // v1.4.0-beta: unlockSecretFact basic behavior
+  (() => {
+    const origFacts = state.unlockedFacts;
+    const origSave = factStore.save;
+    factStore.save = () => {};
+    state.unlockedFacts = {};
+    const f1 = unlockSecretFact("nurse");
+    ok("unlockSecretFact returns a fact", typeof f1 === "string" && f1.length > 0);
+    ok("unlockSecretFact tracks unlock", (state.unlockedFacts["nurse"] || []).length === 1);
+    ok("unlockSecretFact null for unknown", unlockSecretFact("not-a-shark") === null);
+    state.unlockedFacts = origFacts;
+    factStore.save = origSave;
+  })();
+  // v1.4.0-beta: doTagAlong resolves with tag-along intent
+  (() => {
+    let resolved = null;
+    const origRender = renderAll;
+    const origLog = logLine;
+    renderAll = () => {};
+    logLine = () => {};
+    const origSave = factStore.save;
+    factStore.save = () => {};
+    state.encounterDone = (r) => { resolved = r; };
+    state.healthSpecies = { id: "nurse", name: "Nurse Shark" };
+    state.tagged = { nurse: { name: "", researchId: "NS-2026-001" } };
+    state.unlockedFacts = {};
+    doTagAlong();
+    ok("doTagAlong resolves with tagAlong id", resolved && resolved.tagAlong === "nurse");
+    ok("doTagAlong clears encounterDone", state.encounterDone === null);
+    renderAll = origRender;
+    logLine = origLog;
+    factStore.save = origSave;
+  })();
+  ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
+
+console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');
   
