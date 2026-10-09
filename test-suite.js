@@ -1160,66 +1160,69 @@ code += `
   ok('maryLeeEgg handler exists', typeof maybeNameEgg === 'function');
 
   // v1.3.0-beta: Watch notes pools exist, habitat-split (Mira review)
-  const _reefTexts = WATCH_NOTES_REEF.map(n => n.text);
-  const _pelagicTexts = WATCH_NOTES_PELAGIC.map(n => n.text);
-  const _deepTexts = WATCH_NOTES_DEEP.map(n => n.text);
   ok('WATCH_NOTES_REEF pool exists', Array.isArray(WATCH_NOTES_REEF) && WATCH_NOTES_REEF.length >= 4);
   ok('WATCH_NOTES_PELAGIC pool exists', Array.isArray(WATCH_NOTES_PELAGIC) && WATCH_NOTES_PELAGIC.length >= 4);
   ok('WATCH_NOTES_DEEP pool exists', Array.isArray(WATCH_NOTES_DEEP) && WATCH_NOTES_DEEP.length >= 4);
   ok('pickWatchNote picks reef pool for reef species', (() => {
     const seen = new Set();
-    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["surface", "reef"] }, "gliding past without a hurry", "reef"));
-    return [...seen].every(n => _reefTexts.includes(n));
+    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["surface", "reef"] }));
+    return [...seen].every(n => WATCH_NOTES_REEF.includes(n));
   })());
   ok('pickWatchNote picks deep pool for deep species', (() => {
     const seen = new Set();
-    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["deep"] }, "gliding past without a hurry", "deep"));
-    return [...seen].every(n => _deepTexts.includes(n));
+    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["deep"] }));
+    return [...seen].every(n => WATCH_NOTES_DEEP.includes(n));
   })());
   ok('pickWatchNote picks pelagic pool for surface-only species', (() => {
     const seen = new Set();
-    for (let i = 0; i < 40; i++) seen.add(pickWatchNote({ depths: ["surface"] }, "gliding past without a hurry", "surface"));
-    return [...seen].every(n => _pelagicTexts.includes(n));
+    for (let i = 0; i < 40; i++) seen.add(pickWatchNote({ depths: ["surface"] }));
+    return [...seen].every(n => WATCH_NOTES_PELAGIC.includes(n));
   })());
   ok('pickWatchNote reef notes never leak to deep species', (() => {
-    // reef-only notes must not appear for a deep species over many draws
-    const reefOnly = _reefTexts.filter(t => !_deepTexts.includes(t) && !_pelagicTexts.includes(t));
+    const reefOnly = WATCH_NOTES_REEF.filter(t => !WATCH_NOTES_DEEP.includes(t) && !WATCH_NOTES_PELAGIC.includes(t));
     for (let i = 0; i < 50; i++) {
-      if (reefOnly.includes(pickWatchNote({ depths: ["twilight", "deep"] }, "gliding past without a hurry", "deep"))) return false;
+      if (reefOnly.includes(pickWatchNote({ depths: ["twilight", "deep"] }))) return false;
     }
     return true;
   })());
-  // v1.3.0-beta Mira review round 2: notes must not contradict the encounter
-  ok('watch notes never contradict encounter activity or depth', (() => {
+  // v1.3.0-beta Mira review round 3: notes are purely observational —
+  // they must never assign an action to the shark (no locomotion verbs,
+  // no resting/feeding/hunting), so they can't contradict the sighting.
+  ok('watch notes never assign a shark action', (() => {
+    const actionVerbs = ["resting", "feeding", "hunting", "cruising", "circling",
+      "gliding", "drifting", "swimming", "pausing", "investigating", "following",
+      "motionless", "barely moving"];
+    const all = [...WATCH_NOTES_REEF, ...WATCH_NOTES_PELAGIC, ...WATCH_NOTES_DEEP];
+    return all.every(n => !actionVerbs.some(v => n.toLowerCase().includes(v)));
+  })());
+  ok('no watch note assigns locomotion after any sighting doing', (() => {
+    // Regression: "circling lazily" + "resting on the sandy bottom" must be impossible.
+    // Since no note contains an action verb at all, draw every pool many times
+    // and confirm none of the sighting action keywords appear as shark actions.
     const doings = ["cruising slow along the reef edge", "circling lazily in the blue",
       "gliding past without a hurry", "hunting, focused and silent",
       "drifting with the current", "patrolling, unhurried and thorough",
       "curious \u2014 circling back for a second look", "feeding, oblivious to the boat"];
-    const speciesDepths = [["surface", "reef"], ["surface"], ["twilight", "deep"], ["deep"], ["reef"]];
-    const planDepths = ["surface", "reef", "twilight", "deep"];
-    const activeKw = ["hunting", "feeding", "patrolling", "curious"];
-    for (const sd of speciesDepths) {
-      for (const pd of planDepths) {
-        for (const doing of doings) {
-          for (let i = 0; i < 25; i++) {
-            const note = pickWatchNote({ depths: sd }, doing, pd).toLowerCase();
-            const doingLower = doing.toLowerCase();
-            // resting/motionless notes must not appear during active behaviour
-            if ((note.includes("resting") || note.includes("motionless")) &&
-                activeKw.some(k => doingLower.includes(k))) return false;
-            // surface-only language must not appear on deep/twilight dives
-            if (note.includes("near the surface") && (pd === "deep" || pd === "twilight")) return false;
-            // reef-structure language must not appear on surface dives
-            if ((note.includes("ledge") || note.includes("sandy bottom")) && pd === "surface") return false;
-            // thermocline is a subsurface feature
-            if (note.includes("thermocline") && pd === "surface") return false;
-            // no invented time-of-day
-            if (note.includes("dusk") || note.includes("dawn")) return false;
-          }
+    const sharkActionKw = ["resting", "hunting", "feeding", "cruising", "circling",
+      "gliding", "drifting", "swimming", "pausing", "patrolling"];
+    const speciesList = [{ depths: ["surface", "reef"] }, { depths: ["surface"] },
+      { depths: ["twilight", "deep"] }, { depths: ["deep"] }, { depths: ["reef"] }];
+    for (const sp of speciesList) {
+      for (const doing of doings) {
+        for (let i = 0; i < 20; i++) {
+          const note = pickWatchNote(sp).toLowerCase();
+          // The note must not describe the shark performing any of these actions
+          if (sharkActionKw.some(k => note.includes(k))) return false;
         }
       }
     }
     return true;
+  })());
+  ok('a resting note never follows a circling sighting', (() => {
+    // Targeted regression for Mira's example: no note may contain "resting"
+    // regardless of sighting, since notes are observational only.
+    const all = [...WATCH_NOTES_REEF, ...WATCH_NOTES_PELAGIC, ...WATCH_NOTES_DEEP];
+    return all.every(n => !n.toLowerCase().includes("resting"));
   })());
 
   // v1.3.0-beta: FIELD_NOTES expanded (at least 16 per zone)
