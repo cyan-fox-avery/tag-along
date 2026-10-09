@@ -847,7 +847,7 @@ video.archive-media { max-height: 420px; }
 
 /* v0.22.0: conservation note on collection cards */
 .conservation-note {
-  background: #e8f5e9; border-left: 3px solid #4caf50;
+  background: var(--bg-soft); border-left: 3px solid #4caf50;
   border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 8px 0;
   font-size: 13px; line-height: 1.55;
 }
