@@ -314,6 +314,34 @@ select option:disabled { color: #7a8a9e; }
 .phone-convo {
   padding: 14px 12px 20px; display: grid; gap: 16px;
   max-height: 62vh; overflow-y: auto;
+  /* v1.4.0-beta: fixed minimum height so the empty state doesn't collapse. */
+  min-height: 320px;
+}
+
+/* v1.4.0-beta: third release choice — tag along ends the expedition. */
+.tagalong-choice {
+  display: block; width: 100%; margin-top: 10px;
+  padding: 14px 16px; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(180deg, #ffd166 0%, #f0b429 100%);
+  border: 2px solid #b8860b; color: #3a2b00;
+  font-size: 16px; font-weight: 700; text-align: center;
+  font-family: inherit;
+}
+.tagalong-choice .tagalong-sub {
+  display: block; font-size: 12px; font-weight: 400; margin-top: 4px;
+  color: #5a4500;
+}
+.tagalong-choice:active { transform: scale(0.98); }
+
+/* v1.4.0-beta: tag-along insights in collection detail. */
+.secret-facts-block {
+  background: var(--bg-soft); border-left: 3px solid #ffd166;
+  border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 8px 0;
+  font-size: 13px; line-height: 1.55;
+}
+.secret-facts-block h4 { margin: 0 0 6px; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) {
+  .tagalong-choice:active { transform: none; }
 }
 .thread-stamp {
   text-align: center; font-size: 11px; color: var(--ink-dim); margin-bottom: 6px;
@@ -866,9 +894,9 @@ video.archive-media { max-height: 420px; }
   .tabs { justify-content: center; }
   .tab { flex: 0 1 auto; padding: 12px 16px; }
 
-  /* Research: 2-column grid, open rows span full width */
+  /* Research: 2-column grid. v1.4.0-beta: open entries stay in their column —
+     expanding must not push neighbors out of their columns. */
   .guide-list { grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
-  .guide-row.open { grid-column: 1 / -1; }
 
   /* Filter panel: inline instead of bottom sheet */
   .filter-panel.open-sheet {
@@ -897,15 +925,18 @@ video.archive-media { max-height: 420px; }
   .tab { font-size: 15px; }
   .dive-scene { top: 76px; }
 
-  /* Research: 3 columns, expanded rows get 2-col interior */
+  /* Research: 3 columns. v1.4.0-beta: open entries stay in their column;
+     body stacks vertically within the cell. */
   .guide-list { grid-template-columns: repeat(3, 1fr); }
-  .guide-row.open .guide-row-body { display: grid; grid-template-columns: 320px 1fr; gap: 18px; }
 
   /* Expedition: side-by-side dive */
   .dive-view { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
   .dive-scene { height: 260px; }
   .dive-log { max-height: 400px; margin-top: 0; }
   .dive-shark img, .dive-shark svg { max-height: 180px; }
+  /* v1.4.0-beta: action buttons sit under the viewing window (left column),
+     bottom-aligned with the log. Phone stacked layout untouched. */
+  #diveActions { grid-column: 1; align-self: end; }
 
   /* Collection: 6 columns */
   .collection-grid { grid-template-columns: repeat(6, 1fr); }
