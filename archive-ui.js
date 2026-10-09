@@ -85,26 +85,35 @@ function renderArchive() {
     /* v0.17.0 review fix: the archive promise is "the real animals you tagged."
        A species dossier requires an actual tag, so a future roster expansion
        (e.g. salmon) can't leak into a returning player's Archive before they
-       tag one. */
-    if (!state.tagged[s.id]) return;
+       tag one.
+       v1.2.0-beta (for Mira's review): locked species now appear as
+       silhouettes instead of being hidden entirely — the player sees what's
+       still out there to discover. Photos unlock per-tag as before. */
+    const isLocked = !state.tagged[s.id];
     const t = state.tagged[s.id] || {};
     const yourShark = t.researchId
       ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
       : "";
+    const lockedHtml = `
+      <div class="archive-locked">
+        <div class="archive-locked-art">${typeof SKETCH !== "undefined" && SKETCH[s.id] ? SKETCH[s.id] : "🦈"}</div>
+        <p class="hook">🔒 Tag a ${s.name} to unlock its archive photos.</p>
+      </div>`;
     const row = document.createElement("div");
-    row.className = "guide-row";
+    row.className = "guide-row" + (isLocked ? " archive-locked-row" : "");
     row.innerHTML = `
       <button type="button" class="guide-row-head" aria-expanded="false">
         <span class="guide-row-name">${s.name}</span>
         <span class="latin">${media.scientific}</span>
         <span class="status-pill">IUCN: ${s.status}</span>
+        ${isLocked ? `<span class="status-pill locked-pill">🔒 Locked</span>` : ""}
         <span class="guide-caret" aria-hidden="true">\u25be</span>
       </button>
       <div class="guide-row-body hidden">
-        ${yourShark}
+        ${isLocked ? lockedHtml : `${yourShark}
         ${media.comingSoon
           ? `<p class="hook">📸 Wild media coming soon — being curated.</p>`
-          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
+          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}`}
       </div>`;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
