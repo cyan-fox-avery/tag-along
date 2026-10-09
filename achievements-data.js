@@ -187,9 +187,9 @@ const ACHIEVEMENTS = [
   {
     id: "bruce",
     name: "You Named Him WHAT?",
-    icon: "🎬",
-    breadcrumb: "???",
-    description: "Named a shark Bruce and let Sarah piece together why that's hilarious. She's still laughing.",
+    icon: "🏆",
+    breadcrumb: "name a shark the most popular shark name",
+    description: "Named a shark Bruce and discovered how deep the rabbit hole goes.",
     hidden: true,
     check: (st) => !!st.bruceChainComplete
   },
