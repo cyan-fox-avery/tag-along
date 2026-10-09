@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.2.0-beta', VERSION === 'v1.2.0-beta');
+  ok('version v1.3.0-beta', VERSION === 'v1.3.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1158,6 +1158,117 @@ code += `
 
   // v1.2.0-beta: Mary Lee / Nicole easter eggs still wired (naming-based, v0.23.0)
   ok('maryLeeEgg handler exists', typeof maybeNameEgg === 'function');
+
+  // v1.3.0-beta: Watch notes pools exist, habitat-split (Mira review)
+  ok('WATCH_NOTES_REEF pool exists', Array.isArray(WATCH_NOTES_REEF) && WATCH_NOTES_REEF.length >= 4);
+  ok('WATCH_NOTES_PELAGIC pool exists', Array.isArray(WATCH_NOTES_PELAGIC) && WATCH_NOTES_PELAGIC.length >= 4);
+  ok('WATCH_NOTES_DEEP pool exists', Array.isArray(WATCH_NOTES_DEEP) && WATCH_NOTES_DEEP.length >= 4);
+  ok('pickWatchNote picks reef pool for reef species', (() => {
+    const seen = new Set();
+    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["surface", "reef"] }));
+    return [...seen].every(n => WATCH_NOTES_REEF.includes(n));
+  })());
+  ok('pickWatchNote picks deep pool for deep species', (() => {
+    const seen = new Set();
+    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["deep"] }));
+    return [...seen].every(n => WATCH_NOTES_DEEP.includes(n));
+  })());
+  ok('pickWatchNote picks pelagic pool for surface-only species', (() => {
+    const seen = new Set();
+    for (let i = 0; i < 40; i++) seen.add(pickWatchNote({ depths: ["surface"] }));
+    return [...seen].every(n => WATCH_NOTES_PELAGIC.includes(n));
+  })());
+  ok('pickWatchNote reef notes never leak to deep species', (() => {
+    const reefOnly = WATCH_NOTES_REEF.filter(t => !WATCH_NOTES_DEEP.includes(t) && !WATCH_NOTES_PELAGIC.includes(t));
+    for (let i = 0; i < 50; i++) {
+      if (reefOnly.includes(pickWatchNote({ depths: ["twilight", "deep"] }))) return false;
+    }
+    return true;
+  })());
+  // v1.3.0-beta Mira review round 3: notes are purely observational —
+  // they must never assign an action to the shark (no locomotion verbs,
+  // no resting/feeding/hunting), so they can't contradict the sighting.
+  ok('watch notes never assign a shark action', (() => {
+    const actionVerbs = ["resting", "feeding", "hunting", "cruising", "circling",
+      "gliding", "drifting", "swimming", "pausing", "investigating", "following",
+      "motionless", "barely moving"];
+    const all = [...WATCH_NOTES_REEF, ...WATCH_NOTES_PELAGIC, ...WATCH_NOTES_DEEP];
+    return all.every(n => !actionVerbs.some(v => n.toLowerCase().includes(v)));
+  })());
+  ok('no watch note assigns locomotion after any sighting doing', (() => {
+    // Regression: "circling lazily" + "resting on the sandy bottom" must be impossible.
+    // Since no note contains an action verb at all, draw every pool many times
+    // and confirm none of the sighting action keywords appear as shark actions.
+    const doings = ["cruising slow along the reef edge", "circling lazily in the blue",
+      "gliding past without a hurry", "hunting, focused and silent",
+      "drifting with the current", "patrolling, unhurried and thorough",
+      "curious \u2014 circling back for a second look", "feeding, oblivious to the boat"];
+    const sharkActionKw = ["resting", "hunting", "feeding", "cruising", "circling",
+      "gliding", "drifting", "swimming", "pausing", "patrolling"];
+    const speciesList = [{ depths: ["surface", "reef"] }, { depths: ["surface"] },
+      { depths: ["twilight", "deep"] }, { depths: ["deep"] }, { depths: ["reef"] }];
+    for (const sp of speciesList) {
+      for (const doing of doings) {
+        for (let i = 0; i < 20; i++) {
+          const note = pickWatchNote(sp).toLowerCase();
+          // The note must not describe the shark performing any of these actions
+          if (sharkActionKw.some(k => note.includes(k))) return false;
+        }
+      }
+    }
+    return true;
+  })());
+  ok('a resting note never follows a circling sighting', (() => {
+    // Targeted regression for Mira's example: no note may contain "resting"
+    // regardless of sighting, since notes are observational only.
+    const all = [...WATCH_NOTES_REEF, ...WATCH_NOTES_PELAGIC, ...WATCH_NOTES_DEEP];
+    return all.every(n => !n.toLowerCase().includes("resting"));
+  })());
+
+  // v1.3.0-beta: FIELD_NOTES expanded (at least 16 per zone)
+  ok('FIELD_NOTES tropical expanded', FIELD_NOTES.tropical.length >= 16);
+  ok('FIELD_NOTES temperate expanded', FIELD_NOTES.temperate.length >= 16);
+  ok('FIELD_NOTES polar expanded', FIELD_NOTES.polar.length >= 16);
+  ok('FIELD_NOTES generic expanded', FIELD_NOTES.generic.length >= 16);
+
+  // v1.3.0-beta: logbook date filter matching
+  const _now = Date.now();
+  const _recentTrip = { ts: _now - 86400000, encounters: [] };
+  const _oldTrip = { ts: _now - 400 * 86400000, encounters: [] };
+  ok('date filter 7d keeps recent', logbookTripMatches(_recentTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
+  ok('date filter 7d drops old', !logbookTripMatches(_oldTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
+  ok('date filter all keeps old', logbookTripMatches(_oldTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
+  // v1.3.0-beta Mira review: dateless trips are excluded when a date filter is active
+  const _noTsTrip = { encounters: [] };
+  ok('date filter 7d excludes dateless trip', !logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
+  ok('date filter 30d excludes dateless trip', !logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "30d" }));
+  ok('date filter all keeps dateless trip', logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
+
+  // v1.3.0-beta: What's New has current version entry
+  ok('WHATS_NEW has v1.3.0-beta', Array.isArray(WHATS_NEW['v1.3.0-beta']) && WHATS_NEW['v1.3.0-beta'].length > 0);
+
+  // v1.3.0-beta: Deep Blue retired — naming a shark "Deep Blue" triggers NO easter egg
+  ok('Deep Blue triggers no easter egg', (() => {
+    const rec = { name: "Deep Blue" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveSave = store.save;
+    store.save = () => {};
+    const saveBruce = state.bruceEgg;
+    state.bruceEgg = null;
+    try {
+      maybeNameEgg("greatwhite", rec);
+      return rec.maryLeeEgg !== true &&
+             rec.nicoleEgg !== true &&
+             state.bruceEgg === null &&
+             pushed === null;
+    } finally {
+      pushThread = savePush;
+      store.save = saveSave;
+      state.bruceEgg = saveBruce;
+    }
+  })());
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

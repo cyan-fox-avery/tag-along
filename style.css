@@ -937,3 +937,13 @@ video.archive-media { max-height: 420px; }
   padding: 10px 4px; list-style-position: inside;
 }
 .archive-still-locked > summary::-webkit-details-marker { color: var(--ink-dim, #9db8c9); }
+
+/* v1.3.0-beta: field notes from "Just watch" encounters */
+.watch-notes-block {
+  background: var(--bg-soft); border-left: 3px solid #7fd4e6;
+  border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 10px 0;
+}
+.watch-notes-block h4 { margin: 0 0 6px; font-size: 14px; }
+.watch-notes-block .track-stops { margin: 0; padding-left: 18px; }
+.watch-notes-block .track-stops li { font-size: 13px; margin-bottom: 4px; }
+/* v1.3.0-beta: archive "still to discover" is inline in v1.2.0; logbook date filter needs no extra CSS */
