@@ -1245,7 +1245,7 @@ code += `
   ok('date filter all keeps dateless trip', logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
 
   // v1.3.0-beta: What's New has current version entry
-  ok('WHATS_NEW has v1.3.0-beta', Array.isArray(WHATS_NEW['v1.3.1-beta']) && WHATS_NEW['v1.3.1-beta'].length > 0);
+  ok('WHATS_NEW has v1.3.1-beta', Array.isArray(WHATS_NEW['v1.3.1-beta']) && WHATS_NEW['v1.3.1-beta'].length > 0);
 
   // v1.3.0-beta: Deep Blue retired — naming a shark "Deep Blue" triggers NO easter egg
   ok('Deep Blue triggers no easter egg', (() => {
@@ -1270,15 +1270,39 @@ code += `
     }
   })());
 
+  // v1.3.1-beta: "Tag along" title language
+  // v1.3.1-beta Mira review: CTA must NOT appear pre-release (health check),
+  // only post-release (doRelease). The release choice is mandatory.
+  ok('tagAlongToMap exists', typeof tagAlongToMap === 'function');
+  ok('showHealthCheck does NOT reference tagAlongToMap (no pre-release CTA)', !showHealthCheck.toString().includes('tagAlongToMap'));
+  ok('doRelease references tagAlongToMap (post-release CTA)', doRelease.toString().includes('tagAlongToMap'));
+  // Behavioral: doRelease must clear state.encounterDone (resolves the expedition lifecycle)
+  // v1.3.1-beta Mira review (blocking): the old pre-release CTA left encounterDone
+  // pending, hanging runExpedition(). This verifies the lifecycle completes.
+  ok('doRelease clears encounterDone', (() => {
+    const saveDone = state.encounterDone;
+    const saveSpecies = state.healthSpecies;
+    const saveRenderAll = renderAll;
+    let doneCalled = false;
+    state.encounterDone = (hb) => { doneCalled = true; };
+    state.healthSpecies = null; // no shark -> skips logLine, just clears state
+    renderAll = () => {}; // stub: render functions need full DOM
+    try {
+      doRelease(false);
+      return state.encounterDone === null && doneCalled === true;
+    } catch (e) {
+      return false;
+    } finally {
+      state.encounterDone = saveDone;
+      state.healthSpecies = saveSpecies;
+      renderAll = saveRenderAll;
+    }
+  })());
+
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');
   
-  // v1.3.1-beta: "Tag along" title language
-  ok('tagAlongToMap exists', typeof tagAlongToMap === 'function');
-  ok('showHealthCheck references tagAlongToMap', showHealthCheck.toString().includes('tagAlongToMap'));
-  ok('doRelease references tagAlongToMap', doRelease.toString().includes('tagAlongToMap'));
-
   process.exit(fails ? 1 : 0);
 })();
 `;
