@@ -734,6 +734,7 @@ const state = {
   currentPlan: null,      // the trip's region/depth/bait/method (method added v0.8.0 as scent, reworked v0.9.0)
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
+  followedThisTrip: false,  // v1.4.0-beta: skip random post-trip chat after a tag-along follow
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
   /* v0.17.1: Ask Sarah offer persists in the message store — Sarah's saved
      thread promises "pick one below", so the panel must survive a reload. */
@@ -754,7 +755,8 @@ const state = {
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
-  pendingTagAlong: null // v1.4.0-beta: species id to focus on map after tag-along trip
+  pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
+  deferredTagAlong: null // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -1712,7 +1714,17 @@ function doEncounter(species, plan) {
       followBtn.addEventListener("click", () => {
         actions.classList.add("hidden");
         actions.innerHTML = "";
-        doFollowTagged(species.id);
+        /* v1.4.0-beta Mira review (blocker): the already-tagged path never
+           calls openTagging(), so state.encounterDone is null. Pass
+           doEncounter's local resolver directly — one-shot guard against
+           double taps. */
+        let _followResolved = false;
+        doFollowTagged(species.id, (result) => {
+          if (!_followResolved) {
+            _followResolved = true;
+            resolve(result);
+          }
+        });
       });
       actions.appendChild(followBtn);
       /* v0.8.0: it's one of yours — log the re-sighting. */
@@ -1742,6 +1754,7 @@ async function runExpedition(plan) {
   state.pendingWin = false;
   state.taggedThisTrip = false;
   state.resightedThisTrip = false;
+  state.followedThisTrip = false;
   /* v0.18.0: feed achievement stats — regions visited, baits used. */
   if (plan.region && !state.stats.regionsVisited.includes(plan.region)) {
     state.stats.regionsVisited.push(plan.region);
@@ -1909,22 +1922,28 @@ async function runExpedition(plan) {
        cleanup all done exactly once), navigate to the map and focus the shark. */
     const tagAlongSid = state.pendingTagAlong || null;
     state.pendingTagAlong = null;
+    const factInfo = state.pendingTagAlongFact;
+    state.pendingTagAlongFact = null;
     if (state.pendingWin) {
       state.pendingWin = false;
+      /* v1.4.0-beta Mira review (win-path edge case): the 50th tag + tag-along
+         must not stack the map/fact overlay on the win ceremony. Defer until
+         the finale is acknowledged (handled in winStep beat 4). */
+      if (tagAlongSid) {
+        state.deferredTagAlong = { speciesId: tagAlongSid, factInfo: factInfo };
+      }
       doWin();
     } else {
       afterExpedition(plan);
-    }
-    if (tagAlongSid) {
-      goTab("map");
-      setTimeout(() => { try { mapFocusOn(tagAlongSid); } catch {} }, 200);
-      /* v1.4.0-beta Mira review (important): show the unlocked fact in a
-         readable overlay with learned X/3 progression — at quick pace the
-         dive-log line may never be read before auto-navigation. */
-      const factInfo = state.pendingTagAlongFact;
-      state.pendingTagAlongFact = null;
-      if (factInfo) {
-        setTimeout(() => showTagAlongFact(factInfo), 600);
+      if (tagAlongSid) {
+        goTab("map");
+        setTimeout(() => { try { mapFocusOn(tagAlongSid); } catch {} }, 200);
+        /* v1.4.0-beta Mira review (important): show the unlocked fact in a
+           readable overlay with learned X/3 progression — at quick pace the
+           dive-log line may never be read before auto-navigation. */
+        if (factInfo) {
+          setTimeout(() => showTagAlongFact(factInfo), 600);
+        }
       }
     }
   };
@@ -2091,6 +2110,7 @@ const logbookFilters = { outcome: "all", region: "all", species: "all", dateRang
    - "tagged": any tagged encounter (trip may also have others)
    - "resighted": any re-sighted encounter
    - "watched": any watched (just watch) encounter
+   - "followed": any tag-along follow encounter
    - "missed": no shark encounters at all
    A trip with multiple outcomes appears in each relevant filter. */
 function logbookTripMatches(t, f) {
@@ -2099,6 +2119,7 @@ function logbookTripMatches(t, f) {
     if (f.outcome === "tagged" && !enc.some(e => e.result === "tagged")) return false;
     if (f.outcome === "resighted" && !enc.some(e => e.result === "resighted")) return false;
     if (f.outcome === "watched" && !enc.some(e => e.result === "watched")) return false;
+    if (f.outcome === "followed" && !enc.some(e => e.result === "followed")) return false;
     if (f.outcome === "missed" && enc.length > 0) return false;
   }
   if (f.region !== "all" && t.region !== f.region) return false;
@@ -2191,7 +2212,7 @@ function renderLogbook() {
     ];
     const enc = t.encounters.length
       ? t.encounters.map(e => {
-          const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : "👁️";
+          const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : e.result === "followed" ? "🧭" : "👁️";
           const idBit = e.researchId ? ` <span class="dim">🔬 ${esc(e.researchId)}</span>` : "";
           return `${icon} ${esc(e.name)}${idBit} <span class="dim">(${e.result})</span>`;
         }).join("<br>")
@@ -2299,10 +2320,11 @@ function pickChat() {
 }
 function afterExpedition(plan) {
   /* A trip with a successful tag already got its Sarah moment — the
-     species-relevant celebration thread. Same for a re-sighting. Don't
-     follow it minutes later with an unrelated random fact. */
+     species-relevant celebration thread. Same for a re-sighting or a
+     tag-along follow. Don't follow it minutes later with an unrelated
+     random fact. */
   if (plan && plan.region) { state.lastRegion = plan.region; saveMsgs(); }
-  if (state.taggedThisTrip || state.resightedThisTrip) return;
+  if (state.taggedThisTrip || state.resightedThisTrip || state.followedThisTrip) return;
   let thread;
   if (state.failures >= 5) {
     // gentle nudge, genuine-conversation style — about YOUR waters.
@@ -2917,7 +2939,7 @@ $("tagAlongBtn").addEventListener("click", doTagAlong);
    secret facts (2nd, 3rd) without retagging or replacing the collection record.
    Ends the expedition like doTagAlong — you're spending the rest of the trip
    following this shark. */
-function doFollowTagged(speciesId) {
+function doFollowTagged(speciesId, doneCb) {
   const s = SHARKS.find(x => x.id === speciesId);
   if (!s) return;
   const rec = state.tagged[speciesId];
@@ -2932,10 +2954,18 @@ function doFollowTagged(speciesId) {
     logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
     state.pendingTagAlongFact = { speciesId, fact: null, exhausted: true };
   }
+  /* v1.4.0-beta Mira review (related polish): log the follow as a trip
+     encounter with the "followed" outcome — the logbook shows a meaningful
+     event, Sarah's after-trip logic doesn't misclassify the expedition, and
+     the collection record is untouched (no fake re-tag). */
+  logTripEncounter(s, "followed", rec ? rec.researchId : null);
+  state.followedThisTrip = true;
   logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
   renderAll();
-  /* Resolve the encounter with tag-along intent, ending the expedition. */
-  const done = state.encounterDone;
+  /* Resolve the encounter with tag-along intent, ending the expedition.
+     Prefer the passed callback (already-tagged path from doEncounter);
+     fall back to state.encounterDone for safety. */
+  const done = doneCb || state.encounterDone;
   state.encounterDone = null;
   if (done) done({ tagAlong: speciesId });
 }
@@ -3185,7 +3215,20 @@ function winStep(n) {
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
     $("winNext").addEventListener("click", () => {
       ov.classList.add("hidden");
-      goTab("collection");
+      /* v1.4.0-beta Mira review (win-path edge case): if the winning tag was
+         also a tag-along, go to the map with the fact overlay instead of the
+         collection book — the win ceremony keeps its priority. */
+      const deferred = state.deferredTagAlong;
+      state.deferredTagAlong = null;
+      if (deferred) {
+        goTab("map");
+        setTimeout(() => { try { mapFocusOn(deferred.speciesId); } catch {} }, 200);
+        if (deferred.factInfo) {
+          setTimeout(() => showTagAlongFact(deferred.factInfo), 600);
+        }
+      } else {
+        goTab("collection");
+      }
     });
   }
 }
