@@ -947,3 +947,26 @@ video.archive-media { max-height: 420px; }
 .watch-notes-block .track-stops { margin: 0; padding-left: 18px; }
 .watch-notes-block .track-stops li { font-size: 13px; margin-bottom: 4px; }
 /* v1.3.0-beta: archive "still to discover" is inline in v1.2.0; logbook date filter needs no extra CSS */
+
+/* v1.3.1-beta: "Tag along" title language — warm, tappable, emotional */
+.tagalong-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #0b2237;
+  background: linear-gradient(135deg, #ffd166, #f4a940);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease;
+}
+.tagalong-link:hover { transform: scale(1.03); }
+.tagalong-link:active { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) {
+  .tagalong-link { transition: none; }
+  .tagalong-link:hover, .tagalong-link:active { transform: none; }
+}
