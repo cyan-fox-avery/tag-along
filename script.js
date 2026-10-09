@@ -1699,6 +1699,22 @@ function doEncounter(species, plan) {
       });
       actions.appendChild(tagBtn);
     } else {
+      /* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged
+         species — unlocks remaining secret facts without retagging. Ends the
+         expedition (you're spending the rest of the trip following). */
+      const followBtn = document.createElement("button");
+      followBtn.className = "primary-button";
+      followBtn.type = "button";
+      const _followRec = state.tagged[species.id];
+      const _followName = (_followRec && _followRec.name) || species.name;
+      followBtn.textContent = `🧭 Follow ${_followName}`;
+      followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)`);
+      followBtn.addEventListener("click", () => {
+        actions.classList.add("hidden");
+        actions.innerHTML = "";
+        doFollowTagged(species.id);
+      });
+      actions.appendChild(followBtn);
       /* v0.8.0: it's one of yours — log the re-sighting. */
       const resightBtn = document.createElement("button");
       resightBtn.className = "secondary-button";
@@ -1902,6 +1918,14 @@ async function runExpedition(plan) {
     if (tagAlongSid) {
       goTab("map");
       setTimeout(() => { try { mapFocusOn(tagAlongSid); } catch {} }, 200);
+      /* v1.4.0-beta Mira review (important): show the unlocked fact in a
+         readable overlay with learned X/3 progression — at quick pace the
+         dive-log line may never be read before auto-navigation. */
+      const factInfo = state.pendingTagAlongFact;
+      state.pendingTagAlongFact = null;
+      if (factInfo) {
+        setTimeout(() => showTagAlongFact(factInfo), 600);
+      }
     }
   };
   /* v0.13.0: the player already said "head back" once — don't ask again.
@@ -2591,20 +2615,6 @@ function confirmTag(name) {
   showHealthCheck(s, rec);
 }
 
-/* v1.3.1-beta: "Tag along" title language — the game's name appears naturally
-   in emotional moments. Tapping it takes you to the Map and focuses on your
-   shark's latest ping, so you're following YOUR animal, not just opening a map.
-   v1.3.1-beta Mira review: only called post-release (from doRelease), never
-   from the health check — the release choice is mandatory. */
-function tagAlongToMap(sid) {
-  try { $("tagOverlay").classList.add("hidden"); } catch {}
-  goTab("map");
-  /* Focus the just-tagged shark after the tab switch settles. */
-  if (sid) {
-    setTimeout(() => { try { mapFocusOn(sid); } catch {} }, 150);
-  }
-}
-
 /* v1.3.1-beta Mira review (blocking): the "Tag along" CTA must NOT appear
    before release — tapping it hid the overlay without resolving the encounter,
    leaving runExpedition() awaiting forever. The CTA lives only in doRelease(),
@@ -2640,11 +2650,11 @@ function doRelease(headBack) {
   if (s) {
     /* v1.3.1-beta: warm release moment with the title woven in.
        Personalized CTA ("Tag along with [name]") focuses the map on YOUR shark.
-       This is the ONLY "Tag along" CTA — it appears after the release choice. */
+       (v1.4.0-beta: retired per Mira review — the health-check third release
+       choice is now the single tag-along path.) */
     const rec = state.tagged[s.id];
     const displayName = (rec && rec.name) || s.name;
     logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
-    logLine(`<button type="button" class="tagalong-link" onclick="tagAlongToMap('${s.id}')">Tag along with ${esc(displayName)} →</button>`);
   }
   renderAll();
   if (done) done(headBack);
@@ -2695,7 +2705,7 @@ const SECRET_FACTS = {
     "Makos think fast too: that warm blood reaches the brain, keeping it sharp in cold water where other predators slow down."
   ],
   basking: [
-    "Basking sharks shed their bristly gill rakers every winter and grow a fresh set each spring — like losing and regrowing a built-in sieve.",
+    "Basking sharks can shed and regrow their bristly gill rakers — like losing and regrowing a built-in sieve — though scientists are still working out how regularly it happens.",
     "In summer they've been filmed swimming slow nose-to-tail circles in pairs, a stately dance scientists believe is courtship."
   ],
   epaulette: [
@@ -2704,7 +2714,7 @@ const SECRET_FACTS = {
   ],
   lemon: [
     "Lemon sharks have remarkable memories for place: pups born in Bimini's mangrove nurseries return years later as adults, navigating back across open ocean to where they were born.",
-    "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and recognize familiar researchers' boats."
+    "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and in lab tests they've shown they can learn and remember visual cues, a rare trick for a fish."
   ],
   blacktip: [
     "Blacktip sharks hunt in spectacular spinning leaps, corkscrewing out of the water through schools of fish with their mouths open.",
@@ -2889,8 +2899,10 @@ function doTagAlong() {
     const fact = unlockSecretFact(s.id);
     if (fact) {
       logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
+      state.pendingTagAlongFact = { speciesId: s.id, fact, exhausted: false };
     } else {
       logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+      state.pendingTagAlongFact = { speciesId: s.id, fact: null, exhausted: true };
     }
     logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
   }
@@ -2900,6 +2912,73 @@ function doTagAlong() {
 $("releaseBtn").addEventListener("click", () => doRelease(false));
 $("releaseShipBtn").addEventListener("click", () => doRelease(true));
 $("tagAlongBtn").addEventListener("click", doTagAlong);
+/* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged species.
+   Lets the player follow a shark they've already tagged to unlock remaining
+   secret facts (2nd, 3rd) without retagging or replacing the collection record.
+   Ends the expedition like doTagAlong — you're spending the rest of the trip
+   following this shark. */
+function doFollowTagged(speciesId) {
+  const s = SHARKS.find(x => x.id === speciesId);
+  if (!s) return;
+  const rec = state.tagged[speciesId];
+  const displayName = (rec && rec.name) || s.name;
+  logLine(`🧭 Following ${esc(displayName)} — tag secure, swimming strong.`);
+  const fact = unlockSecretFact(speciesId);
+  if (fact) {
+    logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
+    /* Stash for the map overlay (readable reward with progression). */
+    state.pendingTagAlongFact = { speciesId, fact, exhausted: false };
+  } else {
+    logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+    state.pendingTagAlongFact = { speciesId, fact: null, exhausted: true };
+  }
+  logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
+  renderAll();
+  /* Resolve the encounter with tag-along intent, ending the expedition. */
+  const done = state.encounterDone;
+  state.encounterDone = null;
+  if (done) done({ tagAlong: speciesId });
+}
+/* v1.4.0-beta Mira review (important): readable tag-along reward on the Map.
+   Shows the unlocked fact (or the graceful exhaustion line) in an overlay card
+   with "learned X/3" progression, so the player can actually read it even at
+   quick pace. Dismissed with an explicit button — no auto-close. */
+function showTagAlongFact(info) {
+  const s = SHARKS.find(x => x.id === info.speciesId);
+  if (!s) return;
+  const rec = state.tagged[info.speciesId];
+  const displayName = (rec && rec.name) || s.name;
+  const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[info.speciesId]) || [];
+  const unlocked = state.unlockedFacts[info.speciesId] || [];
+  const total = pool.length;
+  const learned = unlocked.length;
+  let bodyHtml;
+  if (info.fact && !info.exhausted) {
+    bodyHtml = `
+      <div class="tagalong-fact-card">
+        <div class="fact-progress">Tag-along insight — learned ${learned}/${total}</div>
+        <div class="fact-text">🔬 ${esc(info.fact)}</div>
+      </div>
+      <p class="dim">Following ${esc(displayName)} paid off. ${total - learned > 0
+        ? `Follow ${esc(displayName)} again sometime to learn more.`
+        : `That's everything this shark had to teach.`}</p>`;
+  } else {
+    bodyHtml = `
+      <div class="tagalong-fact-card">
+        <div class="fact-progress">Tag-along insight — ${learned}/${total} learned</div>
+        <div class="fact-text"><em>I've learned all I can — the rest is in the specialists' hands now.</em></div>
+      </div>
+      <p class="dim">${esc(displayName)} still appreciates the company. 🧭</p>`;
+  }
+  $("tagAlongFactContent").innerHTML = `
+    <h3 style="margin:4px 0 8px">🧭 Tagging along with ${esc(displayName)}</h3>
+    ${bodyHtml}`;
+  $("tagAlongOverlay").classList.remove("hidden");
+}
+$("tagAlongFactClose").addEventListener("click", () => {
+  $("tagAlongOverlay").classList.add("hidden");
+});
+
 /* v0.17.1: Ask Sarah for advice. */
 $("sarahAskBtn").addEventListener("click", () => {
   const sid = $("sarahAskSelect").value;
@@ -3608,7 +3687,9 @@ function validateSaveData(data) {
   }
   // Version: must be a recognized Tag Along version, else reject
   const fv = data.version || "unknown";
-  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
+  /* v1.4.0-beta Mira review (blocker 3): accept the 1.x beta lineage so
+     exported v1.3.x playtest saves import cleanly. */
+  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || /^v1\.\d+\.\d+-beta$/.test(fv) || fv === VERSION;
   if (!supported) return { ok: false, reason: "unsupported version: " + fv };
   // Progress-bearing payload: importing tyi-pace alone would wipe the collection
   const hasProgress = ["tyi-collection", "tyi-logbook", "tyi-won"].some(k => {
