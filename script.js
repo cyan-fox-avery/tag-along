@@ -31,7 +31,7 @@ const WHATS_NEW = {
   "v1.2.0-beta": [
     "📓 <strong>Failed trips teach more.</strong> Unsuccessful expeditions now surface 1–2 field observations — water temp, currents, wildlife, the small details that make a day on the water.",
     "🎉 <strong>Louder tag celebrations.</strong> Tagging now clearly announces whether it's your first of that species or your Nth — no more squinting at the small print.",
-    "🖼️ <strong>Archive shows the locked ones.</strong> Species you haven't tagged yet appear as locked silhouettes — tag one to reveal its real-world photos. (Under Mira's review!)",
+    "🖼️ <strong>Archive shows the locked ones.</strong> Species you haven't tagged yet appear as locked silhouettes — tag one to reveal its real-world photos.",
     "📱 <strong>iPad & desktop layouts.</strong> The game now uses wider screens properly — multi-column research, side-by-side dive views, a proper collection wall."
   ]
 };
@@ -224,7 +224,7 @@ const FIELD_NOTES = {
     "Field notes: an iceberg drifted past, impossibly blue underneath. The sharks are down there somewhere.",
     "Field notes: logged three seabird species. The Arctic terns seemed to pity us.",
     "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
-    "Field notes: water temp 2°C. The bait froze stiff within the hour. The sharks, presumably, are unbothered.",
+    "Field notes: water temp 2°C. The bait hangs sluggish in the cold — everything moves slower down here, including us.",
     "Field notes: a seal surfaced through a crack in the ice, stared, vanished. The whole encounter took four seconds.",
     "Field notes: the current under the ice runs steady west. Our instruments are happy even if our nets are empty.",
     "Field notes: plankton sparse but the water is impossibly clear — 40 metres of visibility and nothing in it.",
@@ -256,9 +256,14 @@ function regionClimate(regionId) {
   if (polar.includes(regionId)) return "polar";
   return "temperate";
 }
-function pickFieldNote(regionId) {
+/* v1.2.0-beta Mira review: chum-slick observations only appear when the
+   expedition actually used chum — otherwise they'd imply a method the
+   player never chose. */
+function pickFieldNote(regionId, plan) {
   const zone = regionClimate(regionId);
-  const notes = FIELD_NOTES[zone] || FIELD_NOTES.generic;
+  let notes = FIELD_NOTES[zone] || FIELD_NOTES.generic;
+  const usedChum = plan && plan.method === "attract" && plan.methodOpt === "chum";
+  if (!usedChum) notes = notes.filter(n => !/chum slick/i.test(n));
   return pick(notes);
 }
 
@@ -1709,9 +1714,9 @@ async function runExpedition(plan) {
        v0.22.0 Mira review: persist the note so it survives in the logbook. */
     /* v1.2.0-beta: 1-2 field observations per failed trip — a day on the
        water always teaches something. Never a right/wrong signal. */
-    const fieldNotes = [pickFieldNote(plan.region)];
+    const fieldNotes = [pickFieldNote(plan.region, plan)];
     if (Math.random() < 0.5) {
-      const second = pickFieldNote(plan.region);
+      const second = pickFieldNote(plan.region, plan);
       if (second !== fieldNotes[0]) fieldNotes.push(second);
     }
     fieldNotes.forEach(fn => logLine(`📓 <em>${fn}</em>`));
@@ -2295,6 +2300,13 @@ function logTripEncounter(species, result) {
 /* v1.2.0-beta: count how many individuals of a species the player has tagged,
    across all logbook trips. state.tagged only keeps the latest per species,
    so the logbook is the source of truth for lifetime counts. */
+/* v1.2.0-beta Mira review: ordinal words for the tag announcement —
+   "the third Nurse Shark you've tagged", not "3 in your collection". */
+function ordinal(n) {
+  const words = ["first","second","third","fourth","fifth","sixth","seventh",
+    "eighth","ninth","tenth","eleventh","twelfth"];
+  return n >= 1 && n <= words.length ? words[n - 1] : n + "th";
+}
 function countSpeciesTags(speciesId) {
   let n = 0;
   (state.logbook || []).forEach(t => {
@@ -2363,7 +2375,7 @@ function confirmTag(name) {
   if (lifetimeTags <= 1) {
     logLine(`🎉 <span class="found"><strong>New species!</strong> This is your first ${s.name}!</span>`, "found");
   } else {
-    logLine(`🎉 <span class="found"><strong>${s.name} tagged!</strong> That's ${lifetimeTags} in your collection.</span>`, "found");
+    logLine(`🎉 <span class="found"><strong>${s.name} tagged!</strong> That's the ${ordinal(lifetimeTags)} ${s.name} you've tagged!</span>`, "found");
   }
   state.pendingTag = null;
   /* v0.18.0: chum tags feed the "Something in the Water" achievement —
