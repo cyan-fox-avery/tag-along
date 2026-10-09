@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.1.0-beta";
+const VERSION = "v1.2.0-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -27,6 +27,12 @@ const WHATS_NEW = {
     "🦈 <strong>Real-shark stories.</strong> Name a great white Mary Lee or Nicole, and Sarah will tell you about the real sharks behind the names — their extraordinary journeys.",
     "🤫 <strong>A secret swims in these waters.</strong> There's a new hidden surprise for curious researchers. We won't spoil it here.",
     "💾 <strong>Save export/import.</strong> Back up your research as a JSON file, or bring a save to a new device. Find it in the footer."
+  ],
+  "v1.2.0-beta": [
+    "📓 <strong>Failed trips teach more.</strong> Unsuccessful expeditions now surface 1–2 field observations — water temp, currents, wildlife, the small details that make a day on the water.",
+    "🎉 <strong>Louder tag celebrations.</strong> Tagging now clearly announces whether it's your first of that species or your Nth — no more squinting at the small print.",
+    "🖼️ <strong>Archive shows the locked ones.</strong> Species you haven't tagged yet appear as locked silhouettes — tag one to reveal its real-world photos. (Under Mira's review!)",
+    "📱 <strong>iPad & desktop layouts.</strong> The game now uses wider screens properly — multi-column research, side-by-side dive views, a proper collection wall."
   ]
 };
 
@@ -189,24 +195,57 @@ const FIELD_NOTES = {
     "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
     "Field notes: a sea turtle surfaced beside the boat and regarded us with ancient indifference.",
     "Field notes: a manta ray passed underneath, huge and unhurried. Not a shark, but nobody's complaining.",
-    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
+    "Field notes: water temp 27°C at the surface, visibility easily 30 metres. Perfect conditions — just no sharks.",
+    "Field notes: the bait came up untouched, not even nibbled. Whatever's down there wasn't hungry today.",
+    "Field notes: a current running east pushed our chum slick into a long ribbon. Good drift, wrong audience.",
+    "Field notes: plankton thick in the water column tonight — the whole sea glitters when the boat rocks.",
+    "Field notes: found a turtle with a satellite tag from another project. Waved. It did not wave back.",
+    "Field notes: remora attached itself to the hull for an hour. We named it Kevin. Kevin has left.",
+    "Field notes: a school of jacks swirled under the boat, flashing silver. Beautiful. Not sharks.",
+    "Field notes: flying fish skittered across the surface at dusk, chased by something we'll never identify."
   ],
   temperate: [
     "Field notes: no sharks, but a pod of dolphins rode the bow wave for twenty minutes. Worth the fuel.",
     "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
     "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
-    "Field notes: a seal watched us from a nearby rock, unimpressed by our sharklessness."
+    "Field notes: a seal watched us from a nearby rock, unimpressed by our sharklessness.",
+    "Field notes: water temp 16°C, a thermocline at 20 metres. The bait sat right on it, undisturbed.",
+    "Field notes: the current shifted north around noon and took our scent trail with it. Recalibrating.",
+    "Field notes: gulls followed the boat all morning, hopeful. We shared nothing. They judged us.",
+    "Field notes: plankton bloom turning the water green-gold. Pretty, but it cuts visibility to 10 metres.",
+    "Field notes: a sunfish drifted past like a lost dinner plate. Enormous. Serene. Not a shark.",
+    "Field notes: bait untouched after six hours. Either the sharks are elsewhere or they're laughing at us.",
+    "Field notes: spotted a ray's wingtip breaking the surface at distance — gone before the binoculars came up.",
+    "Field notes: the hydrophone picked up whale song, faint and far. The ocean is busy, just not with sharks."
   ],
   polar: [
     "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
     "Field notes: an iceberg drifted past, impossibly blue underneath. The sharks are down there somewhere.",
     "Field notes: logged three seabird species. The Arctic terns seemed to pity us.",
-    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today."
+    "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
+    "Field notes: water temp 2°C. The bait froze stiff within the hour. The sharks, presumably, are unbothered.",
+    "Field notes: a seal surfaced through a crack in the ice, stared, vanished. The whole encounter took four seconds.",
+    "Field notes: the current under the ice runs steady west. Our instruments are happy even if our nets are empty.",
+    "Field notes: plankton sparse but the water is impossibly clear — 40 metres of visibility and nothing in it.",
+    "Field notes: a polar bear watched from the ice edge for an hour. We maintained a respectful distance. It did not.",
+    "Field notes: the bait line came up with ice crystals on it. The ocean is telling us something about our life choices.",
+    "Field notes: narwhal clicks on the hydrophone, close enough to feel. Not a shark, but we'll take it.",
+    "Field notes: the sky went full aurora at 11pm. No sharks, but honestly? Worth it."
   ],
   generic: [
     "Field notes: water temp steady, bait fresh, patience intact. The sharks have their own schedule.",
     "Field notes: the chum slick drifted true all day. Sometimes the ocean just says not today.",
-    "Field notes: logged three seabird species and one very confused flying fish. Science is science."
+    "Field notes: logged three seabird species and one very confused flying fish. Science is science.",
+    "Field notes: the bait came up untouched — not a nibble. The sea keeps its own counsel.",
+    "Field notes: current running steady, visibility fair. All the conditions are right except the one that matters.",
+    "Field notes: plankton drifting thick past the hull. The base of everything, and today it's all we've got.",
+    "Field notes: something large moved deep below the boat, too deep for the lights. We logged it as 'interesting'.",
+    "Field notes: a seabird landed on the rail and refused to leave for an hour. We have named it Supervisor.",
+    "Field notes: the water went glassy calm at sunset. Beautiful. Sharkless, but beautiful.",
+    "Field notes: jellyfish pulsing past in the hundreds, lit up by the deck lights. The ocean's lava lamps.",
+    "Field notes: the depth sounder showed a bait ball at 40 metres, scattering. Something hunts here — just not today.",
+    "Field notes: salt spray, diesel, and kelp. The smell of a working day with nothing to show but the smell."
   ]
 };
 /* Map regions to climate zones for wildlife notes. */
@@ -1668,9 +1707,15 @@ async function runExpedition(plan) {
     await wait(1200);
     /* v0.22.0: failed trips feel like fieldwork — warm, never punishing.
        v0.22.0 Mira review: persist the note so it survives in the logbook. */
-    const fieldNote = pickFieldNote(plan.region);
-    logLine(`📓 <em>${fieldNote}</em>`);
-    if (tripLog) tripLog.fieldNote = fieldNote;
+    /* v1.2.0-beta: 1-2 field observations per failed trip — a day on the
+       water always teaches something. Never a right/wrong signal. */
+    const fieldNotes = [pickFieldNote(plan.region)];
+    if (Math.random() < 0.5) {
+      const second = pickFieldNote(plan.region);
+      if (second !== fieldNotes[0]) fieldNotes.push(second);
+    }
+    fieldNotes.forEach(fn => logLine(`📓 <em>${fn}</em>`));
+    if (tripLog) tripLog.fieldNote = fieldNotes.join(" ");
   } else {
     state.failures = 0;
   }
@@ -2247,6 +2292,24 @@ function logTripEncounter(species, result) {
   if (!tripLog) return;
   tripLog.encounters.push({ speciesId: species.id, name: species.name, result });
 }
+/* v1.2.0-beta: count how many individuals of a species the player has tagged,
+   across all logbook trips. state.tagged only keeps the latest per species,
+   so the logbook is the source of truth for lifetime counts. */
+function countSpeciesTags(speciesId) {
+  let n = 0;
+  (state.logbook || []).forEach(t => {
+    (t.encounters || []).forEach(e => {
+      if (e.speciesId === speciesId && e.result === "tagged") n++;
+    });
+  });
+  // The current trip's log isn't in state.logbook yet — count it too.
+  if (tripLog) {
+    (tripLog.encounters || []).forEach(e => {
+      if (e.speciesId === speciesId && e.result === "tagged") n++;
+    });
+  }
+  return n;
+}
 
 /* ---------- Tagging: tag -> health check -> release ----------
    v0.7.0: tagging happens mid-trip and the day goes on. After the tag is
@@ -2294,6 +2357,14 @@ function confirmTag(name) {
   state.taggedThisTrip = true;
   logTripEncounter(s, "tagged");
   store.save(state.tagged);
+  /* v1.2.0-beta: prominent species-count announcement — no more squinting
+     at the small print. First of species vs. Nth individual, loud and clear. */
+  const lifetimeTags = countSpeciesTags(s.id);
+  if (lifetimeTags <= 1) {
+    logLine(`🎉 <span class="found"><strong>New species!</strong> This is your first ${s.name}!</span>`, "found");
+  } else {
+    logLine(`🎉 <span class="found"><strong>${s.name} tagged!</strong> That's ${lifetimeTags} in your collection.</span>`, "found");
+  }
   state.pendingTag = null;
   /* v0.18.0: chum tags feed the "Something in the Water" achievement —
      v0.18.0 review: only when chum is a real method for THIS species. */
