@@ -1138,7 +1138,7 @@ code += `
     }
     return true;
   })());
-  ok('ordinal words work', ordinal(1) === 'first' && ordinal(2) === 'second' && ordinal(3) === 'third' && ordinal(12) === 'twelfth' && ordinal(21) === '21th');
+  ok('ordinal words work', ordinal(1) === 'first' && ordinal(2) === 'second' && ordinal(3) === 'third' && ordinal(12) === 'twelfth' && ordinal(13) === '13th' && ordinal(21) === '21st' && ordinal(22) === '22nd' && ordinal(23) === '23rd' && ordinal(11) === 'eleventh' && ordinal(111) === '111th' && ordinal(112) === '112th' && ordinal(113) === '113th');
   ok('pickFieldNote returns a string', typeof pickFieldNote('caribbean') === 'string');
 
   // v1.2.0-beta: species tag counting
