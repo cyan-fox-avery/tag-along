@@ -1159,8 +1159,33 @@ code += `
   // v1.2.0-beta: Mary Lee / Nicole easter eggs still wired (naming-based, v0.23.0)
   ok('maryLeeEgg handler exists', typeof maybeNameEgg === 'function');
 
-  // v1.3.0-beta: Watch notes pool exists and has entries
-  ok('WATCH_NOTES pool exists', Array.isArray(WATCH_NOTES) && WATCH_NOTES.length >= 10);
+  // v1.3.0-beta: Watch notes pools exist, habitat-split (Mira review)
+  ok('WATCH_NOTES_REEF pool exists', Array.isArray(WATCH_NOTES_REEF) && WATCH_NOTES_REEF.length >= 4);
+  ok('WATCH_NOTES_PELAGIC pool exists', Array.isArray(WATCH_NOTES_PELAGIC) && WATCH_NOTES_PELAGIC.length >= 4);
+  ok('WATCH_NOTES_DEEP pool exists', Array.isArray(WATCH_NOTES_DEEP) && WATCH_NOTES_DEEP.length >= 4);
+  ok('pickWatchNote picks reef pool for reef species', (() => {
+    const seen = new Set();
+    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["surface", "reef"] }));
+    return [...seen].every(n => WATCH_NOTES_REEF.includes(n));
+  })());
+  ok('pickWatchNote picks deep pool for deep species', (() => {
+    const seen = new Set();
+    for (let i = 0; i < 30; i++) seen.add(pickWatchNote({ depths: ["deep"] }));
+    return [...seen].every(n => WATCH_NOTES_DEEP.includes(n));
+  })());
+  ok('pickWatchNote picks pelagic pool for surface-only species', (() => {
+    const seen = new Set();
+    for (let i = 0; i < 40; i++) seen.add(pickWatchNote({ depths: ["surface"] }));
+    return [...seen].every(n => WATCH_NOTES_PELAGIC.includes(n));
+  })());
+  ok('pickWatchNote reef notes never leak to deep species', (() => {
+    // reef-only notes must not appear for a deep species over many draws
+    const reefOnly = WATCH_NOTES_REEF.filter(n => !WATCH_NOTES_DEEP.includes(n) && !WATCH_NOTES_PELAGIC.includes(n));
+    for (let i = 0; i < 50; i++) {
+      if (reefOnly.includes(pickWatchNote({ depths: ["twilight", "deep"] }))) return false;
+    }
+    return true;
+  })());
 
   // v1.3.0-beta: FIELD_NOTES expanded (at least 16 per zone)
   ok('FIELD_NOTES tropical expanded', FIELD_NOTES.tropical.length >= 16);
@@ -1175,12 +1200,37 @@ code += `
   ok('date filter 7d keeps recent', logbookTripMatches(_recentTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
   ok('date filter 7d drops old', !logbookTripMatches(_oldTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
   ok('date filter all keeps old', logbookTripMatches(_oldTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
+  // v1.3.0-beta Mira review: dateless trips are excluded when a date filter is active
+  const _noTsTrip = { encounters: [] };
+  ok('date filter 7d excludes dateless trip', !logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
+  ok('date filter 30d excludes dateless trip', !logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "30d" }));
+  ok('date filter all keeps dateless trip', logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
 
   // v1.3.0-beta: What's New has current version entry
   ok('WHATS_NEW has v1.3.0-beta', Array.isArray(WHATS_NEW['v1.3.0-beta']) && WHATS_NEW['v1.3.0-beta'].length > 0);
 
-  // v1.3.0-beta: Deep Blue retirement comment present (not implemented)
-  ok('Deep Blue retired comment', typeof maybeNameEgg === 'function'); // comment-only, no code change
+  // v1.3.0-beta: Deep Blue retired — naming a shark "Deep Blue" triggers NO easter egg
+  ok('Deep Blue triggers no easter egg', (() => {
+    const rec = { name: "Deep Blue" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveSave = store.save;
+    store.save = () => {};
+    const saveBruce = state.bruceEgg;
+    state.bruceEgg = null;
+    try {
+      maybeNameEgg("greatwhite", rec);
+      return rec.maryLeeEgg !== true &&
+             rec.nicoleEgg !== true &&
+             state.bruceEgg === null &&
+             pushed === null;
+    } finally {
+      pushThread = savePush;
+      store.save = saveSave;
+      state.bruceEgg = saveBruce;
+    }
+  })());
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
