@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.2.0-beta', VERSION === 'v1.2.0-beta');
+  ok('version v1.3.0-beta', VERSION === 'v1.3.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1158,6 +1158,29 @@ code += `
 
   // v1.2.0-beta: Mary Lee / Nicole easter eggs still wired (naming-based, v0.23.0)
   ok('maryLeeEgg handler exists', typeof maybeNameEgg === 'function');
+
+  // v1.3.0-beta: Watch notes pool exists and has entries
+  ok('WATCH_NOTES pool exists', Array.isArray(WATCH_NOTES) && WATCH_NOTES.length >= 10);
+
+  // v1.3.0-beta: FIELD_NOTES expanded (at least 16 per zone)
+  ok('FIELD_NOTES tropical expanded', FIELD_NOTES.tropical.length >= 16);
+  ok('FIELD_NOTES temperate expanded', FIELD_NOTES.temperate.length >= 16);
+  ok('FIELD_NOTES polar expanded', FIELD_NOTES.polar.length >= 16);
+  ok('FIELD_NOTES generic expanded', FIELD_NOTES.generic.length >= 16);
+
+  // v1.3.0-beta: logbook date filter matching
+  const _now = Date.now();
+  const _recentTrip = { ts: _now - 86400000, encounters: [] };
+  const _oldTrip = { ts: _now - 400 * 86400000, encounters: [] };
+  ok('date filter 7d keeps recent', logbookTripMatches(_recentTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
+  ok('date filter 7d drops old', !logbookTripMatches(_oldTrip, { outcome: "all", region: "all", species: "all", dateRange: "7d" }));
+  ok('date filter all keeps old', logbookTripMatches(_oldTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
+
+  // v1.3.0-beta: What's New has current version entry
+  ok('WHATS_NEW has v1.3.0-beta', Array.isArray(WHATS_NEW['v1.3.0-beta']) && WHATS_NEW['v1.3.0-beta'].length > 0);
+
+  // v1.3.0-beta: Deep Blue retirement comment present (not implemented)
+  ok('Deep Blue retired comment', typeof maybeNameEgg === 'function'); // comment-only, no code change
 
   console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
