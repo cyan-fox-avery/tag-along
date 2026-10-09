@@ -1322,10 +1322,16 @@ code += `
     factStore.save = origSave;
   })();
   // v1.4.0-beta: doTagAlong resolves with tag-along intent
+  // (v1.4.0-beta Mira review: restore ALL mocked state)
   (() => {
     let resolved = null;
     const origRender = renderAll;
     const origLog = logLine;
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origDone = state.encounterDone;
+    const origHealth = state.healthSpecies;
+    const origPendingFact = state.pendingTagAlongFact;
     renderAll = () => {};
     logLine = () => {};
     const origSave = factStore.save;
@@ -1340,6 +1346,52 @@ code += `
     renderAll = origRender;
     logLine = origLog;
     factStore.save = origSave;
+    state.tagged = origTagged;
+    state.unlockedFacts = origFacts;
+    state.encounterDone = origDone;
+    state.healthSpecies = origHealth;
+    state.pendingTagAlongFact = origPendingFact;
+  })();
+  // v1.4.0-beta Mira review: full 1->2->3->exhausted fact progression
+  (() => {
+    const origFacts = state.unlockedFacts;
+    const origSave = factStore.save;
+    const origLog = logLine;
+    factStore.save = () => {};
+    logLine = () => {};
+    state.unlockedFacts = {};
+    // Nurse has 3 facts — unlock all 3, then verify exhaustion
+    const f1 = unlockSecretFact("nurse");
+    const f2 = unlockSecretFact("nurse");
+    const f3 = unlockSecretFact("nurse");
+    const f4 = unlockSecretFact("nurse");
+    ok("fact progression unlocks 3 distinct", f1 && f2 && f3 && f1 !== f2 && f2 !== f3 && f1 !== f3);
+    ok("fact progression exhausts at 4th", f4 === null);
+    ok("fact progression tracks 3 unlocked", (state.unlockedFacts["nurse"] || []).length === 3);
+    state.unlockedFacts = origFacts;
+    factStore.save = origSave;
+    logLine = origLog;
+  })();
+  // v1.4.0-beta Mira review: v1.3.2 save imports into v1.4.0
+  (() => {
+    const fakeSave = {
+      version: "v1.3.2-beta",
+      keys: {
+        "tyi-collection": JSON.stringify({ nurse: { tagged: true, researchId: "NS-2026-001", name: "" } }),
+        "tyi-logbook": JSON.stringify([{ encounters: [] }])
+      }
+    };
+    const result = validateSaveData(fakeSave);
+    ok("v1.3.2-beta save imports", result.ok === true);
+    const badSave = { version: "v0.5.0", keys: { "tyi-collection": "{}" } };
+    const badResult = validateSaveData(badSave);
+    ok("ancient version still rejected", badResult.ok === false);
+  })();
+  // v1.4.0-beta Mira review: old post-release CTA is retired
+  (() => {
+    ok("tagAlongToMap retired", typeof tagAlongToMap === "undefined");
+    ok("doFollowTagged exists", typeof doFollowTagged === "function");
+    ok("showTagAlongFact exists", typeof showTagAlongFact === "function");
   })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
 
