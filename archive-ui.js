@@ -79,6 +79,11 @@ function renderArchive() {
   const list = $("archiveList");
   if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
   list.innerHTML = "";
+  /* v1.2.0-beta Mira review: unlocked species first (the reward), locked
+     ones collapsed in a "Still to discover" section — the Archive should
+     feel like earned photographs, not another species catalogue. */
+  const unlockedRows = [];
+  const lockedRows = [];
   SHARKS.forEach(s => {
     const media = ARCHIVE_MEDIA[s.id];
     if (!media || media.future) return;
@@ -121,7 +126,17 @@ function renderArchive() {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
     });
-    list.appendChild(row);
+    if (isLocked) lockedRows.push(row); else unlockedRows.push(row);
   });
+  unlockedRows.forEach(row => list.appendChild(row));
+  if (lockedRows.length) {
+    const det = document.createElement("details");
+    det.className = "archive-still-locked";
+    det.innerHTML = `<summary>Still to discover (${lockedRows.length})</summary>`;
+    const wrap = document.createElement("div");
+    lockedRows.forEach(row => wrap.appendChild(row));
+    det.appendChild(wrap);
+    list.appendChild(det);
+  }
 }
 
