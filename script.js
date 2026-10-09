@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.3.2-beta";
+const VERSION = "v1.4.0-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -45,6 +45,12 @@ const WHATS_NEW = {
   ],
   "v1.3.2-beta": [
     "🌊 <strong>Conservation note readability.</strong> Fixed the conservation note background so the text is actually readable."
+  ],
+  "v1.4.0-beta": [
+    "🧭 <strong>Tag along ends the expedition.</strong> A new third release choice: follow your shark for the rest of the day. The UI tells you explicitly — no more encounters this trip.",
+    "🔬 <strong>Secret tag-along facts.</strong> Each follow unlocks a special fact about the species (1–3 per species). Find them all in your collection book.",
+    "📌 <strong>Pinned shark slot.</strong> The pinned card now sits above the field guide grid, not inside it.",
+    "📱 <strong>iPad polish.</strong> Dive buttons repositioned, field-guide columns stay put when expanding, phone keeps its height."
   ]
 };
 
@@ -678,6 +684,18 @@ const pinStore = {
     } catch {}
   }
 };
+/* v1.4.0-beta: secret tag-along facts. Tracks which facts have been unlocked
+   per species: {speciesId: [factIndex, ...]}. Persists through export/import
+   via RESET_KEYS. */
+const factStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-facts") || "{}"); }
+    catch { return {}; }
+  },
+  save(d) {
+    try { localStorage.setItem("tyi-facts", JSON.stringify(d)); } catch {}
+  }
+};
 /* v1.0.3-beta: collapsible pinned explainer. Tracks whether the player has
    ever pinned a shark — after the first pin, the empty pinned card shows a
    single line ("Pinned sharks appear here.") instead of the full explanation. */
@@ -732,9 +750,11 @@ const state = {
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
   pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
   hasPinnedBefore: pinHistoryStore.load(), // v1.0.3-beta: player has pinned at least once
+  unlockedFacts: factStore.load(), // v1.4.0-beta: {speciesId: [factIdx, ...]}
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
-  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })()
+  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
+  pendingTagAlong: null // v1.4.0-beta: species id to focus on map after tag-along trip
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -1073,6 +1093,11 @@ function jumpToPinned(s, list) {
   }
 }
 function renderPinnedCard(list) {
+  /* v1.4.0-beta: pinned card lives in its own full-width section above the
+     grid, not as the first grid cell. */
+  const slot = $("pinnedSlot");
+  const target = slot || list;
+  if (slot) slot.innerHTML = "";
   const s = SHARKS.find(x => x.id === state.pinned);
   const card = document.createElement("div");
   card.className = "pinned-card" + (s ? "" : " pinned-empty");
@@ -1098,7 +1123,7 @@ function renderPinnedCard(list) {
     card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
     card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
   }
-  list.appendChild(card);
+  target.appendChild(card);
 }
 /* v0.22.0: pin-gated soft hints. When a shark is pinned and the planned
    expedition matches 3 of its 4 needs (region, depth, bait, method), the
@@ -1660,10 +1685,16 @@ function doEncounter(species, plan) {
         actions.innerHTML = "";
         /* v0.17.1: the release buttons resolve the encounter directly —
            no second keep-diving/head-back prompt after the health check. */
-        openTagging(species, (headBack) => {
+        openTagging(species, (result) => {
           actions.classList.add("hidden");
           actions.innerHTML = "";
-          resolve(headBack === true);
+          /* v1.4.0-beta: result is false (keep diving), true (head back),
+             or {tagAlong: speciesId} (tag along — ends expedition). */
+          if (result && typeof result === "object" && result.tagAlong) {
+            resolve({ tagAlong: result.tagAlong });
+          } else {
+            resolve(result === true);
+          }
         });
       });
       actions.appendChild(tagBtn);
@@ -1786,9 +1817,16 @@ async function runExpedition(plan) {
     if (s) {
       shown.add(s.id);
       sawShark = true;
-      const headBack = await doEncounter(s, plan);
+      const encResult = await doEncounter(s, plan);
       await wait(1200);
-      if (headBack) { endedEarly = true; break; }
+      /* v1.4.0-beta: tag-along ends the expedition. Stash the species so
+         closeDive can focus the map AFTER trip completion. */
+      if (encResult && typeof encResult === "object" && encResult.tagAlong) {
+        endedEarly = true;
+        state.pendingTagAlong = encResult.tagAlong;
+        break;
+      }
+      if (encResult === true) { endedEarly = true; break; }
     } else {
       logLine(`👀 ${deal(tripDecks.waiting, WAITING_LINES)}`);
       await wait(1800);
@@ -1851,11 +1889,19 @@ async function runExpedition(plan) {
     $("diveView").classList.add("hidden");
     $("launchBtn").disabled = false;
     renderAll();
+    /* v1.4.0-beta: tag-along — after the trip fully completes (log, achievements,
+       cleanup all done exactly once), navigate to the map and focus the shark. */
+    const tagAlongSid = state.pendingTagAlong || null;
+    state.pendingTagAlong = null;
     if (state.pendingWin) {
       state.pendingWin = false;
       doWin();
     } else {
       afterExpedition(plan);
+    }
+    if (tagAlongSid) {
+      goTab("map");
+      setTimeout(() => { try { mapFocusOn(tagAlongSid); } catch {} }, 200);
     }
   };
   /* v0.13.0: the player already said "head back" once — don't ask again.
@@ -2567,6 +2613,12 @@ function showHealthCheck(s, rec) {
   state.healthSpecies = s;
   $("tagForm").classList.add("hidden");
   $("healthView").classList.remove("hidden");
+  /* v1.4.0-beta: third release choice — tag along ends the expedition. */
+  try {
+    const rec2 = state.tagged[s.id];
+    const nm = (rec2 && rec2.name) || s.name;
+    $("tagAlongName").textContent = nm;
+  } catch {}
   $("healthArt").innerHTML = sharkArtImg(s.id, "illustration", s.name);
   $("healthInfo").innerHTML = `
     <strong>${s.name}</strong> — ${esc(rec.researchId)}<br>
@@ -2597,8 +2649,257 @@ function doRelease(headBack) {
   renderAll();
   if (done) done(headBack);
 }
+/* v1.4.0-beta: secret tag-along facts — 1-3 curated, biologically correct facts
+   per species. Unlock one per tag-along; when exhausted, the graceful line plays.
+   Facts are filled in below (generated content). */
+const SECRET_FACTS = {
+  nurse: [
+    "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks would suffocate doing that, but a nurse shark can nap on the seafloor and breathe easy.",
+    "They hunt by suction, inhaling with such force that prey is vacuumed straight out of holes in the reef — and they often pile on top of each other in sleepy daytime heaps.",
+    "Every summer, nurse sharks gather in the same shallow mating grounds off Florida, returning year after year like a family reunion."
+  ],
+  thresher: [
+    "A thresher hunts with its tail like a whip — high-speed cameras finally caught them in 2013 herding sardines, then stunning them with an overhead tail-slap.",
+    "That scythe of a tail can be as long as the rest of its body, and special warm muscles keep its brain and eyes heated so it can hunt in cold, deep water."
+  ],
+  whale: [
+    "Every whale shark wears a constellation of spots as unique as a fingerprint — researchers photograph them to recognize individuals across decades and oceans.",
+    "They're champion divers, recorded plunging nearly two kilometres straight down into the dark, then cruising back up to feed at the surface after dark."
+  ],
+  goblin: [
+    "A goblin shark's jaws launch forward off its face like a slingshot to snatch prey — one of the fastest bites ever measured in a shark.",
+    "Its pinkish skin is so soft and translucent you can see blood vessels beneath, and its long snout is packed with sensors that feel the faint electric hum of hidden prey."
+  ],
+  tiger: [
+    "Tiger sharks are famous for eating almost anything — license plates, tires, and once an entire suit of armor have all turned up in their stomachs.",
+    "The bold stripes that give them their name fade as they age, so the biggest old tigers swim nearly plain grey; some individuals also wander entire ocean basins on years-long journeys."
+  ],
+  sandtiger: [
+    "Sand tigers do something no other shark does: they gulp air at the surface and hold it in their stomachs like a built-in float, letting them hover motionless in the water.",
+    "Before birth, the pups fight a darker battle — the largest embryo in each uterus eats its siblings, so only two sharks, one per side, are ever born."
+  ],
+  galapagos: [
+    "Galapagos sharks are famously curious, often circling divers for a long, deliberate look — researchers consider them one of the most inquisitive reef sharks.",
+    "Despite the name, they roam tropical reefs far beyond the Galápagos, from Hawaii to Bermuda, patrolling clear-water drop-offs in small groups."
+  ],
+  greatwhite: [
+    "Off South Africa's Seal Island, great whites launch their whole multi-ton bodies clean out of the water to ambush seals — a behavior called breaching, perfected through practice.",
+    "They're warm-bodied for a fish, keeping their swimming muscles heated, and some cross entire oceans — tagged whites have commuted from California to Hawaii and back to a patch of open ocean scientists call the White Shark Café."
+  ],
+  hammerhead: [
+    "That hammer isn't just for show — spreading the eyes wide gives hammerheads a full 360-degree view, and sweeping the head side to side lets them scan the sand for the electric whispers of buried stingrays.",
+    "By day, scalloped hammerheads gather in shimmering schools hundreds strong around offshore seamounts, then scatter alone into the night to hunt."
+  ],
+  mako: [
+    "The shortfin mako is the fastest shark alive, built like a torpedo with a heated engine — its warm muscles let it explode after tuna and even leap clear out of the water.",
+    "Makos think fast too: that warm blood reaches the brain, keeping it sharp in cold water where other predators slow down."
+  ],
+  basking: [
+    "Basking sharks shed their bristly gill rakers every winter and grow a fresh set each spring — like losing and regrowing a built-in sieve.",
+    "In summer they've been filmed swimming slow nose-to-tail circles in pairs, a stately dance scientists believe is courtship."
+  ],
+  epaulette: [
+    "When the tide drops, epaulette sharks simply walk — paddling across exposed reef on their fins from pool to pool, and surviving hours in water so low in oxygen it would kill most fish.",
+    "They're homebodies with tiny territories, often spending their whole lives on one small patch of reef."
+  ],
+  lemon: [
+    "Lemon sharks have remarkable memories for place: pups born in Bimini's mangrove nurseries return years later as adults, navigating back across open ocean to where they were born.",
+    "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and recognize familiar researchers' boats."
+  ],
+  blacktip: [
+    "Blacktip sharks hunt in spectacular spinning leaps, corkscrewing out of the water through schools of fish with their mouths open.",
+    "They're sprinters of the shallows, often hunting in packs that herd baitfish against the shoreline."
+  ],
+  whitetip: [
+    "Whitetip reef sharks are night owls — by day they pile together in caves and under ledges, resting in sleepy heaps, and by night they slink out alone to hunt.",
+    "Their slim bodies can wriggle into reef crevices no other shark their size could enter, and like nurse sharks they can pump water to breathe while lying still."
+  ],
+  blue: [
+    "Blue sharks are ocean wanderers, crossing entire oceans on migrations that can span the whole Atlantic, guided by senses we still don't fully understand.",
+    "They're famously curious around divers, circling in slow and deliberate — and a single mother can give birth to litters of more than a hundred pups."
+  ],
+  porbeagle: [
+    "Porbeagles run hot — among the warmest-bodied of all sharks, they keep their core heated well above the icy North Atlantic water they hunt in.",
+    "That internal furnace lets them chase prey in near-freezing seas and power long migrations across whole ocean basins."
+  ],
+  silky: [
+    "Silky sharks are named for their skin: their tiny scales are so smooth the hide feels like silk, unlike the sandpaper of most sharks.",
+    "They're bold and inquisitive, often trailing divers for long stretches just to investigate — and they shadow schools of tuna across the open ocean."
+  ],
+  oceanic: [
+    "Oceanic whitetips were once the most abundant large shark on Earth — bold, curious wanderers that would investigate anything floating in the open sea, from wreckage to research vessels.",
+    "Their long, rounded, white-tipped fins work like wings, letting them cruise the blue desert for months between meals."
+  ],
+  sevengill: [
+    "Most sharks have five gill slits; the broadnose sevengill has seven — an ancient design it shares with only a handful of species.",
+    "Divers in places like La Jolla, California, recognize regulars by their unique spot patterns, and sevengills have been seen teaming up in loose packs to hunt seals."
+  ],
+  bronze: [
+    "Bronze whalers wear their name in their skin — a coppery sheen that flashes as they turn, unique among the grey requiem sharks.",
+    "They're long-distance travelers of the Southern Hemisphere, migrating along entire coastlines between feeding and pupping grounds."
+  ],
+  frilled: [
+    "The frilled shark is a living time capsule — eel-bodied, with 25 rows of needle teeth (about 300 in all), it has barely changed in 80 million years.",
+    "It lives so deep it's almost never seen; one filmed off Japan in 2007 was among the first ever caught on camera alive near the surface, and scientists think it strikes at prey like a snake."
+  ],
+  zebra: [
+    "Baby zebra sharks are born with bold black-and-white stripes — and grow into spotted, leopard-like adults. They essentially change their pattern, and their common name, as they age.",
+    "Gentle bottom-dwellers, they rest on the seafloor by day and use their long tails to corner small prey in reef crevices at night."
+  ],
+  scalloped: [
+    "Scalloped hammerheads gather by day in vast schools around offshore seamounts — Cocos Island and the Galápagos host hundreds swirling together in the blue.",
+    "Females make long migrations to give birth in coastal nurseries, and the pups' hammer-heads are soft and rounded at birth."
+  ],
+  smooth: [
+    "The smooth hammerhead is the cold-water specialist of its family, ranging into temperate seas where other hammerheads won't go — including the Mediterranean and the coasts of New Zealand.",
+    "Its hammer has a smooth, rounded front edge with no central notch, giving it the cleanest profile of any hammerhead."
+  ],
+  bonnethead: [
+    "In 2018 scientists discovered the bonnethead eats and digests seagrass — the first omnivorous shark ever found, getting real nutrition from plants.",
+    "The smallest of the hammerheads, bonnetheads travel in sociable schools, sometimes dozens strong, cruising shallow bays and estuaries."
+  ],
+  bull: [
+    "Bull sharks swim hundreds of kilometres up rivers — they've been found far up the Amazon and Mississippi, and they live year-round in Lake Nicaragua, adjusting their bodies to fresh water like few sharks can.",
+    "That adaptability comes from remarkable kidneys that recycle salt, letting one shark hunt in both the open ocean and a muddy river."
+  ],
+  greyreef: [
+    "When bothered, a grey reef shark performs one of the ocean's clearest warning displays — arching its back, dropping its pectoral fins, and swimming in an exaggerated, swaggering S-shape that says 'back off.'",
+    "They're otherwise curious and social, often approaching divers for a close look before deciding you're not interesting."
+  ],
+  caribbean: [
+    "Caribbean reef sharks have learned to rest in ocean currents, facing into the flow so water streams over their gills — napping while the sea does the breathing for them.",
+    "They're homebodies of the coral reef, patrolling the same stretches of reef edge for years."
+  ],
+  sandbar: [
+    "Sandbar sharks carry one of the tallest dorsal fins of any shark — a proud sail that makes them easy to spot from a boat.",
+    "Their pups grow up in famous nurseries like Delaware Bay, where scientists have tracked generations of young sandbars returning to the same shallow waters."
+  ],
+  salmon: [
+    "Salmon sharks are the Arctic's answer to the mako — warm-bodied hunters that keep their swimming muscles heated in near-freezing northern Pacific water.",
+    "They follow the salmon runs, and their warm red muscle lets them strike with full power in water cold enough to numb most predators."
+  ],
+  dusky: [
+    "Dusky sharks live life in the slow lane — they can take twenty years to mature and may live past forty, among the slowest life cycles of any shark.",
+    "They migrate thousands of kilometres along coastlines, and females gather in warm southern waters to give birth."
+  ],
+  silvertip: [
+    "Silvertip sharks are famously bold around divers, often making close, deliberate passes — curious rather than aggressive, but impossible to ignore.",
+    "Their white-tipped fins flash like signals as they patrol Indo-Pacific reef drop-offs, usually alone or in small groups."
+  ],
+  spinner: [
+    "Spinner sharks feed by charging vertically through bait balls while spinning like a drill — then launching out of the water in a twisting leap.",
+    "Those acrobatic spins aren't play; the rotation lets them snap at fish in every direction as they rocket upward through the school."
+  ],
+  wobbegong: [
+    "A wobbegong is a living rug — its tasseled, mottled camouflage is so perfect that fish swim right up to the fringe of sensory barbels around its mouth, which twitch like worms to lure them closer.",
+    "Then it strikes with one of the fastest bites in the shark world, hinging its huge jaws open to engulf prey nearly its own size."
+  ],
+  leopard: [
+    "Every summer, pregnant female leopard sharks gather in the warm shallows of La Jolla, California, basking to speed up the development of their pups — a maternity ward in the surf.",
+    "They're gentle bottom-feeders, crunching crabs and clam siphons, and their spots are unique enough that researchers can tell individuals apart."
+  ],
+  horn: [
+    "Horn sharks crunch through sea urchins and crabs with rows of flat, molar-like teeth — built for crushing, not slicing.",
+    "Females lay beautiful spiral egg cases, screwing them into rocky crevices where the corkscrew shape wedges them safe from predators."
+  ],
+  portjackson: [
+    "Port Jackson sharks lay corkscrew-shaped egg cases too, wedging them between rocks — and mothers are sometimes seen picking the case up in their mouths to carry it to a safer crevice.",
+    "They make real migrations along Australia's coast, traveling hundreds of kilometres between feeding and breeding grounds."
+  ],
+  angelshark: [
+    "Angel sharks are ambush artists — they vanish beneath the sand with only their eyes showing, then explode upward to engulf passing fish in a fraction of a second.",
+    "Despite the angelic name, they're flattened bottom-dwellers more like rays, and Europe's angelsharks are now critically endangered."
+  ],
+  megamouth: [
+    "The megamouth was unknown to science until 1976, when one tangled in a Navy sea anchor off Hawaii — a 15-foot shark nobody had ever seen.",
+    "It spends days in the deep and rises toward the surface each night to filter-feed on krill, and researchers suspect the pale band inside its huge mouth may glow to lure prey in the dark."
+  ],
+  sawshark: [
+    "A sawshark's saw is studded with sensors — it sweeps the rostrum through the sand feeling for the electric heartbeat of buried prey, then slashes sideways to disable it.",
+    "Those whisker-like barbels halfway along the saw are taste-testers, confirming a find before the shark digs in."
+  ],
+  greenland: [
+    "Greenland sharks may live 400 years or more — the longest-lived vertebrate known, with one female estimated at nearly four centuries old.",
+    "They're nearly blind, their eyes clouded by parasitic copepods, yet they cruise the Arctic dark as patient scavengers — and their flesh is toxic unless fermented, which is how Iceland's hákarl is made."
+  ],
+  cookiecutter: [
+    "The cookiecutter glows from below — light-producing organs in its belly match the faint light from above, hiding its silhouette, except for a dark collar that may mimic a small fish to lure big predators close.",
+    "Then this foot-long shark takes a single cookie-shaped plug of flesh from whales, tuna, and even submarines, and vanishes back into the dark."
+  ],
+  sixgill: [
+    "Bluntnose sixgills are deep-sea heavyweights, cruising cold depths down past a kilometre, surfacing only at night in a few special places like Puget Sound.",
+    "They're unhurried scavengers with a slow, powerful build — and those six gill slits mark them as survivors of an ancient lineage."
+  ],
+  velvetbelly: [
+    "The velvet belly lanternshark carries its own dim lighting — rows of light-producing organs along its belly glow to erase its silhouette from predators below.",
+    "It lives in the twilight depths of the eastern Atlantic, a small shark in a very big dark."
+  ],
+  dwarflantern: [
+    "The dwarf lanternshark is the smallest shark in the world — fully grown at about 20 centimetres, it could curl up in your hand.",
+    "It lives in deep water off Colombia and Venezuela and glows with its own bioluminescence, a tiny lantern in the dark."
+  ],
+  kitefin: [
+    "The kitefin shark is the largest glowing vertebrate known — at over a metre and a half long, this deep-sea hunter produces its own blue-green light.",
+    "Its glow was only confirmed in 2020, making it one of the biggest recent surprises in shark science."
+  ],
+  pacificsleeper: [
+    "Pacific sleepers are giants of the deep North Pacific, growing as long as a great white, yet so rarely seen that almost everything about their lives is a mystery.",
+    "They're known to gather at whale falls in the abyss, slow-moving feasts in the dark where these huge sharks scavenge for months."
+  ],
+  spinydogfish: [
+    "Spiny dogfish carry mild venom in the spines ahead of each dorsal fin — a rare defense among sharks, and sharp enough to demand respect.",
+    "They're marathon mothers too: pregnancies last up to two years, among the longest of any vertebrate on Earth."
+  ],
+  catshark: [
+    "Catsharks lay their eggs in leathery purses with curly tendrils at each corner — 'mermaid's purses' that anchor to seaweed until the pups hatch.",
+    "They're nocturnal prowlers with cat-like eyes, and some species can even squeeze their bodies through astonishingly small gaps to hide by day."
+  ]
+};
+
+/* Returns the next unlearned fact for a species, or null if exhausted.
+   Guarantees one unlearned fact if any remain (Mira's guardrail). */
+function unlockSecretFact(speciesId) {
+  const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[speciesId]) || [];
+  if (!pool.length) return null;
+  const unlocked = state.unlockedFacts[speciesId] || [];
+  const remaining = pool.map((_, i) => i).filter(i => !unlocked.includes(i));
+  if (!remaining.length) return null;
+  const idx = remaining[Math.floor(Math.random() * remaining.length)];
+  unlocked.push(idx);
+  state.unlockedFacts[speciesId] = unlocked;
+  factStore.save(state.unlockedFacts);
+  return pool[idx];
+}
+/* v1.4.0-beta: third release choice — "Release & tag along" ENDS the expedition.
+   Lifecycle-safe per Mira's guardrail: resolves the encounter exactly once
+   (with tag-along intent), so trip log, achievements, counters, Sarah batching,
+   and launch-button cleanup all run exactly once. The map focuses the shark
+   AFTER trip completion (in closeDive), not here. */
+function doTagAlong() {
+  const done = state.encounterDone;
+  const s = state.healthSpecies;
+  state.encounterDone = null;
+  state.healthSpecies = null;
+  $("tagOverlay").classList.add("hidden");
+  if (s) {
+    const rec = state.tagged[s.id];
+    const displayName = (rec && rec.name) || s.name;
+    logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
+    /* v1.4.0-beta: tag-along unlocks a secret fact (or the graceful exhaustion line). */
+    const fact = unlockSecretFact(s.id);
+    if (fact) {
+      logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
+    } else {
+      logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+    }
+    logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
+  }
+  renderAll();
+  if (done) done({ tagAlong: s ? s.id : null });
+}
 $("releaseBtn").addEventListener("click", () => doRelease(false));
 $("releaseShipBtn").addEventListener("click", () => doRelease(true));
+$("tagAlongBtn").addEventListener("click", doTagAlong);
 /* v0.17.1: Ask Sarah for advice. */
 $("sarahAskBtn").addEventListener("click", () => {
   const sid = $("sarahAskSelect").value;
@@ -3099,6 +3400,19 @@ function openDetail(id) {
         ${t.notes.map(n => `<li>👁️ ${esc(n)}</li>`).join("")}
       </ul>
     </div>` : ""}
+    ${(() => {
+      /* v1.4.0-beta: show unlocked tag-along facts in the collection detail. */
+      const unlocked = state.unlockedFacts[id] || [];
+      const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[id]) || [];
+      const shown = unlocked.map(i => pool[i]).filter(Boolean);
+      if (!shown.length) return "";
+      return `<div class="secret-facts-block">
+        <h4>🔬 Tag-along insights (${shown.length}/${pool.length})</h4>
+        <ul class="track-stops">
+          ${shown.map(f => `<li>🔬 ${esc(f)}</li>`).join("")}
+        </ul>
+      </div>`;
+    })()}
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
     ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
@@ -3191,7 +3505,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts"]; // v1.4.0-beta: +tyi-facts
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {
