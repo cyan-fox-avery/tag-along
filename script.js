@@ -37,7 +37,7 @@ const WHATS_NEW = {
   "v1.3.0-beta": [
     "👁️ <strong>Watch notes.</strong> 'Just watch' sometimes adds a natural-history observation to that shark's record.",
     "📓 <strong>Logbook date filter.</strong> Filter trips by last 7 days, 30 days, or year — plus research IDs on tagged encounters.",
-    "🌊 <strong>Richer dive flavour.</strong> 20 new field observations and 6 new wildlife sightings across all waters.",
+    "🌊 <strong>Richer dive flavour.</strong> 20 new field observations and 6 new wildlife sightings (surface and reef waters).",
     "💾 <strong>Save export/import</strong> is in the footer — back up your sharks as JSON, restore them anywhere."
   ]
 };
@@ -327,49 +327,45 @@ const SIGHTING_DOINES = [
    Mira review (v1.3.0): split by habitat so notes stay scientifically
    coherent — a deep-sea shark doesn't rest on a reef, and a reef shark
    doesn't hunt alone in the blue. */
-/* Mira review (v1.3.0, round 2): every note carries condition tags so it
-   can't contradict the encounter. avoidDoing lists SIGHTING_DOINES keywords
-   the note would clash with; depths lists the plan-depth ids the note fits
-   (omit = any depth). Time-of-day words were removed — the game doesn't
-   track time, so notes must read true at any hour. */
+
+/* Mira review (v1.3.0, round 3): ALL watch notes are now purely
+   observational — they describe the environment, other animals, water
+   conditions, or static features of the shark. They never assign an action
+   to the shark, so they can't contradict the sighting's "doing" line.
+   Habitat pools are kept for scientific coherence. */
 const WATCH_NOTES_REEF = [
-  { text: "resting under a ledge, barely moving", avoidDoing: ["hunting", "feeding", "patrolling", "curious"], depths: ["reef"] },
-  { text: "resting on the sandy bottom", avoidDoing: ["hunting", "feeding", "patrolling", "curious"], depths: ["reef"] },
-  { text: "feeding, quick and focused", avoidDoing: [] },
-  { text: "investigating the boat, then losing interest", avoidDoing: [] }
+  "a nearby ledge offers perfect shelter",
+  "the sandy bottom below is undisturbed",
+  "small reef fish dart between the coral heads",
+  "the boat's shadow ripples across the reef"
 ];
 const WATCH_NOTES_PELAGIC = [
-  { text: "cruising with a remora attached", avoidDoing: [] },
-  { text: "circling a bait ball, patient", avoidDoing: ["drifting"] },
-  { text: "following a current edge", avoidDoing: [] },
-  { text: "hunting alone in the blue", avoidDoing: ["feeding"] },
-  { text: "drifting near the surface", avoidDoing: ["hunting", "patrolling"], depths: ["surface"] },
-  { text: "feeding, quick and focused", avoidDoing: [] },
-  { text: "investigating the boat, then losing interest", avoidDoing: [] }
+  "a remora is attached near the dorsal fin",
+  "a bait ball shimmers in the distance",
+  "the current edge is visible as a line of floating debris",
+  "no other sharks in sight — just blue in every direction",
+  "sunlight shafts angle down through the surface",
+  "a school of small fish flashes silver nearby",
+  "the boat's hull sounds loud in the quiet blue"
 ];
 const WATCH_NOTES_DEEP = [
-  { text: "gliding through a thermocline", avoidDoing: [], depths: ["twilight", "deep"] },
-  { text: "swimming with slow, deliberate tail beats", avoidDoing: [] },
-  { text: "pausing mid-water, hanging motionless", avoidDoing: ["hunting", "feeding", "patrolling", "curious"] },
-  { text: "feeding, quick and focused", avoidDoing: [] },
-  { text: "investigating the lights, then losing interest", avoidDoing: [] }
+  "the water temperature drops noticeably here",
+  "the tail fin is broad and powerful up close",
+  "marine snow drifts down like slow rain",
+  "bioluminescent flashes blink in the dark below",
+  "the dive lights catch particles suspended in the water"
 ];
 /* Pick a habitat-appropriate pool from the species' depth bands.
    Reef species -> reef notes; twilight/deep -> deep notes;
    surface-only (open water) -> pelagic notes. */
-function pickWatchNote(species, doing, planDepth) {
+function pickWatchNote(species) {
+  /* Notes are purely observational (see above), so no doing/depth
+     filtering is needed — any note suits any encounter in its habitat. */
   const d = (species && species.depths) || [];
   const pool = d.includes("reef") ? WATCH_NOTES_REEF
     : (d.includes("deep") || d.includes("twilight")) ? WATCH_NOTES_DEEP
     : WATCH_NOTES_PELAGIC;
-  const doingLower = (doing || "").toLowerCase();
-  const ok = pool.filter(n =>
-    (!n.depths || !planDepth || n.depths.includes(planDepth)) &&
-    !(n.avoidDoing || []).some(k => doingLower.includes(k))
-  );
-  /* Fallback: filters should never empty a pool, but a note is better
-     than a crash if they ever do. */
-  return pick((ok.length ? ok : pool).map(n => n.text));
+  return pick(pool);
 }
 
 /* v0.7.0: tagging the first six earns new waters. */
@@ -1636,7 +1632,7 @@ function doEncounter(species, plan) {
          Pure flavor — not a checklist, no achievements attached. */
       let noteLine = "";
       if (rec && Math.random() < 0.35) {
-        const note = pickWatchNote(species, entry.doing, plan.depth);
+        const note = pickWatchNote(species);
         rec.notes = rec.notes || [];
         if (!rec.notes.includes(note)) {
           rec.notes.push(note);
