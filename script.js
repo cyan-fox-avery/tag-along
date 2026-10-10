@@ -1396,7 +1396,7 @@ function renderPinnedCard(list) {
       <div class="pinned-body">
         <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
         <div>
-          <span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><strong>${s.name}</strong><br>
+          <span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span><strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
@@ -1572,7 +1572,7 @@ function renderResearch() {
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
           <span class="guide-names">
-            <span class="guide-row-name"><span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span>${s.name}</span>
+            <span class="guide-row-name"><span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span>${s.name}</span>
             <span class="latin">${s.latin}</span>
           </span>
           <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
