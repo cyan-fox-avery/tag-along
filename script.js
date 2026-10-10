@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.10-beta";
+const VERSION = "v1.5.11-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -117,6 +117,9 @@ const WHATS_NEW = {
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
   ],
+  "v1.5.11-beta": [
+    "📸 <strong>Archive tab always visible.</strong> The Archive tab now stays in the tab bar from the start — greyed out and unclickable until Sarah's intro text unlocks it. This keeps all 8 tabs on one row with no layout shift.",
+  ],
   "v1.5.10-beta": [
     "🖼️ <strong>Archive is tagged-sharks only.</strong> The \"Still to discover\" locked list is gone — the Archive now shows just the sharks you have actually tagged, with Research-style name + color-coded IUCN badges (no checkmarks).",
   ],
@@ -208,7 +211,6 @@ function playerHasSaveData() {
 }
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
-
 
 /* ---------- Ambient sea life: small silhouettes that drift through the dive ---------- */
 
@@ -1083,6 +1085,7 @@ const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
 const tabScroll = {};
 document.querySelectorAll(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
+    if (btn.disabled) return; /* v1.5.11: locked Archive tab is unclickable */
     const current = document.querySelector(".tab.active");
     if (current) tabScroll[current.dataset.tab] = window.scrollY;
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
@@ -1257,25 +1260,7 @@ function togglePin(id) {
 }
 /* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
    clears any filters hiding the shark first, so Jump never silently fails. */
-function jumpToPinned(s, list) {
-  if (!list.querySelector(`[data-entry="${s.id}"]`) && activeFilterCount() > 0) {
-    clearGuideFilters();
-  }
-  const target = list.querySelector(`[data-entry="${s.id}"]`);
-  if (target) {
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
-    const body = target.querySelector(".guide-row-body");
-    const head = target.querySelector(".guide-row-head");
-    if (body && body.classList.contains("hidden")) {
-      body.classList.remove("hidden");
-      head.setAttribute("aria-expanded", "true");
-      target.classList.add("open");
-      target.style.zIndex = String(++guideOverlayZ);
-    }
-    target.classList.add("pin-flash");
-    setTimeout(() => target.classList.remove("pin-flash"), 1200);
-  }
-}
+
 /* v1.4.15-beta: highlight key research clues in bold (same font/size).
    Bolds location, diet, and depth cues — never the expedition answers. */
 function highlightClues(s) {
@@ -1327,10 +1312,8 @@ function renderPinnedCard(list) {
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
       </div>
-      <p class="pinned-research">${researchPreview}</p>
-      <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
+      <p class="pinned-research">${researchPreview}</p>`;
     card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
-    card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
   }
   target.appendChild(card);
 }
