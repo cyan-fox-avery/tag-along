@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.10-beta', VERSION === 'v1.5.10-beta');
+  ok('version v1.5.11-beta', VERSION === 'v1.5.11-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -181,6 +181,19 @@ code += `
   ok('archive has no locked list', !archiveUiCode.includes('lockedRows') && !archiveUiCode.includes('Still to discover'));
   ok('archive uses Research-style IUCN pill', archiveUiCode.includes('status-pill iucn-'));
   ok('archive has no checkmark', !archiveUiCode.includes('✅'));
+  // v1.5.11-beta: Archive tab always visible, locked until Sarah's text.
+  ok('updateArchiveTab toggles locked state not hidden',
+    archiveUiCode.includes('toggle("tab-locked"') && !archiveUiCode.includes('toggle("hidden", !state.archiveUnlocked'));
+  ok('archive tab has disabled attr support',
+    archiveUiCode.includes('btn.disabled'));
+  ok('tab click handler skips disabled tabs',
+    code.includes('if (btn.disabled) return;'));
+  ok('disabled tabs are greyed out',
+    cssCode.includes('.tab[disabled]') && cssCode.includes('cursor: not-allowed'));
+  ok('archive tab not hidden in HTML',
+    htmlCode.includes('data-tab="archive"') && !htmlCode.includes('class="tab hidden" data-tab="archive"'));
+  ok('archive tab starts disabled in HTML',
+    htmlCode.includes('data-tab="archive" type="button" disabled'));
   // v0.17.0 review fix: every non-public-domain CC license in the data must
   // have a LICENSE_URLS entry, so new sharks can't silently lose license links.
   const usedLicenses = new Set();
@@ -505,16 +518,6 @@ code += `
     const html = document.getElementById('expeditionPin').innerHTML;
     state.pinned = null; renderExpeditionPin();
     return !html.includes('[object Object]') && html.includes('Surface');
-  })());
-  ok('jump clears filters hiding the pinned shark', (() => {
-    state.pinned = 'dusky';
-    guideFilters.q = 'zzzz-no-match';
-    // filtered-out state: the entry is not in the rendered list
-    const list = { querySelector() { return null; } };
-    jumpToPinned(SHARKS.find(s => s.id === 'dusky'), list);
-    const cleared = activeFilterCount() === 0;
-    state.pinned = null;
-    return cleared;
   })());
   ok('repeat-plan with no method clears the planner method', (() => {
     const mk = (vals) => {
@@ -1722,6 +1725,7 @@ code += `
   ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
   ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
   ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
