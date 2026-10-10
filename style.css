@@ -63,45 +63,64 @@ body {
    different wedge patterns sway and breathe at different rates for organic,
    clearly-alive light. mix-blend-mode: screen caps overlap brightness.
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
-.caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
-.caustics span {
-  position: absolute; top: -120px; left: 2%; height: 2000px;
-  transform-origin: 50% 0; /* pivot around the sun point at far top-left */
-  /* v1.4.17: span-based rays restored (the v1.4.16 conic fan broke iPad layout).
-     Wide soft DIFFUSED shafts: a vertical linear-gradient gives length falloff
-     (bright near the sun, dissolving with depth) while a horizontal mask
-     feathers both sides — no hard edge can ever render. Brighter than v1.4.15
-     so the fan is actually visible, and rays never fully vanish. */
-  background: linear-gradient(to bottom,
-    rgba(215,240,255,0.32) 0%,
-    rgba(205,235,255,0.18) 38%,
-    rgba(195,228,255,0.08) 62%,
-    transparent 88%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
-  opacity: 0.15;
-  animation: ray-life 18s ease-in-out infinite;
+.caustics { position: fixed; inset: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
+/* v1.5.6: conic-gradient fan REBUILT safely. The v1.4.16 fan looked great but
+   broke iPad layout — root cause was the standalone `scale` CSS property in
+   the breathe keyframes (Safari mishandles individual transform properties).
+   This rebuild merges sway + breathe into single `transform` keyframes
+   (rotate + scale together), which is well-supported everywhere.
+   A conic gradient centered at the sun point cannot miss: every wedge radiates
+   from the sun across the viewport by construction. */
+.caustics .fan {
+  position: absolute; inset: -12%; /* oversized so sway rotation never exposes an edge */
+  transform-origin: 0% 0%; /* the sun point — this corner sits 12% off-screen top-left */
+  /* radial mask dissolves every ray with distance from the sun: bright near
+     the surface, gone before the deep corner. Soft on all sides, always. */
+  -webkit-mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
+  mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
 }
-/* Fan angles from the far-left sun point: wide spread (12-72 deg) so the fan
-   visibly sweeps the screen. Each ray pivots around the shared sun point;
-   wide-angle rays cross the viewport diagonally and exit through the right
-   edge — all visible, none wasted off-screen. */
-.caustics span:nth-child(1) { --ray-angle: 12deg; width: 120px; animation-duration: 17s; animation-delay: -5s; }
-.caustics span:nth-child(2) { --ray-angle: 20deg; width: 95px;  animation-duration: 22s; animation-delay: -14s; }
-.caustics span:nth-child(3) { --ray-angle: 28deg; width: 140px; animation-duration: 15s; animation-delay: -8s; }
-.caustics span:nth-child(4) { --ray-angle: 36deg; width: 105px; animation-duration: 20s; animation-delay: -3s; }
-.caustics span:nth-child(5) { --ray-angle: 46deg; width: 130px; animation-duration: 18s; animation-delay: -11s; }
-.caustics span:nth-child(6) { --ray-angle: 54deg; width: 100px; animation-duration: 24s; animation-delay: -17s; }
-.caustics span:nth-child(7) { --ray-angle: 63deg; width: 145px; animation-duration: 16s; animation-delay: -7s; }
-.caustics span:nth-child(8) { --ray-angle: 72deg; width: 110px; animation-duration: 21s; animation-delay: -13s; }
-@keyframes ray-life {
-  /* v1.4.17: clearly visible life — slow sway (±4 deg) plus a real grow/shrink
-     pulse (scaleX 0.7-1.25). Rays breathe but never fully vanish (min 0.15). */
-  0%   { opacity: 0.15; transform: rotate(calc(var(--ray-angle) - 4deg))   scaleX(0.7); }
-  25%  { opacity: 0.75; transform: rotate(calc(var(--ray-angle) - 1.5deg)) scaleX(1.0); }
-  50%  { opacity: 0.9;  transform: rotate(var(--ray-angle))                scaleX(1.25); }
-  75%  { opacity: 0.6;  transform: rotate(calc(var(--ray-angle) + 2deg))   scaleX(0.9); }
-  100% { opacity: 0.15; transform: rotate(calc(var(--ray-angle) + 4deg))   scaleX(0.7); }
+/* Fan 1 — three broad wedges, the main visible fan.
+   (CSS conic 0deg=up, 90deg=right, 180deg=down; from the sun at top-left the
+   viewport spans ~96deg-174deg, so these wedges sweep the whole screen.) */
+.caustics .fan-1 {
+  background: conic-gradient(from 100deg at 0% 0%,
+    transparent 0deg,
+    rgba(215,240,255,0.15) 7deg, rgba(215,240,255,0.15) 13deg, transparent 21deg,
+    rgba(215,240,255,0.11) 29deg, rgba(215,240,255,0.11) 33deg, transparent 41deg,
+    rgba(215,240,255,0.13) 49deg, rgba(215,240,255,0.13) 55deg, transparent 63deg,
+    transparent 70deg);
+  animation: fan-motion-1 34s ease-in-out infinite;
+}
+/* Fan 2 — two narrower wedges at different angles, quicker shimmer. */
+.caustics .fan-2 {
+  background: conic-gradient(from 108deg at 0% 0%,
+    transparent 0deg,
+    rgba(215,240,255,0.12) 4deg, rgba(215,240,255,0.12) 8deg, transparent 14deg,
+    rgba(215,240,255,0.10) 38deg, rgba(215,240,255,0.10) 44deg, transparent 50deg,
+    transparent 62deg);
+  animation: fan-motion-2 27s ease-in-out infinite;
+}
+/* Fan 3 — faintest and slowest, widest sweep, for depth. */
+.caustics .fan-3 {
+  background: conic-gradient(from 96deg at 0% 0%,
+    transparent 0deg,
+    rgba(215,240,255,0.09) 10deg, rgba(215,240,255,0.09) 20deg, transparent 30deg,
+    rgba(215,240,255,0.07) 45deg, rgba(215,240,255,0.07) 58deg, transparent 68deg,
+    transparent 78deg);
+  animation: fan-motion-3 41s ease-in-out infinite;
+}
+/* Combined sway + breathe in single transform keyframes — no `scale` property. */
+@keyframes fan-motion-1 {
+  0%, 100% { transform: rotate(-1.8deg) scale(1);    opacity: 0.55; }
+  50%      { transform: rotate(1.8deg)  scale(1.04); opacity: 0.95; }
+}
+@keyframes fan-motion-2 {
+  0%, 100% { transform: rotate(2.2deg)  scale(1.03); opacity: 0.9; }
+  50%      { transform: rotate(-2.2deg) scale(1);    opacity: 0.5; }
+}
+@keyframes fan-motion-3 {
+  0%, 100% { transform: rotate(-1.2deg) scale(1.015); opacity: 0.7; }
+  50%      { transform: rotate(1.2deg)  scale(1.05);  opacity: 1; }
 }
 /* Slow rising bubbles — viewport-fixed for a little continuous life while scrolling.
    v1.4.16: columns fire in OVERLAPPING pairs (2 places at once), bubbles
@@ -111,27 +130,32 @@ body {
 .bubbles span {
   position: absolute; bottom: -20px; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
-  animation: bubble-column 24s linear infinite;
   opacity: 0;
 }
-/* columns A+B fire together (2 places at once, left half) */
-.bubbles span:nth-child(1)  { left: 11%;   width: 10px; height: 10px; animation-delay: -0.5s; }
-.bubbles span:nth-child(2)  { left: 13.5%; width: 7px;  height: 7px;  animation-delay: -1.2s; }
-.bubbles span:nth-child(3)  { left: 16%;   width: 12px; height: 12px; animation-delay: -1.9s; }
-.bubbles span:nth-child(4)  { left: 14%;   width: 6px;  height: 6px;  animation-delay: -2.6s; }
-.bubbles span:nth-child(5)  { left: 36%;   width: 8px;  height: 8px;  animation-delay: -1.0s; }
-.bubbles span:nth-child(6)  { left: 38.5%; width: 11px; height: 11px; animation-delay: -1.7s; }
-.bubbles span:nth-child(7)  { left: 41%;   width: 6px;  height: 6px;  animation-delay: -2.4s; }
-.bubbles span:nth-child(8)  { left: 39%;   width: 9px;  height: 9px;  animation-delay: -3.1s; }
-/* columns C+D fire together (2 places at once, right half) */
-.bubbles span:nth-child(9)  { left: 61%;   width: 7px;  height: 7px;  animation-delay: -12.5s; }
-.bubbles span:nth-child(10) { left: 63.5%; width: 12px; height: 12px; animation-delay: -13.2s; }
-.bubbles span:nth-child(11) { left: 66%;   width: 8px;  height: 8px;  animation-delay: -13.9s; }
-.bubbles span:nth-child(12) { left: 64%;   width: 10px; height: 10px; animation-delay: -14.6s; }
-.bubbles span:nth-child(13) { left: 84%;   width: 9px;  height: 9px;  animation-delay: -13.0s; }
-.bubbles span:nth-child(14) { left: 86.5%; width: 6px;  height: 6px;  animation-delay: -13.7s; }
-.bubbles span:nth-child(15) { left: 89%;   width: 11px; height: 11px; animation-delay: -14.4s; }
-.bubbles span:nth-child(16) { left: 87%;   width: 7px;  height: 7px;  animation-delay: -15.1s; }
+/* v1.5.6: natural bubble columns — 2-5 bubbles per column (varied counts),
+   all starting together per column. Bigger bubbles rise faster (shorter
+   duration), so they drift apart just enough not to overlap. */
+.bubbles span { animation-name: bubble-column; animation-timing-function: linear; animation-iteration-count: infinite; }
+/* column A — 5 bubbles */
+.bubbles span:nth-child(1)  { left: 9%;    width: 12px; height: 12px; animation-delay: -0.5s;  animation-duration: 18s; }
+.bubbles span:nth-child(2)  { left: 14.2%; width: 7px;  height: 7px;  animation-delay: -0.5s;  animation-duration: 24s; }
+.bubbles span:nth-child(3)  { left: 12.1%; width: 10px; height: 10px; animation-delay: -0.5s;  animation-duration: 20s; }
+.bubbles span:nth-child(4)  { left: 16.8%; width: 6px;  height: 6px;  animation-delay: -0.5s;  animation-duration: 26s; }
+.bubbles span:nth-child(5)  { left: 11.3%; width: 8px;  height: 8px;  animation-delay: -0.5s;  animation-duration: 22s; }
+/* column B — 3 bubbles */
+.bubbles span:nth-child(6)  { left: 33%;   width: 11px; height: 11px; animation-delay: -7.5s;  animation-duration: 19s; }
+.bubbles span:nth-child(7)  { left: 38.7%; width: 6px;  height: 6px;  animation-delay: -7.5s;  animation-duration: 25s; }
+.bubbles span:nth-child(8)  { left: 35.9%; width: 9px;  height: 9px;  animation-delay: -7.5s;  animation-duration: 21s; }
+/* column C — 4 bubbles */
+.bubbles span:nth-child(9)  { left: 58%;   width: 8px;  height: 8px;  animation-delay: -13.5s; animation-duration: 22s; }
+.bubbles span:nth-child(10) { left: 64.9%; width: 12px; height: 12px; animation-delay: -13.5s; animation-duration: 18s; }
+.bubbles span:nth-child(11) { left: 61.6%; width: 6px;  height: 6px;  animation-delay: -13.5s; animation-duration: 26s; }
+.bubbles span:nth-child(12) { left: 67.2%; width: 10px; height: 10px; animation-delay: -13.5s; animation-duration: 20s; }
+/* column D — 2 bubbles */
+.bubbles span:nth-child(13) { left: 83%;   width: 9px;  height: 9px;  animation-delay: -19.5s; animation-duration: 21s; }
+.bubbles span:nth-child(14) { left: 87.5%; width: 7px;  height: 7px;  animation-delay: -19.5s; animation-duration: 24s; }
+/* unused slots stay hidden */
+.bubbles span:nth-child(15), .bubbles span:nth-child(16) { display: none; }
 @keyframes bubble-column {
   /* visible rise is the first ~42% of the 24s cycle (~10s); the rest is quiet */
   0% { transform: translateY(0) translateX(0); opacity: 0; }
@@ -150,9 +174,9 @@ body {
 .seafloor .sediment { fill: #0a1a24; opacity: 0.6; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
-  .surface-shimmer, .caustics span, .bubbles span { animation: none; }
+  .surface-shimmer, .caustics .fan, .bubbles span, .dive-scene .rays, .dive-scene .motes { animation: none; }
   /* v1.4.17: static sun-ray fan for reduced motion */
-  .caustics span { opacity: 0.22; transform: rotate(var(--ray-angle)); }
+  .caustics .fan { opacity: 0.75; }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.
@@ -348,10 +372,46 @@ select option:disabled { color: #7a8a9e; }
   height: 190px; border-radius: var(--radius); overflow: hidden;
   border: 2px solid #2c5364;
 }
+/* v1.5.6: dive scene redo — a real underwater feel instead of abstract stripes.
+   Depth gradient (sunlit teal at top melting to deep blue), soft god-ray
+   shafts angling down from the surface, drifting plankton motes. All
+   transform/opacity, no blur filters — iPad-friendly. */
+.dive-scene:not(.porthole) {
+  background: linear-gradient(180deg,
+    #3d8ab5 0%, #2e6f96 22%, #20567c 45%, #163f5e 70%, #0e2c44 100%);
+}
 .dive-scene .rays {
-  position: absolute; inset: 0; opacity: 0.35; z-index: 2;
-  background: repeating-linear-gradient(115deg, transparent 0 26px, rgba(255,255,255,0.25) 26px 34px);
-  animation: sway 7s ease-in-out infinite alternate;
+  position: absolute; inset: -10%; z-index: 2; opacity: 0.5;
+  pointer-events: none;
+  /* soft god-ray shafts: a few wide, feathered light columns angling down
+     from the surface — never hard stripes */
+  background:
+    linear-gradient(100deg, transparent 42%, rgba(200,235,255,0.20) 47%, rgba(200,235,255,0.20) 52%, transparent 58%),
+    linear-gradient(104deg, transparent 62%, rgba(190,230,255,0.14) 67%, rgba(190,230,255,0.14) 71%, transparent 77%),
+    linear-gradient(97deg,  transparent 18%, rgba(210,240,255,0.16) 23%, rgba(210,240,255,0.16) 27%, transparent 33%);
+  -webkit-mask-image: linear-gradient(180deg, black 0%, black 45%, transparent 92%);
+  mask-image: linear-gradient(180deg, black 0%, black 45%, transparent 92%);
+  animation: dive-rays-sway 11s ease-in-out infinite alternate;
+}
+@keyframes dive-rays-sway {
+  from { transform: translateX(-16px) rotate(-1deg); }
+  to   { transform: translateX(16px)  rotate(1deg); }
+}
+/* drifting plankton motes catch the light */
+.dive-scene .motes {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 65% 55%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2.5px 2.5px at 40% 75%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(2px 2px at 10% 65%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 50% 15%, rgba(255,255,255,0.4), transparent);
+  animation: motes-drift 23s linear infinite;
+}
+@keyframes motes-drift {
+  from { transform: translateY(-12px); }
+  to   { transform: translateY(12px); }
 }
 .dive-scene .scenery {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
@@ -398,6 +458,7 @@ select option:disabled { color: #7a8a9e; }
 }
 /* v1.4.10: hide the old underwater diagonal-stripe rays in porthole mode only */
 .dive-scene.porthole .rays { display: none; }
+.dive-scene.porthole .motes { display: none; }
 
 /* wave layer container — full-bleed, clips the drifting tiles */
 .dive-scene.porthole .porthole-waves {
@@ -676,6 +737,11 @@ select option:disabled { color: #7a8a9e; }
   border: 2px solid #b8860b; color: #3a2b00;
   font-size: 16px; font-weight: 700; text-align: center;
   font-family: inherit;
+}
+/* v1.5.6: release buttons match — both primary yellow actions use the same gradient */
+#releaseBtn {
+  background: linear-gradient(180deg, #ffd166 0%, #f0b429 100%);
+  border: 2px solid #b8860b; color: #3a2b00;
 }
 .tagalong-choice .tagalong-sub {
   display: block; font-size: 12px; font-weight: 400; margin-top: 4px;
@@ -1396,13 +1462,11 @@ video.archive-media { max-height: 420px; }
 .locked-pill { background: rgba(255,255,255,0.08); }
 .archive-locked-row .guide-row-name { opacity: 0.75; }
 
-/* v1.2.0-beta Mira review: collapsed "Still to discover" archive section. */
-.archive-still-locked { margin-top: 14px; }
-.archive-still-locked > summary {
-  cursor: pointer; font-weight: 700; font-size: 15px; color: var(--ink-dim, #9db8c9);
-  padding: 10px 4px; list-style-position: inside;
+/* v1.5.6: "Still to discover" is static descriptive text, not a dropdown. */
+.archive-still-locked-head {
+  margin-top: 14px; font-weight: 700; font-size: 15px;
+  color: var(--ink-dim, #9db8c9); padding: 10px 4px;
 }
-.archive-still-locked > summary::-webkit-details-marker { color: var(--ink-dim, #9db8c9); }
 
 /* v1.3.0-beta: field notes from "Just watch" encounters */
 .watch-notes-block {
