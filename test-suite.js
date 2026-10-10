@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.0-beta', VERSION === 'v1.4.0-beta');
+  ok('version v1.4.1-beta', VERSION === 'v1.4.1-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1550,6 +1550,15 @@ code += `
     ok("caustics have no hard bar edges", !/\\.caustics\\s+span\\s*\\{[^}]*border-radius:\\s*50%/.test(cssCode));
     ok("caustics core is bright", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(218,242,255,0\\.34\\)/.test(cssCode));
   })();
+  // v1.4.1: sun-ray caustics radiate from a sun point at angled fan positions
+  (() => {
+    ok("caustics pivot around sun point", /\\.caustics\\s+span\\s*\\{[^}]*transform-origin:\\s*50%\\s+0/.test(cssCode));
+    ok("caustics use angled fan keyframes", /@keyframes\\s+ray-life/.test(cssCode));
+    ok("caustics keyframes rotate around --ray-angle", /rotate\\(calc\\(var\\(--ray-angle\\)/.test(cssCode));
+    const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
+    ok("caustics has 8 rays", rayCount === 8);
+    ok("rays are narrower than v1.4.0", !/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*width:\\s*(8[5-9]|9\\d|10[0-4])px/.test(cssCode));
+  })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
     ok("open guide body is absolutely positioned", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
@@ -1557,6 +1566,7 @@ code += `
     ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
   })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
+  ok("WHATS_NEW has v1.4.1-beta", !!(WHATS_NEW["v1.4.1-beta"] && WHATS_NEW["v1.4.1-beta"].length));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
