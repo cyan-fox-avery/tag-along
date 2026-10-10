@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.11-beta', VERSION === 'v1.4.11-beta');
+  ok('version v1.4.12-beta', VERSION === 'v1.4.12-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1599,6 +1599,7 @@ code += `
   ok("WHATS_NEW has v1.4.9-beta", !!(WHATS_NEW["v1.4.9-beta"] && WHATS_NEW["v1.4.9-beta"].length));
   ok("WHATS_NEW has v1.4.10-beta", !!(WHATS_NEW["v1.4.10-beta"] && WHATS_NEW["v1.4.10-beta"].length));
   ok("WHATS_NEW has v1.4.11-beta", !!(WHATS_NEW["v1.4.11-beta"] && WHATS_NEW["v1.4.11-beta"].length));
+  ok("WHATS_NEW has v1.4.12-beta", !!(WHATS_NEW["v1.4.12-beta"] && WHATS_NEW["v1.4.12-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
@@ -1608,11 +1609,11 @@ code += `
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
-  // v1.4.11: porthole — asset-led waves (Mira's illustrated strips)
+  // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
   ok('porthole has nested drift+bob structure', /class="pw-drift"><div class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
-  ok('porthole spray instances in HTML', /class="porthole-spray ps1"/.test(htmlCode) && /class="porthole-spray ps2"/.test(htmlCode) && /class="porthole-spray ps3"/.test(htmlCode));
+  ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
   ok('porthole no longer procedural', !/class="porthole-crest/.test(htmlCode) && !/class="porthole-surface"/.test(htmlCode));
   ok('porthole no longer underwater-style', !/class="porthole-shafts"/.test(htmlCode) && !/class="porthole-bubbles"/.test(htmlCode));
   ok('diveView not hidden by default', !/id="diveView" class="dive-view hidden"/.test(htmlCode));
@@ -1622,7 +1623,10 @@ code += `
   ok('porthole has drift keyframes', /@keyframes\\s+pw-drift-(right|left)/.test(cssCode));
   ok('porthole has bob keyframes', /@keyframes\\s+pw-bob-\\d/.test(cssCode));
   ok('porthole has spray keyframes', /@keyframes\\s+pw-spray-\\d/.test(cssCode));
-  ok('porthole drift is seamless one-tile', /translateX\\(calc\\(-100%\\s*\\/\\s*6\\)\\)/.test(cssCode));
+  ok('porthole drift is seamless two-tile', /translateX\\(calc\\(-100%\\s*\\/\\s*3\\)\\)/.test(cssCode));
+  ok('porthole tiles mirrored for seamless loop', /pw-tile:nth-child\\(even\\)[\\s\\S]*?scaleX\\(-1\\)/.test(cssCode));
+  ok('porthole splash is large', /\\.porthole-spray\\s*\\{[^}]*width:\\s*240px/.test(cssCode));
+  ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?\\.porthole-waves/.test(cssCode) || /prefers-reduced-motion[\\s\\S]*?pw-drift/.test(cssCode));
   ok('bubbles travel in clusters', /bubbles travel in little clusters/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
