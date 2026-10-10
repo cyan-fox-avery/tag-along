@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.0-beta";
+const VERSION = "v1.6.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -117,14 +117,13 @@ const WHATS_NEW = {
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
   ],
-  "v1.6.0-beta": [
-    "📖 <strong>Research accordion.</strong> Opening one field-guide entry now closes the others — only one open at a time.",
-    "🏷️ <strong>IUCN badge breathing room.</strong> More space between the IUCN badge and pin icon, so Latin names show more.",
-    "🔬 <strong>Full scientific names.</strong> Collection and Archive expanded cards now show the full scientific name prominently above the description.",
-    "🏆 <strong>Achievement hints get two lines.</strong> No more truncating with \"...\" — hints can breathe.",
-  ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.1-beta": [
+    "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",
+    "🃏 <strong>Horizontal collection cards on desktop.</strong> Tagged-shark cards lay out side-by-side (art left, details right) on wide screens.",
+    "⭕ <strong>Checklist-style tag status.</strong> Field-guide rows and the pinned card now show an empty circle that fills green when the shark is tagged — no more ✅.",
   ],
   "v1.5.32-beta": [
     "🦈 <strong>Bruce reacts on the first catch.</strong> Naming a shark Bruce now gets Sarah's opener right away — the slow-burn spacing applies between later stages, not before the first one.",
@@ -647,7 +646,8 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
-/* v0.15.0: no explore mode, no pinch — zoom is buttons/wheel only.
+/* v0.15.0: no explore mode — zoom is buttons/wheel.
+   v1.6.1-beta: pinch-to-zoom restored then reverted (iPad: it didn't engage).
    touch-action follows the zoom level, decided before any touch begins:
    at 1x the page owns one-finger drags (the page scrolls); zoomed in,
    the map owns them (one finger pans). No mid-gesture races, no modes. */
@@ -1395,7 +1395,7 @@ function renderPinnedCard(list) {
       <div class="pinned-body">
         <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
         <div>
-          ${done ? "✅ " : ""}<strong>${s.name}</strong><br>
+          <span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span><strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
@@ -1494,17 +1494,15 @@ function renderExpeditionPin() {
    above earlier ones, regardless of DOM order. */
 let guideOverlayZ = 30;
 /* v1.5.4-beta: shared collapse for guide rows — used by the close button,
-   Escape key, and outside-click dismissal. Returns focus to the row header.
-   v1.6.0-beta: restoreFocus flag — the accordion passes false so closing
-   other cards doesn't yank focus (and scroll) back to them. */
-function collapseGuideRow(row, restoreFocus = true) {
+   Escape key, and outside-click dismissal. Returns focus to the row header. */
+function collapseGuideRow(row) {
   if (!row || !row.classList.contains("open")) return;
   const body = row.querySelector(".guide-row-body");
   const head = row.querySelector(".guide-row-head");
   if (body) body.classList.add("hidden");
   if (head) {
     head.setAttribute("aria-expanded", "false");
-    if (restoreFocus) head.focus();
+    head.focus();
   }
   row.classList.remove("open");
   row.style.zIndex = "";
@@ -1573,7 +1571,7 @@ function renderResearch() {
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
           <span class="guide-names">
-            <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
+            <span class="guide-row-name"><span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span>${s.name}</span>
             <span class="latin">${s.latin}</span>
           </span>
           <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
@@ -1607,13 +1605,7 @@ function renderResearch() {
       row.classList.toggle("open", !isHidden);
       /* v1.4.0-beta: overlay floats above neighbors; rising z-index keeps
          the most recently opened entry on top. */
-      if (!isHidden) {
-        /* v1.6.0-beta: accordion — opening one entry closes the others. */
-        document.querySelectorAll(".guide-row.open").forEach(other => {
-          if (other !== row && other.closest("#researchList")) collapseGuideRow(other, false);
-        });
-        row.style.zIndex = String(++guideOverlayZ);
-      }
+      if (!isHidden) row.style.zIndex = String(++guideOverlayZ);
       else row.style.zIndex = "";
     });
     const pinBtn = row.querySelector("[data-pin]");
@@ -3002,7 +2994,7 @@ function renderAchievements() {
       <div class="guide-row-head" style="cursor:default">
         <span style="font-size:22px">${unlocked ? a.icon : "🔒"}</span>
         <span class="guide-row-name">${unlocked ? esc(a.name) : "???"}</span>
-        <span class="latin ach-hint">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
+        <span class="latin">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
       </div>`;
     list.appendChild(row);
   });
@@ -4043,10 +4035,12 @@ function renderCollection() {
     cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}`);
     cell.innerHTML = `
       <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
-      ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
-      <div class="grid-id">${esc(t.researchId)}</div>
-      <h3>${s.name}</h3>
-      <p class="latin">${s.latin}</p>`;
+      <div class="grid-cell-text">
+        ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
+        <div class="grid-id">${esc(t.researchId)}</div>
+        <h3>${s.name}</h3>
+        <p class="latin">${s.latin}</p>
+      </div>`;
     cell.addEventListener("click", () => openDetail(s.id));
     list.appendChild(cell);
   });
@@ -4084,7 +4078,7 @@ function openDetail(id) {
       </div>
     </div>
     <h3 style="margin:6px 0 0">${s.name}</h3>
-    <p class="latin detail-scientific">${s.latin}</p>
+    <p class="latin">${s.latin}</p>
     <span class="status-pill">IUCN: ${s.status}</span>
     <p class="book-stats">
       📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
@@ -4578,11 +4572,11 @@ onMapBtn("mapZoomReset", () => { mapFocusClear(); mapZoom = 1; mapCX = MAP_W / 2
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
    then applies the new zoom (clamped). Used by wheel; buttons use the
-   fixed-step zoom below. (v0.15.0: pinch removed.) */
+   fixed-step zoom below. */
 let suppressMarkerClick = false;
 let mapRenderQueued = false;
 function requestMapRender() {
-  /* rAF-throttle so pinch/pan stay smooth on phones; direct render where
+  /* rAF-throttle so pan stays smooth on phones; direct render where
      requestAnimationFrame doesn't exist (tests, old webviews). */
   if (typeof requestAnimationFrame === "function") {
     if (mapRenderQueued) return;
@@ -4684,13 +4678,11 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
   mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
-/* v0.15.0: touchscreen gestures — one-finger pan when zoomed, nothing else.
-   Pointer Events give one code path for mouse and touch. Move/up/cancel
-   listen on window so a finger sliding off the map can't strand a pointer.
-   Pinch-to-zoom and explore mode are gone: zoom is +/- buttons (and wheel
-   on desktop) only. At 1x the browser owns one-finger drags (touch-action:
-   pan-y, so the page scrolls); zoomed in, the map takes them (touch-action:
-   none, set by renderMap before any touch begins). */
+/* v1.6.1-beta (revised): pinch-to-zoom removed after iPad testing
+   showed the gesture didn't engage. Buttons/wheel zoom and one-finger
+   pan (when zoomed in) are unchanged. touch-action still follows the zoom
+   level, decided before any touch begins: at 1x the page owns one-finger
+   drags (the page scrolls); zoomed in, the map owns them (one finger pans). */
 (function initMapGestures() {
   const wrap = $("worldMapWrap");
   if (!wrap || typeof window === "undefined") return;
@@ -4726,17 +4718,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0) {
-      if (movedMax > 10) suppressMarkerClick = true;
-    } else if (pts.size === 1) {
-      // A lifted finger during an (unsupported) two-finger touch collapses
-      // back into a normal one-finger pan: re-anchor the remaining finger
-      // so the map doesn't jump from its older position.
-      const p = [...pts.values()][0];
-      downX = panX = p.x;
-      downY = panY = p.y;
-      movedMax = 0;
-    }
+    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);

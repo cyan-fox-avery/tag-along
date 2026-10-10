@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.0-beta', VERSION === 'v1.6.0-beta');
+  ok('version v1.6.1-beta', VERSION === 'v1.6.1-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1600,7 +1600,7 @@ code += `
   ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
   ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
   // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
-  ok('desktop logo 156px', /\\.site-logo\\s*\\{[^}]*height:\\s*156px/.test(cssCode));
+  ok('desktop logo 190px', /\\.site-logo\\s*\\{[^}]*height:\\s*190px/.test(cssCode));
   // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
   ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
   // v1.4.15-beta: time-of-day progression in expedition log
@@ -1625,7 +1625,7 @@ code += `
   (() => {
     ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
     ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
-    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
+    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row\\)/.test(code));
     ok("collapseGuideRow resets aria-expanded", /collapseGuideRow[\\s\\S]*?setAttribute\\("aria-expanded", "false"\\)/.test(code));
     ok("collapseGuideRow returns focus to header", /collapseGuideRow[\\s\\S]*?head\\.focus\\(\\)/.test(code));
     ok("Escape key closes topmost open row", /keydown[\\s\\S]*?Escape[\\s\\S]*?\\.guide-row\\.open/.test(code));
@@ -1749,19 +1749,7 @@ code += `
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
   ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
   ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
-  ok('WHATS_NEW has v1.6.0-beta', Array.isArray(WHATS_NEW['v1.6.0-beta']) && WHATS_NEW['v1.6.0-beta'].length === 4);
-  // v1.6.0: Research accordion — opening one entry closes the others
-  ok('accordion closes other research rows', /collapseGuideRow\\(other, false\\)/.test(code));
-  // v1.6.0: accordion doesn't steal focus — collapseGuideRow takes a restoreFocus flag
-  ok('collapseGuideRow has restoreFocus flag', /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
-  ok('focus only restored when flag is true', /if \\(restoreFocus\\) head\\.focus\\(\\);/.test(code));
-  // v1.6.0: IUCN badge spacing — more room between badge and pin
-  ok('iucn badge has right margin', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*8px/.test(cssCode));
-  // v1.6.0: full scientific name in expanded Collection/Archive cards
-  ok('detail-scientific class styled', /\\.detail-scientific\\s*\\{[^}]*font-size:\\s*15px/.test(cssCode));
-  ok('collection detail shows scientific name', code.indexOf('detail-scientific') !== -1);
-  // v1.6.0: achievement hints get two lines
-  ok('achievement hints allow two lines', /\\.ach-hint[^}]*-webkit-line-clamp:\\s*2/.test(cssCode));
+  ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
   // v1.5.29: blue through ~90%, black only at the very bottom
   ok('gradient stays blue until 90%', cssCode.indexOf('#020a16 90%') !== -1);
@@ -1934,7 +1922,7 @@ code += `
   ok('legend has bottom margin', cssCode.includes('margin: 8px 2px 14px'));
   ok('legend styled', cssCode.includes('.iucn-legend'));
   // v1.5.1: header/phone/archive/porthole batch
-  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
+  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*8px 8px 2px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
   ok('archive badge removed', !/data-tab=\\"archive\\"\\] \\.tab-badge/.test(code));
   ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
@@ -1989,6 +1977,22 @@ code += `
   })());
   ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
   ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
+
+  // v1.6.1-beta: layout & interaction batch
+  ok('WHATS_NEW has v1.6.1-beta with 3 entries', Array.isArray(WHATS_NEW['v1.6.1-beta']) && WHATS_NEW['v1.6.1-beta'].length === 3);
+  ok('desktop logo is 190px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 190px/.test(cssCode));
+  ok('base logo is 76px', /\\.site-logo \\{ display: block; height: 76px/.test(cssCode));
+  ok('desktop collection cards are horizontal', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.grid-cell \\{ display: flex/.test(cssCode));
+  ok('desktop collection is 3 columns', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.collection-grid \\{ grid-template-columns: repeat\\(3, 1fr\\)/.test(cssCode));
+  ok('collection cell has text wrapper', /class="grid-cell-text"/.test(fileCode));
+  ok('checklist circle CSS present', /\\.tag-check \\{/.test(cssCode) && /\\.tag-check\\.is-done/.test(cssCode));
+  ok('field-guide rows use checklist circles', /class="tag-check/.test(fileCode));
+  ok('sr-only utility CSS present', /\.sr-only \{/.test(cssCode));
+  ok('checklist circles have screen-reader status text', fileCode.indexOf('class="sr-only"') !== -1 && fileCode.indexOf('\${done ? "Tagged" : "Not tagged"}') !== -1);
+  ok('no checkmark prefix in field-guide rows', fileCode.indexOf('\${done ? "✅ " : ""}') === -1);
+  ok('pinch-to-zoom removed (no pinch state)', !/pinchStartDist|pinching|pinchMoved/.test(fileCode));
+  ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
+  ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

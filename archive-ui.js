@@ -115,7 +115,6 @@ function renderArchive() {
         <span class="guide-caret" aria-hidden="true">\u25be</span>
       </button>
       <div class="guide-row-body hidden">
-        <p class="latin detail-scientific">${media.scientific}</p>
         ${yourShark}
         ${media.comingSoon
           ? `<p class="hook">📸 Wild media coming soon — being curated.</p>`
