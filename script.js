@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.17-beta";
+const VERSION = "v1.5.18-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -117,9 +117,12 @@ const WHATS_NEW = {
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
   ],
+  "v1.5.18-beta": [
+    "🏷️ <strong>Legend tidy-up.</strong> Removed Data Deficient from the IUCN key (none of our sharks have that status) and gave the legend more breathing room.",
+  ],
   "v1.5.17-beta": [
     "👆 <strong>Whole header is tappable.</strong> The IUCN badge is now inside the card's tap area — tapping it expands the entry too.",
-    "🏷️ <strong>IUCN badge key.</strong> A compact legend at the top of the field guide explains what LC, NT, VU, EN, CR and DD mean.",
+    "🏷️ <strong>IUCN badge key.</strong> A compact legend at the top of the field guide explains what LC, NT, VU, EN and CR mean.",
   ],
   "v1.5.16-beta": [
     "📑 <strong>Tabs, locked in.</strong> The 8-column tab grid is now the base layout on every screen size (phones keep their 4+4) — no more relying on media queries that iPad Safari could ignore.",
