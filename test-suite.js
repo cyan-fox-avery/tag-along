@@ -39,7 +39,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.7-beta', VERSION === 'v1.5.7-beta');
+  ok('version v1.5.8-beta', VERSION === 'v1.5.8-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1581,12 +1581,13 @@ code += `
   ok('time progression', /The afternoon stretches out/.test(fileCode) && /Evening approaches/.test(fileCode));
   // v1.4.15-beta: subtle diet phrases (not bait answers)
   ok('diet phrases', /they eat plankton/.test(fileCode) && /DIET_PHRASE/.test(fileCode));
-  // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
+  // v1.5.8: denser organic bubbles — 8 columns of varied heights via --rise
   (() => {
-    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
-    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
+    ok("bubbles use rise keyframes", /@keyframes\\s+bubble-rise/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
-    ok("bubbles have varied column counts", bubbleCount === 15);
+    ok("bubbles: 26 spans across 8 columns", bubbleCount === 26);
+    ok("bubbles vary travel distance", cssCode.indexOf("--rise:") !== -1 && cssCode.indexOf("var(--rise") !== -1);
+    ok("bubble columns launch mid-screen too", /bottom: 30%/.test(cssCode) && /bottom: 55%/.test(cssCode));
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1658,10 +1659,10 @@ code += `
   ok('porthole orbit has depth gradient', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*38s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
-  ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
+  ok('bubbles rise in varied-height columns (v1.5.8)', /different vertical ranges/i.test(cssCode));
   // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
-  ok('bubbles are randomized (v1.5.6)', /randomized bubble columns/.test(cssCode) || /natural bubble columns/.test(cssCode));
-  ok('bubble columns have varied counts (2-5)', /column A — 5 bubbles/.test(cssCode) && /column D — 2 bubbles/.test(cssCode));
+  ok('bubbles are organic and dense (v1.5.8)', /denser and more organic/i.test(cssCode));
+  ok('bubble columns have varied counts (v1.5.8)', /column E — full riser, 5 bubbles/.test(cssCode) && /column H — short hop, 2 bubbles/.test(cssCode));
   ok('bigger bubbles rise faster', /width: 12px[^}]*animation-duration: 18s/.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
@@ -1769,7 +1770,7 @@ code += `
   ok('no standalone scale property in fan CSS', !/(?<![a-zA-Z-])scale\\s*:/.test(cssCode.split('.bubbles')[0]));
   ok('fan divs in HTML', /class="fan fan-1"/.test(htmlCode));
   ok('no caustics spans in HTML', !/class="caustics"><span/.test(htmlCode));
-  ok('bubbles start together per column', /animation-delay:\\s*-0\\.5s/.test(cssCode) && /animation-delay:\\s*-19\\.5s/.test(cssCode));
+  ok('bubbles start together per column (v1.5.8)', /animation-delay:\\s*-1s/.test(cssCode) && /animation-delay:\\s*-16s/.test(cssCode));
   ok('logo is bigger with tight header', /\\.site-logo\\s*\\{[^}]*height:\\s*84px/.test(cssCode) && /padding:\\s*4px 8px 2px/.test(cssCode));
   ok('dive scene has depth gradient', /\\.dive-scene:not\\(\\.porthole\\)/.test(cssCode));
   ok('dive god-rays are soft (no stripes)', !/repeating-linear-gradient\\(115deg/.test(cssCode));
@@ -1789,6 +1790,12 @@ code += `
   ok('tag-along still unlocks fact (v1.5.7)', /pendingTagAlongFact = fact/.test(code));
   ok('desktop collection cards horizontal (v1.5.7)', cssCode.indexOf('repeat(3, 1fr)') !== -1 && cssCode.indexOf('grid-text') !== -1);
   ok('grid text wrapper exists (v1.5.7)', code.indexOf('grid-text') !== -1);
+  // v1.5.8-beta: ray fan scroll-break fix — persistent compositing layers
+  ok('WHATS_NEW has v1.5.8-beta', Array.isArray(WHATS_NEW['v1.5.8-beta']) && WHATS_NEW['v1.5.8-beta'].length > 0);
+  ok('caustics forced into GPU layer (v1.5.8)', cssCode.indexOf('translateZ(0)') !== -1);
+  ok('fan keeps persistent layer (v1.5.8)', cssCode.indexOf('backface-visibility: hidden') !== -1);
+  ok('tab bar keeps compositing layer (v1.5.8)', /\\.tabs\\s*\\{[^}]*translateZ\\(0\\)/.test(cssCode));
+  ok('tab buttons keep pointer events (v1.5.8)', cssCode.indexOf('.tabs .tab { pointer-events: auto; }') !== -1);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
