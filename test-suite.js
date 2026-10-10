@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.0-beta', VERSION === 'v1.5.0-beta');
+  ok('version v1.5.1-beta', VERSION === 'v1.5.1-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1648,7 +1648,7 @@ code += `
   ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   // v1.4.14: calm porthole — sky above the far wave, slow drift, splash pops without sliding
   ok('porthole has sky behind far wave', /\\.dive-scene\\.porthole\\s*\\{[^}]*#a8dcf5/.test(cssCode));
-  ok('porthole orbit is calm', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*52s/.test(cssCode));
+  ok('porthole orbit has depth gradient', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*38s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
   ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
@@ -1659,8 +1659,8 @@ code += `
   ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
   // v1.4.18: waves stacked tight, oval orbital motion, bigger/faster splash
   ok('waves stacked almost on top of each other', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode) && /\\.pw-mid\\s*\\{[^}]*top:\\s*20%/.test(cssCode) && /\\.pw-near\\s*\\{[^}]*top:\\s*24%/.test(cssCode));
-  ok('orbit periods differ per layer (far slowest)', /pw-orbit-far 52s/.test(cssCode) && /pw-orbit-mid 40s/.test(cssCode) && /pw-orbit-near 32s/.test(cssCode));
-  ok('splash is the fastest thing (14s cycle)', /\\.splash-a\\s*\\{[^}]*14s/.test(cssCode));
+  ok('orbit periods: far 38s, mid 26s, near 16s (near fastest)', /pw-orbit-far 38s/.test(cssCode) && /pw-orbit-mid 26s/.test(cssCode) && /pw-orbit-near 16s/.test(cssCode));
+  ok('splash is rarer (24s cycle)', /\\.splash-a\\s*\\{[^}]*24s/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
@@ -1695,6 +1695,15 @@ code += `
   ok('closeDive flushes celebrations', /flushPendingCelebrations\\(\\);/.test(code));
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.1-beta', Array.isArray(WHATS_NEW['v1.5.1-beta']) && WHATS_NEW['v1.5.1-beta'].length > 0);
+  // v1.5.1: header/phone/archive/porthole batch
+  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
+  ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
+  ok('archive badge removed', !/data-tab=\\"archive\\"\\] \\.tab-badge/.test(code));
+  ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
+  ok('clouds are defined', /rgba\\(255,255,255,0\\.95\\)/.test(cssCode));
+  ok('near orbit is 2x+ faster than far', /pw-orbit-near 16s/.test(cssCode) && /pw-orbit-far 38s/.test(cssCode));
+
   // v1.5.0-beta Mira review: persistence + copy fixes
   ok('celebrationStore persists pending celebrations', (() => {
     celebrationStore.clear();
