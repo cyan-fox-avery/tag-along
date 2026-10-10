@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.27-beta";
+const VERSION = "v1.5.28-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -119,6 +119,9 @@ const WHATS_NEW = {
   ],
   "v1.5.26-beta": [
     "⬛ <strong>Black below the seafloor.</strong> The viewport beneath the seafloor wave is now solid black all the way to the bottom edge — no more blue water showing under the ground.",
+  ],
+  "v1.5.28-beta": [
+    "⬛ <strong>True black depths.</strong> The page background now fades to pure black at the bottom — deep ocean, not blue — so the seafloor sits on black all the way down.",
   ],
   "v1.5.27-beta": [
     "🌊 <strong>Seafloor wave rebuilt.</strong> Removed the black overlay layer that was covering content on iPad — the seafloor graphic itself is now taller (400px) with solid black extending to the bottom, and the page tracks Safari's dynamic viewport height.",
