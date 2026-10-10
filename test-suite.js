@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.13-beta', VERSION === 'v1.6.13-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2018,6 +2018,11 @@ code += `
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
+
+  // v1.6.13-beta: bigger follow map on tablet/desktop
+  ok('WHATS_NEW has v1.6.13-beta', Array.isArray(WHATS_NEW['v1.6.13-beta']) && WHATS_NEW['v1.6.13-beta'].length === 1);
+  ok('finale map bigger on tablet', /@media \\(min-width: 768px\\)[\\s\\S]*?\\.finale \\{\\s*max-width: min\\(94vw, 1100px\\)/.test(cssCode));
+  ok('finale map bigger on desktop', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.finale \\{\\s*max-width: min\\(94vw, 1400px\\)/.test(cssCode));
   ok('archiveMatches filters by name', (() => {
     archiveFilters.q = 'nurse';
     const nurse = SHARKS.find(s => s.id === 'nurse');
