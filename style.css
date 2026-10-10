@@ -65,7 +65,14 @@ body {
    different wedge patterns sway and breathe at different rates for organic,
    clearly-alive light. mix-blend-mode: screen caps overlap brightness.
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
-.caustics { position: fixed; inset: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
+.caustics { position: fixed; inset: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen;
+  /* v1.5.8: persistent GPU layer — Safari's compositor can lose the
+     mix-blend-mode composite when the page scrolls the layer off and back
+     on-screen; translateZ(0) keeps the layer alive through scrolls. */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
 /* v1.5.6: conic-gradient fan REBUILT safely. The v1.4.16 fan looked great but
    broke iPad layout — root cause was the standalone `scale` CSS property in
    the breathe keyframes (Safari mishandles individual transform properties).
@@ -80,6 +87,11 @@ body {
      the surface, gone before the deep corner. Soft on all sides, always. */
   -webkit-mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
   mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
+  /* v1.5.8: keep each fan in its own persistent compositing layer so the
+     animation survives scroll-off/scroll-back on iPad Safari. */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 /* Fan 1 — three broad wedges, the main visible fan.
    (CSS conic 0deg=up, 90deg=right, 180deg=down; from the sun at top-left the
@@ -125,46 +137,60 @@ body {
   50%      { transform: rotate(1.2deg)  scale(1.05);  opacity: 1; }
 }
 /* Slow rising bubbles — viewport-fixed for a little continuous life while scrolling.
-   v1.4.16: columns fire in OVERLAPPING pairs (2 places at once), bubbles
-   within each column on a tight ~0.7s stagger — dense little air trails,
-   never an empty screen. */
+   v1.5.8: denser and more organic — 8 columns, 2-5 bubbles each, spanning
+   different vertical ranges. Some are full-height risers from below the
+   viewport; others are short hops that start and end mid-screen. --rise
+   sets each bubble's travel distance; the column's `bottom` sets where it
+   launches from. Bigger bubbles rise faster (shorter duration); all bubbles
+   in a column share a start delay so they launch together, then drift apart
+   just enough not to overlap. */
 .bubbles { position: fixed; inset: 0; pointer-events: none; }
 .bubbles span {
-  position: absolute; bottom: -20px; border-radius: 50%;
+  position: absolute; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
   opacity: 0;
+  animation-name: bubble-rise; animation-timing-function: linear; animation-iteration-count: infinite;
 }
-/* v1.5.6: natural bubble columns — 2-5 bubbles per column (varied counts),
-   all starting together per column. Bigger bubbles rise faster (shorter
-   duration), so they drift apart just enough not to overlap. */
-.bubbles span { animation-name: bubble-column; animation-timing-function: linear; animation-iteration-count: infinite; }
-/* column A — 5 bubbles */
-.bubbles span:nth-child(1)  { left: 9%;    width: 12px; height: 12px; animation-delay: -0.5s;  animation-duration: 18s; }
-.bubbles span:nth-child(2)  { left: 14.2%; width: 7px;  height: 7px;  animation-delay: -0.5s;  animation-duration: 24s; }
-.bubbles span:nth-child(3)  { left: 12.1%; width: 10px; height: 10px; animation-delay: -0.5s;  animation-duration: 20s; }
-.bubbles span:nth-child(4)  { left: 16.8%; width: 6px;  height: 6px;  animation-delay: -0.5s;  animation-duration: 26s; }
-.bubbles span:nth-child(5)  { left: 11.3%; width: 8px;  height: 8px;  animation-delay: -0.5s;  animation-duration: 22s; }
-/* column B — 3 bubbles */
-.bubbles span:nth-child(6)  { left: 33%;   width: 11px; height: 11px; animation-delay: -7.5s;  animation-duration: 19s; }
-.bubbles span:nth-child(7)  { left: 38.7%; width: 6px;  height: 6px;  animation-delay: -7.5s;  animation-duration: 25s; }
-.bubbles span:nth-child(8)  { left: 35.9%; width: 9px;  height: 9px;  animation-delay: -7.5s;  animation-duration: 21s; }
-/* column C — 4 bubbles */
-.bubbles span:nth-child(9)  { left: 58%;   width: 8px;  height: 8px;  animation-delay: -13.5s; animation-duration: 22s; }
-.bubbles span:nth-child(10) { left: 64.9%; width: 12px; height: 12px; animation-delay: -13.5s; animation-duration: 18s; }
-.bubbles span:nth-child(11) { left: 61.6%; width: 6px;  height: 6px;  animation-delay: -13.5s; animation-duration: 26s; }
-.bubbles span:nth-child(12) { left: 67.2%; width: 10px; height: 10px; animation-delay: -13.5s; animation-duration: 20s; }
-/* column D — 2 bubbles */
-.bubbles span:nth-child(13) { left: 83%;   width: 9px;  height: 9px;  animation-delay: -19.5s; animation-duration: 21s; }
-.bubbles span:nth-child(14) { left: 87.5%; width: 7px;  height: 7px;  animation-delay: -19.5s; animation-duration: 24s; }
-/* unused slots stay hidden */
-.bubbles span:nth-child(15), .bubbles span:nth-child(16) { display: none; }
-@keyframes bubble-column {
-  /* visible rise is the first ~42% of the 24s cycle (~10s); the rest is quiet */
+@keyframes bubble-rise {
   0% { transform: translateY(0) translateX(0); opacity: 0; }
-  5% { opacity: 0.85; }
-  36% { transform: translateY(-105vh) translateX(20px); opacity: 0.5; }
-  42%, 100% { transform: translateY(-105vh) translateX(20px); opacity: 0; }
+  8% { opacity: 0.85; }
+  85% { opacity: 0.45; }
+  100% { transform: translateY(var(--rise, -105vh)) translateX(24px); opacity: 0; }
 }
+/* column A — full riser, 4 bubbles */
+.bubbles span:nth-child(1)  { left: 7%;    bottom: -20px; --rise: -105vh; width: 12px; height: 12px; animation-delay: -1s;  animation-duration: 18s; }
+.bubbles span:nth-child(2)  { left: 10.5%; bottom: -20px; --rise: -105vh; width: 7px;  height: 7px;  animation-delay: -1s;  animation-duration: 24s; }
+.bubbles span:nth-child(3)  { left: 5.2%;  bottom: -20px; --rise: -105vh; width: 9px;  height: 9px;  animation-delay: -1s;  animation-duration: 21s; }
+.bubbles span:nth-child(4)  { left: 12.8%; bottom: -20px; --rise: -105vh; width: 6px;  height: 6px;  animation-delay: -1s;  animation-duration: 26s; }
+/* column B — mid hop, 3 bubbles */
+.bubbles span:nth-child(5)  { left: 18%;   bottom: 30%; --rise: -55vh; width: 11px; height: 11px; animation-delay: -6s;  animation-duration: 19s; }
+.bubbles span:nth-child(6)  { left: 21.7%; bottom: 30%; --rise: -55vh; width: 6px;  height: 6px;  animation-delay: -6s;  animation-duration: 25s; }
+.bubbles span:nth-child(7)  { left: 16.1%; bottom: 30%; --rise: -55vh; width: 8px;  height: 8px;  animation-delay: -6s;  animation-duration: 22s; }
+/* column C — full riser, 4 bubbles */
+.bubbles span:nth-child(8)  { left: 30%;   bottom: -20px; --rise: -105vh; width: 8px;  height: 8px;  animation-delay: -11s; animation-duration: 22s; }
+.bubbles span:nth-child(9)  { left: 34.2%; bottom: -20px; --rise: -105vh; width: 12px; height: 12px; animation-delay: -11s; animation-duration: 18s; }
+.bubbles span:nth-child(10) { left: 27.5%; bottom: -20px; --rise: -105vh; width: 6px;  height: 6px;  animation-delay: -11s; animation-duration: 26s; }
+.bubbles span:nth-child(11) { left: 32.8%; bottom: -20px; --rise: -105vh; width: 10px; height: 10px; animation-delay: -11s; animation-duration: 20s; }
+/* column D — short hop, 2 bubbles */
+.bubbles span:nth-child(12) { left: 43%;   bottom: 55%; --rise: -38vh; width: 9px; height: 9px; animation-delay: -4s; animation-duration: 21s; }
+.bubbles span:nth-child(13) { left: 46.3%; bottom: 55%; --rise: -38vh; width: 7px; height: 7px; animation-delay: -4s; animation-duration: 24s; }
+/* column E — full riser, 5 bubbles */
+.bubbles span:nth-child(14) { left: 55%;   bottom: -20px; --rise: -105vh; width: 10px; height: 10px; animation-delay: -16s; animation-duration: 20s; }
+.bubbles span:nth-child(15) { left: 59.1%; bottom: -20px; --rise: -105vh; width: 12px; height: 12px; animation-delay: -16s; animation-duration: 18s; }
+.bubbles span:nth-child(16) { left: 52.4%; bottom: -20px; --rise: -105vh; width: 6px;  height: 6px;  animation-delay: -16s; animation-duration: 26s; }
+.bubbles span:nth-child(17) { left: 57.6%; bottom: -20px; --rise: -105vh; width: 8px;  height: 8px;  animation-delay: -16s; animation-duration: 22s; }
+.bubbles span:nth-child(18) { left: 61.3%; bottom: -20px; --rise: -105vh; width: 7px;  height: 7px;  animation-delay: -16s; animation-duration: 24s; }
+/* column F — mid riser, 3 bubbles */
+.bubbles span:nth-child(19) { left: 68%;   bottom: 20%; --rise: -70vh; width: 11px; height: 11px; animation-delay: -9s;  animation-duration: 19s; }
+.bubbles span:nth-child(20) { left: 71.9%; bottom: 20%; --rise: -70vh; width: 6px;  height: 6px;  animation-delay: -9s;  animation-duration: 25s; }
+.bubbles span:nth-child(21) { left: 65.8%; bottom: 20%; --rise: -70vh; width: 9px;  height: 9px;  animation-delay: -9s;  animation-duration: 21s; }
+/* column G — full riser, 3 bubbles */
+.bubbles span:nth-child(22) { left: 80%;   bottom: -20px; --rise: -105vh; width: 8px;  height: 8px;  animation-delay: -2s;  animation-duration: 22s; }
+.bubbles span:nth-child(23) { left: 83.6%; bottom: -20px; --rise: -105vh; width: 12px; height: 12px; animation-delay: -2s;  animation-duration: 18s; }
+.bubbles span:nth-child(24) { left: 77.9%; bottom: -20px; --rise: -105vh; width: 7px;  height: 7px;  animation-delay: -2s;  animation-duration: 24s; }
+/* column H — short hop, 2 bubbles */
+.bubbles span:nth-child(25) { left: 90%;   bottom: 45%; --rise: -45vh; width: 10px; height: 10px; animation-delay: -13s; animation-duration: 20s; }
+.bubbles span:nth-child(26) { left: 93.2%; bottom: 45%; --rise: -45vh; width: 6px;  height: 6px;  animation-delay: -13s; animation-duration: 26s; }
 /* Seafloor silhouette along the bottom. */
 .seafloor {
   position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
@@ -229,7 +255,15 @@ body { overflow-x: clip; }
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
   backdrop-filter: blur(4px);
   align-items: stretch;
+  /* v1.5.8: iPad Safari fix — heavy fixed decor layers (blended caustics +
+     animated bubbles) can desync a sticky bar's paint layer from its
+     hit-test layer after scrolling, so taps miss the buttons and the bar
+     renders off-center. A dedicated compositing layer keeps paint,
+     hit-testing, and centering in sync. */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
+.tabs .tab { pointer-events: auto; }
 /* v1.4.0: equal-height tabs — every .tab is a 3-row stack
    (count/icon/label); tabs without a count use an invisible spacer with
    identical dimensions, so all buttons are naturally the same height. */
