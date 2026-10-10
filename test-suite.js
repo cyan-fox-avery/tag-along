@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.30-beta', VERSION === 'v1.5.30-beta');
+  ok('version v1.5.31-beta', VERSION === 'v1.5.31-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1749,7 +1749,7 @@ code += `
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
   ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
   ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
-  ok('WHATS_NEW has v1.5.30-beta', Array.isArray(WHATS_NEW['v1.5.30-beta']) && WHATS_NEW['v1.5.30-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.31-beta', Array.isArray(WHATS_NEW['v1.5.31-beta']) && WHATS_NEW['v1.5.31-beta'].length === 1);
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
   // v1.5.29: blue through ~90%, black only at the very bottom
   ok('gradient stays blue until 90%', cssCode.indexOf('#020a16 90%') !== -1);
@@ -1758,7 +1758,7 @@ code += `
   ok('html background is pure black', cssCode.indexOf('html { background: #000; }') !== -1);
   // v1.5.27: body::after overlay removed; seafloor SVG itself is taller
   ok('no body::after overlay', !/body::after/.test(cssCode));
-  ok('seafloor is 400px tall', /\.seafloor\\s*\{[^}]*height:\\s*400px/.test(cssCode));
+  ok('seafloor is a thin 5vh strip', /\.seafloor\\s*\{[^}]*height:\\s*5vh/.test(cssCode));
   // v1.5.30: seafloor is viewport-fixed so the bottom stays on the bottom
   ok('seafloor is viewport-fixed', /\.seafloor\\s*\{[^}]*position:\\s*fixed/.test(cssCode));
   ok('seafloor is bottom-anchored', /\.seafloor\\s*\{[^}]*bottom:\\s*0/.test(cssCode));
