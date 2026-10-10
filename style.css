@@ -198,11 +198,14 @@ body { overflow-x: clip; }
 /* v1.5.7: flex (not grid) at ALL breakpoints — grid's justify-content
    left the tab group off-center on iPad Safari; flex-wrap + center
    centers every row reliably. No transforms. */
-/* v1.5.14: tablets/phones moved BACK to grid — flex-wrap: nowrap was
-   ignored by iPad Safari so tabs wrapped anyway. repeat(8, 1fr) /
-   repeat(4, 1fr) cannot wrap. Desktop stays flex. */
+/* v1.5.16: grid is now the BASE tab layout. iPad Safari kept ignoring
+   flex-wrap: nowrap AND the tablet media queries didn't reliably match, so
+   tabs wrapped anyway. display:grid + repeat(8, 1fr) on the base rule
+   applies everywhere by default and structurally cannot wrap. Only phones
+   (<560px) override with repeat(4, 1fr) for the 4+4 layout.
+   No transforms, no compositing. */
 .tabs {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;
   margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
@@ -274,21 +277,17 @@ body { overflow-x: clip; }
      count on top, icon on its own row, label below (Collection, Achievements). */
   .dive-scene { top: 160px; }
 }
-/* v1.5.14: Avery — GRID (not flex) for tabs at tablet breakpoints.
-   flex-wrap: nowrap was ignored by iPad Safari, so tabs kept wrapping.
-   Grid with an explicit column count CANNOT wrap: repeat(8, 1fr) =
-   8 equal columns, one row, guaranteed. Same small type as v1.5.13.
-   Long labels truncate with ellipsis instead of overflowing.
-   No transforms, no compositing. */
+/* v1.5.16: grid(8) now inherited from the base .tabs rule — these queries
+   only tune gap, type size, and label truncation. */
 @media (min-width: 560px) and (max-width: 699px) {
-  .tabs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+  .tabs { gap: 4px; }
   .tab { min-width: 0; font-size: 9px; padding: 8px 1px; }
   .tab-icon { font-size: 14px; }
   .tab-stack { min-width: 0; max-width: 100%; }
   .tab-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 }
 @media (min-width: 700px) and (max-width: 1023px) {
-  .tabs { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .tabs { gap: 6px; }
   .tab { min-width: 0; font-size: 10px; padding: 8px 2px; }
   .tab-icon { font-size: 16px; }
   .tab-stack { min-width: 0; max-width: 100%; }
