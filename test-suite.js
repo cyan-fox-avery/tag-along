@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'assets/art-loader.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'bigday-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'assets/art-loader.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.18-beta', VERSION === 'v1.4.18-beta');
+  ok('version v1.4.19-beta', VERSION === 'v1.4.19-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1671,6 +1671,29 @@ code += `
   // v1.4.4: all tabs are uniform 2-row (icon+label) — no count spacers
   ok('no count-spacer spans in tabs', !/count-spacer/.test(htmlCode));
   ok('no count-spacer CSS remains', !/count-spacer/.test(cssCode));
+  // v1.4.19: Sarah's Big Day
+  ok('BIG_DAY has 8 conversations per tier (2/3/4)', BIG_DAY[2].length === 8 && BIG_DAY[3].length === 8 && BIG_DAY[4].length === 8);
+  ok('BIG_DAY lemon pool has 2 conversations', BIG_DAY.lemon.length === 2);
+  ok('all Big Day conversations have 3-4 bubbles', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.length >= 3 && c.length <= 4)));
+  ok('all Big Day bubbles have who/text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => (m.who === 'them' || m.who === 'me') && typeof m.text === 'string' && m.text.length > 0))));
+  ok('no raw placeholders in Big Day text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => !/\\{(?!speciesList\\}|count\\})[^}]*\\}/.test(m.text)))));
+  ok('formatSpeciesList: two species', formatSpeciesList([{speciesName:'Nurse Shark'},{speciesName:'Lemon Shark'}]) === 'a nurse shark and a lemon shark');
+  ok('formatSpeciesList: three species', formatSpeciesList([{speciesName:'Nurse Shark'},{speciesName:'Lemon Shark'},{speciesName:'Tiger Shark'}]) === 'a nurse shark, a lemon shark, and a tiger shark');
+  ok('formatSpeciesList: an- article', formatSpeciesList([{speciesName:'Oceanic Whitetip'}]) === 'an oceanic whitetip');
+  ok('buildBigDayThread resolves placeholders', (() => {
+    const thread = buildBigDayThread([{speciesId:'nurse',speciesName:'Nurse Shark'},{speciesId:'tiger',speciesName:'Tiger Shark'}]);
+    return thread.length >= 3 && thread.every(m => !m.text.includes('{speciesList}') && !m.text.includes('{count}'));
+  })());
+  ok('buildBigDayThread uses lemon pool for lemon', (() => {
+    // Force lemon tier by seeding the bag to a known state
+    state.bigDayBags = { lemon: [0] };
+    const thread = buildBigDayThread([{speciesId:'lemon',speciesName:'Lemon Shark'},{speciesId:'nurse',speciesName:'Nurse Shark'}]);
+    return thread.some(m => /LEMON SHARK/i.test(m.text));
+  })());
+  ok('flushPendingCelebrations defined', /function flushPendingCelebrations/.test(code));
+  ok('confirmTag queues (no immediate pushThread celebration)', /state\\.pendingCelebrations\\.push/.test(code));
+  ok('closeDive flushes celebrations', /flushPendingCelebrations\\(\\);/.test(code));
+  ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
