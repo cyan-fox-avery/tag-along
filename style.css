@@ -371,14 +371,13 @@ select option:disabled { color: #7a8a9e; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 
 /* v1.4.14: porthole — asset-led boat-window waves. Illustrated wave strips
-   (far/mid/near, art by Mira) drift as slow parallax layers; one big splash
-   hits the glass occasionally. Separate nested transforms for drift vs bob.
-   Transform/opacity only, respects prefers-reduced-motion.
-   v1.4.14: (1) far layer higher, all three pulled close so the art overlaps
-   into continuous water with no gaps; (2) CSS sky (sun glow + soft clouds)
-   behind the far wave — placeholder for Mira to art-direct; (3) much slower
-   drift/bob — calm lazy ocean, not a storm; (4) splash pops in, holds
-   briefly, fades fast — no sliding down the glass. */
+   (far/mid/near, art by Mira) move as slow parallax layers; one big splash
+   hits the glass occasionally. Transform/opacity only, respects
+   prefers-reduced-motion.
+   v1.4.18: (1) layers stacked tight — almost on top of each other, no gaps;
+   (2) OVAL orbital motion — each layer traces a gentle ellipse like real
+   water, replacing the one-direction drift; (3) splash is bigger (320px),
+   more sudden, and slides down fast — the quickest thing in the scene. */
 .dive-scene.porthole {
   /* v1.4.14: sky above the far wave — sun glow + soft CSS clouds, then the
      horizon melts into ocean. Placeholder until Mira art-directs the sky. */
@@ -403,15 +402,15 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene.porthole .pw-layer {
   position: absolute; left: 0; right: 0; overflow: hidden;
 }
-/* outer (.pw-drift): horizontal drift. inner (.pw-bob): vertical bob.
-   Separate nested transforms so the two animations never overwrite
-   each other's transform. */
-.dive-scene.porthole .pw-drift {
+/* v1.4.18: OVAL orbital motion — each layer traces a gentle ellipse like
+   real water, instead of scrolling constantly to one side. A single orbital
+   animation per layer (on .pw-orbit) replaces the old drift+bob nesting.
+   The 8-stop keyframes trace x=A*cos, y=B*sin for a smooth closed ellipse;
+   different periods + phase offsets per layer so they never sync up.
+   The strip is 6 tiles wide (way wider than the porthole), so the ±50px
+   orbital swing never exposes an edge. Loops seamlessly by construction. */
+.dive-scene.porthole .pw-orbit {
   display: flex; width: max-content; height: 100%;
-  will-change: transform;
-}
-.dive-scene.porthole .pw-bob {
-  display: flex; height: 100%;
   will-change: transform;
 }
 .dive-scene.porthole .pw-tile {
@@ -431,110 +430,123 @@ select option:disabled { color: #7a8a9e; }
    continuous swells filling the whole porthole, no blue gap underneath.
    far: drift RIGHT 52s linear, bob ±6px on 18s. */
 
+/* v1.4.18: stacked tight — far DOWN, near UP, almost on top of each other */
 .dive-scene.porthole .pw-far {
-  top: 8%; height: 150px; opacity: 0.7;
+  top: 14%; height: 150px; opacity: 0.7;
 }
 .dive-scene.porthole .pw-far .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_far_draft.png);
 }
-.dive-scene.porthole .pw-far .pw-drift {
-  animation: pw-drift-right 52s linear infinite;
-}
-.dive-scene.porthole .pw-far .pw-bob {
-  animation: pw-bob-6 18s ease-in-out infinite alternate;
-  animation-delay: -2.3s;
+.dive-scene.porthole .pw-far .pw-orbit {
+  animation: pw-orbit-far 52s linear infinite;
+  animation-delay: -7s;
 }
 
 /* mid: pulled up to overlap the far crest — drift LEFT 40s linear, bob ±8px on 15s */
 .dive-scene.porthole .pw-mid {
-  top: 25%; height: 175px; opacity: 0.85;
+  top: 20%; height: 175px; opacity: 0.85;
 }
 .dive-scene.porthole .pw-mid .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_mid_draft.png);
 }
-.dive-scene.porthole .pw-mid .pw-drift {
-  animation: pw-drift-left 40s linear infinite;
-  animation-delay: -5.1s;
-}
-.dive-scene.porthole .pw-mid .pw-bob {
-  animation: pw-bob-8 15s ease-in-out infinite alternate;
-  animation-delay: -1.7s;
+.dive-scene.porthole .pw-mid .pw-orbit {
+  animation: pw-orbit-mid 40s linear infinite;
+  animation-delay: -23s;
 }
 
 /* near: pulled up to overlap the mid crest — drift RIGHT 32s linear, bob ±10px on 12s */
 .dive-scene.porthole .pw-near {
-  top: 42%; height: 210px;
+  top: 24%; height: 210px;
 }
 .dive-scene.porthole .pw-near .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_near_draft.png);
 }
-.dive-scene.porthole .pw-near .pw-drift {
-  animation: pw-drift-right 32s linear infinite;
-  animation-delay: -3.8s;
-}
-.dive-scene.porthole .pw-near .pw-bob {
-  animation: pw-bob-10 12s ease-in-out infinite alternate;
-  animation-delay: -4.2s;
+.dive-scene.porthole .pw-near .pw-orbit {
+  animation: pw-orbit-near 32s linear infinite;
+  animation-delay: -11s;
 }
 
-/* drift: shift exactly two tiles (2/6 = 1/3 of the strip) per loop. Because
-   alternate tiles are mirrored, the 2-tile pattern repeats perfectly, so
-   the wrap is invisible — no more loop glitch. */
-@keyframes pw-drift-right {
-  from { transform: translateX(calc(-100% / 3)); }
-  to   { transform: translateX(0); }
+/* orbital ellipses: 8 stops trace a smooth closed oval (x=A*cos, y=B*sin).
+   far: slowest/gentlest (±30px, ±8px). mid: medium (±40px, ±10px).
+   near: fastest/liveliest (±50px, ±12px). All calm — the splash is the
+   fast thing here, not the water. */
+@keyframes pw-orbit-far {
+  0%    { transform: translate(30px, 0); }
+  12.5% { transform: translate(21px, -6px); }
+  25%   { transform: translate(0, -8px); }
+  37.5% { transform: translate(-21px, -6px); }
+  50%   { transform: translate(-30px, 0); }
+  62.5% { transform: translate(-21px, 6px); }
+  75%   { transform: translate(0, 8px); }
+  87.5% { transform: translate(21px, 6px); }
+  100%  { transform: translate(30px, 0); }
 }
-@keyframes pw-drift-left {
-  from { transform: translateX(0); }
-  to   { transform: translateX(calc(-100% / 3)); }
+@keyframes pw-orbit-mid {
+  0%    { transform: translate(-40px, 0); }
+  12.5% { transform: translate(-28px, 7px); }
+  25%   { transform: translate(0, 10px); }
+  37.5% { transform: translate(28px, 7px); }
+  50%   { transform: translate(40px, 0); }
+  62.5% { transform: translate(28px, -7px); }
+  75%   { transform: translate(0, -10px); }
+  87.5% { transform: translate(-28px, -7px); }
+  100%  { transform: translate(-40px, 0); }
 }
-/* bob: gentle vertical, on the nested inner transform */
-@keyframes pw-bob-6 { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
-@keyframes pw-bob-8 { from { transform: translateY(-8px); } to { transform: translateY(8px); } }
-@keyframes pw-bob-10 { from { transform: translateY(-10px); } to { transform: translateY(10px); } }
+@keyframes pw-orbit-near {
+  0%    { transform: translate(0, 12px); }
+  12.5% { transform: translate(35px, 8px); }
+  25%   { transform: translate(50px, 0); }
+  37.5% { transform: translate(35px, -8px); }
+  50%   { transform: translate(0, -12px); }
+  62.5% { transform: translate(-35px, -8px); }
+  75%   { transform: translate(-50px, 0); }
+  87.5% { transform: translate(-35px, 8px); }
+  100%  { transform: translate(0, 12px); }
+}
 
 /* spray on the glass — ONE big splash at a time, brief and snappy.
    Two instances alternate on an 18s cycle, 9s apart: quick appear, FAST
    slide down the glass, quick fade. Most of the glass stays clear. */
+/* v1.4.18: BIGGER splash (320px), more sudden, FASTER slide — it's the
+   fastest thing in the wave scene, the quick punctuation in calm water. */
 .dive-scene.porthole .porthole-spray {
   position: absolute; z-index: 4; pointer-events: none;
-  width: 240px; height: 240px; opacity: 0;
+  width: 320px; height: 320px; opacity: 0;
   background: url(assets/porthole/drafts/porthole_glass_splash_draft.png)
     center / contain no-repeat;
   will-change: transform, opacity;
 }
 .dive-scene.porthole .splash-a {
-  left: 14%; top: 2%;
-  animation: pw-spray-1 18s ease-in infinite;
+  left: 12%; top: -4%;
+  animation: pw-spray-1 14s ease-in infinite;
 }
 .dive-scene.porthole .splash-b {
-  left: 58%; top: 0%;
-  animation: pw-spray-2 18s ease-in infinite;
-  animation-delay: -9s;
+  left: 56%; top: -6%;
+  animation: pw-spray-2 14s ease-in infinite;
+  animation-delay: -7s;
 }
 @keyframes pw-spray-1 {
-  0%   { opacity: 0; transform: scale(0.9) translateY(0); }
-  4%   { opacity: 0.9; transform: scale(1) translateY(0); }
-  10%  { opacity: 0.85; transform: scale(1) translateY(48px); }
-  16%  { opacity: 0; transform: scale(1) translateY(64px); }
-  100% { opacity: 0; transform: scale(1) translateY(64px); }
+  0%   { opacity: 0; transform: scale(0.92) translateY(0); }
+  2%   { opacity: 0.95; transform: scale(1.08) translateY(0); }
+  8%   { opacity: 0.75; transform: scale(1.08) translateY(110px); }
+  12%  { opacity: 0; transform: scale(1.08) translateY(140px); }
+  100% { opacity: 0; transform: scale(1.08) translateY(140px); }
 }
 @keyframes pw-spray-2 {
-  0%   { opacity: 0; transform: scale(0.86) translateY(0); }
-  4%   { opacity: 0.85; transform: scale(0.96) translateY(0); }
-  10%  { opacity: 0.8; transform: scale(0.96) translateY(42px); }
-  16%  { opacity: 0; transform: scale(0.96) translateY(56px); }
-  100% { opacity: 0; transform: scale(0.96) translateY(56px); }
+  0%   { opacity: 0; transform: scale(0.88) translateY(0); }
+  2%   { opacity: 0.9; transform: scale(1.04) translateY(0); }
+  8%   { opacity: 0.7; transform: scale(1.04) translateY(100px); }
+  12%  { opacity: 0; transform: scale(1.04) translateY(130px); }
+  100% { opacity: 0; transform: scale(1.04) translateY(130px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   /* freeze waves at attractive offsets; no bob, no spray */
-  .dive-scene.porthole .pw-drift,
-  .dive-scene.porthole .pw-bob,
+  .dive-scene.porthole .pw-orbit,
   .dive-scene.porthole .porthole-spray { animation: none; }
-  .dive-scene.porthole .pw-far .pw-drift { transform: translateX(-8%); }
-  .dive-scene.porthole .pw-mid .pw-drift { transform: translateX(-11%); }
-  .dive-scene.porthole .pw-near .pw-drift { transform: translateX(-5%); }
+  .dive-scene.porthole .pw-far .pw-orbit { transform: translate(12px, -3px); }
+  .dive-scene.porthole .pw-mid .pw-orbit { transform: translate(-15px, 4px); }
+  .dive-scene.porthole .pw-near .pw-orbit { transform: translate(8px, -5px); }
   .dive-scene.porthole .porthole-spray { opacity: 0; }
 }
 
