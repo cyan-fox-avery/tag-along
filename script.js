@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.31-beta";
+const VERSION = "v1.5.32-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -119,6 +119,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.5.32-beta": [
+    "🦈 <strong>Bruce reacts on the first catch.</strong> Naming a shark Bruce now gets Sarah's opener right away — the slow-burn spacing applies between later stages, not before the first one.",
   ],
   "v1.5.31-beta": [
     "🌊 <strong>Thinner seafloor.</strong> The ocean-floor wave is now a slim strip in the bottom 5% of the screen instead of a tall band — more ocean, less floor.",
@@ -3922,12 +3925,18 @@ function advanceBruceChain() {
   /* v1.5.25-beta: defensive reads — never let missing stats block the chain. */
   let _expNow = 0;
   try { _expNow = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0; } catch {}
-  const expeditionsSince = _expNow - (state.bruceEgg.expeditionsAtStage || 0);
-  const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
-  // Need either 2+ expeditions or 12+ hours since last stage
-  if (expeditionsSince < 2 && hoursSince < 12) return;
-
   const stage = state.bruceEgg.stage;
+  /* v1.5.32-beta: stage 0 (the opener) fires immediately — Sarah should
+     react when the player names a shark Bruce, not stay silent. The
+     2-expedition/12-hour spacing applies BETWEEN stages, not before the
+     first one. Previously the gate blocked stage 1 too, so naming a shark
+     Bruce on the first catch produced no feedback at all. */
+  if (stage > 0) {
+    const expeditionsSince = _expNow - (state.bruceEgg.expeditionsAtStage || 0);
+    const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
+    // Need either 2+ expeditions or 12+ hours since last stage
+    if (expeditionsSince < 2 && hoursSince < 12) return;
+  }
   if (stage >= BRUCE_CHAIN.length) {
     // Chain complete — unlock hidden achievement
     state.bruceChainComplete = true;
