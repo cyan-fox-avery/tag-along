@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.11-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.11-beta": [
+    "🗺️ <strong>Fixed trans-Pacific tracks crossing continents.</strong> Shark tracks that cross the antimeridian (like a salmon shark's Alaska ↔ Japan run) now exit one map edge and re-enter the other — no more lines streaking across Asia, Europe and the Atlantic.",
   ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
@@ -685,6 +688,37 @@ function splitAntimeridian(pts) {
   return segs.filter(s => s.length > 1);
 }
 
+/* Track legs that cross the antimeridian: split the [lat, lon] waypoint
+   list and run each cut leg to the map edge, so the line exits one edge
+   and re-enters the other instead of streaking across the whole map.
+   v1.6.11-beta: a salmon shark's Sea of Okhotsk -> Gulf of Alaska leg used
+   to draw straight from Japan eastward across Asia, Europe and the
+   Atlantic — one shark apparently crossing continents. The shark really
+   does cross the North Pacific (documented); only the rendering was wrong. */
+function splitTrackAntimeridian(ll) {
+  if (!ll || ll.length < 2) return [];
+  const segs = [];
+  let cur = [ll[0]];
+  for (let i = 1; i < ll.length; i++) {
+    const a = ll[i - 1], b = ll[i];
+    const dLon = b[1] - a[1];
+    if (Math.abs(dLon) > 180) {
+      const eastward = dLon < 0; /* e.g. 150 -> -145 crosses +180 going east */
+      const edgeLon = eastward ? 180 : -180;
+      const lonB = eastward ? b[1] + 360 : b[1] - 360;
+      const t = (edgeLon - a[1]) / (lonB - a[1]);
+      const edgeLat = a[0] + t * (b[0] - a[0]);
+      cur.push([edgeLat, edgeLon]);
+      segs.push(cur);
+      cur = [[edgeLat, -edgeLon], b];
+    } else {
+      cur.push(b);
+    }
+  }
+  segs.push(cur);
+  return segs.filter(s => s.length > 1);
+}
+
 /* Catmull-Rom -> cubic Bezier smoothing, so currents curve instead of kinking. */
 function smoothPath(p) {
   const f = q => q[0].toFixed(1) + "," + q[1].toFixed(1);
@@ -759,14 +793,21 @@ function renderMap() {
     const pts = mapPoints(t);
     if (pts.length < 2) return;
     /* Illustrative track: envelope walk only (points[1..]). The tag site
-       gets its own pin below — no line implying a migration between them. */
-    const path = pts.slice(1);
-    if (path.length >= 2) {
-      const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
-      const archival = t.track.kind === "archival";
-      svg += `<path class="map-track" d="${d}" stroke="${color}" stroke-width="${tsw}"`
-        + (archival ? ` stroke-dasharray="${(5 / z).toFixed(1)} ${(4 / z).toFixed(1)}"` : "") + "/>";
-    }
+       gets its own pin below — no line implying a migration between them.
+       v1.6.11-beta: legs crossing the antimeridian are split at +/-180 and
+       run to the map edge, so a trans-Pacific leg never streaks across
+       continents the long way round. */
+    const ll = (t.track.points || []).slice(1)
+      .map(p => MAP_COORDS[p.label]).filter(Boolean);
+    const archival = t.track.kind === "archival";
+    const dash = archival ? ` stroke-dasharray="${(5 / z).toFixed(1)} ${(4 / z).toFixed(1)}"` : "";
+    splitTrackAntimeridian(ll).forEach(seg => {
+      const d = seg.map((c, i) => {
+        const xy = mapProj(c[0], c[1]);
+        return (i ? "L" : "M") + xy[0].toFixed(1) + "," + xy[1].toFixed(1);
+      }).join(" ");
+      svg += `<path class="map-track" d="${d}" stroke="${color}" stroke-width="${tsw}"${dash}/>`;
+    });
   });
   /* Markers: hollow pin = tag site, filled dot = latest position.
      Sizes are divided by zoom so they stay readable, not gigantic. */

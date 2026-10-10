@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.11-beta', VERSION === 'v1.6.11-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2104,6 +2104,28 @@ code += `
     /* newest: later-inserted (nurse) first; oldest: earlier-inserted (zebra) first */
     return newestFirst.join(',') === 'nurse,zebra' && oldestFirst.join(',') === 'zebra,nurse';
   })());
+
+
+  // v1.6.11-beta: antimeridian-safe track rendering
+  ok('WHATS_NEW has v1.6.11-beta', Array.isArray(WHATS_NEW['v1.6.11-beta']) && WHATS_NEW['v1.6.11-beta'].length >= 1);
+  ok('splitTrackAntimeridian exists', typeof splitTrackAntimeridian === 'function');
+  ok('antimeridian leg splits into two edge-running segments', (() => {
+    const segs = splitTrackAntimeridian([[55, 150], [58, -145]]);
+    return segs.length === 2
+      && segs[0][segs[0].length - 1][1] === 180
+      && segs[1][0][1] === -180;
+  })());
+  ok('no rendered track segment jumps more than 180 degrees of longitude', (() => {
+    const ll = TRACK_ENVELOPES.salmon.areas.map(a => MAP_COORDS[a]).filter(Boolean);
+    return splitTrackAntimeridian(ll).every(seg =>
+      seg.slice(1).every((p, i) => Math.abs(p[1] - seg[i][1]) <= 180));
+  })());
+  ok('renderMap draws track legs via splitTrackAntimeridian', fileCode.indexOf('splitTrackAntimeridian(ll)') !== -1);
+  ok('salmon envelope still spans the North Pacific (data unchanged, render fixed)', (() => {
+    const lons = TRACK_ENVELOPES.salmon.areas.map(a => MAP_COORDS[a][1]);
+    return Math.max(...lons) - Math.min(...lons) > 180;
+  })());
+  ok('splitTrackAntimeridian handles short input safely', splitTrackAntimeridian([]).length === 0 && splitTrackAntimeridian([[1, 2]]).length === 0);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
