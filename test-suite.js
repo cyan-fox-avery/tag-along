@@ -219,6 +219,12 @@ code += `
   ok('chip shows common name first', /esc\\(s\\.name\\)\\} · /.test(fileCode));
   ok('overlays scroll when overflowing', /\\.overlay\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
+  // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
+  ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
+  ok('tabs share equal width', /\\.tab\\s*\\{[^}]*flex:\\s*1 1 0/.test(cssCode));
+  ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
+  ok('achievements tab is labeled', /data-tab="achievements"[^>]*>[\\s\\S]*?Achievements/.test(htmlCode));
+  ok('collection tab stacks count above label', /data-tab="collection"[\\s\\S]*?tab-stack[\\s\\S]*?collectionCount[\\s\\S]*?tab-label/.test(htmlCode));
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
   ok('sand tiger GIF flagged for reframe', !!stGif);
 
