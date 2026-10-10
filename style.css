@@ -93,21 +93,27 @@ body {
   88%  { opacity: 0;    transform: rotate(calc(var(--ray-angle) + 2.5deg)) scaleX(0.55); }
   100% { opacity: 0;    transform: rotate(calc(var(--ray-angle) + 2.5deg)) scaleX(0.55); }
 }
-/* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling. */
+/* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling.
+   v1.4.7: bubbles travel in little clusters (bursts/trails), like real air bubbles — same 8 bubbles
+   and same rise durations as before (identical total spawn rate), but grouped: cluster-mates share
+   a horizontal lane and staggered delays so they rise together as a burst. Bigger bubbles rise faster. */
 .bubbles { position: fixed; inset: 0; pointer-events: none; }
 .bubbles span {
   position: absolute; bottom: -20px; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
   animation: bubble-rise linear infinite;
 }
-.bubbles span:nth-child(1) { left: 8%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: -3s; }
-.bubbles span:nth-child(2) { left: 22%; width: 6px; height: 6px; animation-duration: 22s; animation-delay: -11s; }
-.bubbles span:nth-child(3) { left: 41%; width: 12px; height: 12px; animation-duration: 19s; animation-delay: -7s; }
-.bubbles span:nth-child(4) { left: 55%; width: 7px; height: 7px; animation-duration: 25s; animation-delay: -15s; }
-.bubbles span:nth-child(5) { left: 68%; width: 9px; height: 9px; animation-duration: 17s; animation-delay: -5s; }
-.bubbles span:nth-child(6) { left: 79%; width: 5px; height: 5px; animation-duration: 28s; animation-delay: -20s; }
-.bubbles span:nth-child(7) { left: 90%; width: 11px; height: 11px; animation-duration: 21s; animation-delay: -9s; }
-.bubbles span:nth-child(8) { left: 33%; width: 6px; height: 6px; animation-duration: 24s; animation-delay: -13s; }
+/* cluster A — left lane */
+.bubbles span:nth-child(1) { left: 13%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: -3s; }
+.bubbles span:nth-child(3) { left: 16.5%; width: 12px; height: 12px; animation-duration: 19s; animation-delay: -4.2s; }
+.bubbles span:nth-child(7) { left: 19.5%; width: 11px; height: 11px; animation-duration: 21s; animation-delay: -5.4s; }
+/* cluster B — middle lane */
+.bubbles span:nth-child(2) { left: 53%; width: 6px; height: 6px; animation-duration: 22s; animation-delay: -11s; }
+.bubbles span:nth-child(4) { left: 56.5%; width: 7px; height: 7px; animation-duration: 25s; animation-delay: -12.4s; }
+.bubbles span:nth-child(8) { left: 59.5%; width: 6px; height: 6px; animation-duration: 24s; animation-delay: -13.6s; }
+/* cluster C — right lane */
+.bubbles span:nth-child(5) { left: 80%; width: 9px; height: 9px; animation-duration: 17s; animation-delay: -5s; }
+.bubbles span:nth-child(6) { left: 83.5%; width: 5px; height: 5px; animation-duration: 28s; animation-delay: -6.3s; }
 @keyframes bubble-rise {
   from { transform: translateY(0) translateX(0); opacity: 0; }
   10% { opacity: 0.8; }
@@ -333,93 +339,96 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene .dive-shark { z-index: 3; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 
-/* v1.4.4: porthole — top-down ocean surface, like looking over the side
-   of a boat. Rich blue water, slow swells, foam catching the crests, sun
-   glitter dancing. Calm and subtle, matching the game's aesthetic.
-   Lightweight (transform/opacity only), respects prefers-reduced-motion. */
+/* v1.4.7: porthole — boat-window view of the ocean surface. Rolling wave
+   crests drift past at three depths (parallax), and spray periodically
+   hits the glass, then runs down and fades. Transform/opacity only,
+   respects prefers-reduced-motion. */
 .dive-scene.porthole {
   background: linear-gradient(180deg,
-    #2a7d9d 0%, #1e6685 45%, #134a66 100%);
+    #4a9abf 0%, #2f7a9e 38%, #1a5475 72%, #0f3c58 100%);
+  overflow: hidden;
 }
+/* deep trough wash — static, gives the water its body */
 .dive-scene.porthole .porthole-surface {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
-    /* sun glitter where the light catches, upper-left */
-    radial-gradient(ellipse 42% 30% at 30% 22%,
-      rgba(255,255,255,0.20) 0%,
-      rgba(230,245,252,0.08) 45%,
-      transparent 70%),
-    /* broad soft swell troughs */
-    radial-gradient(ellipse 70% 26% at 78% 62%,
-      rgba(8,40,60,0.28) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 22% at 22% 78%,
-      rgba(8,40,60,0.22) 0%, transparent 70%);
-  animation: porthole-swell 14s ease-in-out infinite alternate;
+    radial-gradient(ellipse 70% 24% at 76% 64%,
+      rgba(8,38,58,0.30) 0%, transparent 70%),
+    radial-gradient(ellipse 58% 20% at 24% 82%,
+      rgba(8,38,58,0.24) 0%, transparent 70%),
+    radial-gradient(ellipse 44% 26% at 40% 18%,
+      rgba(255,255,255,0.10) 0%, transparent 70%);
 }
-@keyframes porthole-swell {
-  from { transform: translateX(-14px) translateY(4px); }
-  to   { transform: translateX(14px) translateY(-4px); }
+/* rolling crest rows — scalloped foam humps on a soft crest glow.
+   Each row is one tile wider than the window and loops exactly one
+   tile width, so the drift is seamless. */
+.dive-scene.porthole .porthole-crest {
+  position: absolute; left: 0; z-index: 2; pointer-events: none;
+  background-repeat: repeat-x;
 }
-/* lighter swell patches drifting the other way, offset timing */
-.dive-scene.porthole .porthole-swells {
-  position: absolute; inset: -8%; z-index: 1; pointer-events: none;
-  background:
-    radial-gradient(ellipse 46% 20% at 64% 34%,
-      rgba(150,210,235,0.16) 0%, transparent 70%),
-    radial-gradient(ellipse 52% 24% at 30% 58%,
-      rgba(150,210,235,0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 18% at 74% 82%,
-      rgba(150,210,235,0.10) 0%, transparent 70%);
-  animation: porthole-swells 19s ease-in-out infinite alternate;
+.dive-scene.porthole .crest-far {
+  top: 12%; height: 52px; width: calc(100% + 64px);
+  background-image:
+    radial-gradient(circle at 32px 52px,
+      rgba(255,255,255,0.20) 0 10px, transparent 11px),
+    linear-gradient(180deg, transparent 60%, rgba(255,255,255,0.10) 100%);
+  background-size: 64px 52px, 100% 52px;
+  animation: porthole-drift-far 26s linear infinite;
 }
-@keyframes porthole-swells {
-  from { transform: translateX(18px) translateY(-6px); }
-  to   { transform: translateX(-18px) translateY(6px); }
+.dive-scene.porthole .crest-mid {
+  top: 42%; height: 44px; width: calc(100% + 44px);
+  background-image:
+    radial-gradient(circle at 22px 44px,
+      rgba(255,255,255,0.28) 0 8px, transparent 9px),
+    linear-gradient(180deg, transparent 58%, rgba(255,255,255,0.13) 100%);
+  background-size: 44px 44px, 100% 44px;
+  animation: porthole-drift-mid 17s linear infinite;
 }
-/* foam streaks catching the wave crests — thin, soft, drifting */
-.dive-scene.porthole .porthole-foam {
-  position: absolute; inset: -8%; z-index: 1; pointer-events: none;
-  background:
-    radial-gradient(ellipse 34% 3.5% at 56% 30%,
-      rgba(255,255,255,0.28) 0%, transparent 70%),
-    radial-gradient(ellipse 28% 3% at 30% 52%,
-      rgba(255,255,255,0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 38% 4% at 68% 72%,
-      rgba(255,255,255,0.25) 0%, transparent 70%),
-    radial-gradient(ellipse 24% 2.6% at 44% 88%,
-      rgba(255,255,255,0.18) 0%, transparent 70%);
-  animation: porthole-foam 11s ease-in-out infinite alternate;
+.dive-scene.porthole .crest-near {
+  top: 72%; height: 38px; width: calc(100% + 30px);
+  background-image:
+    radial-gradient(circle at 15px 38px,
+      rgba(255,255,255,0.36) 0 7px, transparent 8px),
+    linear-gradient(180deg, transparent 55%, rgba(255,255,255,0.16) 100%);
+  background-size: 30px 38px, 100% 38px;
+  animation: porthole-drift-near 11s linear infinite;
 }
-@keyframes porthole-foam {
-  from { transform: translateX(-22px); opacity: 0.75; }
-  to   { transform: translateX(22px); opacity: 1; }
+/* far + near drift left, mid drifts right — the water never moves in lockstep */
+@keyframes porthole-drift-far  { from { transform: translateX(0); }     to { transform: translateX(-64px); } }
+@keyframes porthole-drift-mid  { from { transform: translateX(-44px); } to { transform: translateX(0); } }
+@keyframes porthole-drift-near { from { transform: translateX(0); }     to { transform: translateX(-30px); } }
+/* spray hitting the glass — droplets pop in, run down, fade out */
+.dive-scene.porthole .porthole-splash {
+  position: absolute; z-index: 3; pointer-events: none;
+  width: 90px; height: 70px; opacity: 0;
 }
-/* sun glints — tiny sparkles twinkling on the surface */
-.dive-scene.porthole .porthole-glint {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  overflow: hidden;
-}
-.dive-scene.porthole .porthole-glint span {
+.dive-scene.porthole .porthole-splash i {
   position: absolute; border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(255,255,255,0.9) 0%, transparent 70%);
-  animation: porthole-glint ease-in-out infinite alternate;
+    rgba(255,255,255,0.95) 0%,
+    rgba(225,242,252,0.55) 45%,
+    transparent 72%);
 }
-.dive-scene.porthole .porthole-glint span:nth-child(1) { left: 22%; top: 18%; width: 7px; height: 7px; animation-duration: 3.2s; }
-.dive-scene.porthole .porthole-glint span:nth-child(2) { left: 58%; top: 32%; width: 5px; height: 5px; animation-duration: 4.1s; animation-delay: -1.4s; }
-.dive-scene.porthole .porthole-glint span:nth-child(3) { left: 74%; top: 14%; width: 6px; height: 6px; animation-duration: 2.8s; animation-delay: -0.8s; }
-.dive-scene.porthole .porthole-glint span:nth-child(4) { left: 38%; top: 58%; width: 5px; height: 5px; animation-duration: 3.7s; animation-delay: -2.2s; }
-.dive-scene.porthole .porthole-glint span:nth-child(5) { left: 66%; top: 72%; width: 7px; height: 7px; animation-duration: 4.5s; animation-delay: -3s; }
-.dive-scene.porthole .porthole-glint span:nth-child(6) { left: 14%; top: 44%; width: 4px; height: 4px; animation-duration: 3s; animation-delay: -1.1s; }
-@keyframes porthole-glint {
-  from { opacity: 0.15; transform: scale(0.8); }
-  to   { opacity: 0.85; transform: scale(1.15); }
+.dive-scene.porthole .sp1 { left: 14%; top: 8%;  animation: porthole-splash 13s ease-in infinite; }
+.dive-scene.porthole .sp2 { left: 62%; top: 5%;  animation: porthole-splash 19s ease-in infinite; animation-delay: -7s; }
+.dive-scene.porthole .sp3 { left: 40%; top: 14%; animation: porthole-splash 27s ease-in infinite; animation-delay: -16s; }
+.dive-scene.porthole .porthole-splash i:nth-child(1) { left: 28px; top: 10px; width: 32px; height: 32px; opacity: 0.45; }
+.dive-scene.porthole .porthole-splash i:nth-child(2) { left: 12px; top: 8px;  width: 9px;  height: 9px; }
+.dive-scene.porthole .porthole-splash i:nth-child(3) { left: 54px; top: 4px;  width: 7px;  height: 7px; }
+.dive-scene.porthole .porthole-splash i:nth-child(4) { left: 66px; top: 24px; width: 11px; height: 11px; }
+.dive-scene.porthole .porthole-splash i:nth-child(5) { left: 34px; top: 32px; width: 6px;  height: 6px; }
+.dive-scene.porthole .porthole-splash i:nth-child(6) { left: 6px;  top: 36px; width: 8px;  height: 8px; }
+@keyframes porthole-splash {
+  0%, 70% { opacity: 0; transform: translateY(0); }
+  75%     { opacity: 1; transform: translateY(3px); }
+  92%     { opacity: 0; transform: translateY(30px); }
+  100%    { opacity: 0; transform: translateY(34px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .dive-scene.porthole .porthole-surface,
-  .dive-scene.porthole .porthole-swells,
-  .dive-scene.porthole .porthole-foam,
-  .dive-scene.porthole .porthole-glint { animation: none; }
+  .dive-scene.porthole .porthole-crest,
+  .dive-scene.porthole .porthole-splash { animation: none; }
+}
 }
 
 .depth-shallow { background: linear-gradient(180deg, #8fd8ef 0%, #2a9db8 100%); }
