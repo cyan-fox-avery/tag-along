@@ -125,6 +125,17 @@ function renderArchive() {
     head.addEventListener("click", () => {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
+      /* v1.5.22-beta: match the Research tab — toggling "open" makes the
+         expanded card overlay its neighbors (absolute/fixed positioning)
+         instead of pushing them down. Rising z-index keeps the most
+         recently opened card on top. */
+      row.classList.toggle("open", !isHidden);
+      if (!isHidden) {
+        try { row.style.zIndex = String(++guideOverlayZ); }
+        catch (e) { row.style.zIndex = "30"; }
+      } else {
+        row.style.zIndex = "";
+      }
     });
     list.appendChild(row);
   });
