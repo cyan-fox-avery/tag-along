@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.19-beta', VERSION === 'v1.4.19-beta');
+  ok('version v1.5.0-beta', VERSION === 'v1.5.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1694,6 +1694,34 @@ code += `
   ok('confirmTag queues (no immediate pushThread celebration)', /state\\.pendingCelebrations\\.push/.test(code));
   ok('closeDive flushes celebrations', /flushPendingCelebrations\\(\\);/.test(code));
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
+  // v1.5.0-beta Mira review: persistence + copy fixes
+  ok('celebrationStore persists pending celebrations', (() => {
+    celebrationStore.clear();
+    const evts = [{speciesId:'nurse',speciesName:'Nurse Shark',nickname:'',researchId:'NS-2026-001',length:2.5,sex:'F',opener:'op',cheer:'ch'}];
+    celebrationStore.save(evts);
+    const loaded = celebrationStore.load();
+    celebrationStore.clear();
+    return loaded.length === 1 && loaded[0].speciesId === 'nurse' && celebrationStore.load().length === 0;
+  })());
+  ok('reload recovery delivers celebration exactly once', (() => {
+    celebrationStore.clear();
+    const before = state.messages.length;
+    const evts = [
+      {speciesId:'nurse',speciesName:'Nurse Shark',nickname:'',researchId:'NS-2026-001',length:2.5,sex:'F',opener:'Nice one!',cheer:'Great work!'},
+      {speciesId:'tiger',speciesName:'Tiger Shark',nickname:'',researchId:'TS-2026-001',length:3.1,sex:'M',opener:'Whoa!',cheer:'Amazing!'}
+    ];
+    state.bigDayBags = { 2: [0,1,2,3,4,5,6,7] };
+    celebrationStore.save(evts); // simulate: tag saved, reload before Return to ship
+    recoverPendingCelebrations(); // first recovery (boot)
+    const afterFirst = state.messages.length;
+    const storeEmpty = celebrationStore.load().length === 0;
+    recoverPendingCelebrations(); // second recovery must be a no-op
+    const afterSecond = state.messages.length;
+    return (afterFirst - before) === 1 && storeEmpty && afterSecond === afterFirst;
+  })());
+  ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
+  ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
