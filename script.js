@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.15-beta";
+const VERSION = "v1.5.16-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.16-beta": [
+    "📑 <strong>Tabs, locked in.</strong> The 8-column tab grid is now the base layout on every screen size (phones keep their 4+4) — no more relying on media queries that iPad Safari could ignore.",
   ],
   "v1.5.15-beta": [
     "📖 <strong>Field-guide headers, restacked.</strong> Common name in bold on its own line, with the italic scientific name below it — easier to scan, more room to breathe.",
