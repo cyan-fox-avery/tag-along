@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.4-beta', VERSION === 'v1.6.4-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -235,6 +235,10 @@ code += `
   ok('auto-nudge waits for five failures', /state\\.failures >= 5/.test(fileCode));
   ok('ask-Sarah advice path exists', typeof askSarahAdvice === 'function' && typeof renderSarahAsk === 'function');
   ok('encounter announces tagged status', fileCode.includes('new to your book') && (fileCode.includes('tag looks familiar') || fileCode.includes('already in your book')));
+  ok('resight uses encounter-level one-shot guard (v1.6.4)', fileCode.includes('lastResightEncounterId'));
+  ok('resight guard keys on encounterId', fileCode.includes('lastResightEncounterId === encounterId'));
+  ok('doEncounter mints encounterId', fileCode.includes('const encounterId = "enc-"'));
+  ok('resight button disabled after tap (v1.6.4)', fileCode.includes('resightBtn.disabled = true'));
   ok('map legend is two-column', /\\.map-legend\\s*\\{\\s*display:\\s*grid/.test(cssCode));
   ok('chip shows common name first', /esc\\(s\\.name\\)\\} · /.test(fileCode));
   ok('overlays scroll when overflowing', /\\.overlay\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
@@ -2015,6 +2019,7 @@ code += `
 
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));

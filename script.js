@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.4-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.4-beta": [
+    "🔁 <strong>Re-sighting, logged once.</strong> The 'Log re-sighting' button is now guarded at the encounter level, not just the button — no more duplicate Sarah messages from double-taps.",
   ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
@@ -1929,8 +1932,17 @@ function pickEncounter(appeared, shown, plan) {
 /* One encounter: the shark appears, and the player chooses to WATCH
    (a sighting, logged) or TAG (if untagged — opportunistic tagging is
    always allowed). Either way the day goes on. */
+/* v1.6.4-beta: encounter-level one-shot for "Log re-sighting". The v1.5.25
+   guard lived on the button's dataset — if the encounter UI ever re-rendered
+   (or iOS retargeted the tap), a fresh button lost the guard and Sarah's
+   resighting thread could fire twice. This key lives outside the DOM. */
+let lastResightEncounterId = null;
 function doEncounter(species, plan) {
   return new Promise(resolve => {
+    /* v1.6.4-beta: unique ID for this encounter instance. The resight guard
+       keys on it, so exactly one re-sighting can be logged per encounter
+       no matter how many buttons get rendered. */
+    const encounterId = "enc-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 46656).toString(36);
     /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
        encountering the species rolls: is it YOUR shark (reunion) or a different
        untagged animal? Odds by ecology tier (game-balance, not science):
@@ -2121,9 +2133,15 @@ function doEncounter(species, plan) {
       resightBtn.type = "button";
       resightBtn.textContent = "📝 Log re-sighting";
       resightBtn.addEventListener("click", () => {
-        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice. */
+        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice.
+           v1.6.4-beta: hardened — the dataset guard alone wasn't enough (Avery
+           still saw duplicates on iPad). The encounter-ID check lives outside
+           the DOM, so a re-rendered button can't lose it. */
+        if (lastResightEncounterId === encounterId) return;
+        lastResightEncounterId = encounterId;
         if (resightBtn.dataset.done) return;
         resightBtn.dataset.done = "true";
+        resightBtn.disabled = true;
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
