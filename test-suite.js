@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.8-beta', VERSION === 'v1.5.8-beta');
+  ok('version v1.5.9-beta', VERSION === 'v1.5.9-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1515,12 +1515,13 @@ code += `
   (() => {
     ok("tabs use flexbox (v1.5.7)", /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
   ok("desktop tabs have flex-basis pills", /\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
-  ok("tablet tabs wider (v1.5.7)", /max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex-basis:\\s*150px/.test(cssCode));
+  ok("tablet tabs single row (v1.5.9)", /max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+0/.test(cssCode));
+  ok("tablet tabs no fixed 150px basis (v1.5.9)", !/max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex-basis:\\s*150px/.test(cssCode));
   ok("phone tabs use flex-wrap (v1.5.6)", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
     ok("phone tabs wrap", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
     ok("phone tabs center every row", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
     ok("phone tabs keep ~3-per-row size", /max-width:\\s*559px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
-    ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
+    ok("flex 1-1-0 only inside tablet query (v1.5.9)", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+0(?![^}]*\\})[\\s\\S]*?@media/.test(cssCode.split("@media (min-width: 560px)")[0]));
     ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
   })();
   // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
@@ -1715,7 +1716,7 @@ code += `
   ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
   ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
   ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.8-beta', Array.isArray(WHATS_NEW['v1.5.8-beta']) && WHATS_NEW['v1.5.8-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover is plain heading', code.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
