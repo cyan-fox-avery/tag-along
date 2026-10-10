@@ -34,11 +34,12 @@ let code = files.map(f => fs.readFileSync(path.join(DIR, f), 'utf8')).join('\n')
 const fileCode = code;
 const cssCode = fs.readFileSync(path.join(DIR, 'style.css'), 'utf8');
 const htmlCode = fs.readFileSync(path.join(DIR, 'index.html'), 'utf8');
+const archiveUiCode = fs.readFileSync(path.join(DIR, 'archive-ui.js'), 'utf8');
 code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.5-beta', VERSION === 'v1.5.5-beta');
+  ok('version v1.5.6-beta', VERSION === 'v1.5.6-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1550,25 +1551,18 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
-  // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
-  // iPad layout) — brighter, wider fan, clearly visible motion
+  // v1.5.6: conic fan rebuilt safely — merged transform keyframes,
+  // no standalone scale property (the v1.4.16 layout-breaker)
   (() => {
-    ok("caustics use span-based rays", /\\.caustics\\s+span\\s*\\{/.test(cssCode));
-    ok("no conic fan divs remain", !/\\.caustics\\s+\\.fan/.test(cssCode));
-    ok("rays have diffused soft edges (mask)", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to\\s+right/.test(cssCode));
-    ok("rays use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
+    ok("caustics use conic fan divs", /\\.caustics\\s+\\.fan\\s*\\{/.test(cssCode));
+    ok("no span-based rays remain", !/\\.caustics\\s+span\\s*\\{/.test(cssCode));
+    ok("fan has three layers", /\\.fan-1/.test(cssCode) && /\\.fan-2/.test(cssCode) && /\\.fan-3/.test(cssCode));
+    ok("fan uses conic gradients", /conic-gradient/.test(cssCode));
+    ok("fan uses screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
     ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
-    const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)/g) || []).length;
-    ok("caustics has 8 rays", rayCount === 8);
-    ok("rays never use the scale property (layout-safe)", !/scale:\\s*[\\d.]+/.test(cssCode));
-  })();
-  // v1.4.17: rays have clearly visible life — sway plus grow/shrink via transform
-  (() => {
-    ok("rays have ray-life keyframes", /@keyframes\\s+ray-life/.test(cssCode));
-    ok("ray-life sways visibly", /ray-life[\\s\\S]{0,800}?rotate\\(calc\\(var\\(--ray-angle\\)\\s*-\\s*4deg/.test(cssCode));
-    ok("ray-life grows/shrinks via scaleX", /ray-life[\\s\\S]{0,800}?scaleX\\(1\\.25\\)/.test(cssCode));
-    ok("rays never fully vanish", /ray-life[\\s\\S]{0,800}?opacity:\\s*0\\.15/.test(cssCode));
-    ok("reduced-motion freezes rays statically", /\\.surface-shimmer,\\s*\\.caustics\\s+span,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
+    ok("fan motion uses merged transform (no scale property)", /@keyframes\\s+fan-motion-1[\\s\\S]{0,400}?transform:\\s*rotate/.test(cssCode));
+    ok("fan never uses standalone scale property", !/(?<![a-zA-Z-])scale\\s*:[\\s\\d.]/.test(cssCode.split(".bubbles")[0]));
+    ok("reduced-motion freezes fan", /\\.surface-shimmer,\\s*\\.caustics\\s+\\.fan,/.test(cssCode));
   })();
   // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column
   (() => {
@@ -1590,9 +1584,9 @@ code += `
   // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
   (() => {
     ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
-    ok("bubble columns share a 24s cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+24s/.test(cssCode));
+    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
-    ok("bubbles number 16 (4 lanes x 4)", bubbleCount === 16);
+    ok("bubbles have varied column counts", bubbleCount === 15);
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1600,7 +1594,7 @@ code += `
     ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
     ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
   })();
-  // v1.5.5-beta: guide popup is closable — close button, Escape, outside tap
+  // v1.5.6-beta: guide popup is closable — close button, Escape, outside tap
   (() => {
     ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
     ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
@@ -1640,7 +1634,7 @@ code += `
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
   // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
-  ok('caustic ray spans in HTML', /<div class=\"caustics\"><span><\\/span>/.test(htmlCode));
+  ok('conic fan divs in HTML', /<div class=\\"caustics\\"><div class=\\"fan fan-1/.test(htmlCode));
   ok('porthole has single orbit structure per layer', /class="pw-layer pw-far"><div class="pw-orbit"/.test(htmlCode) && !/class="pw-drift"/.test(htmlCode) && !/class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
   ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
@@ -1666,7 +1660,9 @@ code += `
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
   ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
   // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
-  ok('bubble columns overlap in pairs', /columns A.B fire together/.test(cssCode) && /columns C.D fire together/.test(cssCode));
+  ok('bubbles are randomized (v1.5.6)', /randomized bubble columns/.test(cssCode) || /natural bubble columns/.test(cssCode));
+  ok('bubble columns have varied counts (2-5)', /column A — 5 bubbles/.test(cssCode) && /column D — 2 bubbles/.test(cssCode));
+  ok('bigger bubbles rise faster', /width: 12px[^}]*animation-duration: 18s/.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
   ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
@@ -1710,7 +1706,7 @@ code += `
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
@@ -1767,6 +1763,20 @@ code += `
   })());
   ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
   ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
+
+  // v1.5.6-beta: conic fan rebuild + bubbles + dive scene + release dialog + archive
+  ok('conic fan uses merged transform keyframes', /@keyframes fan-motion-1/.test(cssCode) && /transform:\\s*rotate\\([^)]+\\)\\s*scale\\(/.test(cssCode));
+  ok('no standalone scale property in fan CSS', !/(?<![a-zA-Z-])scale\\s*:/.test(cssCode.split('.bubbles')[0]));
+  ok('fan divs in HTML', /class="fan fan-1"/.test(htmlCode));
+  ok('no caustics spans in HTML', !/class="caustics"><span/.test(htmlCode));
+  ok('bubbles start together per column', /animation-delay:\\s*-0\\.5s/.test(cssCode) && /animation-delay:\\s*-19\\.5s/.test(cssCode));
+  ok('dive scene has depth gradient', /\\.dive-scene:not\\(\\.porthole\\)/.test(cssCode));
+  ok('dive god-rays are soft (no stripes)', !/repeating-linear-gradient\\(115deg/.test(cssCode));
+  ok('dive motes exist', /\\.dive-scene \\.motes/.test(cssCode));
+  ok('release buttons reordered (tagalong before ship)', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
+  ok('releaseBtn uses gradient', /#releaseBtn\\s*\\{[^}]*linear-gradient/.test(cssCode));
+  ok('archive still-to-discover is static text', /archive-still-locked-head/.test(archiveUiCode));
+  ok('no details/summary for still-to-discover', !/<summary>Still to discover/.test(archiveUiCode));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
