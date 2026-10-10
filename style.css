@@ -756,6 +756,7 @@ select option:disabled { color: #7a8a9e; }
 
 /* Collection grid: compact two-across cells, tap for detail */
 .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.collection-grid .empty-note { grid-column: 1 / -1; }
 @media (min-width: 560px) {
   .collection-grid { grid-template-columns: repeat(4, 1fr); }
 }
