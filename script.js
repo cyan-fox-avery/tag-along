@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.8-beta";
+const VERSION = "v1.4.9-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -91,6 +91,9 @@ const WHATS_NEW = {
   ],
   "v1.4.8-beta": [
     "🔧 <strong>Edge bar fix.</strong> Fixed the dark vertical bars that slid in and out at the screen edges — the surface shimmer layer is now wider than the viewport so its drift never exposes an edge."
+  ],
+  "v1.4.9-beta": [
+    "🐋 <strong>New achievement: White Whale.</strong> Tag the elusive megamouth shark — fewer than 300 have ever been seen — and Sarah will absolutely lose her mind."
   ]
 };
 
@@ -2496,6 +2499,11 @@ function unlockAchievement(a) {
      achievements shows each card in turn instead of overwriting. */
   achieveQueue.push(a);
   showNextAchievement();
+  /* v1.4.9: White Whale gets a Sarah reaction — she'd lose her mind
+     over a megamouth. Fires alongside the achievement celebration. */
+  if (a.id === "white-whale" && typeof WHITE_WHALE_THREAD !== "undefined") {
+    pushThread(WHITE_WHALE_THREAD.map(m => ({ ...m })));
+  }
 }
 const achieveQueue = [];
 let achieveShowing = false;
