@@ -16,7 +16,7 @@
 
 /* Dark fallback for overscroll areas; also keeps body's transparent
    background off the canvas so the fixed gradient layer paints cleanly. */
-html { background: #020a16; }
+html { background: #000; } /* v1.5.28-beta: pure black — no blue in overscroll */
 
 body {
   margin: 0;
@@ -47,10 +47,11 @@ body::before {
     #1e6a9e 0%,    /* sunlit surface */
     #155a8a 12%,
     #0f4470 28%,   /* mid-water */
-    #0a2f52 48%,
-    #071f3a 68%,   /* deep water */
-    #041224 85%,
-    #020a16 100%); /* abyssal dark */
+    #0a2f52 46%,
+    #071f3a 60%,   /* deep water */
+    #020a16 72%,
+    #000 85%,      /* v1.5.28-beta: fade to pure black at the bottom — deep ocean, not blue */
+    #000 100%);
 }
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
