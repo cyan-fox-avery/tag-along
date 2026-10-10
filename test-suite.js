@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.6-beta', VERSION === 'v1.4.6-beta');
+  ok('version v1.4.7-beta', VERSION === 'v1.4.7-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1594,19 +1594,21 @@ code += `
   ok("WHATS_NEW has v1.4.4-beta", !!(WHATS_NEW["v1.4.4-beta"] && WHATS_NEW["v1.4.4-beta"].length));
   ok("WHATS_NEW has v1.4.5-beta", !!(WHATS_NEW["v1.4.5-beta"] && WHATS_NEW["v1.4.5-beta"].length));
   ok("WHATS_NEW has v1.4.6-beta", !!(WHATS_NEW["v1.4.6-beta"] && WHATS_NEW["v1.4.6-beta"].length));
-  ok("collection empty-note spans grid", /\.collection-grid\s+\.empty-note\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/.test(cssCode));
+  ok("WHATS_NEW has v1.4.7-beta", !!(WHATS_NEW["v1.4.7-beta"] && WHATS_NEW["v1.4.7-beta"].length));
+  ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
-  // v1.4.4: porthole — top-down ocean surface (boat view): swells, foam, glints
-  ok('porthole wave elements in HTML', /class="porthole-surface"/.test(htmlCode) && /class="porthole-swells"/.test(htmlCode) && /class="porthole-foam"/.test(htmlCode) && /class="porthole-glint"/.test(htmlCode));
+  // v1.4.7: porthole — boat-window waves: rolling crests, spray splashes
+  ok('porthole wave elements in HTML', /class="porthole-surface"/.test(htmlCode) && /class="porthole-crest crest-far"/.test(htmlCode) && /class="porthole-splash sp1"/.test(htmlCode));
   ok('porthole no longer underwater-style', !/class="porthole-shafts"/.test(htmlCode) && !/class="porthole-bubbles"/.test(htmlCode));
   ok('diveView not hidden by default', !/id="diveView" class="dive-view hidden"/.test(htmlCode));
   ok('porthole CSS exists', /\\.dive-scene\\.porthole/.test(cssCode));
-  ok('porthole has swell animation', /@keyframes\\s+porthole-swell/.test(cssCode));
-  ok('porthole has foam animation', /@keyframes\\s+porthole-foam/.test(cssCode));
-  ok('porthole has glint animation', /@keyframes\\s+porthole-glint/.test(cssCode));
+  ok('porthole has crest drift animation', /@keyframes\\s+porthole-drift-(far|mid|near)/.test(cssCode));
+  ok('porthole has splash animation', /@keyframes\\s+porthole-splash/.test(cssCode));
+  ok('porthole splash has six droplets', /class="porthole-splash sp2"[^>]*>(<i><\\/i>){6}/.test(htmlCode));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?porthole-surface/.test(cssCode));
+  ok('bubbles travel in clusters', /bubbles travel in little clusters/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
