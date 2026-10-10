@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.14-beta', VERSION === 'v1.4.14-beta');
+  ok('version v1.4.15-beta', VERSION === 'v1.4.15-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1584,6 +1584,17 @@ code += `
     const negAngles = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*-\\d+deg/g) || []).length;
     ok("no ray has a negative fan angle", negAngles === 0);
   })();
+  // v1.4.15-beta: IUCN badges are color-coded by threat level
+  ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
+  ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
+  // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
+  ok('desktop logo 156px', /\\.site-logo\\s*\\{[^}]*height:\\s*156px/.test(cssCode));
+  // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
+  ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
+  // v1.4.15-beta: time-of-day progression in expedition log
+  ok('time progression', /The afternoon stretches out/.test(fileCode) && /Evening approaches/.test(fileCode));
+  // v1.4.15-beta: subtle diet phrases (not bait answers)
+  ok('diet phrases', /they eat plankton/.test(fileCode) && /DIET_PHRASE/.test(fileCode));
   // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
   (() => {
     ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
@@ -1612,6 +1623,7 @@ code += `
   ok("WHATS_NEW has v1.4.12-beta", !!(WHATS_NEW["v1.4.12-beta"] && WHATS_NEW["v1.4.12-beta"].length));
   ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
+  ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
