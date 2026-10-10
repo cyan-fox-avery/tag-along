@@ -116,6 +116,17 @@ const SARAH_EGG_THREAD = [
   { who: "me",   text: "She's got your name now. I think she knows." }
 ];
 
+/* v1.5.25-beta: naming specifically the LEMON shark "Sarah". The real Sarah's
+   reaction to lemon sharks was literally "LEMONNNNNNN" — this thread is
+   separate from the regular Sarah-naming thread, and has maximum feelings. */
+const LEMON_SARAH_EGG_THREAD = [
+  { who: "them", text: "wait. WAIT. you named the LEMON shark sarah??" },
+  { who: "me",   text: "Seemed like the right shark for your name." },
+  { who: "them", text: "LEMONNNNNNN 😭😭 lemons are my FAVOURITE shark. my absolute favourite shark in the whole ocean. and now there's one out there with MY name and i am not okay." },
+  { who: "me",   text: "She's a good one. She knows." },
+  { who: "them", text: "she's the best one. tell her i love her. actually she already knows. 😭😭" }
+];
+
 /* v0.23.0: real-shark easter eggs. Mary Lee was a real great white — tagged
    Sept 17, 2012 off Cape Cod by OCEARCH, 4.9m mature female, ~50 years old,
    named for Chris Fischer's mother. "Matriarch of the Sea" with 130k Twitter
@@ -161,26 +172,35 @@ const BRUCE_CHAIN = [
     { who: "me", text: "It's from Jaws. I figured you'd notice eventually." },
     { who: "them", text: "oh i noticed. and honestly? i love it. the jaws shark was mechanical — built for the movie — and the crew nicknamed it Bruce, after spielberg's lawyer. but the {bruce} you named is out there actually swimming. a real {species} carrying the best name in the database." },
   ],
-  /* Stage 2 — the notorious technical problems. */
+  /* Stage 2 — the notorious technical problems.
+     v1.5.25-beta: context-setting opener — stages arrive expeditions apart,
+     so each one re-establishes what it's about. */
   [
+    { who: "them", text: "okay so i've been thinking about your {species}. the one you named {bruce}. i went down a rabbit hole about its namesake and oh boy." },
     { who: "them", text: "and when i say machine i mean a machine that barely worked. salt water kept breaking it — hydraulics, buoyancy, everything. the ocean won every round." },
     { who: "me", text: "A shark that can't handle the ocean. That's brutal." },
     { who: "them", text: "right?? they built this enormous complicated thing and spent half the shoot just trying to keep it functioning." },
   ],
-  /* Stage 3 — the failures forced restraint, and restraint made it scarier. */
+  /* Stage 3 — the failures forced restraint, and restraint made it scarier.
+     v1.5.25-beta: context-setting opener (see stage 2). */
   [
+    { who: "them", text: "more bruce lore, since you're stuck with me: the robot shark story gets better." },
     { who: "them", text: "so spielberg had a problem: no working shark. his fix was to barely show it. most of the movie you never SEE the thing — it's the pov shot, the barrels on the surface, the fin, the music." },
     { who: "me", text: "duh-duh. duh-duh." },
     { who: "them", text: "exactly. and it made the movie SCARIER. not seeing it was worse than seeing it. the broken robot accidentally proved that holding back beats showing everything." },
   ],
-  /* Stage 4 — Nemo's Bruce + Jaws' cultural effect on real sharks. */
+  /* Stage 4 — Nemo's Bruce + Jaws' cultural effect on real sharks.
+     v1.5.25-beta: context-setting opener (see stage 2). */
   [
+    { who: "them", text: "bruce update — the name keeps popping up in shark history and i had to tell you." },
     { who: "them", text: "years later finding nemo names their great white bruce. on purpose — it's a jaws reference. 'fish are friends, not food.' the nicest shark in movies is named after the scariest one." },
     { who: "me", text: "Okay that's actually perfect." },
     { who: "them", text: "the un-funny part: jaws genuinely terrified people. it put the mindless-monster idea in everyone's head, and real sharks have been paying for it ever since." },
   ],
-  /* Stage 5 — the contrast: the player's actual Bruce. The punchline. */
+  /* Stage 5 — the contrast: the player's actual Bruce. The punchline.
+     v1.5.25-beta: context-setting opener (see stage 2). */
   [
+    { who: "them", text: "last bruce thought, i swear. back to YOUR {bruce} for a sec —" },
     { who: "them", text: "and then there's the {bruce} you named. a real {species}. you found it, tagged it, let it go. you know what it actually does all day." },
     { who: "me", text: "It's got a research ID and everything." },
     { who: "them", text: "exactly. they needed a monster so they built one out of metal. you went and met the real animal instead. Bruce the robot, Bruce the joke — and {bruce}, just a shark, doing shark things. anyway. 10/10 name." },
