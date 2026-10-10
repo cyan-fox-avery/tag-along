@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.24-beta";
+const VERSION = "v1.5.25-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,10 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.25-beta": [
+    "🌊 <strong>One-screen ocean.</strong> The background gradient is now fixed to the viewport — light at the top of the screen, dark at the bottom, always — so every tab shows the same full gradient whether it's a long list or an empty page.",
+    "📌 <strong>Pinning stays put.</strong> Tapping the pin button no longer makes the page jump — your scroll position is preserved.",
   ],
   "v1.5.24-beta": [
     "\U0001F988 <strong>Bruce, your way.</strong> Sarah's Bruce chain now uses your exact capitalization for your shark, while the original Jaws shark is always \"Bruce\".",
@@ -1293,6 +1297,9 @@ function clearGuideFilters() {
 /* v0.20.0: pin one shark as "currently researching". Tapping the pin on a
    pinned shark unpins it. One pin at a time — a focus, not a collection. */
 function togglePin(id) {
+  /* v1.5.25-beta: pinning must not move the page. The list re-render below used
+     to make the page jump/scroll on tap — save and restore the scroll position. */
+  const keepY = window.scrollY;
   state.pinned = (state.pinned === id) ? null : id;
   if (state.pinned) { // v1.0.3-beta: remember the first pin to collapse the explainer later
     state.hasPinnedBefore = true;
@@ -1302,6 +1309,7 @@ function togglePin(id) {
   renderResearch();
   renderExpeditionPin();
   renderPinHint(); // v0.22.0
+  window.scrollTo(0, keepY);
 }
 /* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
    clears any filters hiding the shark first, so Jump never silently fails. */
