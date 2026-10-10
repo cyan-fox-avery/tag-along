@@ -194,21 +194,23 @@ body { overflow-x: clip; }
 }
 
 /* v1.5.1: tighter header — less vertical room around the logo/title/tab bar */
-.topbar { text-align: center; padding: 10px 8px 4px; }
-.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 4px; border-radius: 8px; }
+/* v1.6.1-beta: bigger logo, tighter margins still */
+.topbar { text-align: center; padding: 8px 8px 2px; }
+.site-logo { display: block; height: 76px; width: auto; margin: 0 auto 3px; border-radius: 8px; }
 /* v1.4.0: desktop-only side-by-side title lockup — logo beside (not above)
    the title, bigger logo, less vertical room. Phone/tablet keep the stack. */
 @media (min-width: 1024px) {
-  .topbar { display: flex; align-items: center; justify-content: center; gap: 18px; text-align: left; padding: 8px 8px 4px; }
+  .topbar { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: left; padding: 6px 8px 2px; }
   /* v1.4.15-beta: logo 150% bigger — it's a logo, give it presence */
-  .site-logo { height: 156px; margin: 0; flex: none; }
+  /* v1.6.1-beta: bigger still */
+  .site-logo { height: 190px; margin: 0; flex: none; }
   .topbar-text { min-width: 0; }
   .topbar h1 { margin: 0 0 2px; }
 }
 .eyebrow {
   margin: 0; font-size: 11px; letter-spacing: 3px; color: var(--ink-dim);
 }
-.topbar h1 { margin: 3px 0 2px; font-size: 34px; letter-spacing: 1px; }
+.topbar h1 { margin: 2px 0 1px; font-size: 34px; letter-spacing: 1px; }
 .subtitle { margin: 0; color: var(--ink-dim); font-size: 14px; }
 
 /* v1.4.0: full-bleed tab band — the dark band spans the viewport edge to edge
@@ -1096,6 +1098,14 @@ select option:disabled { color: #7a8a9e; }
 .guide-row-head .guide-names .guide-row-name { flex: none; max-width: 100%; }
 .guide-row-head .guide-names .latin { flex: none; font-size: 12px; }
 .guide-row-head .status-pill { margin-bottom: 0; flex: none; }
+/* v1.6.1-beta: checklist-style tag status — an empty circle before each name
+   that fills green when the shark is tagged. Replaces the ✅ prefix. */
+.tag-check {
+  display: inline-block; width: 13px; height: 13px; flex: none;
+  border: 2px solid var(--ink-dim); border-radius: 50%;
+  margin-right: 7px; vertical-align: -1px;
+}
+.tag-check.is-done { background: #2ecc71; border-color: #2ecc71; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
 .guide-row.open .guide-caret { transform: rotate(180deg); }
 .guide-row-body { padding: 0 14px 14px; border-top: 1px solid #2c5364; }
@@ -1431,8 +1441,11 @@ video.archive-media { max-height: 420px; }
      Phone stacked layout untouched. */
   #diveActions { grid-column: 1; grid-row: 2; }
 
-  /* Collection: 6 columns */
-  .collection-grid { grid-template-columns: repeat(6, 1fr); }
+  /* Collection: 3 columns of horizontal cards (v1.6.1-beta) */
+  .collection-grid { grid-template-columns: repeat(3, 1fr); }
+  .grid-cell { display: flex; align-items: center; gap: 14px; text-align: left; padding: 12px; }
+  .grid-cell .shark-art { flex: 0 0 140px; margin: 0; }
+  .grid-cell-text { min-width: 0; }
   .grid-cell h3 { font-size: 16px; }
 
   /* Logbook: 2 columns */
