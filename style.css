@@ -275,8 +275,14 @@ body { overflow-x: clip; }
    so every tab keeps the same width without squeezing labels. */
 @media (min-width: 560px) and (max-width: 1023px) {
   /* v1.5.9: all 8 tabs share one row on tablets — even flex
-     distribution, no fixed basis, no wrap. No transforms. */
-  .tab { flex: 1 1 0; min-width: 0; font-size: 12.5px; }
+     distribution, no fixed basis, no wrap. No transforms.
+     v1.5.12: tighter type + shrinkable label stack so 8 tabs truly fit
+     one iPad row — the icon/label content's intrinsic width was forcing
+     the last tab to wrap. */
+  .tabs { gap: 6px; }
+  .tab { flex: 1 1 0; min-width: 0; font-size: 11px; padding: 10px 2px; }
+  .tab-stack { min-width: 0; }
+  .tab-label { white-space: nowrap; }
 }
 
 .panel { display: none; }
@@ -1063,19 +1069,25 @@ select option:disabled { color: #7a8a9e; }
    column widening (absolute elements don't participate in grid sizing). */
 .guide-row { position: relative; min-width: 0; }
 .guide-row.open { overflow: visible; z-index: 20; }
+/* v1.5.12: expanded cards show the full description — no internal scrolling,
+   the card grows to fit its content. Top corners rounded to match the bottom. */
 .guide-row.open .guide-row-body {
   position: absolute; top: 100%; left: 0; width: 100%; max-width: 100%; min-width: 0; z-index: 20;
   background: var(--bg-card);
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius: var(--radius);
   box-shadow: 0 18px 36px rgba(0,0,0,0.55);
-  max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 /* v1.5.2-beta: on small screens the expanded card becomes a centered modal
    so the full content is always reachable — no more cut-off bottoms. */
 @media (max-width: 768px) {
+  /* v1.5.2-beta: on small screens the expanded card becomes a centered modal
+     so the full content is always reachable — no more cut-off bottoms.
+     v1.5.12: top-anchored (not vertically centered) so a tall card can never
+     clip its close button; no max-height, no internal scroll — the card
+     grows to fit its full content. */
   .guide-row.open .guide-row-body {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: calc(100vw - 32px); max-width: 520px; max-height: 80vh;
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    width: calc(100vw - 32px); max-width: 520px;
     border-radius: var(--radius);
   }
 }
