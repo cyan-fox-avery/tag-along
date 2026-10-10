@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.9-beta";
+const VERSION = "v1.5.10-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.10-beta": [
+    "🖼️ <strong>Archive is tagged-sharks only.</strong> The \"Still to discover\" locked list is gone — the Archive now shows just the sharks you have actually tagged, with Research-style name + color-coded IUCN badges (no checkmarks).",
   ],
   "v1.5.9-beta": [
     "📑 <strong>All eight tabs, one row.</strong> The tab bar no longer wraps \"Achievements\" to a second line on tablets — the tabs share the row evenly.",

@@ -79,46 +79,40 @@ function renderArchive() {
   const list = $("archiveList");
   if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
   list.innerHTML = "";
-  /* v1.2.0-beta Mira review: unlocked species first (the reward), locked
-     ones collapsed in a "Still to discover" section — the Archive should
-     feel like earned photographs, not another species catalogue. */
-  const unlockedRows = [];
-  const lockedRows = [];
+  /* v1.5.10-beta: the Archive shows ONLY sharks the player has tagged.
+     The locked-species teaser list is gone — no tantalizing teasers.
+     It's a gallery of earned photographs, not a catalogue.
+     v1.2.0-beta Mira review: unlocked species first (the reward).
+     v0.17.0 review fix: the archive promise is "the real animals you tagged."
+     A species dossier requires an actual tag, so a future roster expansion
+     (e.g. salmon) can't leak into a returning player's Archive before they
+     tag one. */
+  const abbrFor = (status) => (typeof IUCN_ABBR !== "undefined" && IUCN_ABBR[status]) || status;
   SHARKS.forEach(s => {
     const media = ARCHIVE_MEDIA[s.id];
     if (!media || media.future) return;
-    /* v0.17.0 review fix: the archive promise is "the real animals you tagged."
-       A species dossier requires an actual tag, so a future roster expansion
-       (e.g. salmon) can't leak into a returning player's Archive before they
-       tag one.
-       v1.2.0-beta (for Mira's review): locked species now appear as
-       silhouettes instead of being hidden entirely — the player sees what's
-       still out there to discover. Photos unlock per-tag as before. */
-    const isLocked = !state.tagged[s.id];
-    const t = state.tagged[s.id] || {};
+    const t = state.tagged[s.id];
+    if (!t) return; /* untagged species are not rendered at all */
     const yourShark = t.researchId
       ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
       : "";
-    const lockedHtml = `
-      <div class="archive-locked">
-        <div class="archive-locked-art">${typeof SKETCH !== "undefined" && SKETCH[s.id] ? SKETCH[s.id] : "🦈"}</div>
-        <p class="hook">🔒 Tag a ${s.name} to unlock its archive photos.</p>
-      </div>`;
+    /* v1.5.10-beta: row head matches the Research page — common name first,
+       then the color-coded abbreviated IUCN badge. No checkmark. */
+    const abbr = abbrFor(s.status);
     const row = document.createElement("div");
-    row.className = "guide-row" + (isLocked ? " archive-locked-row" : "");
+    row.className = "guide-row";
     row.innerHTML = `
       <button type="button" class="guide-row-head" aria-expanded="false">
         <span class="guide-row-name">${s.name}</span>
         <span class="latin">${media.scientific}</span>
-        <span class="status-pill">IUCN: ${s.status}</span>
-        ${isLocked ? `<span class="status-pill locked-pill">🔒 Locked</span>` : ""}
+        <span class="status-pill iucn-${abbr}" title="IUCN Red List: ${s.status}">${abbr}</span>
         <span class="guide-caret" aria-hidden="true">\u25be</span>
       </button>
       <div class="guide-row-body hidden">
-        ${isLocked ? lockedHtml : `${yourShark}
+        ${yourShark}
         ${media.comingSoon
           ? `<p class="hook">📸 Wild media coming soon — being curated.</p>`
-          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}`}
+          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
       </div>`;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
@@ -126,17 +120,7 @@ function renderArchive() {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
     });
-    if (isLocked) lockedRows.push(row); else unlockedRows.push(row);
+    list.appendChild(row);
   });
-  unlockedRows.forEach(row => list.appendChild(row));
-  if (lockedRows.length) {
-    /* v1.5.8-beta: plain heading text, not a dropdown — the locked list
-       is always visible, part of the flow above the sharks. */
-    const head = document.createElement("h3");
-    head.className = "archive-still-locked-head";
-    head.textContent = `Still to discover (${lockedRows.length})`;
-    list.appendChild(head);
-    lockedRows.forEach(row => list.appendChild(row));
-  }
 }
 

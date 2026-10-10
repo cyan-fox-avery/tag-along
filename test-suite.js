@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.9-beta', VERSION === 'v1.5.9-beta');
+  ok('version v1.5.10-beta', VERSION === 'v1.5.10-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -173,10 +173,14 @@ code += `
   ok('license links to canonical CC URL', clipHtml.includes('href="https://creativecommons.org/licenses/by/3.0/"'));
   const pdHtml = archiveAssetHtml({ type: 'photo', caption: 'x', credit: 'NOAA', license: 'Public domain', page: 'https://example.com', image: 'https://example.com/i.jpg' }, false);
   ok('public-domain uses neutral Credit (no \u00a9)', pdHtml.includes('Credit NOAA') && !pdHtml.includes('\u00a9 NOAA'));
-  // v1.2.0-beta (for Mira's review): locked species show as placeholders,
-  // photos still require an actual tag
-  ok('dossiers require an actual tag for photos', fileCode.includes('const isLocked = !state.tagged[s.id]'));
-  ok('locked archive shows placeholder', fileCode.includes('archive-locked'));
+  // v1.5.10-beta: Archive is tagged-sharks only — no locked list at all.
+  // Untagged species are skipped before rendering, so photos still require
+  // an actual tag.
+  const archiveUiCode = fs.readFileSync(path.join(DIR, 'archive-ui.js'), 'utf8');
+  ok('archive skips untagged species', archiveUiCode.includes('if (!t) return;'));
+  ok('archive has no locked list', !archiveUiCode.includes('lockedRows') && !archiveUiCode.includes('Still to discover'));
+  ok('archive uses Research-style IUCN pill', archiveUiCode.includes('status-pill iucn-'));
+  ok('archive has no checkmark', !archiveUiCode.includes('✅'));
   // v0.17.0 review fix: every non-public-domain CC license in the data must
   // have a LICENSE_URLS entry, so new sharks can't silently lose license links.
   const usedLicenses = new Set();
@@ -1717,8 +1721,9 @@ code += `
   ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
   ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
   ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
   // v1.5.8: safe batch — seven low-risk items
-  ok('still-to-discover is plain heading', code.includes('archive-still-locked-head'));
+  ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
   ok('release button matches tag-along gradient', cssCode.includes('#releaseBtn') && cssCode.includes('linear-gradient(180deg, #ffd166 0%, #f0b429 100%)'));
   ok('follow button before watch button', code.includes('insertBefore(followBtn, watchBtn)'));

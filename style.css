@@ -1402,25 +1402,8 @@ video.archive-media { max-height: 420px; }
   .research-text { font-size: 15px; }
 }
 
-/* v1.2.0-beta: locked archive placeholders (for Mira's review) */
-.archive-locked { text-align: center; padding: 18px 12px; }
-.archive-locked-art { opacity: 0.35; filter: grayscale(1); max-width: 220px; margin: 0 auto 10px; }
-.archive-locked-art svg { width: 100%; height: auto; }
-.locked-pill { background: rgba(255,255,255,0.08); }
-.archive-locked-row .guide-row-name { opacity: 0.75; }
-
-/* v1.2.0-beta Mira review: collapsed "Still to discover" archive section. */
-.archive-still-locked { margin-top: 14px; }
-.archive-still-locked > summary {
-  cursor: pointer; font-weight: 700; font-size: 15px; color: var(--ink-dim, #9db8c9);
-  padding: 10px 4px; list-style-position: inside;
-}
-.archive-still-locked > summary::-webkit-details-marker { color: var(--ink-dim, #9db8c9); }
-/* v1.5.8-beta: "Still to discover" is now a plain heading, not a dropdown. */
-.archive-still-locked-head {
-  font-weight: 700; font-size: 15px; color: var(--ink-dim, #9db8c9);
-  padding: 10px 4px; margin: 14px 0 0;
-}
+/* v1.5.10-beta: locked archive list removed — the Archive shows tagged
+   sharks only. (Placeholder/locked styles retired.) */
 
 /* v1.3.0-beta: field notes from "Just watch" encounters */
 .watch-notes-block {
