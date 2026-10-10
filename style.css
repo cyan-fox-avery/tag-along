@@ -157,12 +157,16 @@ body::before {
   36% { transform: translateY(-105vh) translateX(20px); opacity: 0.5; }
   42%, 100% { transform: translateY(-105vh) translateX(20px); opacity: 0; }
 }
-/* Seafloor silhouette along the bottom. v1.5.27-beta: 400px tall (was 180px)
-   so solid black extends well below the wave crest to the viewport bottom —
-   replaces the v1.5.26 black overlay layer which painted over content on iPad.
-   The black is part of the wave graphic itself, not an overlay. */
+/* Seafloor silhouette along the bottom. v1.5.30-beta: viewport-fixed so the
+   ocean bottom is always at the screen bottom — no more floating mid-page
+   with blue below it when scrolled. (position:fixed inside .ocean-decor is
+   safe: like the existing .caustics rays, .ocean-decor is absolute without
+   transforms, so it doesn't trap fixed descendants. Plain CSS, no
+   compositing tricks — iPad-safe.) v1.5.27-beta: 400px tall (was 180px) so
+   solid black extends well below the wave crest; the black is part of the
+   wave graphic itself, not an overlay. */
 .seafloor {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 400px;
+  position: fixed; bottom: 0; left: 0; width: 100%; height: 400px;
   fill: #000; opacity: 1;
 }
 .seafloor .kelp { fill: #03141f; }
