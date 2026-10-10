@@ -221,7 +221,7 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
   ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
-  ok('tabs share equal width', /\\.tab\\s*\\{[^}]*flex:\\s*1 1 0/.test(cssCode));
+  ok('tabs share equal width', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
   ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
   ok('achievements tab is labeled', /data-tab="achievements"[^>]*>[\\s\\S]*?Achievements/.test(htmlCode));
   ok('collection tab stacks count above label', /data-tab="collection"[\\s\\S]*?tab-stack[\\s\\S]*?collectionCount[\\s\\S]*?tab-label/.test(htmlCode));
@@ -1497,6 +1497,44 @@ code += `
     ok("cookiecutter fact mentions sonar domes", facts.cookiecutter.join(" ").includes("sonar domes"));
     ok("kitefin fact cites 2021", facts.kitefin.join(" ").includes("2021"));
     ok("tiger fact drops suit of armor", !facts.tiger.join(" ").includes("suit of armor"));
+  })();
+  // v1.4.0-beta Mira review: fixed grid tracks keep tabs equal on sparse rows
+  (() => {
+    ok("tabs use CSS grid", /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
+    ok("desktop tabs have 8 fixed tracks", /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
+    ok("tablet tabs have 4 fixed tracks", /max-width:\\s*1023px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*1fr\\)/.test(cssCode));
+    ok("phone tabs have 3 fixed tracks", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3,\\s*1fr\\)/.test(cssCode));
+    ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
+    ok("no flex-wrap on tabs", !/\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
+  })();
+  // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
+  (() => {
+    const origQS = global.document.querySelector;
+    const mkPhoneTab = (active) => {
+      const el = makeEl();
+      if (active) el.classList.add('active');
+      return el;
+    };
+    const origUnread = state.unread;
+    const origMsgsLen = state.messages.length;
+    state.unread = 0;
+    // Phone active: thread renders immediately, no unread increment
+    global.document.querySelector = (sel) => sel === '.tab[data-tab="phone"]' ? mkPhoneTab(true) : origQS(sel);
+    pushThread([{ from: 'sarah', text: 'grid test' }]);
+    ok("pushThread on active Phone does not increment unread", state.unread === 0);
+    // Other tab: unread increments as before
+    global.document.querySelector = (sel) => sel === '.tab[data-tab="phone"]' ? mkPhoneTab(false) : origQS(sel);
+    pushThread([{ from: 'sarah', text: 'grid test 2' }]);
+    ok("pushThread on other tab increments unread", state.unread === 1);
+    // Persistence: the saved store carries the unread count
+    const saved = JSON.parse(global.localStorage.getItem('tyi-messages') || '{}');
+    ok("unread persists through saveMsgs", saved.unread === 1);
+    ok("pushed threads persisted", (saved.messages || []).length >= origMsgsLen + 2);
+    // restore
+    global.document.querySelector = origQS;
+    state.unread = origUnread;
+    state.messages.length = origMsgsLen;
+    saveMsgs();
   })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
 
