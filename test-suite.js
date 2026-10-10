@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.7-beta', VERSION === 'v1.5.7-beta');
+  ok('version v1.5.8-beta', VERSION === 'v1.5.8-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1715,6 +1715,15 @@ code += `
   ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
   ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
   ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.8-beta', Array.isArray(WHATS_NEW['v1.5.8-beta']) && WHATS_NEW['v1.5.8-beta'].length > 0);
+  // v1.5.8: safe batch — seven low-risk items
+  ok('still-to-discover is plain heading', code.includes('archive-still-locked-head'));
+  ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
+  ok('release button matches tag-along gradient', cssCode.includes('#releaseBtn') && cssCode.includes('linear-gradient(180deg, #ffd166 0%, #f0b429 100%)'));
+  ok('follow button before watch button', code.includes('insertBefore(followBtn, watchBtn)'));
+  ok('reunion uses research ID for unnamed', code.includes('rec.researchId || species.name'));
+  ok('double-tap zoom disabled', cssCode.includes('touch-action: manipulation'));
+  ok('tag-along insight not in log', !code.split('function doTagAlong')[1].split('function doFollowTagged')[0].includes('Tag-along insight'));
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
