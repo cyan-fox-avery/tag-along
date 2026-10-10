@@ -1574,7 +1574,7 @@ code += `
   ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
   ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
   // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
-  ok('desktop logo 156px', /\\.site-logo\\s*\\{[^}]*height:\\s*156px/.test(cssCode));
+  ok('desktop logo 190px', /\\.site-logo\\s*\\{[^}]*height:\\s*190px/.test(cssCode));
   // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
   ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
   // v1.4.15-beta: time-of-day progression in expedition log
@@ -1708,7 +1708,7 @@ code += `
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
   ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
-  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
+  ok('header is tight (v1.5.6)', /\\.topbar\\s*\\{[^}]*padding:\\s*4px 8px 2px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
   ok('archive badge removed', !/data-tab=\\"archive\\"\\] \\.tab-badge/.test(code));
   ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
@@ -1770,6 +1770,7 @@ code += `
   ok('fan divs in HTML', /class="fan fan-1"/.test(htmlCode));
   ok('no caustics spans in HTML', !/class="caustics"><span/.test(htmlCode));
   ok('bubbles start together per column', /animation-delay:\\s*-0\\.5s/.test(cssCode) && /animation-delay:\\s*-19\\.5s/.test(cssCode));
+  ok('logo is bigger with tight header', /\\.site-logo\\s*\\{[^}]*height:\\s*84px/.test(cssCode) && /padding:\\s*4px 8px 2px/.test(cssCode));
   ok('dive scene has depth gradient', /\\.dive-scene:not\\(\\.porthole\\)/.test(cssCode));
   ok('dive god-rays are soft (no stripes)', !/repeating-linear-gradient\\(115deg/.test(cssCode));
   ok('dive motes exist', /\\.dive-scene \\.motes/.test(cssCode));
