@@ -99,7 +99,7 @@ const WHATS_NEW = {
     "🔧 <strong>Porthole cleanup.</strong> The old underwater light-ray layer no longer shows through the boat-window surface view, and a stray bit of malformed CSS is gone."
   ],
   "v1.4.11-beta": [
-    "🌊 <strong>Illustrated porthole waves.</strong> The boat-window view now uses hand-drawn wave art (far/mid/near) drifting as slow parallax layers, with occasional spray on the glass. Art by Mira."
+    "🌊 <strong>Porthole waves.</strong> The boat-window view now has illustrated wave layers (far/mid/near) drifting as slow parallax, with occasional spray on the glass. Art by Mira."
   ]
 };
 
