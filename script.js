@@ -2486,7 +2486,10 @@ function renderAchievements() {
   const badge = $("achieveBadge");
   if (badge) {
     badge.textContent = `${unlockedCount}/${visible.length}`;
-    badge.classList.toggle("hidden", unlockedCount === 0);
+    // v1.4.0: visibility (not display) so the Achievements tab keeps its
+    // 3-row height like every other tab even at 0 unlocks.
+    badge.classList.remove("hidden");
+    badge.style.visibility = unlockedCount === 0 ? "hidden" : "visible";
   }
 }
 
