@@ -130,13 +130,13 @@ function renderArchive() {
   });
   unlockedRows.forEach(row => list.appendChild(row));
   if (lockedRows.length) {
-    const det = document.createElement("details");
-    det.className = "archive-still-locked";
-    det.innerHTML = `<summary>Still to discover (${lockedRows.length})</summary>`;
-    const wrap = document.createElement("div");
-    lockedRows.forEach(row => wrap.appendChild(row));
-    det.appendChild(wrap);
-    list.appendChild(det);
+    /* v1.5.8-beta: plain heading text, not a dropdown — the locked list
+       is always visible, part of the flow above the sharks. */
+    const head = document.createElement("h3");
+    head.className = "archive-still-locked-head";
+    head.textContent = `Still to discover (${lockedRows.length})`;
+    list.appendChild(head);
+    lockedRows.forEach(row => list.appendChild(row));
   }
 }
 
