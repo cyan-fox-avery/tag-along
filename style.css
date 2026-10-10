@@ -168,12 +168,13 @@ body { overflow-x: clip; }
   border-radius: 999px; padding: 3px 10px; pointer-events: none;
 }
 
-.topbar { text-align: center; padding: 18px 8px 6px; }
-.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 6px; border-radius: 8px; }
+/* v1.5.1: tighter header — less vertical room around the logo/title/tab bar */
+.topbar { text-align: center; padding: 10px 8px 4px; }
+.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 4px; border-radius: 8px; }
 /* v1.4.0: desktop-only side-by-side title lockup — logo beside (not above)
    the title, bigger logo, less vertical room. Phone/tablet keep the stack. */
 @media (min-width: 1024px) {
-  .topbar { display: flex; align-items: center; justify-content: center; gap: 22px; text-align: left; }
+  .topbar { display: flex; align-items: center; justify-content: center; gap: 18px; text-align: left; padding: 8px 8px 4px; }
   /* v1.4.15-beta: logo 150% bigger — it's a logo, give it presence */
   .site-logo { height: 156px; margin: 0; flex: none; }
   .topbar-text { min-width: 0; }
@@ -182,7 +183,7 @@ body { overflow-x: clip; }
 .eyebrow {
   margin: 0; font-size: 11px; letter-spacing: 3px; color: var(--ink-dim);
 }
-.topbar h1 { margin: 6px 0 2px; font-size: 34px; letter-spacing: 1px; }
+.topbar h1 { margin: 3px 0 2px; font-size: 34px; letter-spacing: 1px; }
 .subtitle { margin: 0; color: var(--ink-dim); font-size: 14px; }
 
 /* v1.4.0: full-bleed tab band — the dark band spans the viewport edge to edge
@@ -380,12 +381,16 @@ select option:disabled { color: #7a8a9e; }
    more sudden, and slides down fast — the quickest thing in the scene. */
 .dive-scene.porthole {
   /* v1.4.14: sky above the far wave — sun glow + soft CSS clouds, then the
-     horizon melts into ocean. Placeholder until Mira art-directs the sky. */
+     horizon melts into ocean. Placeholder until Mira art-directs the sky.
+     v1.5.1: clouds more defined — harder edges, brighter cores, layered puffs. */
   background:
     radial-gradient(90px 90px at 76% 10%, rgba(255,253,235,0.95), rgba(255,250,220,0.4) 45%, transparent 70%),
-    radial-gradient(150px 42px at 18% 9%, rgba(255,255,255,0.8), transparent 70%),
-    radial-gradient(110px 36px at 48% 4%, rgba(255,255,255,0.65), transparent 70%),
-    radial-gradient(170px 46px at 88% 19%, rgba(255,255,255,0.6), transparent 70%),
+    radial-gradient(70px 26px at 14% 8%, rgba(255,255,255,0.95), rgba(255,255,255,0.5) 55%, transparent 85%),
+    radial-gradient(95px 30px at 22% 10%, rgba(255,255,255,0.9), rgba(255,255,255,0.4) 60%, transparent 88%),
+    radial-gradient(60px 24px at 44% 3%, rgba(255,255,255,0.95), rgba(255,255,255,0.45) 55%, transparent 85%),
+    radial-gradient(80px 28px at 52% 5%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 60%, transparent 88%),
+    radial-gradient(85px 30px at 84% 17%, rgba(255,255,255,0.9), rgba(255,255,255,0.45) 55%, transparent 86%),
+    radial-gradient(110px 34px at 92% 20%, rgba(255,255,255,0.8), rgba(255,255,255,0.3) 60%, transparent 88%),
     linear-gradient(180deg,
       #a8dcf5 0%, #c9ecfb 13%, #9fd8ec 23%,
       #5d9ec2 31%, #2a6f96 48%, #1a4f70 72%, #103a56 100%);
@@ -412,6 +417,9 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene.porthole .pw-orbit {
   display: flex; width: max-content; height: 100%;
   will-change: transform;
+  /* v1.5.1: left buffer so the orbital swing never exposes the strip's
+     left edge at the porthole edge — the strip must always cover the view. */
+  margin-left: -70px;
 }
 .dive-scene.porthole .pw-tile {
   flex: none; height: 100%; aspect-ratio: 3 / 1;
@@ -437,8 +445,10 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene.porthole .pw-far .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_far_draft.png);
 }
+/* v1.5.1: pronounced depth gradient — far slowest, near clearly fastest.
+   far: 38s, mid: 26s, near: 16s. Faster overall than v1.4.18, near is 2.4x far. */
 .dive-scene.porthole .pw-far .pw-orbit {
-  animation: pw-orbit-far 52s linear infinite;
+  animation: pw-orbit-far 38s linear infinite;
   animation-delay: -7s;
 }
 
@@ -450,7 +460,7 @@ select option:disabled { color: #7a8a9e; }
   background-image: url(assets/porthole/drafts/porthole_wave_mid_draft.png);
 }
 .dive-scene.porthole .pw-mid .pw-orbit {
-  animation: pw-orbit-mid 40s linear infinite;
+  animation: pw-orbit-mid 26s linear infinite;
   animation-delay: -23s;
 }
 
@@ -462,14 +472,14 @@ select option:disabled { color: #7a8a9e; }
   background-image: url(assets/porthole/drafts/porthole_wave_near_draft.png);
 }
 .dive-scene.porthole .pw-near .pw-orbit {
-  animation: pw-orbit-near 32s linear infinite;
+  animation: pw-orbit-near 16s linear infinite;
   animation-delay: -11s;
 }
 
 /* orbital ellipses: 8 stops trace a smooth closed oval (x=A*cos, y=B*sin).
-   far: slowest/gentlest (±30px, ±8px). mid: medium (±40px, ±10px).
-   near: fastest/liveliest (±50px, ±12px). All calm — the splash is the
-   fast thing here, not the water. */
+   far: slowest/gentlest (±30px, ±8px), 38s. mid: medium (±40px, ±10px), 26s.
+   near: fastest/liveliest (±50px, ±12px), 16s — clear parallax gradient.
+   The splash is still the fastest thing; the water stays calm. */
 @keyframes pw-orbit-far {
   0%    { transform: translate(30px, 0); }
   12.5% { transform: translate(21px, -6px); }
@@ -505,8 +515,9 @@ select option:disabled { color: #7a8a9e; }
 }
 
 /* spray on the glass — ONE big splash at a time, brief and snappy.
-   Two instances alternate on an 18s cycle, 9s apart: quick appear, FAST
-   slide down the glass, quick fade. Most of the glass stays clear. */
+   Two instances alternate on a 24s cycle, 12s apart: quick appear, FAST
+   slide down the glass, quick fade. Most of the glass stays clear.
+   v1.5.1: less frequent (was 14s) — the splash is a rare punctuation. */
 /* v1.4.18: BIGGER splash (320px), more sudden, FASTER slide — it's the
    fastest thing in the wave scene, the quick punctuation in calm water. */
 .dive-scene.porthole .porthole-spray {
@@ -518,12 +529,12 @@ select option:disabled { color: #7a8a9e; }
 }
 .dive-scene.porthole .splash-a {
   left: 12%; top: -4%;
-  animation: pw-spray-1 14s ease-in infinite;
+  animation: pw-spray-1 24s ease-in infinite;
 }
 .dive-scene.porthole .splash-b {
   left: 56%; top: -6%;
-  animation: pw-spray-2 14s ease-in infinite;
-  animation-delay: -7s;
+  animation: pw-spray-2 24s ease-in infinite;
+  animation-delay: -12s;
 }
 @keyframes pw-spray-1 {
   0%   { opacity: 0; transform: scale(0.92) translateY(0); }
