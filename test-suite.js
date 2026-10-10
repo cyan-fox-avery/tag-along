@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.26-beta', VERSION === 'v1.5.26-beta');
+  ok('version v1.5.27-beta', VERSION === 'v1.5.27-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1747,10 +1747,11 @@ code += `
   ok('WHATS_NEW has v1.5.24-beta', Array.isArray(WHATS_NEW['v1.5.24-beta']) && WHATS_NEW['v1.5.24-beta'].length === 2);
   ok('WHATS_NEW has v1.5.25-beta', Array.isArray(WHATS_NEW['v1.5.25-beta']) && WHATS_NEW['v1.5.25-beta'].length === 6);
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
-  // v1.5.26: solid black abyss below the seafloor (body::after fixed layer)
-  ok('body::after black abyss layer exists', /body::after\\s*\\{[^}]*position:\\s*fixed[^}]*background:\\s*#000/.test(cssCode));
-  ok('black abyss is bottom-anchored', /body::after\\s*\\{[^}]*bottom:\\s*0/.test(cssCode));
-  ok('black abyss sits behind content', /body::after\\s*\\{[^}]*z-index:\\s*-1/.test(cssCode));
+  ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
+  // v1.5.27: body::after overlay removed; seafloor SVG itself is taller
+  ok('no body::after overlay', !/body::after/.test(cssCode));
+  ok('seafloor is 400px tall', /\.seafloor\\s*\{[^}]*height:\\s*400px/.test(cssCode));
+  ok('body uses dynamic viewport height', /min-height:\\s*100dvh/.test(cssCode));
   // v1.5.25: lemon shark named Sarah gets its own thread
   ok('lemon sarah thread exists with max feelings', LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('😭😭')) && LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('FAVOURITE')));
   ok('lemon named Sarah gets the lemon thread', (() => {

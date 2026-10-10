@@ -30,6 +30,7 @@ body {
   background: transparent;
   color: var(--ink);
   min-height: 100vh;
+  min-height: 100dvh; /* v1.5.27-beta: dynamic viewport height tracks iPad Safari's collapsing toolbar */
   position: relative;
 }
 /* v1.5.25-beta: the gradient lives on a viewport-fixed layer behind everything.
@@ -50,23 +51,6 @@ body::before {
     #071f3a 68%,   /* deep water */
     #041224 85%,
     #020a16 100%); /* abyssal dark */
-}
-/* v1.5.26-beta: solid black abyss below the seafloor. The seafloor wave sits
-   at the bottom of the document; when the page is shorter than the viewport
-   (or iPad Safari's collapsing toolbar grows the viewport past 100vh), the
-   fixed gradient above would otherwise show blue water below the black
-   ground. This fixed layer guarantees solid black from the lower viewport to
-   the bottom edge. Plain position:fixed, no transforms — iPad-safe. */
-body::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 50vh;
-  background: #000;
-  z-index: -1;
-  pointer-events: none;
 }
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
@@ -172,11 +156,12 @@ body::after {
   36% { transform: translateY(-105vh) translateX(20px); opacity: 0.5; }
   42%, 100% { transform: translateY(-105vh) translateX(20px); opacity: 0; }
 }
-/* Seafloor silhouette along the bottom. v1.5.25-beta: solid black and fully
-   opaque — the ground must read as solid earth, never a translucent film
-   floating over the background gradient. */
+/* Seafloor silhouette along the bottom. v1.5.27-beta: 400px tall (was 180px)
+   so solid black extends well below the wave crest to the viewport bottom —
+   replaces the v1.5.26 black overlay layer which painted over content on iPad.
+   The black is part of the wave graphic itself, not an overlay. */
 .seafloor {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 400px;
   fill: #000; opacity: 1;
 }
 .seafloor .kelp { fill: #03141f; }
