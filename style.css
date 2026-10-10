@@ -20,7 +20,17 @@ body {
   /* v0.19.1: the descent — surface light at the top, deep dark below.
      No background-attachment:fixed — the gradient belongs to the document,
      so scrolling down genuinely takes you deeper. */
-  background: linear-gradient(180deg, #17517e 0%, #10395c 22%, #0b2740 48%, #071a2c 72%, #030e1a 100%);
+  /* v1.4.15-beta: full underwater vista — bright surface light up top,
+     deepening through mid-water blues to near-black depths, with a hint
+     of sediment warmth at the very bottom. Static; only bubbles and rays move. */
+  background: linear-gradient(180deg,
+    #1e6a9e 0%,    /* sunlit surface */
+    #155a8a 12%,
+    #0f4470 28%,   /* mid-water */
+    #0a2f52 48%,
+    #071f3a 68%,   /* deep water */
+    #041224 85%,
+    #020a16 100%); /* abyssal dark */
   color: var(--ink);
   min-height: 100vh;
   position: relative;
@@ -139,10 +149,13 @@ body {
 }
 /* Seafloor silhouette along the bottom. */
 .seafloor {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
-  fill: #020a14; opacity: 0.9;
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
+  fill: #020a14; opacity: 0.95;
 }
 .seafloor .kelp { fill: #03141f; }
+.seafloor .kelp-far { fill: #041a28; opacity: 0.7; }
+/* v1.4.15-beta: sediment texture — subtle mounds along the seafloor */
+.seafloor .sediment { fill: #0a1a24; opacity: 0.6; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
   .surface-shimmer, .caustics span, .bubbles span { animation: none; }
@@ -169,7 +182,8 @@ body { overflow-x: clip; }
    the title, bigger logo, less vertical room. Phone/tablet keep the stack. */
 @media (min-width: 1024px) {
   .topbar { display: flex; align-items: center; justify-content: center; gap: 22px; text-align: left; }
-  .site-logo { height: 104px; margin: 0; flex: none; }
+  /* v1.4.15-beta: logo 150% bigger — it's a logo, give it presence */
+  .site-logo { height: 156px; margin: 0; flex: none; }
   .topbar-text { min-width: 0; }
   .topbar h1 { margin: 0 0 2px; }
 }
@@ -277,7 +291,15 @@ body { overflow-x: clip; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 2px 10px; margin-bottom: 8px;
+  color: #fff; border: 1px solid transparent;
 }
+/* v1.4.15-beta: IUCN threat-level color coding — green (safe) to black (critical) */
+.status-pill.iucn-LC { background: #2d7a3e; border-color: #3d9a52; }  /* Least Concern — green */
+.status-pill.iucn-NT { background: #8a8a1a; border-color: #b0b02a; }  /* Near Threatened — yellow */
+.status-pill.iucn-VU { background: #b86a1a; border-color: #e08a2a; }  /* Vulnerable — orange */
+.status-pill.iucn-EN { background: #b03030; border-color: #e04040; }  /* Endangered — red */
+.status-pill.iucn-CR { background: #2a1a3a; border-color: #6a3a9a; color: #e8d8ff; }  /* Critically Endangered — dark purple */
+.status-pill.iucn-DD { background: #4a4a4a; border-color: #6a6a6a; }  /* Data Deficient — grey */
 /* v1.4.2: full IUCN status line inside expanded field-guide entries */
 .iucn-full { font-size: 13px; color: var(--ink-dim); margin: 6px 0; }
 /* v1.4.2: prominent collection count at the top of the collection page */
@@ -983,7 +1005,7 @@ select option:disabled { color: #7a8a9e; }
 .guide-row-body { padding: 0 14px 14px; border-top: 1px solid #2c5364; }
 /* v1.4.0-beta: expanded entries overlay the grid instead of pushing it down.
    The row keeps its grid cell; the detail floats above its neighbors. */
-.guide-row { position: relative; }
+.guide-row { position: relative; min-width: 0; }
 .guide-row.open { overflow: visible; z-index: 20; }
 .guide-row.open .guide-row-body {
   position: absolute; top: 100%; left: 0; right: 0; z-index: 20;
@@ -994,6 +1016,11 @@ select option:disabled { color: #7a8a9e; }
 }
 /* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
 .guide-row-top { display: flex; align-items: stretch; }
+/* v1.4.15-beta: IUCN pill sits beside the pin, outside the head button */
+.guide-row-top .status-pill {
+  margin: 0; flex: none; align-self: center;
+  margin-right: 4px; /* snug against the pin */
+}
 .guide-row-top .guide-row-head { flex: 1; min-width: 0; }
 .pin-btn {
   flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
@@ -1017,6 +1044,9 @@ select option:disabled { color: #7a8a9e; }
 }
 .pinned-body { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
 .pinned-sketch { width: 96px; flex: none; }
+/* v1.4.15-beta: pinned research preview — clues in bold, same font/size */
+.pinned-research { font-size: 13px; line-height: 1.5; color: #dcebf5; margin: 8px 0 4px; }
+.pinned-research strong { font-weight: 700; }
 .pin-jump {
   width: 100%; min-height: 48px; border-radius: 12px; font-size: 1rem; font-weight: 700;
   background: rgba(255,209,102,0.15); border: 1px solid rgba(255,209,102,0.4);
@@ -1233,7 +1263,8 @@ video.archive-media { max-height: 420px; }
 
   /* Research: 2-column grid. v1.4.0-beta: open entries stay in their column —
      expanding must not push neighbors out of their columns. */
-  .guide-list { grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  /* v1.4.15-beta: minmax(0,1fr) so open overlays can never widen a column */
+  .guide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
 
   /* Filter panel: inline instead of bottom sheet */
   .filter-panel.open-sheet {
@@ -1264,7 +1295,7 @@ video.archive-media { max-height: 420px; }
 
   /* Research: 3 columns. v1.4.0-beta: open entries stay in their column;
      body stacks vertically within the cell. */
-  .guide-list { grid-template-columns: repeat(3, 1fr); }
+  .guide-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   /* Expedition: side-by-side dive */
   .dive-view { display: grid; grid-template-columns: 1.2fr 1fr; grid-template-rows: auto auto; gap: 16px; align-items: start; }
