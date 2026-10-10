@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.1-beta";
+const VERSION = "v1.5.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,13 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.2-beta": [
+    "🦈 <strong>Individual sharks.</strong> Encounters with a tagged species are now randomized — 25% chance it's the same individual you know, 75% it's a new shark of the same species with its own name and tag.",
+    "🗺️ <strong>Quieter map.</strong> Ocean currents are off by default (toggle to show), and when visible they're dashed and faded so they're never confused with shark tracks.",
+    "📋 <strong>Cleaner logbook.</strong> Filter dropdowns are proper styled boxes with the arrow inside.",
+    "📖 <strong>Field guide polish.</strong> Expanded cards are fully scrollable on mobile, the ✅ checkmark leads each row, and the IUCN badge sits tight to the pin with no expander arrow — more room for Latin names.",
+    "🛡️ <strong>Easter egg safety.</strong> The Mary Lee/Nicole naming easter eggs are hardened against crashes.",
   ],
   "v1.5.1-beta": [
     "📐 <strong>Tighter header.</strong> Less vertical space around the logo, title, and tab bar — more room for the actual game.",
@@ -535,7 +542,7 @@ let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
    touch-action follows the zoom level, decided before any touch begins:
    at 1x the page owns one-finger drags (the page scrolls); zoomed in,
    the map owns them (one finger pans). No mid-gesture races, no modes. */
-let mapCurrentsOn = true;
+let mapCurrentsOn = false; /* v1.5.2-beta: currents OFF by default */
 const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
 
 function mapViewBox() {
@@ -586,6 +593,7 @@ function renderCurrents(z) {
     segs.forEach((seg, i) => {
       const d = smoothPath(seg.map(pt => mapProj(pt[0], pt[1])));
       s += '<path d="' + d + '" class="current ' + cls + '" stroke-width="' + sw + '"'
+        + ' stroke-dasharray="' + (8/z).toFixed(1) + ' ' + (5/z).toFixed(1) + '"'
         + (i === segs.length - 1 ? ' marker-end="url(#' + mid + ')"' : "") + "/>";
     });
     if (c.label && z >= 1.75) {
@@ -1258,7 +1266,7 @@ function renderPinnedCard(list) {
       <div class="pinned-body">
         <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
         <div>
-          <strong>${s.name}</strong> ${done ? "✅" : ""}<br>
+          ${done ? "✅ " : ""}<strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
@@ -1405,9 +1413,8 @@ function renderResearch() {
     row.innerHTML = `
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
-          <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
+          <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
           <span class="latin">${s.latin}</span>
-          <span class="guide-caret" aria-hidden="true">▾</span>
         </button>
         <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
         <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
@@ -1740,7 +1747,18 @@ function pickEncounter(appeared, shown, plan) {
    always allowed). Either way the day goes on. */
 function doEncounter(species, plan) {
   return new Promise(resolve => {
-    const rec = state.tagged[species.id];
+    /* v1.5.2-beta: randomized individuals — a tagged species isn't always the
+       same shark. 25% chance this is a re-sighting of the known individual;
+       75% chance it's a new individual of the same species (taggable separately).
+       Tracked per-encounter via _isNewIndividual. */
+    const existingRec = state.tagged[species.id];
+    const isResightRoll = existingRec ? Math.random() < 0.25 : false;
+    const rec = isResightRoll ? existingRec : null;
+    const _isNewIndividual = !!existingRec && !isResightRoll;
+    if (_isNewIndividual) {
+      /* Stash for confirmTag — this encounter is a new shark, not the known one. */
+      state._encounterNewIndividual = species.id;
+    }
     const sharkEl = $("diveShark");
     /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
        silhouette (mystery — the species is not named yet). Tapping
@@ -2860,7 +2878,17 @@ function confirmTag(name) {
   };
   /* v1.4.19-beta: Big Day — determine new-species BEFORE recording the tag. */
   const wasNewSpecies = !state.tagged[s.id];
-  state.tagged[s.id] = rec;
+  /* v1.5.2-beta: randomized individuals — if this was a new-individual encounter
+     of an already-tagged species, store as a separate individual, don't overwrite. */
+  const isNewIndividual = state._encounterNewIndividual === s.id && state.tagged[s.id];
+  if (isNewIndividual) {
+    if (!Array.isArray(state.tagged[s.id]._individuals)) state.tagged[s.id]._individuals = [];
+    state.tagged[s.id]._individuals.push(rec);
+    /* The new individual gets its own name via the normal naming flow. */
+  } else {
+    state.tagged[s.id] = rec;
+  }
+  state._encounterNewIndividual = null;
   state.taggedThisTrip = true;
   logTripEncounter(s, "tagged", rec.researchId);
   store.save(state.tagged);
@@ -3625,29 +3653,39 @@ function maybeSarahEgg(speciesId, rec) {
    - Deep Blue: RETIRED per Avery's decision 2026-10-08 (was on hold per Mira).
      Do not implement — the great-white naming easter eggs stay Mary Lee and Nicole only. */
 function maybeNameEgg(speciesId, rec) {
-  if (!rec || !rec.name) return;
-  const name = rec.name.trim().toLowerCase();
-  const s = sharkById(speciesId);
+  /* v1.5.2-beta: defensive guards — the Mary Lee/Nicole easter eggs must never
+     crash the game, even if thread data or pushThread is unavailable. */
+  try {
+    if (!rec || !rec.name) return;
+    if (typeof pushThread !== "function") return;
+    const name = rec.name.trim().toLowerCase();
+    const s = typeof sharkById === "function" ? sharkById(speciesId) : null;
 
-  // Mary Lee: great white only
-  if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
-    rec.maryLeeEgg = true;
-    store.save(state.tagged);
-    pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
-    return;
-  }
-  // Nicole: great white only
-  if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
-    rec.nicoleEgg = true;
-    store.save(state.tagged);
-    pushThread(NICOLE_THREAD.map(m => ({ ...m })));
-    return;
-  }
-  // Bruce: ANY shark. No immediate message — the slow chain begins silently.
-  if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
-    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
-    try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
-    // Deliberately no pushThread here. Sarah will notice... eventually.
+    // Mary Lee: great white only
+    if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
+      if (typeof MARY_LEE_THREAD === "undefined" || !Array.isArray(MARY_LEE_THREAD)) return;
+      rec.maryLeeEgg = true;
+      store.save(state.tagged);
+      pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
+      return;
+    }
+    // Nicole: great white only
+    if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
+      if (typeof NICOLE_THREAD === "undefined" || !Array.isArray(NICOLE_THREAD)) return;
+      rec.nicoleEgg = true;
+      store.save(state.tagged);
+      pushThread(NICOLE_THREAD.map(m => ({ ...m })));
+      return;
+    }
+    // Bruce: ANY shark. No immediate message — the slow chain begins silently.
+    if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
+      state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+      try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+      // Deliberately no pushThread here. Sarah will notice... eventually.
+    }
+  } catch (e) {
+    /* v1.5.2-beta: never let an easter egg crash naming — log and continue. */
+    if (typeof console !== "undefined" && console.warn) console.warn("maybeNameEgg:", e);
   }
 }
 
