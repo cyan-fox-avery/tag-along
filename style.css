@@ -64,52 +64,45 @@ body {
    clearly-alive light. mix-blend-mode: screen caps overlap brightness.
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
 .caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
-.caustics .fan {
-  position: absolute; inset: -12%; /* oversized so sway rotation never exposes an edge */
-  transform-origin: 0% 0%; /* the sun point — this corner sits 12% off-screen top-left */
-  /* radial mask dissolves every ray with distance from the sun: bright near
-     the surface, gone before the deep corner. Soft on all sides, always. */
-  -webkit-mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
-  mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
+.caustics span {
+  position: absolute; top: -120px; left: 2%; height: 2000px;
+  transform-origin: 50% 0; /* pivot around the sun point at far top-left */
+  /* v1.4.17: span-based rays restored (the v1.4.16 conic fan broke iPad layout).
+     Wide soft DIFFUSED shafts: a vertical linear-gradient gives length falloff
+     (bright near the sun, dissolving with depth) while a horizontal mask
+     feathers both sides — no hard edge can ever render. Brighter than v1.4.15
+     so the fan is actually visible, and rays never fully vanish. */
+  background: linear-gradient(to bottom,
+    rgba(215,240,255,0.32) 0%,
+    rgba(205,235,255,0.18) 38%,
+    rgba(195,228,255,0.08) 62%,
+    transparent 88%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
+  opacity: 0.15;
+  animation: ray-life 18s ease-in-out infinite;
 }
-/* Fan 1 — three broad wedges, the main visible fan.
-   (CSS conic 0deg=up, 90deg=right, 180deg=down; from the sun at top-left the
-   viewport spans ~96deg-174deg, so these wedges sweep the whole screen.) */
-.caustics .fan-1 {
-  background: conic-gradient(from 100deg at 0% 0%,
-    transparent 0deg,
-    rgba(215,240,255,0.15) 7deg, rgba(215,240,255,0.15) 13deg, transparent 21deg,
-    rgba(215,240,255,0.11) 29deg, rgba(215,240,255,0.11) 33deg, transparent 41deg,
-    rgba(215,240,255,0.13) 49deg, rgba(215,240,255,0.13) 55deg, transparent 63deg,
-    transparent 70deg);
-  animation: fan-sway-1 34s ease-in-out infinite, fan-breathe-1 26s ease-in-out infinite;
+/* Fan angles from the far-left sun point: wide spread (12-72 deg) so the fan
+   visibly sweeps the screen. Each ray pivots around the shared sun point;
+   wide-angle rays cross the viewport diagonally and exit through the right
+   edge — all visible, none wasted off-screen. */
+.caustics span:nth-child(1) { --ray-angle: 12deg; width: 120px; animation-duration: 17s; animation-delay: -5s; }
+.caustics span:nth-child(2) { --ray-angle: 20deg; width: 95px;  animation-duration: 22s; animation-delay: -14s; }
+.caustics span:nth-child(3) { --ray-angle: 28deg; width: 140px; animation-duration: 15s; animation-delay: -8s; }
+.caustics span:nth-child(4) { --ray-angle: 36deg; width: 105px; animation-duration: 20s; animation-delay: -3s; }
+.caustics span:nth-child(5) { --ray-angle: 46deg; width: 130px; animation-duration: 18s; animation-delay: -11s; }
+.caustics span:nth-child(6) { --ray-angle: 54deg; width: 100px; animation-duration: 24s; animation-delay: -17s; }
+.caustics span:nth-child(7) { --ray-angle: 63deg; width: 145px; animation-duration: 16s; animation-delay: -7s; }
+.caustics span:nth-child(8) { --ray-angle: 72deg; width: 110px; animation-duration: 21s; animation-delay: -13s; }
+@keyframes ray-life {
+  /* v1.4.17: clearly visible life — slow sway (±4 deg) plus a real grow/shrink
+     pulse (scaleX 0.7-1.25). Rays breathe but never fully vanish (min 0.15). */
+  0%   { opacity: 0.15; transform: rotate(calc(var(--ray-angle) - 4deg))   scaleX(0.7); }
+  25%  { opacity: 0.75; transform: rotate(calc(var(--ray-angle) - 1.5deg)) scaleX(1.0); }
+  50%  { opacity: 0.9;  transform: rotate(var(--ray-angle))                scaleX(1.25); }
+  75%  { opacity: 0.6;  transform: rotate(calc(var(--ray-angle) + 2deg))   scaleX(0.9); }
+  100% { opacity: 0.15; transform: rotate(calc(var(--ray-angle) + 4deg))   scaleX(0.7); }
 }
-/* Fan 2 — two narrower wedges at different angles, quicker shimmer. */
-.caustics .fan-2 {
-  background: conic-gradient(from 108deg at 0% 0%,
-    transparent 0deg,
-    rgba(215,240,255,0.12) 4deg, rgba(215,240,255,0.12) 8deg, transparent 14deg,
-    rgba(215,240,255,0.10) 38deg, rgba(215,240,255,0.10) 44deg, transparent 50deg,
-    transparent 62deg);
-  animation: fan-sway-2 27s ease-in-out infinite, fan-breathe-2 31s ease-in-out infinite;
-}
-/* Fan 3 — faintest and slowest, widest sweep, for depth. */
-.caustics .fan-3 {
-  background: conic-gradient(from 96deg at 0% 0%,
-    transparent 0deg,
-    rgba(215,240,255,0.09) 10deg, rgba(215,240,255,0.09) 20deg, transparent 30deg,
-    rgba(215,240,255,0.07) 45deg, rgba(215,240,255,0.07) 58deg, transparent 68deg,
-    transparent 78deg);
-  animation: fan-sway-3 41s ease-in-out infinite, fan-breathe-3 36s ease-in-out infinite;
-}
-/* Sway: slow clearly-visible rotation around the sun point — calm, never frozen. */
-@keyframes fan-sway-1 { 0%, 100% { transform: rotate(-1.8deg); } 50% { transform: rotate(1.8deg); } }
-@keyframes fan-sway-2 { 0%, 100% { transform: rotate(2.2deg); } 50% { transform: rotate(-2.2deg); } }
-@keyframes fan-sway-3 { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
-/* Breathe: opacity pulse plus a real grow/shrink — the light feels alive. */
-@keyframes fan-breathe-1 { 0%, 100% { opacity: 0.55; scale: 1; } 50% { opacity: 0.95; scale: 1.04; } }
-@keyframes fan-breathe-2 { 0%, 100% { opacity: 0.9; scale: 1.03; } 50% { opacity: 0.5; scale: 1; } }
-@keyframes fan-breathe-3 { 0%, 100% { opacity: 0.7; scale: 1.015; } 50% { opacity: 1; scale: 1.05; } }
 /* Slow rising bubbles — viewport-fixed for a little continuous life while scrolling.
    v1.4.16: columns fire in OVERLAPPING pairs (2 places at once), bubbles
    within each column on a tight ~0.7s stagger — dense little air trails,
@@ -157,9 +150,9 @@ body {
 .seafloor .sediment { fill: #0a1a24; opacity: 0.6; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
-  .surface-shimmer, .caustics .fan, .bubbles span { animation: none; }
-  /* v1.4.16: static sun-ray fan for reduced motion */
-  .caustics .fan { opacity: 0.75; transform: none; scale: 1; }
+  .surface-shimmer, .caustics span, .bubbles span { animation: none; }
+  /* v1.4.17: static sun-ray fan for reduced motion */
+  .caustics span { opacity: 0.22; transform: rotate(var(--ray-angle)); }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.
