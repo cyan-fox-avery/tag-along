@@ -14,17 +14,34 @@
 
 * { box-sizing: border-box; }
 
+/* Dark fallback for overscroll areas; also keeps body's transparent
+   background off the canvas so the fixed gradient layer paints cleanly. */
+html { background: #020a16; }
+
 body {
   margin: 0;
   /* v1.5.8-beta: kill double-tap zoom on touch devices; pinch zoom still works. */
   touch-action: manipulation;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  /* v0.19.1: the descent — surface light at the top, deep dark below.
-     No background-attachment:fixed — the gradient belongs to the document,
-     so scrolling down genuinely takes you deeper. */
-  /* v1.4.15-beta: full underwater vista — bright surface light up top,
-     deepening through mid-water blues to near-black depths, with a hint
-     of sediment warmth at the very bottom. Static; only bubbles and rays move. */
+  /* v1.5.25-beta: viewport-fixed background — the full descent gradient is
+     painted once per screen (light at top, abyssal dark at bottom), identical
+     on every tab regardless of scroll position or content length. Replaces the
+     old v0.19.1 document-scrolling gradient per Avery's request. */
+  background: transparent;
+  color: var(--ink);
+  min-height: 100vh;
+  position: relative;
+}
+/* v1.5.25-beta: the gradient lives on a viewport-fixed layer behind everything.
+   Plain position:fixed with no transforms or compositing tricks — safe on iPad
+   Safari. background-attachment:fixed is deliberately NOT used (iOS Safari
+   ignores it). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background: linear-gradient(180deg,
     #1e6a9e 0%,    /* sunlit surface */
     #155a8a 12%,
@@ -33,9 +50,6 @@ body {
     #071f3a 68%,   /* deep water */
     #041224 85%,
     #020a16 100%); /* abyssal dark */
-  color: var(--ink);
-  min-height: 100vh;
-  position: relative;
 }
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
