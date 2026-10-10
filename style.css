@@ -269,7 +269,9 @@ body { overflow-x: clip; }
 /* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
    so every tab keeps the same width without squeezing labels. */
 @media (min-width: 560px) and (max-width: 1023px) {
-  .tab { flex-basis: 150px; } /* 4 per row on tablets, rows centered */
+  /* v1.5.9: all 8 tabs share one row on tablets — even flex
+     distribution, no fixed basis, no wrap. No transforms. */
+  .tab { flex: 1 1 0; min-width: 0; font-size: 12.5px; }
 }
 
 .panel { display: none; }
