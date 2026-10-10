@@ -16,6 +16,8 @@
 
 body {
   margin: 0;
+  /* v1.5.8-beta: kill double-tap zoom on touch devices; pinch zoom still works. */
+  touch-action: manipulation;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
   /* v0.19.1: the descent — surface light at the top, deep dark below.
      No background-attachment:fixed — the gradient belongs to the document,
@@ -337,6 +339,11 @@ select option:disabled { color: #7a8a9e; }
 }
 .primary-button:active { transform: scale(0.98); }
 .primary-button:disabled { opacity: 0.5; cursor: default; }
+/* v1.5.8-beta: "Release & keep diving" matches the tag-along yellow gradient. */
+#releaseBtn {
+  background: linear-gradient(180deg, #ffd166 0%, #f0b429 100%);
+  border: 2px solid #b8860b; color: #3a2b00;
+}
 .secondary-button {
   width: 100%; margin-top: 8px; padding: 11px; font-size: 14px; font-weight: 700;
   border: 2px solid var(--ink-dim); border-radius: 14px; cursor: pointer;
@@ -1407,6 +1414,11 @@ video.archive-media { max-height: 420px; }
   padding: 10px 4px; list-style-position: inside;
 }
 .archive-still-locked > summary::-webkit-details-marker { color: var(--ink-dim, #9db8c9); }
+/* v1.5.8-beta: "Still to discover" is now a plain heading, not a dropdown. */
+.archive-still-locked-head {
+  font-weight: 700; font-size: 15px; color: var(--ink-dim, #9db8c9);
+  padding: 10px 4px; margin: 14px 0 0;
+}
 
 /* v1.3.0-beta: field notes from "Just watch" encounters */
 .watch-notes-block {
