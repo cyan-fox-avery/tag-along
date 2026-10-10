@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.16-beta";
+const VERSION = "v1.4.17-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -112,6 +112,10 @@ const WHATS_NEW = {
     "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
     "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll.",
     "🌊 <strong>Calmer porthole.</strong> The far wave sits higher under a new CSS sky (sun + clouds — Mira may art-direct it later), all three wave layers overlap into continuous water, everything drifts much more slowly, and splashes pop and fade instead of sliding down the glass."
+  ],
+  "v1.4.17-beta": [
+    "\u2600\uFE0F <strong>Sun rays fixed properly.</strong> The v1.4.16 conic-gradient fan broke the page layout, so rays are back on the safe span-based system — brighter, wider fan (12-72\u00B0), clearly visible sway and breathing, and they never fully vanish.",
+    "\ud83d\udd27 <strong>Emergency layout rollback.</strong> The experimental ray rendering that broke the title and tab bar on iPad has been removed."
   ],
   "v1.4.16-beta": [
     "\u2600\uFE0F <strong>Sun rays rebuilt.</strong> The light fan is now a true conic-gradient radiating from the sun point \u2014 it spans the whole screen by construction, with a slow visible sway and breathing pulse. No more frozen bar on the left.",
@@ -4357,9 +4361,26 @@ setInterval(tickPhoneClock, 30000);
    animationiteration, while the ribbon is in its invisible tail, so the
    jump is never seen. Skipped under prefers-reduced-motion (CSS already
    freezes the ribbons there). */
-/* v1.4.16: sun-ray caustics are pure CSS now — three conic-gradient fans
-   sway and breathe on their own timelines. No JS nudging needed.
-   Skipped under prefers-reduced-motion (CSS freezes the fans there). */
+/* v1.4.1: sun-ray caustics — each ray gets a fresh fan angle after its
+   lifecycle completes, so rays keep fanning from the sun point at new
+   angles. Fires on animationiteration, while the ray is in its invisible
+   tail, so the jump is never seen. Each ray keeps its own lane (home angle
+   from CSS) with a small jitter, so the fan stays spread across the screen.
+   Skipped under prefers-reduced-motion (CSS freezes the rays there).
+   v1.4.17: restored after the v1.4.16 conic fan broke iPad layout. */
+(function initCaustics() {
+  if (typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.caustics span').forEach(sp => {
+    const home = parseFloat(getComputedStyle(sp).getPropertyValue('--ray-angle')) || 0;
+    sp.dataset.homeAngle = home;
+    sp.addEventListener('animationiteration', () => {
+      const jitter = Math.random() * 16 - 8;
+      sp.style.setProperty('--ray-angle',
+        (parseFloat(sp.dataset.homeAngle) + jitter).toFixed(1) + 'deg');
+    });
+  });
+})();
 /* v0.19.0: field-guide database controls. */
 (function initGuideTools() {
   const search = $("guideSearch");
