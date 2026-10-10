@@ -171,16 +171,15 @@ body { overflow-x: clip; }
   backdrop-filter: blur(4px);
   align-items: stretch;
 }
-/* v1.4.0: equal-height tabs — every .tab stretches to the row height
-   (height:100% is the Safari-robust way to fill the grid track) and its
-   content stays vertically centered whether it's 2 rows (icon+label) or
-   3 rows (count+icon+label via .tab-stack). */
+/* v1.4.0: equal-height tabs — every .tab is a 3-row stack
+   (count/icon/label); tabs without a count use an invisible spacer with
+   identical dimensions, so all buttons are naturally the same height. */
 .tab {
   border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
   padding: 10px 4px; font-size: 14px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center; text-align: center;
-  min-width: 0; align-self: stretch; height: 100%; box-sizing: border-box;
+  min-width: 0; box-sizing: border-box;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
 .count-badge {
@@ -212,6 +211,12 @@ body { overflow-x: clip; }
 .tab-stack { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.25; }
 .tab-stack .count-badge { margin-left: 0; font-size: 11px; }
 .tab-stack .tab-label { font-size: 11px; }
+/* v1.4.0: invisible count-row spacer — same box dimensions as .count-badge
+   inside .tab-stack, so every tab is 3 rows tall even without a count. */
+.tab-stack .count-spacer {
+  visibility: hidden; margin-left: 0;
+  font-size: 11px; padding: 1px 8px; border-radius: 999px; line-height: 1.25;
+}
 /* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
    so they used to overflow the page and leave a dead strip on the right.
    Two rows of three keeps every tab visible and tappable with no overflow.
