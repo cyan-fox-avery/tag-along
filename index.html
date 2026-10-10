@@ -29,13 +29,13 @@
     </header>
 
     <nav class="tabs" aria-label="Game sections">
-      <button class="tab active" data-tab="research" type="button"><span class="tab-stack"><span class="count-spacer" aria-hidden="true">&nbsp;</span><span class="tab-icon">📖</span><span class="tab-label">Research</span></span></button>
-      <button class="tab" data-tab="expedition" type="button"><span class="tab-stack"><span class="count-spacer" aria-hidden="true">&nbsp;</span><span class="tab-icon">🛥️</span><span class="tab-label">Expedition</span></span></button>
+      <button class="tab active" data-tab="research" type="button"><span class="tab-stack"><span class="tab-icon">📖</span><span class="tab-label">Research</span></span></button>
+      <button class="tab" data-tab="expedition" type="button"><span class="tab-stack"><span class="tab-icon">🛥️</span><span class="tab-label">Expedition</span></span></button>
       <button class="tab" data-tab="collection" type="button"><span class="tab-stack"><span class="tab-icon">🗂️</span><span class="tab-label">Collection</span></span></button>
-      <button class="tab" data-tab="map" type="button"><span class="tab-stack"><span class="count-spacer" aria-hidden="true">&nbsp;</span><span class="tab-icon">🗺️</span><span class="tab-label">Map</span></span></button>
-      <button class="tab" data-tab="logbook" type="button"><span class="tab-stack"><span class="count-spacer" aria-hidden="true">&nbsp;</span><span class="tab-icon">📓</span><span class="tab-label">Logbook</span></span></button>
-      <button class="tab" data-tab="phone" type="button"><span class="tab-stack"><span class="count-spacer" aria-hidden="true">&nbsp;</span><span class="tab-icon">📱<span id="msgBadge" class="phone-badge hidden">0</span></span><span class="tab-label">Phone</span></span></button>
-      <button class="tab hidden" data-tab="archive" type="button"><span class="tab-stack"><span class="count-spacer" aria-hidden="true">&nbsp;</span><span class="tab-icon">📸</span><span class="tab-label">Archive<span class="tab-badge hidden" aria-label="new photo">●</span></span></span></button>
+      <button class="tab" data-tab="map" type="button"><span class="tab-stack"><span class="tab-icon">🗺️</span><span class="tab-label">Map</span></span></button>
+      <button class="tab" data-tab="logbook" type="button"><span class="tab-stack"><span class="tab-icon">📓</span><span class="tab-label">Logbook</span></span></button>
+      <button class="tab" data-tab="phone" type="button"><span class="tab-stack"><span class="tab-icon">📱<span id="msgBadge" class="phone-badge hidden">0</span></span><span class="tab-label">Phone</span></span></button>
+      <button class="tab hidden" data-tab="archive" type="button"><span class="tab-stack"><span class="tab-icon">📸</span><span class="tab-label">Archive<span class="tab-badge hidden" aria-label="new photo">●</span></span></span></button>
       <button class="tab" data-tab="achievements" type="button"><span class="tab-stack"><span class="tab-icon">🏆</span><span class="tab-label">Achievements</span></span></button>
     </nav>
 
@@ -137,8 +137,9 @@
             <div class="scenery" id="diveScenery"></div>
             <div class="rays"></div>
             <div class="porthole-surface" aria-hidden="true"></div>
-            <div class="porthole-shafts" aria-hidden="true"></div>
-            <div class="porthole-bubbles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="porthole-swells" aria-hidden="true"></div>
+            <div class="porthole-foam" aria-hidden="true"></div>
+            <div class="porthole-glint" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
             <div id="diveShark" class="dive-shark hidden"></div>
           </div>
           <div id="diveLog" class="dive-log"></div>
@@ -195,7 +196,7 @@
               <option value="tagged">Successful tags</option>
               <option value="resighted">Re-sightings</option>
               <option value="watched">Watched</option>
-              <option value="followed">Followed 🧭</option>
+              <option value="followed">Followed</option>
               <option value="missed">No sharks</option>
             </select>
           </label>
