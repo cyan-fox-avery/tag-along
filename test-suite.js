@@ -1588,6 +1588,7 @@ code += `
   ok('porthole CSS exists', /\\.dive-scene\\.porthole/.test(cssCode));
   ok('porthole has surface animation', /@keyframes\\s+porthole-ripple/.test(cssCode));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?porthole-surface/.test(cssCode));
+  ok('porthole has bubbles', /class="porthole-bubbles"/.test(htmlCode) && /porthole-bubble/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
 
