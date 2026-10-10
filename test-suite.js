@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.3-beta', VERSION === 'v1.4.3-beta');
+  ok('version v1.4.4-beta', VERSION === 'v1.4.4-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -236,7 +236,6 @@ code += `
   // no stretch hacks needed for equal heights.
   const tabStackCount = (htmlCode.match(/class="tab-stack"/g) || []).length;
   ok('all 8 tabs use tab-stack', tabStackCount === 8);
-  ok('count-spacer keeps layout via visibility:hidden', /\\.count-spacer\\s*\\{[^}]*visibility:\\s*hidden/.test(cssCode));
   ok('no height:100% stretch hack on .tab', !/\\.tab\\s*\\{[^}]*height:\\s*100%/.test(cssCode));
   // v1.4.2: achieveBadge removed — count lives in page header
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
@@ -1589,18 +1588,29 @@ code += `
   ok("WHATS_NEW has v1.4.1-beta", !!(WHATS_NEW["v1.4.1-beta"] && WHATS_NEW["v1.4.1-beta"].length));
   ok("WHATS_NEW has v1.4.2-beta", !!(WHATS_NEW["v1.4.2-beta"] && WHATS_NEW["v1.4.2-beta"].length));
   ok("WHATS_NEW has v1.4.3-beta", !!(WHATS_NEW["v1.4.3-beta"] && WHATS_NEW["v1.4.3-beta"].length));
+  ok("WHATS_NEW has v1.4.4-beta", !!(WHATS_NEW["v1.4.4-beta"] && WHATS_NEW["v1.4.4-beta"].length));
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
-  // v1.4.2: porthole — observation window always present, surface view when idle
-  ok('porthole surface elements in HTML', /class="porthole-surface"/.test(htmlCode) && /class="porthole-shafts"/.test(htmlCode));
+  // v1.4.4: porthole — top-down ocean surface (boat view): swells, foam, glints
+  ok('porthole wave elements in HTML', /class="porthole-surface"/.test(htmlCode) && /class="porthole-swells"/.test(htmlCode) && /class="porthole-foam"/.test(htmlCode) && /class="porthole-glint"/.test(htmlCode));
+  ok('porthole no longer underwater-style', !/class="porthole-shafts"/.test(htmlCode) && !/class="porthole-bubbles"/.test(htmlCode));
   ok('diveView not hidden by default', !/id="diveView" class="dive-view hidden"/.test(htmlCode));
   ok('porthole CSS exists', /\\.dive-scene\\.porthole/.test(cssCode));
-  ok('porthole has surface animation', /@keyframes\\s+porthole-ripple/.test(cssCode));
+  ok('porthole has swell animation', /@keyframes\\s+porthole-swell/.test(cssCode));
+  ok('porthole has foam animation', /@keyframes\\s+porthole-foam/.test(cssCode));
+  ok('porthole has glint animation', /@keyframes\\s+porthole-glint/.test(cssCode));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?porthole-surface/.test(cssCode));
-  ok('porthole has bubbles', /class="porthole-bubbles"/.test(htmlCode) && /porthole-bubble/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
+  // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
+  ok('phone-screen is flex column with real height', /\\.phone-screen[\\s\\S]*?display:\\s*flex[\\s\\S]*?flex-direction:\\s*column/.test(cssCode));
+  ok('phone-convo flexes to fill', /\\.phone-convo[\\s\\S]*?flex:\\s*1\\s+1\\s+auto/.test(cssCode));
+  // v1.4.4: logbook filter options have no emoji (consistency)
+  ok('logbook followed option has no emoji', !/Followed 🧭/.test(htmlCode));
+  // v1.4.4: all tabs are uniform 2-row (icon+label) — no count spacers
+  ok('no count-spacer spans in tabs', !/count-spacer/.test(htmlCode));
+  ok('no count-spacer CSS remains', !/count-spacer/.test(cssCode));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
