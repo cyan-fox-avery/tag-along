@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.4-beta', VERSION === 'v1.5.4-beta');
+  ok('version v1.5.5-beta', VERSION === 'v1.5.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1600,7 +1600,7 @@ code += `
     ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
     ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
   })();
-  // v1.5.4-beta: guide popup is closable — close button, Escape, outside tap
+  // v1.5.5-beta: guide popup is closable — close button, Escape, outside tap
   (() => {
     ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
     ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
@@ -1651,10 +1651,11 @@ code += `
   ok('porthole uses wave art assets', /porthole_wave_far_draft\.png/.test(cssCode) && /porthole_wave_mid_draft\.png/.test(cssCode) && /porthole_wave_near_draft\.png/.test(cssCode));
   ok('porthole uses splash art asset', /porthole_glass_splash_draft\.png/.test(cssCode));
   ok('porthole has orbital keyframes', /@keyframes\\s+pw-orbit-far/.test(cssCode) && /@keyframes\\s+pw-orbit-mid/.test(cssCode) && /@keyframes\\s+pw-orbit-near/.test(cssCode));
-  ok('porthole orbits are elliptical (8 stops)', /@keyframes\\s+pw-orbit-far[\\s\\S]*?12\\.5%[\\s\\S]*?87\\.5%/.test(cssCode));
+  ok('porthole far orbit is a true smooth ellipse (split sinusoidal axes)', /@keyframes\\s+pw-orbit-far-x[\\s\\S]*?translateX\\(-30px\\)/.test(cssCode) && /@keyframes\\s+pw-orbit-far-y[\\s\\S]*?translateY\\(-8px\\)/.test(cssCode));
+  ok('porthole mid/near orbits keep 8-stop ellipses', /@keyframes\\s+pw-orbit-mid[\\s\\S]*?12\\.5%[\\s\\S]*?87\\.5%/.test(cssCode) && /@keyframes\\s+pw-orbit-near[\\s\\S]*?12\\.5%/.test(cssCode));
   ok('porthole no longer uses linear drift', !/@keyframes\\s+pw-drift-/.test(cssCode));
   ok('porthole has spray keyframes', /@keyframes\\s+pw-spray-\\d/.test(cssCode));
-  ok('porthole orbit loops seamlessly (closed ellipse)', /@keyframes\\s+pw-orbit-far[\\s\\S]*?100%\\s*\\{[^}]*translate\\(30px, 0\\)/.test(cssCode));
+  ok('porthole far orbit loops seamlessly (closed ellipse)', /@keyframes\\s+pw-orbit-far-x[\\s\\S]*?100%\\s*\\{[^}]*translateX\\(30px\\)/.test(cssCode) && /@keyframes\\s+pw-orbit-far-y[\\s\\S]*?100%\\s*\\{[^}]*translateY\\(0\\)/.test(cssCode));
   ok('porthole tiles mirrored for seamless loop', /pw-tile:nth-child\\(even\\)[\\s\\S]*?scaleX\\(-1\\)/.test(cssCode));
   ok('porthole splash is bigger', /\\.porthole-spray\\s*\\{[^}]*width:\\s*320px/.test(cssCode));
   ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
@@ -1671,10 +1672,11 @@ code += `
   ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
   // v1.4.18: waves stacked tight, oval orbital motion, bigger/faster splash
   ok('waves stacked almost on top of each other', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode) && /\\.pw-mid\\s*\\{[^}]*top:\\s*20%/.test(cssCode) && /\\.pw-near\\s*\\{[^}]*top:\\s*24%/.test(cssCode));
-  ok('orbit periods: far 38s, mid 26s, near 16s (near fastest)', /pw-orbit-far 38s/.test(cssCode) && /pw-orbit-mid 26s/.test(cssCode) && /pw-orbit-near 16s/.test(cssCode));
+  ok('orbit periods: far 38s, mid 26s, near 16s (near fastest)', /pw-orbit-far-x 38s/.test(cssCode) && /pw-orbit-mid 26s/.test(cssCode) && /pw-orbit-near 16s/.test(cssCode));
   ok('splash is rarer (24s cycle)', /\\.splash-a\\s*\\{[^}]*24s/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
+  ok('showPorthole clears ambient creature shadows', /function showPorthole[\\s\\S]*?querySelectorAll\\("\\.ambient"\\)/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
   ok('phone-screen is flex column with real height', /\\.phone-screen[\\s\\S]*?display:\\s*flex[\\s\\S]*?flex-direction:\\s*column/.test(cssCode));
   ok('phone-convo flexes to fill', /\\.phone-convo[\\s\\S]*?flex:\\s*1\\s+1\\s+auto/.test(cssCode));
@@ -1708,14 +1710,14 @@ code += `
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.4-beta', Array.isArray(WHATS_NEW['v1.5.4-beta']) && WHATS_NEW['v1.5.4-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
   ok('archive badge removed', !/data-tab=\\"archive\\"\\] \\.tab-badge/.test(code));
   ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
   ok('clouds are defined', /rgba\\(255,255,255,0\\.95\\)/.test(cssCode));
-  ok('near orbit is 2x+ faster than far', /pw-orbit-near 16s/.test(cssCode) && /pw-orbit-far 38s/.test(cssCode));
+  ok('near orbit is 2x+ faster than far', /pw-orbit-near 16s/.test(cssCode) && /pw-orbit-far-x 38s/.test(cssCode));
 
   // v1.5.3-beta: reunion system replaces multi-individual tagging
   ok('no _individuals writes', !/\\._individuals\\.push/.test(code));
