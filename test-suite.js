@@ -24,7 +24,7 @@ global.document = {
   querySelector() { return makeEl(); }, querySelectorAll() { return []; },
   addEventListener() {},
 };
-global.window = { addEventListener() {}, innerWidth: 800 };
+global.window = { addEventListener() {}, innerWidth: 800, scrollY: 0, scrollTo() {} };
 global.localStorage = { _s: {}, getItem(k) { return this._s[k] || null; }, setItem(k, v) { this._s[k] = v; }, removeItem(k) { delete this._s[k]; } };
 global.requestAnimationFrame = fn => { return 1; };
 const rafQ = [];
@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.24-beta', VERSION === 'v1.5.24-beta');
+  ok('version v1.5.25-beta', VERSION === 'v1.5.25-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1745,6 +1745,37 @@ code += `
   ok('WHATS_NEW has v1.5.22-beta', Array.isArray(WHATS_NEW['v1.5.22-beta']) && WHATS_NEW['v1.5.22-beta'].length === 1);
   ok('WHATS_NEW has v1.5.23-beta', Array.isArray(WHATS_NEW['v1.5.23-beta']) && WHATS_NEW['v1.5.23-beta'].length === 1);
   ok('WHATS_NEW has v1.5.24-beta', Array.isArray(WHATS_NEW['v1.5.24-beta']) && WHATS_NEW['v1.5.24-beta'].length === 2);
+  ok('WHATS_NEW has v1.5.25-beta', Array.isArray(WHATS_NEW['v1.5.25-beta']) && WHATS_NEW['v1.5.25-beta'].length === 2);
+  ok('togglePin restores scroll position', (() => {
+    window.scrollY = 420;
+    let got = null;
+    const orig = window.scrollTo;
+    window.scrollTo = (x, y) => { got = y; };
+    state.pinned = null;
+    togglePin("salmon");
+    window.scrollTo = orig;
+    const r = got === 420;
+    state.pinned = null; pinStore.save(null);
+    return r;
+  })());
+  // v1.5.25: background gradient is viewport-fixed
+  const _bbIdx = cssCode.indexOf('body::before');
+  const _bbBlock = _bbIdx === -1 ? '' : cssCode.slice(_bbIdx, cssCode.indexOf('}', _bbIdx));
+  ok('gradient lives on fixed body::before', _bbBlock.indexOf('position: fixed') !== -1 && _bbBlock.indexOf('linear-gradient') !== -1);
+  ok('body background is transparent', cssCode.indexOf('background: transparent') !== -1);
+  ok('body has no document gradient', (() => {
+    let i = 0, clean = true;
+    while (true) {
+      const b = cssCode.indexOf('body {', i);
+      if (b === -1) break;
+      const e = cssCode.indexOf('}', b);
+      if (e === -1) break;
+      if (cssCode.slice(b, e).indexOf('linear-gradient') !== -1) clean = false;
+      i = e + 1;
+    }
+    return clean;
+  })());
+  ok('html has dark fallback background', cssCode.indexOf('html { background: #020a16; }') !== -1);
   // v1.5.24: Bruce chain uses {bruce} placeholder with player capitalization
   ok('bruce chain uses {bruce} placeholder', BRUCE_CHAIN.some(c => c.some(m => m.text.includes('{bruce}'))));
   ok('OG Jaws Bruce has capital B', BRUCE_CHAIN[0].some(m => m.text.includes('nicknamed it Bruce')));
