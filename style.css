@@ -44,20 +44,52 @@ body {
   from { transform: translateX(-2%); opacity: 0.85; }
   to { transform: translateX(2%); opacity: 1; }
 }
-/* God rays slanting down from the surface — document-positioned in the upper water column. */
-.god-rays span {
-  position: absolute; top: 120px; width: 90px; height: 640px;
-  background: linear-gradient(180deg, rgba(180,225,255,0.10), transparent 80%);
-  transform: skewX(-12deg); filter: blur(6px);
-  animation: ray-sway 18s ease-in-out infinite alternate;
+/* v1.4.0: living caustics — independent light ribbons, each with its own
+   lifecycle: appear faintly → brighten and broaden → drift → narrow, dim,
+   disappear → reappear elsewhere (JS nudges `left` on animationiteration,
+   while the ribbon is invisible). Staggered durations and negative delays
+   keep the five ribbons unsynchronized. The vertical gradient is baked into
+   each ribbon — full strength at the top edge, gone by ~70% down — so the
+   deep water stays dark even where ribbons overlap. Transform/opacity only,
+   no blur filters, for iPad-friendliness. */
+.caustics { position: absolute; top: 0; left: 0; right: 0; height: 1100px; overflow: hidden; }
+.caustics span {
+  position: absolute; top: -40px; height: 1140px; border-radius: 50%;
+  background: linear-gradient(180deg,
+    rgba(190,230,255,0.16) 0%,
+    rgba(190,230,255,0.07) 35%,
+    transparent 70%);
+  opacity: 0;
+  animation: caustic-a 16s ease-in-out infinite;
 }
-.god-rays span:nth-child(1) { left: 12%; animation-delay: -4s; }
-.god-rays span:nth-child(2) { left: 38%; width: 130px; animation-delay: -11s; }
-.god-rays span:nth-child(3) { left: 64%; width: 70px; animation-delay: -7s; }
-.god-rays span:nth-child(4) { left: 84%; animation-delay: -2s; }
-@keyframes ray-sway {
-  from { transform: skewX(-14deg) translateX(-12px); opacity: 0.7; }
-  to { transform: skewX(-9deg) translateX(12px); opacity: 1; }
+.caustics span:nth-child(1) { left: 6%;  width: 64px;  animation-name: caustic-a; animation-duration: 16s; animation-delay: -4s; }
+.caustics span:nth-child(2) { left: 28%; width: 104px; animation-name: caustic-b; animation-duration: 23s; animation-delay: -15s; }
+.caustics span:nth-child(3) { left: 50%; width: 58px;  animation-name: caustic-c; animation-duration: 19s; animation-delay: -9s; }
+.caustics span:nth-child(4) { left: 68%; width: 88px;  animation-name: caustic-a; animation-duration: 13s; animation-delay: -7s; }
+.caustics span:nth-child(5) { left: 86%; width: 72px;  animation-name: caustic-b; animation-duration: 21s; animation-delay: -18s; }
+@keyframes caustic-a { /* drifts right, medium pace */
+  0%   { opacity: 0;    transform: translateX(-70px) scaleX(0.45); }
+  16%  { opacity: 0.5;  transform: translateX(-38px) scaleX(0.75); }
+  42%  { opacity: 0.85; transform: translateX(6px)    scaleX(1.12); }
+  66%  { opacity: 0.6;  transform: translateX(44px)   scaleX(0.95); }
+  86%  { opacity: 0;    transform: translateX(72px)   scaleX(0.55); }
+  100% { opacity: 0;    transform: translateX(72px)   scaleX(0.55); }
+}
+@keyframes caustic-b { /* drifts left, slightly brighter peak */
+  0%   { opacity: 0;    transform: translateX(70px)  scaleX(0.5); }
+  20%  { opacity: 0.65; transform: translateX(34px)  scaleX(0.85); }
+  48%  { opacity: 1;    transform: translateX(-8px)  scaleX(1.2); }
+  70%  { opacity: 0.55; transform: translateX(-46px) scaleX(0.9); }
+  88%  { opacity: 0;    transform: translateX(-74px) scaleX(0.5); }
+  100% { opacity: 0;    transform: translateX(-74px) scaleX(0.5); }
+}
+@keyframes caustic-c { /* slow, wide, gentle */
+  0%   { opacity: 0;    transform: translateX(-30px) scaleX(0.6); }
+  24%  { opacity: 0.45; transform: translateX(-12px) scaleX(0.9); }
+  52%  { opacity: 0.75; transform: translateX(14px)  scaleX(1.1); }
+  76%  { opacity: 0.4;  transform: translateX(32px)  scaleX(0.85); }
+  92%  { opacity: 0;    transform: translateX(44px)  scaleX(0.6); }
+  100% { opacity: 0;    transform: translateX(44px)  scaleX(0.6); }
 }
 /* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling. */
 .bubbles { position: fixed; inset: 0; pointer-events: none; }
@@ -88,7 +120,8 @@ body {
 .seafloor .kelp { fill: #03141f; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
-  .surface-shimmer, .god-rays span, .bubbles span { animation: none; }
+  .surface-shimmer, .caustics span, .bubbles span { animation: none; }
+  .caustics span { opacity: 0.12; transform: none; }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.
@@ -106,6 +139,14 @@ body { overflow-x: clip; }
 
 .topbar { text-align: center; padding: 18px 8px 6px; }
 .site-logo { display: block; height: 64px; width: auto; margin: 0 auto 6px; border-radius: 8px; }
+/* v1.4.0: desktop-only side-by-side title lockup — logo beside (not above)
+   the title, bigger logo, less vertical room. Phone/tablet keep the stack. */
+@media (min-width: 1024px) {
+  .topbar { display: flex; align-items: center; justify-content: center; gap: 22px; text-align: left; }
+  .site-logo { height: 104px; margin: 0; flex: none; }
+  .topbar-text { min-width: 0; }
+  .topbar h1 { margin: 0 0 2px; }
+}
 .eyebrow {
   margin: 0; font-size: 11px; letter-spacing: 3px; color: var(--ink-dim);
 }
@@ -129,6 +170,21 @@ body { overflow-x: clip; }
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
 }
 .tab.active .count-badge { background: rgba(0,0,0,0.15); color: var(--accent-ink); }
+/* v1.4.0: Phone notification badge — a small familiar red circular
+   app-notification badge at the top-right of the Phone icon. The unread
+   count is real text (never red-alone); updateMsgBadge() also sets an
+   aria-label on the tab with the conversation count. Static: no animation. */
+.tab-icon { position: relative; display: inline-block; }
+.phone-badge {
+  position: absolute; top: -8px; right: -12px;
+  min-width: 20px; height: 20px; border-radius: 999px;
+  background: #ff3b30; color: #fff;
+  font-size: 11px; font-weight: 800; line-height: 20px; text-align: center;
+  padding: 0 5px; pointer-events: none;
+  border: 2px solid var(--bg-panel);
+}
+.phone-badge.hidden { display: none; }
+.tab.active .phone-badge { border-color: var(--accent); }
 /* v0.24.0: Archive new-photo indicator — a dot plus aria-label, not color alone. */
 .tab-badge { color: var(--accent); font-size: 12px; margin-left: 4px; vertical-align: super; }
 .tab-badge.hidden { display: none; }
@@ -351,16 +407,40 @@ select option:disabled { color: #7a8a9e; }
 /* v0.17.1: Ask Sarah panel — player-initiated advice after a tough trip. */
 .sarah-ask {
   padding: 12px 14px; border-top: 1px solid #2c5364;
-  background: var(--bg-panel); border-radius: 0 0 26px 26px;
+  background: var(--bg-panel);
 }
 .sarah-ask p { margin: 0 0 8px; font-size: 13px; }
-.sarah-ask-row { display: flex; gap: 8px; }
+/* v1.4.0: the row wraps and both children respect the panel's inner width,
+   so long shark names can't push the Ask button past the Phone's edge. */
+.sarah-ask-row { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }
 .sarah-ask-row select {
-  flex: 1; min-width: 0; font-size: 15px; padding: 10px 8px;
+  flex: 1 1 140px; min-width: 0; max-width: 100%; font-size: 15px; padding: 10px 8px;
   border-radius: 10px; border: 1px solid #2c5364;
   background: var(--bg-soft); color: var(--ink);
 }
-.sarah-ask-row .secondary-button { flex: none; }
+.sarah-ask-row .secondary-button { flex: 0 1 auto; max-width: 100%; min-width: 0; }
+
+/* v1.4.0: decorative message composer — visual only. Divs, not inputs, plus
+   aria-hidden and pointer-events:none, so it can never steal focus or
+   accept input. Sits in normal flow below the scrolling conversation, so
+   it never overlaps the final message. */
+.phone-composer {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px 16px; background: var(--bg-panel);
+  border-top: 1px solid #2c5364; border-radius: 0 0 26px 26px;
+  user-select: none; -webkit-user-select: none; pointer-events: none;
+}
+.composer-field {
+  flex: 1; min-width: 0; border-radius: 999px;
+  border: 1px solid #2c5364; background: var(--bg-soft);
+  color: var(--ink-dim); font-size: 14px; padding: 11px 16px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.composer-send {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
 
 /* v0.6.0: field guide entries */
 .guide-list { display: grid; gap: 14px; }
