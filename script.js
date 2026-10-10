@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.5-beta";
+const VERSION = "v1.5.6-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,13 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.6-beta": [
+    "☀️ <strong>Sun-ray fan rebuilt.</strong> The conic light fan is back — safe this time, no layout breakage.",
+    "🫧 <strong>Livelier bubbles.</strong> Columns feel more random with tighter bursts.",
+    "🌊 <strong>Dive scene redo.</strong> Real underwater feel: depth gradient, god-ray shafts, drifting motes.",
+    "🔘 <strong>Release dialog polish.</strong> Buttons reordered and matching styles.",
+    "🖼️ <strong>Archive:</strong> 'Still to discover' is now plain text with the full list always visible."
   ],
   "v1.5.5-beta": [
     "\uD83C\uDF0A <strong>Smoother far waves.</strong> The farthest porthole wave layer now traces a true smooth ellipse instead of a boxy path — same gentle speed, just rounder.",
@@ -4648,26 +4655,10 @@ setInterval(tickPhoneClock, 30000);
    animationiteration, while the ribbon is in its invisible tail, so the
    jump is never seen. Skipped under prefers-reduced-motion (CSS already
    freezes the ribbons there). */
-/* v1.4.1: sun-ray caustics — each ray gets a fresh fan angle after its
-   lifecycle completes, so rays keep fanning from the sun point at new
-   angles. Fires on animationiteration, while the ray is in its invisible
-   tail, so the jump is never seen. Each ray keeps its own lane (home angle
-   from CSS) with a small jitter, so the fan stays spread across the screen.
-   Skipped under prefers-reduced-motion (CSS freezes the rays there).
-   v1.4.17: restored after the v1.4.16 conic fan broke iPad layout. */
-(function initCaustics() {
-  if (typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  document.querySelectorAll('.caustics span').forEach(sp => {
-    const home = parseFloat(getComputedStyle(sp).getPropertyValue('--ray-angle')) || 0;
-    sp.dataset.homeAngle = home;
-    sp.addEventListener('animationiteration', () => {
-      const jitter = Math.random() * 16 - 8;
-      sp.style.setProperty('--ray-angle',
-        (parseFloat(sp.dataset.homeAngle) + jitter).toFixed(1) + 'deg');
-    });
-  });
-})();
+/* v1.5.6: sun-ray caustics are pure CSS — three conic-gradient fans sway
+   and breathe on their own timelines via merged transform keyframes.
+   No JS nudging needed (and no standalone `scale` property — see style.css).
+   Skipped under prefers-reduced-motion (CSS freezes the fans there). */
 /* v0.19.0: field-guide database controls. */
 (function initGuideTools() {
   const search = $("guideSearch");
