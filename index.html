@@ -10,8 +10,8 @@
 <body>
   <div class="ocean-decor" aria-hidden="true">
     <div class="surface-shimmer"></div>
-    <div class="caustics"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="bubbles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="caustics"><div class="fan fan-1"></div><div class="fan fan-2"></div><div class="fan fan-3"></div></div>
+    <div class="bubbles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
     <svg class="seafloor" viewBox="0 0 1440 180" preserveAspectRatio="none">
       <!-- v1.4.15-beta: richer seafloor — sediment mounds, layered kelp silhouettes -->
       <path class="sediment" d="M0,130 C200,110 400,140 600,125 C800,110 1000,140 1200,128 C1300,122 1380,130 1440,126 L1440,180 L0,180 Z"/>
@@ -141,6 +141,7 @@
           <div id="diveScene" class="dive-scene porthole">
             <div class="scenery" id="diveScenery"></div>
             <div class="rays"></div>
+            <div class="motes" aria-hidden="true"></div>
             <div class="porthole-waves" aria-hidden="true">
               <div class="pw-layer pw-far"><div class="pw-orbit"><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span></div></div>
               <div class="pw-layer pw-mid"><div class="pw-orbit"><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span><span class="pw-tile"></span></div></div>
@@ -316,8 +317,8 @@
         <div id="healthArt" class="tag-art"></div>
         <div id="healthInfo" class="tag-info"></div>
         <button id="releaseBtn" class="primary-button" type="button">🌊 Release & keep diving</button>
-        <button id="releaseShipBtn" class="secondary-button" type="button">⛵ Release & return to ship</button>
         <button id="tagAlongBtn" class="tagalong-choice" type="button">🦈 Release &amp; tag along with <span id="tagAlongName">this shark</span> →<br><span class="tagalong-sub">ends this expedition — you won't find more sharks today</span></button>
+        <button id="releaseShipBtn" class="secondary-button" type="button">⛵ Release & return to ship</button>
       </div>
     </div>
   </div>
