@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.8-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -132,6 +132,9 @@ const WHATS_NEW = {
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
     "↕️ <strong>Archive sort.</strong> Sort the Archive by name (A–Z), date tagged (newest or oldest first), or IUCN conservation status.",
+  ],
+  "v1.6.8-beta": [
+    "📓 <strong>More re-sighting notes.</strong> Four new field observations for re-sighted sharks — the note pool was repeating too often.",
   ],
   "v1.6.1-beta": [
     "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",
@@ -2455,7 +2458,11 @@ const RESIGHT_NOTES = [
   "Same calm circuit as ever — this one knows these waters.",
   "Bold as brass, came in close to look at the boat.",
   "Feeding well; good body condition.",
-  "The tag is still seated perfectly. Good work, past us."
+  "The tag is still seated perfectly. Good work, past us.",
+  "A remora riding along like it owns the place.",
+  "Scars on the flank, healed clean \u2014 this one\u2019s seen things.",
+  "Circled the boat twice before moving on, curious.",
+  "Hunting the thermocline edge, focused and efficient."
 ];
 
 function recordResighting(species, plan) {

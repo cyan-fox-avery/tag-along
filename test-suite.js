@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.8-beta', VERSION === 'v1.6.8-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2104,6 +2104,11 @@ code += `
     /* newest: later-inserted (nurse) first; oldest: earlier-inserted (zebra) first */
     return newestFirst.join(',') === 'nurse,zebra' && oldestFirst.join(',') === 'zebra,nurse';
   })());
+
+  // v1.6.8-beta: more re-sighting notes
+  ok('WHATS_NEW has v1.6.8-beta with 1 entry', Array.isArray(WHATS_NEW['v1.6.8-beta']) && WHATS_NEW['v1.6.8-beta'].length === 1);
+  ok('RESIGHT_NOTES has 12 entries', RESIGHT_NOTES.length === 12);
+  ok('new re-sighting notes present', RESIGHT_NOTES.includes('A remora riding along like it owns the place.') && RESIGHT_NOTES.includes('Circled the boat twice before moving on, curious.'));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
