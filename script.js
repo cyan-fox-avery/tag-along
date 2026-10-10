@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.18-beta";
+const VERSION = "v1.4.19-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -112,6 +112,9 @@ const WHATS_NEW = {
     "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
     "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll.",
     "🌊 <strong>Calmer porthole.</strong> The far wave sits higher under a new CSS sky (sun + clouds — Mira may art-direct it later), all three wave layers overlap into continuous water, everything drifts much more slowly, and splashes pop and fade instead of sliding down the glass."
+  ],
+  "v1.4.19-beta": [
+    "\uD83E\uDD88 <strong>Sarah's Big Day.</strong> Tag multiple new species in one expedition and Sarah celebrates the extraordinary day with one authored conversation — no more three near-identical texts. 8 variants each for 2, 3, and 4 new species, plus lemon-aware reactions when her favourite is in the mix.",
   ],
   "v1.4.18-beta": [
     "\uD83C\uDF0A <strong>Waves stacked tight, moving in ovals.</strong> The three porthole wave layers now sit almost on top of each other with no gaps, and each traces a gentle elliptical orbit like real water \u2014 far slowest, near liveliest.",
@@ -827,6 +830,8 @@ const state = {
   /* v0.17.1: Ask Sarah offer persists in the message store — Sarah's saved
      thread promises "pick one below", so the panel must survive a reload. */
   sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
+  /* v1.4.19-beta: Big Day no-repeat bags — per-tier shuffled indices. */
+  bigDayBags: _savedMsgs.bigDayBags || {},
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
@@ -889,7 +894,8 @@ const state = {
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
-    sarahAdviceOffered: state.sarahAdviceOffered });
+    sarahAdviceOffered: state.sarahAdviceOffered,
+    bigDayBags: state.bigDayBags });
 }
 /* Every new thread gets a timestamp for the Phone tab.
    v1.4.0: if the Phone panel is already open, the new thread renders
@@ -1913,6 +1919,9 @@ async function runExpedition(plan) {
   state.taggedThisTrip = false;
   state.resightedThisTrip = false;
   state.followedThisTrip = false;
+  /* v1.4.19-beta: Big Day — queue routine species celebrations during the
+     trip; flush one conversation (single or Big Day) at trip end. */
+  state.pendingCelebrations = [];
   /* v0.18.0: feed achievement stats — regions visited, baits used. */
   if (plan.region && !state.stats.regionsVisited.includes(plan.region)) {
     state.stats.regionsVisited.push(plan.region);
@@ -2088,6 +2097,9 @@ async function runExpedition(plan) {
     state.pendingTagAlong = null;
     const factInfo = state.pendingTagAlongFact;
     state.pendingTagAlongFact = null;
+    /* v1.4.19-beta: Big Day — flush queued routine celebrations as one
+       Phone thread (single or Big Day) before win/afterExpedition branching. */
+    flushPendingCelebrations();
     if (state.pendingWin) {
       state.pendingWin = false;
       /* v1.4.0-beta Mira review (win-path edge case): the 50th tag + tag-along
@@ -2489,6 +2501,86 @@ function pickChat() {
   state.chatSeen[s.id] = seen + 1;
   return chats[seen % chats.length];
 }
+/* ---------- Sarah's Big Day (v1.4.19-beta) ----------
+   When an expedition tags multiple first-time species, ONE authored Big Day
+   conversation replaces the routine per-species celebrations. Design: PR #44.
+   - 0 new species: nothing (existing no-tag behavior)
+   - 1 new species: existing opener + research ID + cheer, at trip end
+   - 2/3/4 new species: one Big Day conversation from the tier pool
+   - Lemon shark in the mix: lemon-aware variant (no second thread)
+   No-repeat via per-tier shuffled bags persisted in state.bigDayBags. */
+
+/* "a nurse shark" / "an oceanic whitetip" — simple vowel check. */
+function bigDayArticle(name) {
+  return /^[aeiou]/i.test(name.trim()) ? "an" : "a";
+}
+
+/* "a nurse shark and a lemon shark" / "a, b, and c" — discovery order. */
+function formatSpeciesList(events) {
+  const parts = events.map(e => `${bigDayArticle(e.speciesName)} ${e.speciesName.toLowerCase()}`);
+  if (parts.length === 1) return parts[0];
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1];
+}
+
+/* Deal one conversation index from a tier's no-repeat bag. Reshuffles when
+   exhausted. Bags persist in state so Sarah doesn't repeat across trips. */
+function dealBigDayIndex(tierKey) {
+  if (!state.bigDayBags) state.bigDayBags = {};
+  let bag = state.bigDayBags[tierKey];
+  const poolSize = BIG_DAY[tierKey].length;
+  if (!bag || bag.length === 0) {
+    bag = Array.from({ length: poolSize }, (_, i) => i);
+    // Fisher-Yates shuffle
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+  }
+  const idx = bag.pop();
+  state.bigDayBags[tierKey] = bag;
+  saveMsgs(); // persist the bag
+  return idx;
+}
+
+/* Pure function: build the Big Day thread from queued celebration events.
+   Returns array of {who, text} with placeholders resolved. Testable. */
+function buildBigDayThread(events) {
+  const count = events.length;
+  const hasLemon = events.some(e => e.speciesId === "lemon");
+  const tierKey = hasLemon ? "lemon" : Math.min(count, 4);
+  const pool = BIG_DAY[tierKey];
+  // For tests: allow deterministic selection via last arg; live code deals.
+  const idx = dealBigDayIndex(tierKey);
+  const convo = pool[idx % pool.length];
+  const speciesList = formatSpeciesList(events);
+  return convo.map(m => ({
+    who: m.who,
+    text: m.text.replace(/{speciesList}/g, speciesList).replace(/{count}/g, String(count))
+  }));
+}
+
+/* Flush queued routine celebrations at trip end. Called from closeDive on the
+   guaranteed trip-completion path (normal end + early Head back + tag-along).
+   Fires exactly one Phone thread: single celebration or Big Day. */
+function flushPendingCelebrations() {
+  const events = state.pendingCelebrations || [];
+  state.pendingCelebrations = [];
+  if (events.length === 0) return;
+  if (events.length === 1) {
+    // Single new species: existing celebration, delivered at trip end.
+    const e = events[0];
+    pushThread([
+      { who: "them", text: e.opener },
+      { who: "me", text: `A ${e.speciesName} — ${e.length} metres, ${e.sex}. Research ID ${e.researchId}.` },
+      { who: "them", text: e.cheer }
+    ]);
+  } else {
+    // 2+ new species: one Big Day conversation.
+    pushThread(buildBigDayThread(events));
+  }
+}
+
 function afterExpedition(plan) {
   /* A trip with a successful tag already got its Sarah moment — the
      species-relevant celebration thread. Same for a re-sighting or a
@@ -2747,6 +2839,8 @@ function confirmTag(name) {
     taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
     track: genTrack(s, { location: regionName, date: dateStr })
   };
+  /* v1.4.19-beta: Big Day — determine new-species BEFORE recording the tag. */
+  const wasNewSpecies = !state.tagged[s.id];
   state.tagged[s.id] = rec;
   state.taggedThisTrip = true;
   logTripEncounter(s, "tagged", rec.researchId);
@@ -2774,13 +2868,22 @@ function confirmTag(name) {
     state.stats.depthsTagged.push(state.currentPlan.depth);
     saveStats();
   }
-  // Sarah celebrates wins, not just failures: excitement + a bonus fact.
-  // v0.6.0: the opener varies per species (draft openers — Avery to revise).
-  pushThread([
-    { who: "them", text: s.opener },
-    { who: "me", text: `A ${s.name} — ${rec.length} metres, ${rec.sex}. Research ID ${rec.researchId}.` },
-    { who: "them", text: s.cheer }
-  ]);
+  /* v1.4.19-beta: Big Day — queue the routine celebration instead of pushing
+     immediately. Flushed as one conversation (single or Big Day) at trip end.
+     Special threads (Bruce, Mary Lee, Nicole, Sarah egg, Archive) still push
+     separately below and are never batched. */
+  if (wasNewSpecies) {
+    state.pendingCelebrations.push({
+      speciesId: s.id,
+      speciesName: s.name,
+      nickname: name || "",
+      researchId: rec.researchId,
+      length: rec.length,
+      sex: rec.sex,
+      opener: s.opener,
+      cheer: s.cheer
+    });
+  }
   maybeSarahEgg(s.id, rec);
   maybeNameEgg(s.id, rec); // v0.23.0
   /* v0.24.0: progressive Wild Archive unlock (Mira approved). First tag
