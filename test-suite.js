@@ -39,7 +39,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.6-beta', VERSION === 'v1.5.6-beta');
+  ok('version v1.5.7-beta', VERSION === 'v1.5.7-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1778,6 +1778,17 @@ code += `
   ok('releaseBtn uses gradient', /#releaseBtn\\s*\\{[^}]*linear-gradient/.test(cssCode));
   ok('archive still-to-discover is static text', /archive-still-locked-head/.test(archiveUiCode));
   ok('no details/summary for still-to-discover', !/<summary>Still to discover/.test(archiveUiCode));
+
+  // v1.5.7-beta: reunion dialog order + reunion reaction research ID
+  ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
+  ok('follow button inserted before watch (v1.5.7)', /insertBefore\\(followBtn, watchBtn\\)/.test(code));
+  ok('reunion reaction uses researchId fallback (v1.5.7)', /const name = rec\\.name [^\\n]*: rec\\.researchId/.test(code));
+  ok('double-tap zoom disabled (v1.5.7)', cssCode.indexOf('touch-action: manipulation') !== -1);
+  ok('map pinch-to-zoom handlers (v1.5.7)', code.indexOf('pinchDist') !== -1 && code.indexOf('d / pinchDist') !== -1);
+  ok('tag-along insight not in doTagAlong (v1.5.7)', (function(){ const s = code.indexOf('function doTagAlong()'); const e = code.indexOf('function doFollowTagged'); const body = code.slice(s, e); return body.indexOf('Tag-along insight:</strong>') === -1 && body.indexOf('unlockSecretFact') !== -1; })());
+  ok('tag-along still unlocks fact (v1.5.7)', /pendingTagAlongFact = fact/.test(code));
+  ok('desktop collection cards horizontal (v1.5.7)', cssCode.indexOf('repeat(3, 1fr)') !== -1 && cssCode.indexOf('grid-text') !== -1);
+  ok('grid text wrapper exists (v1.5.7)', code.indexOf('grid-text') !== -1);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
