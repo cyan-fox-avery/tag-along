@@ -5,7 +5,18 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.1-beta";
+const VERSION = "v1.4.2-beta";
+
+/* v1.4.2: standard IUCN Red List category abbreviations for the compact
+   field-guide pills. Full category names appear in expanded entries. */
+const IUCN_ABBR = {
+  "Critically Endangered": "CR",
+  "Endangered": "EN",
+  "Vulnerable": "VU",
+  "Near Threatened": "NT",
+  "Least Concern": "LC",
+  "Data Deficient": "DD"
+};
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -56,6 +67,11 @@ const WHATS_NEW = {
     "☀️ <strong>Sun-ray caustics.</strong> Underwater light now radiates from a sun point above the water, fanning across the screen at angles.",
     "📱 <strong>Tab bar refinements.</strong> Full-width tab band, equal-width tabs, and stacked count/icon/label on Collection and Achievements.",
     "🔍 <strong>Field guide overlays.</strong> Expanded shark entries now float over the grid instead of pushing it down."
+  ],
+  "v1.4.2-beta": [
+    "☀️ <strong>Sun-point caustics.</strong> Light rays now radiate from the far top-left corner like real sunlight, with softer overlap brightness.",
+    "🏷️ <strong>IUCN abbreviations.</strong> Field guide cards show standard IUCN codes (CR, EN, VU, NT, LC) — tap a shark for the full status.",
+    "📱 <strong>Cleaner tabs.</strong> Collection and Achievements tabs show just icon + label; their counts moved to the top of each page."
   ]
 };
 
@@ -1256,7 +1272,7 @@ function renderResearch() {
         <button type="button" class="guide-row-head" aria-expanded="false">
           <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
           <span class="latin">${s.latin}</span>
-          <span class="status-pill">IUCN: ${s.status}</span>
+          <span class="status-pill" title="IUCN Red List: ${s.status}">${IUCN_ABBR[s.status] || s.status}</span>
           <span class="guide-caret" aria-hidden="true">▾</span>
         </button>
         <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
@@ -1265,6 +1281,7 @@ function renderResearch() {
       </div>
       <div class="guide-row-body hidden">
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
+        <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
@@ -1765,6 +1782,21 @@ function doEncounter(species, plan) {
 /* v0.7.0: a trip is a full day out — descent, wildlife, then 2–4
    encounter slots paced through the day, then day's end. The shark is
    a moment in the day, never the end of it. */
+/* v1.4.2: porthole — the observation window is always present. When no
+   expedition is active it shows the ocean surface (looking up through the
+   window like a porthole). Called on init and when an expedition ends. */
+function showPorthole() {
+  const scene = $("diveScene");
+  scene.className = "dive-scene porthole";
+  $("diveScenery").innerHTML = "";
+  $("diveShark").classList.add("hidden");
+  const log = $("diveLog");
+  if (log) log.innerHTML = '<p class="dive-idle">\u{1F30A} The ocean waits. Plan your expedition above, then launch.</p>';
+  const actions = $("diveActions");
+  if (actions) { actions.classList.add("hidden"); actions.innerHTML = ""; }
+  $("diveView").classList.remove("hidden");
+}
+
 async function runExpedition(plan) {
   state.currentPlan = plan;
   state.pendingWin = false;
@@ -1931,7 +1963,7 @@ async function runExpedition(plan) {
   const closeDive = () => {
     actions.classList.add("hidden");
     actions.innerHTML = "";
-    $("diveView").classList.add("hidden");
+    showPorthole();
     $("launchBtn").disabled = false;
     renderAll();
     /* v1.4.0-beta: tag-along — after the trip fully completes (log, achievements,
@@ -2488,14 +2520,7 @@ function renderAchievements() {
       </div>`;
     list.appendChild(row);
   });
-  const badge = $("achieveBadge");
-  if (badge) {
-    badge.textContent = `${unlockedCount}/${visible.length}`;
-    // v1.4.0: visibility (not display) so the Achievements tab keeps its
-    // 3-row height like every other tab even at 0 unlocks.
-    badge.classList.remove("hidden");
-    badge.style.visibility = unlockedCount === 0 ? "hidden" : "visible";
-  }
+  /* v1.4.2: tab badge removed — the count lives in the page header above. */
 }
 
 /* ---------- Tagging ---------- */
@@ -3456,7 +3481,9 @@ function renderCollection() {
   const shelf = $("trophyShelf");
   shelf.innerHTML = "";
   const ids = Object.keys(state.tagged);
-  $("collectionCount").textContent = `${ids.length}/${SHARKS.length}`;
+  /* v1.4.2: count lives in the page header now, not the tab */
+  const ccHead = $("collectionCountHead");
+  if (ccHead) ccHead.innerHTML = `<strong>${ids.length}</strong> of <strong>${SHARKS.length}</strong> species tagged`;
 
   /* v0.6.0: the trophy sits ABOVE the grid on its own distinguished shelf —
      never as a grid slot that reads like "one more shark to catch". */
@@ -4269,5 +4296,6 @@ setInterval(tickPhoneClock, 30000);
 })();
 initCreatureArt(); // v0.26.0: fill CREATURE_ART with WebP shadow sprites
 renderAll();
+showPorthole(); // v1.4.2: observation window always present — porthole surface when idle
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();
