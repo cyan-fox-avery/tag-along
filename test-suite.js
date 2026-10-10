@@ -1625,7 +1625,7 @@ code += `
   (() => {
     ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
     ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
-    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row\\)/.test(code));
+    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
     ok("collapseGuideRow resets aria-expanded", /collapseGuideRow[\\s\\S]*?setAttribute\\("aria-expanded", "false"\\)/.test(code));
     ok("collapseGuideRow returns focus to header", /collapseGuideRow[\\s\\S]*?head\\.focus\\(\\)/.test(code));
     ok("Escape key closes topmost open row", /keydown[\\s\\S]*?Escape[\\s\\S]*?\\.guide-row\\.open/.test(code));
@@ -1751,7 +1751,10 @@ code += `
   ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
   ok('WHATS_NEW has v1.6.0-beta', Array.isArray(WHATS_NEW['v1.6.0-beta']) && WHATS_NEW['v1.6.0-beta'].length === 4);
   // v1.6.0: Research accordion — opening one entry closes the others
-  ok('accordion closes other research rows', /collapseGuideRow\\(other\\)/.test(code));
+  ok('accordion closes other research rows', /collapseGuideRow\\(other, false\\)/.test(code));
+  // v1.6.0: accordion doesn't steal focus — collapseGuideRow takes a restoreFocus flag
+  ok('collapseGuideRow has restoreFocus flag', /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
+  ok('focus only restored when flag is true', /if \\(restoreFocus\\) head\\.focus\\(\\);/.test(code));
   // v1.6.0: IUCN badge spacing — more room between badge and pin
   ok('iucn badge has right margin', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*8px/.test(cssCode));
   // v1.6.0: full scientific name in expanded Collection/Archive cards

@@ -1494,15 +1494,17 @@ function renderExpeditionPin() {
    above earlier ones, regardless of DOM order. */
 let guideOverlayZ = 30;
 /* v1.5.4-beta: shared collapse for guide rows — used by the close button,
-   Escape key, and outside-click dismissal. Returns focus to the row header. */
-function collapseGuideRow(row) {
+   Escape key, and outside-click dismissal. Returns focus to the row header.
+   v1.6.0-beta: restoreFocus flag — the accordion passes false so closing
+   other cards doesn't yank focus (and scroll) back to them. */
+function collapseGuideRow(row, restoreFocus = true) {
   if (!row || !row.classList.contains("open")) return;
   const body = row.querySelector(".guide-row-body");
   const head = row.querySelector(".guide-row-head");
   if (body) body.classList.add("hidden");
   if (head) {
     head.setAttribute("aria-expanded", "false");
-    head.focus();
+    if (restoreFocus) head.focus();
   }
   row.classList.remove("open");
   row.style.zIndex = "";
@@ -1608,7 +1610,7 @@ function renderResearch() {
       if (!isHidden) {
         /* v1.6.0-beta: accordion — opening one entry closes the others. */
         document.querySelectorAll(".guide-row.open").forEach(other => {
-          if (other !== row && other.closest("#researchList")) collapseGuideRow(other);
+          if (other !== row && other.closest("#researchList")) collapseGuideRow(other, false);
         });
         row.style.zIndex = String(++guideOverlayZ);
       }
