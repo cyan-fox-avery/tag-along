@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.6-beta";
+const VERSION = "v1.4.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -85,6 +85,9 @@ const WHATS_NEW = {
   ],
   "v1.4.6-beta": [
     "📐 <strong>Centered empty state.</strong> The Collection page's \"No sharks tagged yet\" message is now centered like the sightings one."
+  ],
+  "v1.4.7-beta": [
+    "🌊 <strong>Boat-window waves.</strong> The idle porthole now shows rolling wave crests drifting past at three depths — and spray periodically hits the glass and runs down."
   ]
 };
 
@@ -1796,9 +1799,9 @@ function doEncounter(species, plan) {
    encounter slots paced through the day, then day's end. The shark is
    a moment in the day, never the end of it. */
 /* v1.4.2: porthole — the observation window is always present.
-   v1.4.4: when no expedition is active it shows the ocean surface from
-   ABOVE, like looking over the side of a boat — slow swells, foam, sun
-   glitter. Called on init and when an expedition ends. */
+   v1.4.7: when no expedition is active it shows the ocean surface from a
+   boat window — rolling wave crests at three depths, spray hitting the
+   glass. Called on init and when an expedition ends. */
 function showPorthole() {
   const scene = $("diveScene");
   scene.className = "dive-scene porthole";
