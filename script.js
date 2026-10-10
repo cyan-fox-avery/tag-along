@@ -803,10 +803,13 @@ function saveMsgs() {
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
     sarahAdviceOffered: state.sarahAdviceOffered });
 }
-/* Every new thread gets a timestamp for the Phone tab. */
+/* Every new thread gets a timestamp for the Phone tab.
+   v1.4.0: if the Phone panel is already open, the new thread renders
+   immediately — count it as read instead of leaving a stale badge. */
 function pushThread(msgs) {
   state.messages.push({ ts: Date.now(), msgs });
-  state.unread += 1;
+  const phoneTab = document.querySelector('.tab[data-tab="phone"]');
+  if (!(phoneTab && phoneTab.classList.contains('active'))) state.unread += 1;
   saveMsgs();
   updateMsgBadge();
   renderMessages();
