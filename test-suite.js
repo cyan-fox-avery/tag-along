@@ -39,7 +39,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.8-beta', VERSION === 'v1.5.8-beta');
+  ok('version v1.5.9-beta', VERSION === 'v1.5.9-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1794,8 +1794,15 @@ code += `
   ok('WHATS_NEW has v1.5.8-beta', Array.isArray(WHATS_NEW['v1.5.8-beta']) && WHATS_NEW['v1.5.8-beta'].length > 0);
   ok('caustics forced into GPU layer (v1.5.8)', cssCode.indexOf('translateZ(0)') !== -1);
   ok('fan keeps persistent layer (v1.5.8)', cssCode.indexOf('backface-visibility: hidden') !== -1);
-  ok('tab bar keeps compositing layer (v1.5.8)', /\\.tabs\\s*\\{[^}]*translateZ\\(0\\)/.test(cssCode));
-  ok('tab buttons keep pointer events (v1.5.8)', cssCode.indexOf('.tabs .tab { pointer-events: auto; }') !== -1);
+  // v1.5.9-beta: white-band root cause — fan must be viewport-sized, never oversized.
+  // v1.4.16 and v1.5.6 both used inset:-12% and both broke iPad Safari layout.
+  ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
+  ok('fan is viewport-sized, not oversized (v1.5.9)', cssCode.indexOf('inset: -12%') === -1);
+  ok('fan uses inset 0 (v1.5.9)', /\.caustics \.fan \{[^}]*inset: 0;/.test(cssCode));
+  // v1.5.9-beta: NO transform on sticky tab bar — translateZ(0) breaks
+  // hit-testing for position:sticky in Safari. The fan fix is the real cure.
+  ok('tabs have no transform (v1.5.9)', !/\.tabs\s*\{[^}]*transform:\s*translateZ/.test(cssCode));
+  ok('no pointer-events override on tabs (v1.5.9)', cssCode.indexOf('.tabs .tab { pointer-events: auto; }') === -1);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
