@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.19-beta";
+const VERSION = "v1.5.20-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.20-beta": [
+    "🦈 <strong>Sarah egg, anywhere.</strong> Naming a shark Sarah from the Collection tab now triggers her reaction and the Best Cousin Ever achievement — not just during expeditions.",
   ],
   "v1.5.19-beta": [
     "💡 <strong>Ask Sarah, about your shark.</strong> The Ask Sarah dropdown now lists only your pinned shark, and the prompt only appears while something is pinned.",
@@ -4042,6 +4045,9 @@ function openDetail(id) {
     store.save(state.tagged);
     maybeSarahEgg(id, t);
     maybeNameEgg(id, t); // v0.23.0: Mary Lee / Nicole / Bruce
+    /* v1.5.20-beta: check achievements on any rename — naming a shark
+       "Sarah" outside an expedition must still unlock Best Cousin Ever. */
+    checkAchievements();
     renderCollection();
     renderResearch();
     openDetail(id);
