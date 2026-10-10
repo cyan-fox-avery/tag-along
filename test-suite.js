@@ -1638,7 +1638,11 @@ code += `
   ok('porthole drift is seamless two-tile', /translateX\\(calc\\(-100%\\s*\\/\\s*3\\)\\)/.test(cssCode));
   ok('porthole tiles mirrored for seamless loop', /pw-tile:nth-child\\(even\\)[\\s\\S]*?scaleX\\(-1\\)/.test(cssCode));
   ok('porthole splash is large', /\\.porthole-spray\\s*\\{[^}]*width:\\s*240px/.test(cssCode));
-  ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
+  ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*150px/.test(cssCode));
+  // v1.4.14: calm porthole — sky above the far wave, slow drift, splash pops without sliding
+  ok('porthole has sky behind far wave', /\\.dive-scene\\.porthole\\s*\\{[^}]*#a8dcf5/.test(cssCode));
+  ok('porthole drift is calm', /\\.pw-far\\s+\\.pw-drift\\s*\\{[^}]*52s/.test(cssCode));
+  ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?\\.porthole-waves/.test(cssCode) || /prefers-reduced-motion[\\s\\S]*?pw-drift/.test(cssCode));
   ok('bubbles rise in burst columns', /MORE bubbles in burst columns/i.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
