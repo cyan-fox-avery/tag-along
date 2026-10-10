@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.1-beta', VERSION === 'v1.4.1-beta');
+  ok('version v1.4.2-beta', VERSION === 'v1.4.2-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -221,17 +221,24 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
   ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
-  ok('tabs share equal width', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
+  ok('tabs share equal width', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*minmax/.test(cssCode));
+  // v1.4.2: tab buttons centered in the band, not left-aligned
+  ok('tabs centered in band', /\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
+  // v1.4.2: bigger tab emojis on desktop
+  ok('desktop tab emojis bigger', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.tab-icon\\s*\\{[^}]*font-size/.test(cssCode));
   ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
   ok('achievements tab is labeled', /data-tab="achievements"[^>]*>[\\s\\S]*?Achievements/.test(htmlCode));
-  ok('collection tab stacks count above label', /data-tab="collection"[\\s\\S]*?tab-stack[\\s\\S]*?collectionCount[\\s\\S]*?tab-label/.test(htmlCode));
+  // v1.4.2: counts removed from tabs — Collection/Achievements are 2-row icon+label
+  ok('collection tab has no count badge', !/data-tab="collection"[^>]*>[\\s\\S]*?id="collectionCount"/.test(htmlCode));
+  ok('achievements tab has no count badge', !/data-tab="achievements"[^>]*>[\\s\\S]*?achieveBadge/.test(htmlCode));
+  ok('collection page shows prominent count', /id="collectionCountHead"/.test(htmlCode));
   // v1.4.0: every tab is a 3-row stack (count/icon/label) with spacers —
   // no stretch hacks needed for equal heights.
   const tabStackCount = (htmlCode.match(/class="tab-stack"/g) || []).length;
   ok('all 8 tabs use tab-stack', tabStackCount === 8);
   ok('count-spacer keeps layout via visibility:hidden', /\\.count-spacer\\s*\\{[^}]*visibility:\\s*hidden/.test(cssCode));
   ok('no height:100% stretch hack on .tab', !/\\.tab\\s*\\{[^}]*height:\\s*100%/.test(cssCode));
-  ok('achieveBadge keeps layout via visibility', /achieveBadge[\\s\\S]*?style\\.visibility/.test(code));
+  // v1.4.2: achieveBadge removed — count lives in page header
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
   ok('sand tiger GIF flagged for reframe', !!stGif);
 
@@ -1508,9 +1515,9 @@ code += `
   // v1.4.0-beta Mira review: fixed grid tracks keep tabs equal on sparse rows
   (() => {
     ok("tabs use CSS grid", /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
-    ok("desktop tabs have 8 fixed tracks", /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
-    ok("tablet tabs have 4 fixed tracks", /max-width:\\s*1023px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*1fr\\)/.test(cssCode));
-    ok("phone tabs have 3 fixed tracks", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3,\\s*1fr\\)/.test(cssCode));
+  ok("desktop tabs have 8 fixed tracks", /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*minmax/.test(cssCode));
+  ok("tablet tabs have 4 fixed tracks", /max-width:\\s*1023px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*minmax/.test(cssCode));
+  ok("phone tabs have 3 fixed tracks", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3,\\s*minmax/.test(cssCode));
     ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
     ok("no flex-wrap on tabs", !/\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
     ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
@@ -1548,11 +1555,15 @@ code += `
   (() => {
     ok("caustics use elliptical radial glow", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse/.test(cssCode));
     ok("caustics have no hard bar edges", !/\\.caustics\\s+span\\s*\\{[^}]*border-radius:\\s*50%/.test(cssCode));
-    ok("caustics core is bright", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(218,242,255,0\\.34\\)/.test(cssCode));
+    // v1.4.2: brightness cap — screen blend + softer peak so overlaps only brighten slightly
+    ok("caustics use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
+    ok("caustics peak alpha reduced", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(218,242,255,0\\.28\\)/.test(cssCode));
   })();
   // v1.4.1: sun-ray caustics radiate from a sun point at angled fan positions
   (() => {
     ok("caustics pivot around sun point", /\\.caustics\\s+span\\s*\\{[^}]*transform-origin:\\s*50%\\s+0/.test(cssCode));
+    // v1.4.2: sun point at far top-left corner
+    ok("sun point at far left", /\\.caustics\\s+span\\s*\\{[^}]*left:\\s*2%/.test(cssCode));
     ok("caustics use angled fan keyframes", /@keyframes\\s+ray-life/.test(cssCode));
     ok("caustics keyframes rotate around --ray-angle", /rotate\\(calc\\(var\\(--ray-angle\\)/.test(cssCode));
     const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
@@ -1567,6 +1578,18 @@ code += `
   })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
   ok("WHATS_NEW has v1.4.1-beta", !!(WHATS_NEW["v1.4.1-beta"] && WHATS_NEW["v1.4.1-beta"].length));
+  ok("WHATS_NEW has v1.4.2-beta", !!(WHATS_NEW["v1.4.2-beta"] && WHATS_NEW["v1.4.2-beta"].length));
+  // v1.4.2: IUCN abbreviations on field-guide pills
+  ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
+  ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
+  // v1.4.2: porthole — observation window always present, surface view when idle
+  ok('porthole surface elements in HTML', /class="porthole-surface"/.test(htmlCode) && /class="porthole-shafts"/.test(htmlCode));
+  ok('diveView not hidden by default', !/id="diveView" class="dive-view hidden"/.test(htmlCode));
+  ok('porthole CSS exists', /\\.dive-scene\\.porthole/.test(cssCode));
+  ok('porthole has surface animation', /@keyframes\\s+porthole-ripple/.test(cssCode));
+  ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?porthole-surface/.test(cssCode));
+  ok('showPorthole defined', /function showPorthole/.test(code));
+  ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
