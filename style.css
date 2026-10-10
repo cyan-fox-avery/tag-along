@@ -54,11 +54,16 @@ body {
    no blur filters, for iPad-friendliness. */
 .caustics { position: absolute; top: 0; left: 0; right: 0; height: 1100px; overflow: hidden; }
 .caustics span {
-  position: absolute; top: -40px; height: 1140px; border-radius: 50%;
-  background: linear-gradient(180deg,
-    rgba(190,230,255,0.16) 0%,
-    rgba(190,230,255,0.07) 35%,
-    transparent 70%);
+  position: absolute; top: -40px; height: 1140px;
+  /* v1.4.0-beta fix: the old vertical-only gradient on a tall bar left hard
+     straight side edges that read as dark "bands" on iPad. Now an elliptical
+     glow — soft on every side, bright core — so each ribbon unambiguously
+     reads as light drifting through water. */
+  background: radial-gradient(ellipse 50% 38% at 50% 30%,
+    rgba(218,242,255,0.34) 0%,
+    rgba(205,234,255,0.16) 45%,
+    rgba(195,230,255,0.05) 65%,
+    transparent 76%);
   opacity: 0;
   animation: caustic-a 16s ease-in-out infinite;
 }
@@ -121,7 +126,7 @@ body {
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
   .surface-shimmer, .caustics span, .bubbles span { animation: none; }
-  .caustics span { opacity: 0.12; transform: none; }
+  .caustics span { opacity: 0.14; transform: none; }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.
@@ -756,6 +761,17 @@ select option:disabled { color: #7a8a9e; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
 .guide-row.open .guide-caret { transform: rotate(180deg); }
 .guide-row-body { padding: 0 14px 14px; border-top: 1px solid #2c5364; }
+/* v1.4.0-beta: expanded entries overlay the grid instead of pushing it down.
+   The row keeps its grid cell; the detail floats above its neighbors. */
+.guide-row { position: relative; }
+.guide-row.open { overflow: visible; z-index: 20; }
+.guide-row.open .guide-row-body {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 20;
+  background: var(--bg-card);
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.55);
+  max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
 /* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
 .guide-row-top { display: flex; align-items: stretch; }
 .guide-row-top .guide-row-head { flex: 1; min-width: 0; }
