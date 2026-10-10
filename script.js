@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.11-beta";
+const VERSION = "v1.5.12-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,10 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.12-beta": [
+    "📑 <strong>Eight tabs, one row — for real this time.</strong> Tighter type and a shrinkable label stack so all 8 tabs fit a single iPad row with no wrapping.",
+    "📖 <strong>Expanded field-guide cards show everything.</strong> No more internal scrolling — the card grows to fit the full description, and its top corners are rounded to match the bottom.",
   ],
   "v1.5.11-beta": [
     "📸 <strong>Archive tab always visible.</strong> The Archive tab now stays in the tab bar from the start — greyed out and unclickable until Sarah's intro text unlocks it. This keeps all 8 tabs on one row with no layout shift.",
