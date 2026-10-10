@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.14-beta";
+const VERSION = "v1.4.15-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -112,7 +112,14 @@ const WHATS_NEW = {
     "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
     "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll.",
     "🌊 <strong>Calmer porthole.</strong> The far wave sits higher under a new CSS sky (sun + clouds — Mira may art-direct it later), all three wave layers overlap into continuous water, everything drifts much more slowly, and splashes pop and fade instead of sliding down the glass."
-  ]
+  ],
+  "v1.4.15-beta": [
+    "🌊 <strong>Underwater vista.</strong> The background is now a full surface-to-seafloor scene — sunlit top, deepening blues, sediment and kelp silhouettes at the bottom.",
+    "🦈 <strong>Bigger logo.</strong> The shark logo beside the title is 150% bigger on desktop.",
+    "🏷️ <strong>IUCN color coding.</strong> Threat levels now read at a glance — green (LC) through yellow, orange, red, to dark purple (CR). The badge sits snug beside the pin.",
+    "📌 <strong>Smarter pinned hints.</strong> The pinned card shows the shark's description with key clues in bold — and the expedition line hints at diet in plain words instead of giving away answers.",
+    "⏳ <strong>Time passes on expeditions.</strong> The dive log now moves from morning through afternoon to evening across your encounters."
+  ],
 };
 
 function whatsNewSeen() {
@@ -175,6 +182,13 @@ const DEPTH_FLAVOUR = {
     "The surface chop rocks the boat gently. Below, everything glows blue-green.",
     "You can see the boat's shadow drifting above you, a dark shape on the bright ceiling of the sea.",
     "A breeze ruffles the surface into glitter. Gulls cry somewhere far above."
+  ],
+  "v1.4.15-beta": [
+    "🌊 <strong>Underwater vista.</strong> The background is now a full surface-to-seafloor scene — sunlit top, deepening blues, sediment and kelp silhouettes at the bottom.",
+    "🦈 <strong>Bigger logo.</strong> The shark logo beside the title is 150% bigger on desktop.",
+    "🏷️ <strong>IUCN color coding.</strong> Threat levels now read at a glance — green (LC) through yellow, orange, red, to dark purple (CR). The badge sits snug beside the pin.",
+    "📌 <strong>Smarter pinned hints.</strong> The pinned card shows the shark's description with key clues in bold — and the expedition line hints at diet in plain words instead of giving away answers.",
+    "⏳ <strong>Time passes on expeditions.</strong> The dive log now moves from morning through afternoon to evening across your encounters."
   ],
   reef: [
     "Coral heads rise like a drowned city. Small bright fish dart between the branches.",
@@ -1159,6 +1173,27 @@ function jumpToPinned(s, list) {
     setTimeout(() => target.classList.remove("pin-flash"), 1200);
   }
 }
+/* v1.4.15-beta: highlight key research clues in bold (same font/size).
+   Bolds location, diet, and depth cues — never the expedition answers. */
+function highlightClues(s) {
+  let text = s.research || "";
+  // Take the first two sentences for the preview
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  text = sentences.slice(0, 2).join(" ").trim();
+  // Bold the region name
+  const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : null;
+  if (regionName) {
+    const re = new RegExp(`(${regionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+    text = text.replace(re, "<strong>$1</strong>");
+  }
+  // Bold diet keywords
+  const dietWords = ["plankton", "krill", "squid", "crabs", "lobster", "fish", "seals", "rays", "urchins", "shellfish"];
+  for (const w of dietWords) {
+    const re = new RegExp(`\\b(${w})\\b`, "gi");
+    text = text.replace(re, "<strong>$1</strong>");
+  }
+  return text;
+}
 function renderPinnedCard(list) {
   /* v1.4.0-beta: pinned card lives in its own full-width section above the
      grid, not as the first grid cell. */
@@ -1174,6 +1209,9 @@ function renderPinnedCard(list) {
       : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
   } else {
     const done = !!state.tagged[s.id];
+    /* v1.4.15-beta: pinned card shows the research description with key clues
+       in subtle bold — same font and size, just bold. Never the actual answers. */
+    const researchPreview = highlightClues(s);
     card.innerHTML = `
       <div class="pinned-head"><span>📌 Currently researching</span>
         <button type="button" class="pin-btn unpin" data-unpin aria-label="Unpin ${s.name}">✕</button>
@@ -1186,6 +1224,7 @@ function renderPinnedCard(list) {
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
       </div>
+      <p class="pinned-research">${researchPreview}</p>
       <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
     card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
     card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
@@ -1249,6 +1288,18 @@ function renderPinHint() {
 
 /* v0.20.0: show the pinned shark on the Expedition tab — a research focus
    to plan around. Never auto-fills the planner; the sea decides. */
+/* v1.4.15-beta: diet phrases for pinned hints — natural language, not answers.
+   "They eat plankton" lets the player infer the bait; "Plankton bloom — no bait"
+   would hand it over. */
+const DIET_PHRASE = {
+  "plankton": "they eat plankton",
+  "crustaceans": "they eat crabs and lobster",
+  "squid": "they hunt squid",
+  "schooling-fish": "they chase schooling fish",
+  "tuna": "they hunt large oily fish",
+  "ray": "they eat rays",
+  "urchins": "they eat urchins and shellfish"
+};
 function renderExpeditionPin() {
   const el = $("expeditionPin");
   if (!el) return;
@@ -1258,9 +1309,11 @@ function renderExpeditionPin() {
   const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region;
   /* v0.20.0: Mira review fix — filter feeders (whale, basking) store bait as a
      string, not an array. baitList() normalizes both. */
-  const baits = baitList(s).map(b => BAITS[b] || b).join(", ");
+  /* v1.4.15-beta: show diet as a natural sentence, not the bait answer. */
+  const dietKeys = baitList(s);
+  const dietText = dietKeys.map(k => DIET_PHRASE[k] || `they eat ${k}`).join("; ");
   el.innerHTML = `📌 Currently researching: <strong>${s.name}</strong>
-    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>
+    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${dietText}</span>
     <br><span class="dim" style="font-size:12px">📓 Pin hints on — your logbook notes nudge you when the plan is close.</span>`;
 }
 /* v1.4.0-beta: rising z-index so a later-opened overlay always floats
@@ -1307,14 +1360,17 @@ function renderResearch() {
     const row = document.createElement("div");
     row.className = "guide-row";
     row.setAttribute("data-entry", s.id);
+    /* v1.4.15-beta: IUCN pill sits beside the pin (not inside the head button),
+       color-coded by threat level, freeing space for more of the Latin name. */
+    const iucnAbbr = IUCN_ABBR[s.status] || s.status;
     row.innerHTML = `
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
           <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
           <span class="latin">${s.latin}</span>
-          <span class="status-pill" title="IUCN Red List: ${s.status}">${IUCN_ABBR[s.status] || s.status}</span>
           <span class="guide-caret" aria-hidden="true">▾</span>
         </button>
+        <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
         <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
           aria-label="${isPinned ? "Unpin" : "Pin"} ${s.name} as currently researching"
           aria-pressed="${isPinned}">📌</button>
@@ -1924,9 +1980,15 @@ async function runExpedition(plan) {
   for (let i = 0; i < slots; i++) {
     $("diveShark").classList.add("hidden");
     if (i > 0) {
+      /* v1.4.15-beta: time progresses across the trip — morning, afternoon, evening */
+      const timeBeats = [
+        `⏳ The morning wears on…`,
+        `⏳ The afternoon stretches out…`,
+        `⏳ Evening approaches…`
+      ];
       logLine(deep
         ? `⏳ The hours slip by. The deep does not hurry, so neither do you.`
-        : `⏳ The morning wears on…`);
+        : (timeBeats[i - 1] || timeBeats[timeBeats.length - 1]));
       await wait(2000);
     }
     await showSighting(plan.depth);
