@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.17-beta', VERSION === 'v1.4.17-beta');
+  ok('version v1.4.18-beta', VERSION === 'v1.4.18-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1616,7 +1616,7 @@ code += `
   ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
-  ok("WHATS_NEW has v1.4.17-beta", !!(WHATS_NEW["v1.4.17-beta"] && WHATS_NEW["v1.4.17-beta"].length));
+  ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
@@ -1629,7 +1629,7 @@ code += `
   // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
   ok('caustic ray spans in HTML', /<div class=\"caustics\"><span><\\/span>/.test(htmlCode));
-  ok('porthole has nested drift+bob structure', /class="pw-drift"><div class="pw-bob"/.test(htmlCode));
+  ok('porthole has single orbit structure per layer', /class="pw-layer pw-far"><div class="pw-orbit"/.test(htmlCode) && !/class="pw-drift"/.test(htmlCode) && !/class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
   ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
   ok('porthole no longer procedural', !/class="porthole-crest/.test(htmlCode) && !/class="porthole-surface"/.test(htmlCode));
@@ -1638,24 +1638,29 @@ code += `
   ok('porthole CSS exists', /\\.dive-scene\\.porthole/.test(cssCode));
   ok('porthole uses wave art assets', /porthole_wave_far_draft\.png/.test(cssCode) && /porthole_wave_mid_draft\.png/.test(cssCode) && /porthole_wave_near_draft\.png/.test(cssCode));
   ok('porthole uses splash art asset', /porthole_glass_splash_draft\.png/.test(cssCode));
-  ok('porthole has drift keyframes', /@keyframes\\s+pw-drift-(right|left)/.test(cssCode));
-  ok('porthole has bob keyframes', /@keyframes\\s+pw-bob-\\d/.test(cssCode));
+  ok('porthole has orbital keyframes', /@keyframes\\s+pw-orbit-far/.test(cssCode) && /@keyframes\\s+pw-orbit-mid/.test(cssCode) && /@keyframes\\s+pw-orbit-near/.test(cssCode));
+  ok('porthole orbits are elliptical (8 stops)', /@keyframes\\s+pw-orbit-far[\\s\\S]*?12\\.5%[\\s\\S]*?87\\.5%/.test(cssCode));
+  ok('porthole no longer uses linear drift', !/@keyframes\\s+pw-drift-/.test(cssCode));
   ok('porthole has spray keyframes', /@keyframes\\s+pw-spray-\\d/.test(cssCode));
-  ok('porthole drift is seamless two-tile', /translateX\\(calc\\(-100%\\s*\\/\\s*3\\)\\)/.test(cssCode));
+  ok('porthole orbit loops seamlessly (closed ellipse)', /@keyframes\\s+pw-orbit-far[\\s\\S]*?100%\\s*\\{[^}]*translate\\(30px, 0\\)/.test(cssCode));
   ok('porthole tiles mirrored for seamless loop', /pw-tile:nth-child\\(even\\)[\\s\\S]*?scaleX\\(-1\\)/.test(cssCode));
-  ok('porthole splash is large', /\\.porthole-spray\\s*\\{[^}]*width:\\s*240px/.test(cssCode));
+  ok('porthole splash is bigger', /\\.porthole-spray\\s*\\{[^}]*width:\\s*320px/.test(cssCode));
   ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   // v1.4.14: calm porthole — sky above the far wave, slow drift, splash pops without sliding
   ok('porthole has sky behind far wave', /\\.dive-scene\\.porthole\\s*\\{[^}]*#a8dcf5/.test(cssCode));
-  ok('porthole drift is calm', /\\.pw-far\\s+\\.pw-drift\\s*\\{[^}]*52s/.test(cssCode));
+  ok('porthole orbit is calm', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*52s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
-  ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?\\.porthole-waves/.test(cssCode) || /prefers-reduced-motion[\\s\\S]*?pw-drift/.test(cssCode));
+  ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
   ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
   // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
   ok('bubble columns overlap in pairs', /columns A.B fire together/.test(cssCode) && /columns C.D fire together/.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
-  ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*8%/.test(cssCode));
-  ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(64px\\)/.test(cssCode));
+  ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
+  ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
+  // v1.4.18: waves stacked tight, oval orbital motion, bigger/faster splash
+  ok('waves stacked almost on top of each other', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode) && /\\.pw-mid\\s*\\{[^}]*top:\\s*20%/.test(cssCode) && /\\.pw-near\\s*\\{[^}]*top:\\s*24%/.test(cssCode));
+  ok('orbit periods differ per layer (far slowest)', /pw-orbit-far 52s/.test(cssCode) && /pw-orbit-mid 40s/.test(cssCode) && /pw-orbit-near 32s/.test(cssCode));
+  ok('splash is the fastest thing (14s cycle)', /\\.splash-a\\s*\\{[^}]*14s/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
