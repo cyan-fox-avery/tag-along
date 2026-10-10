@@ -210,9 +210,8 @@ body { overflow-x: clip; }
 @media (max-width: 559px) {
   .tabs { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .tab { font-size: 13px; padding: 10px 2px; }
-  /* Phones: no vertical room for stacked rows — count tabs stay inline. */
-  .tab-stack { flex-direction: row; }
-  .tab-stack .tab-label { font-size: 13px; }
+  /* v1.4.0: Avery — count tabs keep the column stack on phones too:
+     count on top, icon on its own row, label below (Collection, Achievements). */
   .dive-scene { top: 160px; }
 }
 /* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
