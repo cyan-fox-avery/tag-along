@@ -225,6 +225,13 @@ code += `
   ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
   ok('achievements tab is labeled', /data-tab="achievements"[^>]*>[\\s\\S]*?Achievements/.test(htmlCode));
   ok('collection tab stacks count above label', /data-tab="collection"[\\s\\S]*?tab-stack[\\s\\S]*?collectionCount[\\s\\S]*?tab-label/.test(htmlCode));
+  // v1.4.0: every tab is a 3-row stack (count/icon/label) with spacers —
+  // no stretch hacks needed for equal heights.
+  const tabStackCount = (htmlCode.match(/class="tab-stack"/g) || []).length;
+  ok('all 8 tabs use tab-stack', tabStackCount === 8);
+  ok('count-spacer keeps layout via visibility:hidden', /\\.count-spacer\\s*\\{[^}]*visibility:\\s*hidden/.test(cssCode));
+  ok('no height:100% stretch hack on .tab', !/\\.tab\\s*\\{[^}]*height:\\s*100%/.test(cssCode));
+  ok('achieveBadge keeps layout via visibility', /achieveBadge[\\s\\S]*?style\\.visibility/.test(code));
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
   ok('sand tiger GIF flagged for reframe', !!stGif);
 
