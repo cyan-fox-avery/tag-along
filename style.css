@@ -339,11 +339,15 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene .dive-shark { z-index: 3; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 
-/* v1.4.11: porthole — asset-led boat-window waves. Illustrated wave strips
-   (far/mid/near, art by Mira) drift as slow parallax layers; splash instances
-   hit the glass occasionally. Motion per Mira's spec: separate nested
+/* v1.4.12: porthole — asset-led boat-window waves. Illustrated wave strips
+   (far/mid/near, art by Mira) drift as slow parallax layers; one big splash
+   hits the glass occasionally. Motion per Mira's spec: separate nested
    transforms for drift vs bob. Transform/opacity only,
-   respects prefers-reduced-motion. */
+   respects prefers-reduced-motion.
+   v1.4.12 fixes: (1) alternate tiles mirrored so every seam joins an edge to
+   its own mirror — the drift loop is truly seamless regardless of PNG edges;
+   (2) much bigger, tightly stacked swells for a look-over-the-horizon feel;
+   (3) a single large splash at a time instead of scattered droplets. */
 .dive-scene.porthole {
   background: linear-gradient(180deg,
     #3d8ab5 0%, #2a6f96 35%, #1a4f70 70%, #103a56 100%);
@@ -373,12 +377,20 @@ select option:disabled { color: #7a8a9e; }
 }
 .dive-scene.porthole .pw-tile {
   flex: none; height: 100%; aspect-ratio: 3 / 1;
+  margin-right: -1px; /* swallow subpixel hairline gaps between tiles */
   background-repeat: no-repeat; background-size: 100% 100%;
 }
+/* v1.4.12: mirror every other tile. Each seam then joins an image edge to
+   its own mirror, so the strip tiles seamlessly whatever the PNG edges do.
+   The repeating unit is 2 tiles wide, so the drift loop shifts exactly
+   2 tiles (1/3 of the 6-tile strip) per cycle. */
+.dive-scene.porthole .pw-tile:nth-child(even) {
+  transform: scaleX(-1);
+}
 
-/* far: upper/back, faintest — drift RIGHT 26s linear, bob ±4px on 8s */
+/* far: upper/back, faintest — drift RIGHT 26s linear, bob ±6px on 8s */
 .dive-scene.porthole .pw-far {
-  top: 2%; height: 76px; opacity: 0.75;
+  top: 4%; height: 150px; opacity: 0.7;
 }
 .dive-scene.porthole .pw-far .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_far_draft.png);
@@ -387,13 +399,13 @@ select option:disabled { color: #7a8a9e; }
   animation: pw-drift-right 26s linear infinite;
 }
 .dive-scene.porthole .pw-far .pw-bob {
-  animation: pw-bob-4 8s ease-in-out infinite alternate;
+  animation: pw-bob-6 8s ease-in-out infinite alternate;
   animation-delay: -2.3s;
 }
 
-/* mid: centre, main legible movement — drift LEFT 17s linear, bob ±6px on 6.5s */
+/* mid: centre, main legible movement — drift LEFT 17s linear, bob ±8px on 6.5s */
 .dive-scene.porthole .pw-mid {
-  top: 32%; height: 88px; opacity: 0.9;
+  top: 24%; height: 180px; opacity: 0.85;
 }
 .dive-scene.porthole .pw-mid .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_mid_draft.png);
@@ -403,13 +415,13 @@ select option:disabled { color: #7a8a9e; }
   animation-delay: -5.1s;
 }
 .dive-scene.porthole .pw-mid .pw-bob {
-  animation: pw-bob-6 6.5s ease-in-out infinite alternate;
+  animation: pw-bob-8 6.5s ease-in-out infinite alternate;
   animation-delay: -1.7s;
 }
 
-/* near: lower/front, clearest foam — drift RIGHT 11s linear, bob ±8px on 5.5s */
+/* near: lower/front, clearest foam — drift RIGHT 11s linear, bob ±10px on 5.5s */
 .dive-scene.porthole .pw-near {
-  top: 62%; height: 96px;
+  top: 44%; height: 210px;
 }
 .dive-scene.porthole .pw-near .pw-tile {
   background-image: url(assets/porthole/drafts/porthole_wave_near_draft.png);
@@ -419,69 +431,59 @@ select option:disabled { color: #7a8a9e; }
   animation-delay: -3.8s;
 }
 .dive-scene.porthole .pw-near .pw-bob {
-  animation: pw-bob-8 5.5s ease-in-out infinite alternate;
+  animation: pw-bob-10 5.5s ease-in-out infinite alternate;
   animation-delay: -4.2s;
 }
 
-/* drift: shift exactly one tile (1/6 of the 6-tile strip) for a seamless loop.
-   All tiles identical, so the wrap is invisible. */
+/* drift: shift exactly two tiles (2/6 = 1/3 of the strip) per loop. Because
+   alternate tiles are mirrored, the 2-tile pattern repeats perfectly, so
+   the wrap is invisible — no more loop glitch. */
 @keyframes pw-drift-right {
-  from { transform: translateX(calc(-100% / 6)); }
+  from { transform: translateX(calc(-100% / 3)); }
   to   { transform: translateX(0); }
 }
 @keyframes pw-drift-left {
   from { transform: translateX(0); }
-  to   { transform: translateX(calc(-100% / 6)); }
+  to   { transform: translateX(calc(-100% / 3)); }
 }
 /* bob: gentle vertical, on the nested inner transform */
-@keyframes pw-bob-4 { from { transform: translateY(-4px); } to { transform: translateY(4px); } }
 @keyframes pw-bob-6 { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
 @keyframes pw-bob-8 { from { transform: translateY(-8px); } to { transform: translateY(8px); } }
+@keyframes pw-bob-10 { from { transform: translateY(-10px); } to { transform: translateY(10px); } }
 
-/* spray on the glass — three instances of the splash art. Occasional drops,
-   not dramatic splashes: appear quickly, hold a beat, ease down, fade away,
-   then a generous invisible interval. Most of the glass stays clear. */
+/* spray on the glass — ONE big splash at a time. Two instances alternate on
+   a 26s cycle, 13s apart, so they never overlap: each appears confidently,
+   holds a beat, eases down the glass, fades, then a long clear interval.
+   Most of the glass stays clear. */
 .dive-scene.porthole .porthole-spray {
   position: absolute; z-index: 4; pointer-events: none;
-  width: 84px; height: 84px; opacity: 0;
+  width: 240px; height: 240px; opacity: 0;
   background: url(assets/porthole/drafts/porthole_glass_splash_draft.png)
     center / contain no-repeat;
   will-change: transform, opacity;
 }
-.dive-scene.porthole .ps1 {
-  left: 12%; top: 6%;
-  animation: pw-spray-1 13s ease-in-out infinite;
+.dive-scene.porthole .splash-a {
+  left: 14%; top: 2%;
+  animation: pw-spray-1 26s ease-in-out infinite;
 }
-.dive-scene.porthole .ps2 {
-  left: 58%; top: 4%;
-  animation: pw-spray-2 19s ease-in-out infinite;
-  animation-delay: -6s;
-}
-.dive-scene.porthole .ps3 {
-  left: 78%; top: 10%;
-  animation: pw-spray-3 27s ease-in-out infinite;
-  animation-delay: -15s;
+.dive-scene.porthole .splash-b {
+  left: 58%; top: 0%;
+  animation: pw-spray-2 26s ease-in-out infinite;
+  animation-delay: -13s;
 }
 @keyframes pw-spray-1 {
-  0%   { opacity: 0; transform: translate(0, 0) scale(0.85); }
-  4%   { opacity: 0.7; transform: translate(1px, 2px) scale(0.85); }
-  12%  { opacity: 0.7; transform: translate(2px, 5px) scale(0.87); }
-  30%  { opacity: 0; transform: translate(3px, 20px) scale(0.9); }
-  100% { opacity: 0; transform: translate(3px, 24px) scale(0.9); }
+  0%   { opacity: 0; transform: translate(0, 0) scale(1); }
+  2%   { opacity: 0.85; transform: translate(2px, 4px) scale(1); }
+  7%   { opacity: 0.85; transform: translate(4px, 10px) scale(1.02); }
+  16%  { opacity: 0; transform: translate(8px, 52px) scale(1.05); }
+  100% { opacity: 0; transform: translate(8px, 60px) scale(1.05); }
 }
 @keyframes pw-spray-2 {
-  0%   { opacity: 0; transform: translate(0, 0) scale(1); }
-  3%   { opacity: 0.6; transform: translate(-1px, 2px) scale(1); }
-  10%  { opacity: 0.6; transform: translate(-2px, 6px) scale(1); }
-  26%  { opacity: 0; transform: translate(-3px, 18px) scale(1.02); }
-  100% { opacity: 0; transform: translate(-3px, 22px) scale(1.02); }
-}
-@keyframes pw-spray-3 {
-  0%   { opacity: 0; transform: translate(0, 0) scale(0.8); }
-  5%   { opacity: 0.65; transform: translate(2px, 1px) scale(0.8); }
-  14%  { opacity: 0.65; transform: translate(3px, 4px) scale(0.82); }
-  32%  { opacity: 0; transform: translate(4px, 16px) scale(0.85); }
-  100% { opacity: 0; transform: translate(4px, 20px) scale(0.85); }
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.95); }
+  2%   { opacity: 0.8; transform: translate(-2px, 4px) scale(0.95); }
+  7%   { opacity: 0.8; transform: translate(-4px, 10px) scale(0.97); }
+  16%  { opacity: 0; transform: translate(-8px, 48px) scale(1); }
+  100% { opacity: 0; transform: translate(-8px, 56px) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
