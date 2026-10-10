@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.27-beta', VERSION === 'v1.5.27-beta');
+  ok('version v1.5.28-beta', VERSION === 'v1.5.28-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1748,6 +1748,10 @@ code += `
   ok('WHATS_NEW has v1.5.25-beta', Array.isArray(WHATS_NEW['v1.5.25-beta']) && WHATS_NEW['v1.5.25-beta'].length === 6);
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
   ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
+  // v1.5.28: background fades to pure black at the bottom — deep ocean, not blue
+  ok('html background is pure black', cssCode.indexOf('html { background: #000; }') !== -1);
+  ok('gradient ends in pure black', cssCode.indexOf('#000 85%') !== -1 && cssCode.indexOf('#000 100%') !== -1);
   // v1.5.27: body::after overlay removed; seafloor SVG itself is taller
   ok('no body::after overlay', !/body::after/.test(cssCode));
   ok('seafloor is 400px tall', /\.seafloor\\s*\{[^}]*height:\\s*400px/.test(cssCode));
@@ -1858,7 +1862,7 @@ code += `
     }
     return clean;
   })());
-  ok('html has dark fallback background', cssCode.indexOf('html { background: #020a16; }') !== -1);
+  ok('html has dark fallback background', cssCode.indexOf('html { background: #000; }') !== -1);
   // v1.5.25 (Mira review): togglePin refreshes Ask Sarah so it never shows a stale pin
   ok('togglePin refreshes Ask Sarah panel', (() => {
     const savePinned = state.pinned, saveOffered = state.sarahAdviceOffered;
