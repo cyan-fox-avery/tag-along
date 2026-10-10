@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.2-beta";
+const VERSION = "v1.5.3-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,11 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.3-beta": [
+    "\u{1F979} <strong>Shark reunions.</strong> One tagged shark per species — but now you might run into yours again! Resident sharks have a 50% reunion chance, coastal 25%, migratory 10%. Spot the familiar tag for a heartfelt reunion, or meet a different wild shark and observe the species.",
+    "\u{1F4F1} <strong>Mobile field guide fix.</strong> Expanded cards now center properly on small screens.",
+    "\U0001F9F9 <strong>Cleaner resets.</strong> Pending celebrations and reunion history now clear properly on hard reset.",
   ],
   "v1.5.2-beta": [
     "🦈 <strong>Individual sharks.</strong> Encounters with a tagged species are now randomized — 25% chance it's the same individual you know, 75% it's a new shark of the same species with its own name and tag.",
@@ -873,6 +878,8 @@ const state = {
   pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
   hasPinnedBefore: pinHistoryStore.load(), // v1.0.3-beta: player has pinned at least once
   unlockedFacts: factStore.load(), // v1.4.0-beta: {speciesId: [factIdx, ...]}
+  /* v1.5.3-beta: reunion reactions — one-time Sarah thread per species. */
+  reunionReacted: (() => { try { return JSON.parse(localStorage.getItem("tyi-reunion-reacted") || "{}"); } catch { return {}; } })(),
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
@@ -1019,6 +1026,33 @@ function migrateTracks() {
 const $ = (id) => document.getElementById(id);
 const esc = (str) => String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const sharkById = (id) => SHARKS.find(s => s.id === id);
+/* v1.5.3-beta: reunion odds by species ecology. These are game-balance numbers,
+   NOT scientific re-sighting probabilities. Resident/site-faithful sharks are
+   most likely to be recognized; wide-ranging migrants rarely are. */
+const REUNION_ODDS = { resident: 0.50, coastal: 0.25, migratory: 0.10 };
+const ECOLOGY_TIER = {
+  /* Resident/site-faithful (17) — reef residents, bottom-dwellers, site-attached */
+  nurse: "resident", sandtiger: "resident", galapagos: "resident",
+  epaulette: "resident", lemon: "resident", blacktip: "resident",
+  whitetip: "resident", zebra: "resident", bonnethead: "resident",
+  greyreef: "resident", caribbean: "resident", wobbegong: "resident",
+  leopard: "resident", horn: "resident", portjackson: "resident",
+  angelshark: "resident", catshark: "resident",
+  /* Coastal/seasonal (14) — patrol coasts, seasonal aggregations */
+  tiger: "coastal", hammerhead: "coastal", basking: "coastal",
+  porbeagle: "coastal", bronze: "coastal", scalloped: "coastal",
+  smooth: "coastal", bull: "coastal", sandbar: "coastal",
+  salmon: "coastal", dusky: "coastal", silvertip: "coastal",
+  spinner: "coastal", spinydogfish: "coastal",
+  /* Migratory/wide-ranging (19) — open ocean, deep water, vast ranges */
+  thresher: "migratory", whale: "migratory", goblin: "migratory",
+  greatwhite: "migratory", mako: "migratory", blue: "migratory",
+  silky: "migratory", oceanic: "migratory", sevengill: "migratory",
+  frilled: "migratory", megamouth: "migratory", sawshark: "migratory",
+  greenland: "migratory", cookiecutter: "migratory", sixgill: "migratory",
+  velvetbelly: "migratory", dwarflantern: "migratory", kitefin: "migratory",
+  pacificsleeper: "migratory"
+};
 const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
 /* Migrations run once at boot — see the boot section below. */
 
@@ -1747,18 +1781,20 @@ function pickEncounter(appeared, shown, plan) {
    always allowed). Either way the day goes on. */
 function doEncounter(species, plan) {
   return new Promise(resolve => {
-    /* v1.5.2-beta: randomized individuals — a tagged species isn't always the
-       same shark. 25% chance this is a re-sighting of the known individual;
-       75% chance it's a new individual of the same species (taggable separately).
-       Tracked per-encounter via _isNewIndividual. */
+    /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
+       encountering the species rolls: is it YOUR shark (reunion) or a different
+       untagged animal? Odds by ecology tier (game-balance, not science):
+       resident 50%, coastal 25%, migratory 10%. */
     const existingRec = state.tagged[species.id];
-    const isResightRoll = existingRec ? Math.random() < 0.25 : false;
-    const rec = isResightRoll ? existingRec : null;
-    const _isNewIndividual = !!existingRec && !isResightRoll;
-    if (_isNewIndividual) {
-      /* Stash for confirmTag — this encounter is a new shark, not the known one. */
-      state._encounterNewIndividual = species.id;
+    let isReunion = false;
+    let isDifferentShark = false;
+    if (existingRec) {
+      const tier = (typeof ECOLOGY_TIER !== "undefined" && ECOLOGY_TIER[species.id]) || "coastal";
+      const odds = (typeof REUNION_ODDS !== "undefined" && REUNION_ODDS[tier]) || 0.25;
+      isReunion = Math.random() < odds;
+      isDifferentShark = !isReunion;
     }
+    const rec = isReunion ? existingRec : null;
     const sharkEl = $("diveShark");
     /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
        silhouette (mystery — the species is not named yet). Tapping
@@ -1786,9 +1822,17 @@ function doEncounter(species, plan) {
       sil.dataset.revealed = "true";
       /* v0.17.1: the moment a shark appears, say whether it's already in the
          book — no squinting at the small print under the buttons. */
-      const already = rec
-        ? ` — already in your book${rec.name ? ` as \u201c${esc(rec.name)}\u201d` : ""}!`
-        : ` — new to your book!`;
+      /* v1.5.3-beta: reunion vs different-shark presentation. */
+      let already;
+      if (!existingRec) {
+        already = ` — new to your book!`;
+      } else if (isReunion) {
+        const rname = rec.name ? `\u201c${esc(rec.name)}\u201d` : rec.researchId;
+        already = ` — wait... that tag looks familiar. It's ${rname}! 🥹`;
+      } else {
+        const oname = existingRec.name ? `\u201c${esc(existingRec.name)}\u201d` : "yours";
+        already = ` — another ${species.name}! This one has no matching tag — not ${oname}.`;
+      }
       const showIllustration = () => {
         sharkEl.innerHTML =
           `<div class="shark-reveal">` +
@@ -1863,7 +1907,11 @@ function doEncounter(species, plan) {
       finish();
     });
     actions.appendChild(watchBtn);
-    if (!rec) {
+    /* v1.5.3-beta: three encounter states —
+       !existingRec: first tag (Tag button)
+       isReunion: it's YOUR shark (Follow + Log re-sighting)
+       isDifferentShark: another wild shark (Species observation only) */
+    if (!existingRec) {
       const tagBtn = document.createElement("button");
       tagBtn.className = "primary-button";
       tagBtn.type = "button";
@@ -1886,7 +1934,10 @@ function doEncounter(species, plan) {
         });
       });
       actions.appendChild(tagBtn);
-    } else {
+    } else if (isReunion) {
+      /* v1.5.3-beta: REUNION — it's YOUR shark! Log re-sighting and Follow
+         for this actual individual. One-time Sarah reaction per species. */
+      maybeReunionReaction(species, rec);
       /* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged
          species — unlocks remaining secret facts without retagging. Ends the
          expedition (you're spending the rest of the trip following). */
@@ -1927,6 +1978,26 @@ function doEncounter(species, plan) {
         finish();
       });
       actions.appendChild(resightBtn);
+    } else {
+      /* v1.5.3-beta: DIFFERENT SHARK — another wild ${species.name}, not yours.
+         Just watch, or observe the species (may unlock a secret fact).
+         NO tag, NO re-sighting, NO follow — never touches the tagged record. */
+      const observeBtn = document.createElement("button");
+      observeBtn.className = "secondary-button";
+      observeBtn.type = "button";
+      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">study this ${esc(species.name)} — may reveal a secret fact</small>`;
+      observeBtn.setAttribute("aria-label", `Observe this ${species.name} (species study, not your tagged shark)`);
+      observeBtn.addEventListener("click", () => {
+        const fact = unlockSecretFact(species.id);
+        if (fact) {
+          logLine(`🔬 <strong>Species insight:</strong> ${esc(fact)}`);
+        } else {
+          logLine(`🔬 <em>You watch carefully, but learn nothing new about the ${esc(species.name)} today.</em>`);
+        }
+        logTripEncounter(species, "observed");
+        finish();
+      });
+      actions.appendChild(observeBtn);
     }
     }; // end showEncounterActions
   });
@@ -2280,6 +2351,21 @@ function resightThread(species, rec) {
     { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
     { who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" }
   ];
+}
+/* v1.5.3-beta: one-time Sarah reaction to first reunion per species.
+   Warm, not spammy — only fires once per species, ever. */
+function maybeReunionReaction(species, rec) {
+  state.reunionReacted = state.reunionReacted || {};
+  if (state.reunionReacted[species.id]) return;
+  state.reunionReacted[species.id] = true;
+  try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
+  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : species.name;
+  const thread = [
+    { who: "them", text: `WAIT. You saw ${name} again?!?` },
+    { who: "me", text: `The tag matched — it's really them.` },
+    { who: "them", text: `That's incredible! They came back to the same spot! I'm actually emotional rn \u{1F979}` }
+  ];
+  pushThread(thread);
 }
 
 /* ---------- Sarah remembers sharks by name ----------
@@ -2878,17 +2964,10 @@ function confirmTag(name) {
   };
   /* v1.4.19-beta: Big Day — determine new-species BEFORE recording the tag. */
   const wasNewSpecies = !state.tagged[s.id];
-  /* v1.5.2-beta: randomized individuals — if this was a new-individual encounter
-     of an already-tagged species, store as a separate individual, don't overwrite. */
-  const isNewIndividual = state._encounterNewIndividual === s.id && state.tagged[s.id];
-  if (isNewIndividual) {
-    if (!Array.isArray(state.tagged[s.id]._individuals)) state.tagged[s.id]._individuals = [];
-    state.tagged[s.id]._individuals.push(rec);
-    /* The new individual gets its own name via the normal naming flow. */
-  } else {
-    state.tagged[s.id] = rec;
-  }
-  state._encounterNewIndividual = null;
+  /* v1.5.3-beta: one tagged shark per species (canonical). The reunion system
+     never creates a second record — _individuals from v1.5.2 betas are left
+     dormant, not deleted. */
+  state.tagged[s.id] = rec;
   state.taggedThisTrip = true;
   logTripEncounter(s, "tagged", rec.researchId);
   store.save(state.tagged);
@@ -3958,7 +4037,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts"]; // v1.4.0-beta: +tyi-facts
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {
