@@ -81,8 +81,13 @@ body {
    A conic gradient centered at the sun point cannot miss: every wedge radiates
    from the sun across the viewport by construction. */
 .caustics .fan {
-  position: absolute; inset: -12%; /* oversized so sway rotation never exposes an edge */
-  transform-origin: 0% 0%; /* the sun point — this corner sits 12% off-screen top-left */
+  position: absolute; inset: 0; /* v1.5.9: MUST stay at inset 0. The v1.4.16 and
+     v1.5.6 fans used inset:-12% (oversized) and both times iPad Safari painted
+     a white band / cut off page content below. The radial mask already fades
+     every ray to transparent at 78%, so no hard edge can ever be exposed by
+     the ±2.2deg sway — the oversizing was unnecessary and harmful. */
+  transform-origin: 0% 0%; /* the sun point at the viewport's top-left corner,
+     matching the conic gradient's `at 0% 0%` center */
   /* radial mask dissolves every ray with distance from the sun: bright near
      the surface, gone before the deep corner. Soft on all sides, always. */
   -webkit-mask-image: radial-gradient(circle at 0% 0%, black 0%, transparent 78%);
@@ -255,15 +260,13 @@ body { overflow-x: clip; }
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
   backdrop-filter: blur(4px);
   align-items: stretch;
-  /* v1.5.8: iPad Safari fix — heavy fixed decor layers (blended caustics +
-     animated bubbles) can desync a sticky bar's paint layer from its
-     hit-test layer after scrolling, so taps miss the buttons and the bar
-     renders off-center. A dedicated compositing layer keeps paint,
-     hit-testing, and centering in sync. */
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
+  /* v1.5.9: NO transform on the sticky tab bar. v1.5.8 added translateZ(0)
+     here hoping to fix hit-testing, but transform on a position:sticky
+     element BREAKS hit-testing in Safari — the bar renders in one place
+     while taps land in another (or nowhere). The real fix was the fan
+     inset:-12% -> inset:0 above: the oversized blended layers were what
+     desynced the compositor in the first place. Sticky stays clean. */
 }
-.tabs .tab { pointer-events: auto; }
 /* v1.4.0: equal-height tabs — every .tab is a 3-row stack
    (count/icon/label); tabs without a count use an invisible spacer with
    identical dimensions, so all buttons are naturally the same height. */
