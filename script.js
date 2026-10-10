@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.2-beta";
+const VERSION = "v1.6.3-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,10 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.3-beta": [
+    "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
+    "↕️ <strong>Archive sort.</strong> Sort the Archive by name (A–Z), date tagged (newest or oldest first), or IUCN conservation status.",
   ],
   "v1.6.1-beta": [
     "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",

@@ -18,6 +18,63 @@ function updateArchiveTab() {
   btn.disabled = locked;
   btn.setAttribute("aria-disabled", locked ? "true" : "false");
 }
+/* v1.6.3-beta: Archive search + sort. Session-only state, mirroring the
+   Research tab's search behavior. sort: "name" | "newest" | "oldest" | "iucn". */
+const archiveFilters = { q: "", sort: "name" };
+function archiveMatches(s) {
+  const q = archiveFilters.q;
+  if (q) {
+    const ql = q.toLowerCase();
+    const media = (typeof ARCHIVE_MEDIA !== "undefined" && ARCHIVE_MEDIA[s.id]) || {};
+    const sci = media.scientific || "";
+    if (!s.name.toLowerCase().includes(ql) && !sci.toLowerCase().includes(ql)) return false;
+  }
+  return true;
+}
+/* v1.6.3-beta: IUCN severity rank for sorting (most threatened first). */
+const ARCHIVE_IUCN_RANK = { CR: 0, EN: 1, VU: 2, NT: 3, LC: 4 };
+/* v1.6.3-beta Mira review fix: newest/oldest must not rely on Date.parse of
+   the localized display string — it may return NaN depending on browser
+   language, and same-day tags compare equal. Use the numeric taggedAt
+   timestamp (stored by confirmTag()) instead. Legacy saves without taggedAt
+   fall back to the insertion order of state.tagged, mirroring
+   taggedChronological(); ties break on name so the order is always stable.
+   archiveDateRanks is rebuilt for each sort (reset in renderArchive). */
+let archiveDateRanks = null;
+function archiveBuildDateRanks() {
+  const map = {};
+  Object.keys(state.tagged || {}).forEach((sid, idx) => {
+    const t = state.tagged[sid] || {};
+    map[sid] = { ts: (t.taggedAt != null) ? t.taggedAt : null, idx };
+  });
+  return map;
+}
+function archiveSortCompare(a, b) {
+  const mode = archiveFilters.sort;
+  if (mode === "newest" || mode === "oldest") {
+    if (!archiveDateRanks) archiveDateRanks = archiveBuildDateRanks();
+    const ra = archiveDateRanks[a.id] || { ts: null, idx: 0 };
+    const rb = archiveDateRanks[b.id] || { ts: null, idx: 0 };
+    const newestFirst = mode === "newest";
+    /* Mirror taggedChronological(): real timestamps when both have them,
+       insertion order otherwise. */
+    if (ra.ts != null && rb.ts != null && ra.ts !== rb.ts) {
+      return newestFirst ? rb.ts - ra.ts : ra.ts - rb.ts;
+    }
+    if (ra.idx !== rb.idx) {
+      return newestFirst ? rb.idx - ra.idx : ra.idx - rb.idx;
+    }
+    return a.name.localeCompare(b.name); /* stable tiebreak, always A-Z */
+  }
+  if (mode === "iucn") {
+    const abbrOf = (s) => (typeof IUCN_ABBR !== "undefined" && IUCN_ABBR[s.status]) || s.status;
+    const ra = ARCHIVE_IUCN_RANK[abbrOf(a)] ?? 9;
+    const rb = ARCHIVE_IUCN_RANK[abbrOf(b)] ?? 9;
+    if (ra !== rb) return ra - rb;
+    return a.name.localeCompare(b.name);
+  }
+  return a.name.localeCompare(b.name); /* "name" default */
+}
 /* v0.17.0 review fix: canonical license URLs so the Archive's credit line
    links the license itself, not just names it. Public-domain assets get no
    CC link (and no copyright symbol — "Credit:" instead of "©"). */
@@ -94,11 +151,18 @@ function renderArchive() {
      (e.g. salmon) can't leak into a returning player's Archive before they
      tag one. */
   const abbrFor = (status) => (typeof IUCN_ABBR !== "undefined" && IUCN_ABBR[status]) || status;
-  SHARKS.forEach(s => {
+  /* v1.6.3-beta: search filter + sort order applied to tagged sharks.
+     Reset per-sort date ranks so the sort always uses current state. */
+  archiveDateRanks = null;
+  const entries = SHARKS.filter(s => {
     const media = ARCHIVE_MEDIA[s.id];
-    if (!media || media.future) return;
+    if (!media || media.future) return false;
+    if (!state.tagged[s.id]) return false; /* untagged species are not rendered at all */
+    return archiveMatches(s);
+  }).sort(archiveSortCompare);
+  entries.forEach(s => {
+    const media = ARCHIVE_MEDIA[s.id];
     const t = state.tagged[s.id];
-    if (!t) return; /* untagged species are not rendered at all */
     const yourShark = t.researchId
       ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
       : "";
@@ -141,4 +205,24 @@ function renderArchive() {
     list.appendChild(row);
   });
 }
+/* v1.6.3-beta: wire the Archive search input and sort buttons once the DOM
+   is ready. archive-ui.js loads after the tab markup, before script.js, so
+   this uses document.* directly instead of the $ helper. */
+(function initArchiveTools() {
+  try {
+    const search = document.getElementById("archiveSearch");
+    if (search) search.addEventListener("input", () => {
+      archiveFilters.q = search.value.trim();
+      renderArchive();
+    });
+    const sortBtns = document.querySelectorAll("[data-asort]");
+    sortBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        archiveFilters.sort = btn.dataset.asort;
+        sortBtns.forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+        renderArchive();
+      });
+    });
+  } catch (e) { /* renderArchive re-renders regardless */ }
+})();
 

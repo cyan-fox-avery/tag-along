@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.2-beta', VERSION === 'v1.6.2-beta');
+  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -177,7 +177,7 @@ code += `
   // Untagged species are skipped before rendering, so photos still require
   // an actual tag.
   const archiveUiCode = fs.readFileSync(path.join(DIR, 'archive-ui.js'), 'utf8');
-  ok('archive skips untagged species', archiveUiCode.includes('if (!t) return;'));
+  ok('archive skips untagged species', archiveUiCode.includes('if (!state.tagged[s.id]) return false;'));
   ok('archive has no locked list', !archiveUiCode.includes('lockedRows') && !archiveUiCode.includes('Still to discover'));
   // v1.5.22: Archive expanded cards overlay like the Research tab
   ok('archive toggle adds open class', archiveUiCode.includes('row.classList.toggle("open", !isHidden)'));
@@ -2012,6 +2012,98 @@ code += `
   ok('pinch-to-zoom removed (no pinch state)', !/pinchStartDist|pinching|pinchMoved/.test(fileCode));
   ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
   ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
+
+  // v1.6.3-beta: Archive search + sort
+  ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
+  ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
+  ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
+  ok('archiveMatches filters by name', (() => {
+    archiveFilters.q = 'nurse';
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const thresher = SHARKS.find(s => s.id === 'thresher');
+    const r = archiveMatches(nurse) && !archiveMatches(thresher);
+    archiveFilters.q = '';
+    return r;
+  })());
+  ok('archiveSortCompare sorts A-Z', (() => {
+    archiveFilters.sort = 'name';
+    const a = SHARKS.find(s => s.id === 'thresher');
+    const b = SHARKS.find(s => s.id === 'nurse');
+    return archiveSortCompare(a, b) > 0 && archiveSortCompare(b, a) < 0;
+  })());
+  /* v1.6.3-beta Mira review fix: newest/oldest uses taggedAt, not Date.parse
+     of the localized display string. */
+  ok('archiveSortCompare does not Date.parse the display string', !/Date\\.parse\\(\\s*t[ab]\\.date/.test(fileCode));
+  ok('archiveSortCompare orders same-day tags by taggedAt', (() => {
+    const saved = state.tagged;
+    /* Same display date string, different ms timestamps. */
+    state.tagged = {
+      nurse: { taggedAt: 1000, date: 'Oct 10, 2026' },
+      thresher: { taggedAt: 1001, date: 'Oct 10, 2026' },
+      whale: { taggedAt: 999, date: 'Oct 10, 2026' }
+    };
+    archiveDateRanks = null;
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const thresher = SHARKS.find(s => s.id === 'thresher');
+    const whale = SHARKS.find(s => s.id === 'whale');
+    archiveFilters.sort = 'newest';
+    const newestFirst = [nurse, thresher, whale].sort(archiveSortCompare).map(s => s.id);
+    archiveFilters.sort = 'oldest';
+    archiveDateRanks = null;
+    const oldestFirst = [nurse, thresher, whale].sort(archiveSortCompare).map(s => s.id);
+    archiveFilters.sort = 'name';
+    state.tagged = saved;
+    archiveDateRanks = null;
+    return newestFirst.join(',') === 'thresher,nurse,whale' &&
+           oldestFirst.join(',') === 'whale,nurse,thresher';
+  })());
+  ok('archiveSortCompare falls back to insertion order for legacy saves', (() => {
+    const saved = state.tagged;
+    /* Legacy records have no taggedAt; whale does. Mirrors
+       taggedChronological() behavior. */
+    state.tagged = {
+      nurse: { date: 'Oct 10, 2026' },
+      thresher: { date: 'Oct 10, 2026' },
+      whale: { taggedAt: 5000, date: 'Oct 11, 2026' }
+    };
+    archiveDateRanks = null;
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const thresher = SHARKS.find(s => s.id === 'thresher');
+    const whale = SHARKS.find(s => s.id === 'whale');
+    archiveFilters.sort = 'newest';
+    const newestFirst = [nurse, thresher, whale].sort(archiveSortCompare).map(s => s.id);
+    archiveFilters.sort = 'oldest';
+    archiveDateRanks = null;
+    const oldestFirst = [nurse, thresher, whale].sort(archiveSortCompare).map(s => s.id);
+    archiveFilters.sort = 'name';
+    state.tagged = saved;
+    archiveDateRanks = null;
+    return newestFirst.join(',') === 'whale,thresher,nurse' &&
+           oldestFirst.join(',') === 'nurse,thresher,whale';
+  })());
+  ok('archiveSortCompare identical timestamps fall back to insertion order', (() => {
+    const saved = state.tagged;
+    /* Identical taggedAt: falls to insertion order (mirrors
+       taggedChronological()). zebra inserted first. */
+    state.tagged = {
+      zebra: { taggedAt: 2000, date: 'Oct 10, 2026' },
+      nurse: { taggedAt: 2000, date: 'Oct 10, 2026' }
+    };
+    archiveDateRanks = null;
+    const zebra = SHARKS.find(s => s.id === 'zebra');
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    archiveFilters.sort = 'newest';
+    const newestFirst = [zebra, nurse].sort(archiveSortCompare).map(s => s.id);
+    archiveFilters.sort = 'oldest';
+    archiveDateRanks = null;
+    const oldestFirst = [zebra, nurse].sort(archiveSortCompare).map(s => s.id);
+    archiveFilters.sort = 'name';
+    state.tagged = saved;
+    archiveDateRanks = null;
+    /* newest: later-inserted (nurse) first; oldest: earlier-inserted (zebra) first */
+    return newestFirst.join(',') === 'nurse,zebra' && oldestFirst.join(',') === 'zebra,nurse';
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
