@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.15-beta', VERSION === 'v1.4.15-beta');
+  ok('version v1.4.16-beta', VERSION === 'v1.4.16-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1550,39 +1550,34 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
-  // v1.4.14: caustics render as soft DIFFUSED shafts — vertical gradient + horizontal mask, no hard side edges
+  // v1.4.16: caustics REBUILT as a conic-gradient fan radiating from the sun
+  // point — wedges can't miss the screen the way pivoted sticks could
   (() => {
-    ok("caustics use horizontal soft mask", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to right/.test(cssCode));
-    ok("caustics mask feathers both sides", /\\.caustics\\s+span\\s*\\{[^}]*transparent 0%[^}]*transparent 100%/.test(cssCode));
-    ok("caustics have no hard bar edges", !/\\.caustics\\s+span\\s*\\{[^}]*border-radius:\\s*50%/.test(cssCode));
-    // v1.4.2: brightness cap — screen blend + softer peak so overlaps only brighten slightly
+    ok("caustics use conic-gradient fans", /\\.caustics\\s+\\.fan-\\d\\s*\\{[^}]*conic-gradient/.test(cssCode));
+    ok("fan centered at sun point (corner)", /conic-gradient\\(from\\s+\\d+deg\\s+at\\s+0%\\s+0%/.test(cssCode));
+    ok("fan has soft wedge edges", /rgba\\(215,240,255,0\\.1\\d*\\)\\s+\\d+deg[^}]*transparent\\s+\\d+deg/.test(cssCode));
+    ok("fan dissolves with distance (radial mask)", /\\.caustics\\s+\\.fan\\s*\\{[^}]*mask-image:\\s*radial-gradient/.test(cssCode));
     ok("caustics use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
-    ok("caustics peak alpha is soft", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(215,240,255,0\\.20\\)/.test(cssCode));
     ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
+    const fanCount = (cssCode.match(/\\.caustics\\s+\\.fan-\\d\\s*\\{/g) || []).length;
+    ok("caustics has 3 layered fans", fanCount === 3);
+    ok("no span-based rays remain", !/\\.caustics\\s+span\\s*\\{/.test(cssCode));
   })();
-  // v1.4.1: sun-ray caustics radiate from a sun point at angled fan positions
+  // v1.4.16: rays have VISIBLE life — slow sway plus a grow/shrink breathe
   (() => {
-    ok("caustics pivot around sun point", /\\.caustics\\s+span\\s*\\{[^}]*transform-origin:\\s*50%\\s+0/.test(cssCode));
-    // v1.4.2: sun point at far top-left corner
-    ok("sun point at far left", /\\.caustics\\s+span\\s*\\{[^}]*left:\\s*2%/.test(cssCode));
-    ok("caustics use angled fan keyframes", /@keyframes\\s+ray-life/.test(cssCode));
-    ok("caustics keyframes rotate around --ray-angle", /rotate\\(calc\\(var\\(--ray-angle\\)/.test(cssCode));
-    const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
-    ok("caustics has 8 rays", rayCount === 8);
-    ok("rays are wide soft shafts", /\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*width:\\s*1\\d\\dpx/.test(cssCode));
-    ok("no near-vertical rays", !/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*[0-7]deg/.test(cssCode));
+    ok("fans have sway keyframes", /@keyframes\\s+fan-sway-1/.test(cssCode));
+    ok("sway visibly rotates", /fan-sway-1\\s*\\{[^}]*rotate\\(/.test(cssCode));
+    ok("fans have breathe keyframes", /@keyframes\\s+fan-breathe-1/.test(cssCode));
+    ok("breathe pulses opacity", /fan-breathe-1\\s*\\{[^}]*opacity:/.test(cssCode));
+    ok("breathe grows/shrinks", /fan-breathe-1\\s*\\{[^}]*scale:/.test(cssCode));
+    ok("sway and breathe on different timelines", /fan-sway-1\\s+\\d+s[^}]*fan-breathe-1\\s+\\d+s/.test(cssCode));
+    ok("reduced-motion freezes fans statically", /\\.surface-shimmer,\\s*\\.caustics\\s+\\.fan,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
   })();
-  // v1.4.5: caustics are long soft streaks anchored at the sun point — each
-  // ray's glow dissolves along its own length (no container mask), so the fan
-  // visibly reaches across the screen and no ray can draw a hard edge
+  // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column
   (() => {
-    ok("caustics have no container edge mask", !/\\.caustics\\s*\\{[^}]*mask-image:/.test(cssCode));
-    ok("caustic rays are long streaks", /\\.caustics\\s+span\\s*\\{[^}]*height:\\s*2000px/.test(cssCode));
-    ok("caustic glow fades along its length", /\\.caustics\\s+span\\s*\\{[^}]*linear-gradient\\(to bottom/.test(cssCode));
-    // no ray may angle negative — a negative-angle ray sweeps off-screen and
-    // can peek back in during sway, reading as a sliding bar at the edge
-    const negAngles = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*-\\d+deg/g) || []).length;
-    ok("no ray has a negative fan angle", negAngles === 0);
+    ok("guide row has layout containment", /\\.guide-row\\s*\\{[^}]*contain:\\s*layout/.test(cssCode));
+    ok("open body is absolute with explicit width", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute[^}]*width:\\s*100%/.test(cssCode));
+    ok("open body has max-width guard", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*100%/.test(cssCode));
   })();
   // v1.4.15-beta: IUCN badges are color-coded by threat level
   ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
@@ -1624,6 +1619,7 @@ code += `
   ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
+  ok("WHATS_NEW has v1.4.16-beta", !!(WHATS_NEW["v1.4.16-beta"] && WHATS_NEW["v1.4.16-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
@@ -1635,6 +1631,7 @@ code += `
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
   // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
+  ok('caustic fan divs in HTML', /class="fan fan-1"/.test(htmlCode) && /class="fan fan-2"/.test(htmlCode) && /class="fan fan-3"/.test(htmlCode));
   ok('porthole has nested drift+bob structure', /class="pw-drift"><div class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
   ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
@@ -1650,13 +1647,18 @@ code += `
   ok('porthole drift is seamless two-tile', /translateX\\(calc\\(-100%\\s*\\/\\s*3\\)\\)/.test(cssCode));
   ok('porthole tiles mirrored for seamless loop', /pw-tile:nth-child\\(even\\)[\\s\\S]*?scaleX\\(-1\\)/.test(cssCode));
   ok('porthole splash is large', /\\.porthole-spray\\s*\\{[^}]*width:\\s*240px/.test(cssCode));
-  ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*150px/.test(cssCode));
+  ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   // v1.4.14: calm porthole — sky above the far wave, slow drift, splash pops without sliding
   ok('porthole has sky behind far wave', /\\.dive-scene\\.porthole\\s*\\{[^}]*#a8dcf5/.test(cssCode));
   ok('porthole drift is calm', /\\.pw-far\\s+\\.pw-drift\\s*\\{[^}]*52s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?\\.porthole-waves/.test(cssCode) || /prefers-reduced-motion[\\s\\S]*?pw-drift/.test(cssCode));
-  ok('bubbles rise in burst columns', /MORE bubbles in burst columns/i.test(cssCode));
+  ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
+  // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
+  ok('bubble columns overlap in pairs', /columns A.B fire together/.test(cssCode) && /columns C.D fire together/.test(cssCode));
+  ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
+  ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*8%/.test(cssCode));
+  ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(64px\\)/.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
