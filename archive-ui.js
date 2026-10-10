@@ -8,9 +8,15 @@
    photographs (CC BY-NC, with the project non-commercial notice);
    attribution is shown per asset, with the true source labeled.
    Species not yet in the live roster stay hidden until they're added. */
+/* v1.5.11: Archive tab is always visible (stable 8-tab layout). Until
+   unlocked it is greyed out and unclickable; Sarah's intro text enables it. */
 function updateArchiveTab() {
   const btn = document.querySelector('.tab[data-tab="archive"]');
-  if (btn) btn.classList.toggle("hidden", !state.archiveUnlocked);
+  if (!btn) return;
+  const locked = !state.archiveUnlocked;
+  btn.classList.toggle("tab-locked", locked);
+  btn.disabled = locked;
+  btn.setAttribute("aria-disabled", locked ? "true" : "false");
 }
 /* v0.17.0 review fix: canonical license URLs so the Archive's credit line
    links the license itself, not just names it. Public-domain assets get no
