@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.7-beta";
+const VERSION = "v1.4.8-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -88,6 +88,9 @@ const WHATS_NEW = {
   ],
   "v1.4.7-beta": [
     "🌊 <strong>Boat-window waves.</strong> The idle porthole now shows rolling wave crests drifting past at three depths — and spray periodically hits the glass and runs down."
+  ],
+  "v1.4.8-beta": [
+    "🔧 <strong>Edge bar fix.</strong> Fixed the dark vertical bars that slid in and out at the screen edges — the surface shimmer layer is now wider than the viewport so its drift never exposes an edge."
   ]
 };
 
