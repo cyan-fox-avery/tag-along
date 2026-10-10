@@ -45,12 +45,12 @@ body::before {
   pointer-events: none;
   background: linear-gradient(180deg,
     #1e6a9e 0%,    /* sunlit surface */
-    #155a8a 12%,
-    #0f4470 28%,   /* mid-water */
-    #0a2f52 46%,
-    #071f3a 60%,   /* deep water */
-    #020a16 72%,
-    #000 85%,      /* v1.5.28-beta: fade to pure black at the bottom — deep ocean, not blue */
+    #155a8a 25%,
+    #0f4470 45%,   /* mid-water */
+    #0a2f52 65%,
+    #071f3a 80%,   /* deep water */
+    #020a16 90%,   /* abyssal dark blue */
+    #000 95%,      /* v1.5.29-beta: fade to pure black only at the very bottom — blue through ~90% */
     #000 100%);
 }
 
