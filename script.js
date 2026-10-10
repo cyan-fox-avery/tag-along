@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.3-beta";
+const VERSION = "v1.5.4-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,10 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.4-beta": [
+    "\u274C <strong>Closable guide popups.</strong> The mobile field-guide popup now has a proper close button, plus Escape-key and tap-outside dismissal — no more getting stuck.",
+    "\u{1F979} <strong>Reunion wording.</strong> Sarah's reunion reaction no longer claims the shark returned to the same spot.",
   ],
   "v1.5.3-beta": [
     "\u{1F979} <strong>Shark reunions.</strong> One tagged shark per species — but now you might run into yours again! Resident sharks have a 50% reunion chance, coastal 25%, migratory 10%. Spot the familiar tag for a heartfelt reunion, or meet a different wild shark and observe the species.",
@@ -1400,6 +1404,36 @@ function renderExpeditionPin() {
 /* v1.4.0-beta: rising z-index so a later-opened overlay always floats
    above earlier ones, regardless of DOM order. */
 let guideOverlayZ = 30;
+/* v1.5.4-beta: shared collapse for guide rows — used by the close button,
+   Escape key, and outside-click dismissal. Returns focus to the row header. */
+function collapseGuideRow(row) {
+  if (!row || !row.classList.contains("open")) return;
+  const body = row.querySelector(".guide-row-body");
+  const head = row.querySelector(".guide-row-head");
+  if (body) body.classList.add("hidden");
+  if (head) {
+    head.setAttribute("aria-expanded", "false");
+    head.focus();
+  }
+  row.classList.remove("open");
+  row.style.zIndex = "";
+}
+/* v1.5.4-beta: Escape closes the topmost open guide popup. On small screens a
+   tap outside the open popup also dismisses it — the fixed modal can cover
+   its own row header, leaving no other way to close. */
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const openRows = [...document.querySelectorAll(".guide-row.open")];
+  if (!openRows.length) return;
+  openRows.sort((a, b) => (parseInt(b.style.zIndex || "0", 10) || 0) - (parseInt(a.style.zIndex || "0", 10) || 0));
+  collapseGuideRow(openRows[0]);
+});
+document.addEventListener("click", (e) => {
+  if (!window.matchMedia("(max-width: 768px)").matches) return;
+  const openRow = document.querySelector(".guide-row.open");
+  if (!openRow || openRow.contains(e.target)) return;
+  collapseGuideRow(openRow);
+});
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
@@ -1456,6 +1490,7 @@ function renderResearch() {
           aria-pressed="${isPinned}">📌</button>
       </div>
       <div class="guide-row-body hidden">
+        <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
         <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
@@ -1468,6 +1503,11 @@ function renderResearch() {
     `;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
+    const closeBtn = body.querySelector(".guide-close");
+    if (closeBtn) closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      collapseGuideRow(row);
+    });
     head.addEventListener("click", () => {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
@@ -2363,7 +2403,7 @@ function maybeReunionReaction(species, rec) {
   const thread = [
     { who: "them", text: `WAIT. You saw ${name} again?!?` },
     { who: "me", text: `The tag matched — it's really them.` },
-    { who: "them", text: `That's incredible! They came back to the same spot! I'm actually emotional rn \u{1F979}` }
+    { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
   ];
   pushThread(thread);
 }
