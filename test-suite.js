@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.3-beta', VERSION === 'v1.5.3-beta');
+  ok('version v1.5.4-beta', VERSION === 'v1.5.4-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1600,6 +1600,18 @@ code += `
     ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
     ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
   })();
+  // v1.5.4-beta: guide popup is closable — close button, Escape, outside tap
+  (() => {
+    ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
+    ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
+    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row\\)/.test(code));
+    ok("collapseGuideRow resets aria-expanded", /collapseGuideRow[\\s\\S]*?setAttribute\\("aria-expanded", "false"\\)/.test(code));
+    ok("collapseGuideRow returns focus to header", /collapseGuideRow[\\s\\S]*?head\\.focus\\(\\)/.test(code));
+    ok("Escape key closes topmost open row", /keydown[\\s\\S]*?Escape[\\s\\S]*?\\.guide-row\\.open/.test(code));
+    ok("outside tap closes mobile modal", /matchMedia\\("\\(max-width: 768px\\)"\\)[\\s\\S]*?collapseGuideRow/.test(code));
+    ok("guide-close CSS present", /\\.guide-close\\s*\\{/.test(cssCode));
+    ok("reunion line is location-neutral", !new RegExp("came back to the" + " same spot").test(code));
+  })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
   ok("WHATS_NEW has v1.4.1-beta", !!(WHATS_NEW["v1.4.1-beta"] && WHATS_NEW["v1.4.1-beta"].length));
   ok("WHATS_NEW has v1.4.2-beta", !!(WHATS_NEW["v1.4.2-beta"] && WHATS_NEW["v1.4.2-beta"].length));
@@ -1696,7 +1708,7 @@ code += `
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.3-beta', Array.isArray(WHATS_NEW['v1.5.3-beta']) && WHATS_NEW['v1.5.3-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.4-beta', Array.isArray(WHATS_NEW['v1.5.4-beta']) && WHATS_NEW['v1.5.4-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
