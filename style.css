@@ -44,39 +44,41 @@ body {
   from { transform: translateX(-2%); opacity: 0.85; }
   to { transform: translateX(2%); opacity: 1; }
 }
-/* v1.4.1: sun-ray caustics — soft light rays radiating from a sun point
-   just above the top edge (~1/3 from the left), fanning out at angles like
-   real sunlight through water. Each ray has its own lifecycle: appear
-   faintly → brighten → sway gently around its fan angle → fade → reappear
-   at a new angle (JS nudges --ray-angle on animationiteration, while the
-   ray is invisible). Narrower ribbons than v1.4.0, more of them (8), and
-   quicker fade in/out. Brightness peaks near the sun point and falls off
-   along the ray, so deep water stays dark. Transform/opacity only, no blur
-   filters, for iPad-friendliness. */
-.caustics { position: absolute; top: 0; left: 0; right: 0; height: 1100px; overflow: hidden; pointer-events: none; }
+/* v1.4.2: sun-ray caustics — soft light rays radiating from a sun point
+   at the FAR TOP-LEFT corner, just above the top edge, fanning out at
+   angles like real sunlight through water. Each ray has its own lifecycle:
+   appear faintly → brighten → sway gently around its fan angle → fade →
+   reappear at a new angle (JS nudges --ray-angle on animationiteration,
+   while the ray is invisible). mix-blend-mode: screen on the container
+   gives a natural brightness cap — overlapping rays get brighter, but
+   only a little, like real light. Brightness peaks near the sun point and
+   falls off along the ray, so deep water stays dark. Transform/opacity
+   only, no blur filters, for iPad-friendliness. */
+.caustics { position: absolute; top: 0; left: 0; right: 0; height: 1100px; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
 .caustics span {
-  position: absolute; top: -120px; left: 33%; height: 1400px;
-  transform-origin: 50% 0; /* pivot around the sun point */
+  position: absolute; top: -120px; left: 2%; height: 1400px;
+  transform-origin: 50% 0; /* pivot around the sun point at far top-left */
   /* soft elongated glow — bright core near the sun, fading along the ray,
      soft on every side so each ray unambiguously reads as light */
   background: radial-gradient(ellipse 45% 32% at 50% 20%,
-    rgba(218,242,255,0.34) 0%,
-    rgba(205,234,255,0.16) 42%,
-    rgba(195,230,255,0.05) 62%,
+    rgba(218,242,255,0.28) 0%,
+    rgba(205,234,255,0.13) 42%,
+    rgba(195,230,255,0.04) 62%,
     transparent 74%);
   opacity: 0;
   animation: ray-life 18s ease-in-out infinite;
 }
-/* fan angles from the sun point: negative reaches toward the left edge,
-   positive sweeps toward the right — like rays fanning through water */
-.caustics span:nth-child(1) { --ray-angle: -16deg; width: 44px; animation-duration: 17s; animation-delay: -5s; }
-.caustics span:nth-child(2) { --ray-angle: -6deg;  width: 58px; animation-duration: 22s; animation-delay: -14s; }
-.caustics span:nth-child(3) { --ray-angle: 3deg;   width: 38px; animation-duration: 15s; animation-delay: -8s; }
-.caustics span:nth-child(4) { --ray-angle: 12deg;  width: 52px; animation-duration: 20s; animation-delay: -3s; }
-.caustics span:nth-child(5) { --ray-angle: 21deg;  width: 42px; animation-duration: 18s; animation-delay: -11s; }
-.caustics span:nth-child(6) { --ray-angle: 30deg;  width: 62px; animation-duration: 24s; animation-delay: -17s; }
-.caustics span:nth-child(7) { --ray-angle: 40deg;  width: 48px; animation-duration: 16s; animation-delay: -7s; }
-.caustics span:nth-child(8) { --ray-angle: 50deg;  width: 36px; animation-duration: 21s; animation-delay: -13s; }
+/* fan angles from the far-left sun point: slight negative reaches down
+   the left edge, positive sweeps across toward the right — like sunlight
+   fanning through water from a low sun */
+.caustics span:nth-child(1) { --ray-angle: -8deg;  width: 44px; animation-duration: 17s; animation-delay: -5s; }
+.caustics span:nth-child(2) { --ray-angle: 2deg;   width: 58px; animation-duration: 22s; animation-delay: -14s; }
+.caustics span:nth-child(3) { --ray-angle: 12deg;  width: 38px; animation-duration: 15s; animation-delay: -8s; }
+.caustics span:nth-child(4) { --ray-angle: 22deg;  width: 52px; animation-duration: 20s; animation-delay: -3s; }
+.caustics span:nth-child(5) { --ray-angle: 32deg;  width: 42px; animation-duration: 18s; animation-delay: -11s; }
+.caustics span:nth-child(6) { --ray-angle: 42deg;  width: 62px; animation-duration: 24s; animation-delay: -17s; }
+.caustics span:nth-child(7) { --ray-angle: 52deg;  width: 48px; animation-duration: 16s; animation-delay: -7s; }
+.caustics span:nth-child(8) { --ray-angle: 62deg;  width: 36px; animation-duration: 21s; animation-delay: -13s; }
 @keyframes ray-life {
   /* quick fade in, gentle sway around the ray's fan angle, quick fade out,
      then an invisible tail so the JS angle nudge is never seen */
@@ -155,8 +157,11 @@ body { overflow-x: clip; }
    restores the exact content inset). Fixed grid tracks keep every tab the
    same width even on sparse rows (Archive locked: 7 tabs); the locked tab
    stays display:none, never a fake placeholder. */
+/* v1.4.2: tab buttons centered in the middle of the full-width dark
+   band (not left-aligned). Fixed max-width columns, centered as a group. */
 .tabs {
-  display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;
+  display: grid; grid-template-columns: repeat(8, minmax(0, 108px)); gap: 8px;
+  justify-content: center;
   margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
@@ -184,6 +189,10 @@ body { overflow-x: clip; }
    count is real text (never red-alone); updateMsgBadge() also sets an
    aria-label on the tab with the conversation count. Static: no animation. */
 .tab-icon { position: relative; display: inline-block; }
+/* v1.4.2: bigger tab emojis on desktop — icons only, labels unchanged */
+@media (min-width: 1024px) {
+  .tab-icon { font-size: 24px; }
+}
 .phone-badge {
   position: absolute; top: -8px; right: -12px;
   min-width: 20px; height: 20px; border-radius: 999px;
@@ -215,7 +224,7 @@ body { overflow-x: clip; }
    (Review fix: this block sits AFTER the general .tab rule — equal
    specificity, so source order decides.) */
 @media (max-width: 559px) {
-  .tabs { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tabs { grid-template-columns: repeat(3, minmax(0, 110px)); gap: 6px; }
   .tab { font-size: 13px; padding: 10px 2px; }
   /* v1.4.0: Avery — count tabs keep the column stack on phones too:
      count on top, icon on its own row, label below (Collection, Achievements). */
@@ -224,7 +233,7 @@ body { overflow-x: clip; }
 /* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
    so every tab keeps the same width without squeezing labels. */
 @media (min-width: 560px) and (max-width: 1023px) {
-  .tabs { grid-template-columns: repeat(4, 1fr); }
+  .tabs { grid-template-columns: repeat(4, minmax(0, 150px)); }
 }
 
 .panel { display: none; }
@@ -246,6 +255,11 @@ body { overflow-x: clip; }
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 2px 10px; margin-bottom: 8px;
 }
+/* v1.4.2: full IUCN status line inside expanded field-guide entries */
+.iucn-full { font-size: 13px; color: var(--ink-dim); margin: 6px 0; }
+/* v1.4.2: prominent collection count at the top of the collection page */
+.collection-count { font-size: 16px; margin: 2px 0 8px; }
+.collection-count strong { font-size: 20px; }
 .research-text { font-size: 14px; line-height: 1.55; color: #dcebf5; margin: 8px 0; }
 .hook { font-size: 13px; color: var(--accent); margin: 6px 0 10px; }
 
@@ -289,6 +303,8 @@ select option:disabled { color: #7a8a9e; }
 
 /* Dive view */
 .dive-view { margin-top: 14px; }
+/* v1.4.2: calm idle message in the dive log when showing the porthole */
+.dive-idle { color: var(--ink-dim); font-style: italic; text-align: center; padding: 12px 8px; }
 .dive-scene {
   position: sticky; top: 196px; z-index: 4;
   height: 190px; border-radius: var(--radius); overflow: hidden;
@@ -316,6 +332,54 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene .ambient.bg-fish { opacity: 0.45; filter: blur(0.4px); z-index: 1; }
 .dive-scene .dive-shark { z-index: 3; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
+
+/* v1.4.2: porthole — the expedition observation window is always present.
+   When no expedition is active, it shows the ocean surface as if looking
+   up through a porthole: bright sunlit water above, gentle rippling light.
+   The window frame itself acts as the porthole rim. Alive but calm,
+   matching the caustics aesthetic. Lightweight (transform/opacity only),
+   respects prefers-reduced-motion. */
+.dive-scene.porthole {
+  background: linear-gradient(180deg,
+    #bfe9ff 0%, #8fd4f5 30%, #5fb3dd 60%, #3a8ab8 100%);
+}
+.dive-scene.porthole .porthole-surface {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  /* bright sun glow near the top-center, like the sun through water */
+  background:
+    radial-gradient(ellipse 55% 42% at 50% -8%,
+      rgba(255,255,255,0.75) 0%,
+      rgba(240,250,255,0.35) 38%,
+      transparent 68%),
+    /* gentle rippling light bands drifting across */
+    repeating-linear-gradient(100deg,
+      transparent 0 34px,
+      rgba(255,255,255,0.14) 34px 44px,
+      transparent 44px 78px);
+  animation: porthole-ripple 9s ease-in-out infinite alternate;
+}
+@keyframes porthole-ripple {
+  from { transform: translateX(-18px) translateY(0); }
+  to   { transform: translateX(18px) translateY(-6px); }
+}
+/* a few soft light shafts rising toward the surface */
+.dive-scene.porthole .porthole-shafts {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(78deg,
+    transparent 0 52px,
+    rgba(255,255,255,0.10) 52px 60px,
+    transparent 60px 112px);
+  animation: porthole-shafts 13s ease-in-out infinite alternate;
+}
+@keyframes porthole-shafts {
+  from { transform: translateX(12px); opacity: 0.7; }
+  to   { transform: translateX(-12px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dive-scene.porthole .porthole-surface,
+  .dive-scene.porthole .porthole-shafts { animation: none; }
+}
+
 .depth-shallow { background: linear-gradient(180deg, #8fd8ef 0%, #2a9db8 100%); }
 .depth-surface { background: linear-gradient(180deg, #7cc7e8 0%, #2f88b5 100%); }
 .depth-midwater { background: linear-gradient(180deg, #2b6f9e 0%, #10385c 100%); }
