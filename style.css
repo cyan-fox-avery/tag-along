@@ -54,30 +54,27 @@ body {
    only a little, like real light. Brightness peaks near the sun point and
    falls off along the ray, so deep water stays dark. Transform/opacity
    only, no blur filters, for iPad-friendliness. */
-.caustics { position: absolute; top: 0; left: 0; right: 0; height: 1100px; overflow: hidden; pointer-events: none; mix-blend-mode: screen;
-  /* v1.4.3: fade to transparent near the left/right edges — a rotating ray's
-     glow must never peek in from the viewport edge as a sliding bar */
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%); }
+.caustics { position: absolute; top: 0; left: 0; right: 0; height: 1100px; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
 .caustics span {
-  position: absolute; top: -120px; left: 2%; height: 1400px;
+  position: absolute; top: -120px; left: 2%; height: 2000px;
   transform-origin: 50% 0; /* pivot around the sun point at far top-left */
-  /* soft elongated glow — bright core near the sun, fading along the ray,
-     soft on every side so each ray unambiguously reads as light */
-  background: radial-gradient(ellipse 45% 32% at 50% 20%,
+  /* v1.4.5: long soft streak — the glow is a tall narrow ellipse anchored at
+     the sun point, bright near the sun and dissolving along its own length,
+     so each ray visibly fans across the screen. The ellipse fades to
+     transparent at the span's own edges (soft on every side), so no ray can
+     ever draw a hard boundary — no container mask needed. */
+  background: radial-gradient(ellipse 50% 45% at 50% 12%,
     rgba(218,242,255,0.28) 0%,
-    rgba(205,234,255,0.13) 42%,
-    rgba(195,230,255,0.04) 62%,
-    transparent 74%);
+    rgba(205,234,255,0.13) 45%,
+    rgba(195,230,255,0.05) 68%,
+    transparent 88%);
   opacity: 0;
   animation: ray-life 18s ease-in-out infinite;
 }
 /* fan angles from the far-left sun point: 0deg drops straight down from
    the sun, positive angles sweep across toward the right — like sunlight
-   fanning through water from a low sun.
-   v1.4.3: leftmost ray changed from -8deg to 0deg — at -8deg its glow sat
-   fully off-screen and only peeked in during sway, reading as a sliding
-   dark bar at the left edge. */
+   fanning through water from a low sun. All angles stay on-screen (no
+   negative angles) so no ray can peek in from an edge during its sway. */
 .caustics span:nth-child(1) { --ray-angle: 0deg;  width: 44px; animation-duration: 17s; animation-delay: -5s; }
 .caustics span:nth-child(2) { --ray-angle: 2deg;   width: 58px; animation-duration: 22s; animation-delay: -14s; }
 .caustics span:nth-child(3) { --ray-angle: 12deg;  width: 38px; animation-duration: 15s; animation-delay: -8s; }
