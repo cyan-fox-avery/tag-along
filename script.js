@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.11-beta";
+const VERSION = "v1.4.12-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -100,6 +100,9 @@ const WHATS_NEW = {
   ],
   "v1.4.11-beta": [
     "🌊 <strong>Porthole waves.</strong> The boat-window view now has illustrated wave layers (far/mid/near) drifting as slow parallax, with occasional spray on the glass. Art by Mira."
+  ],
+  "v1.4.12-beta": [
+    "🌊 <strong>Porthole waves, take two.</strong> Bigger, closer-together swells like looking over the horizon; the wave loop is now truly seamless (no more glitch); and the glass gets one big splash at a time instead of scattered droplets. Art by Mira."
   ]
 };
 
