@@ -80,8 +80,9 @@ function renderArchive() {
   if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
   list.innerHTML = "";
   /* v1.2.0-beta Mira review: unlocked species first (the reward), locked
-     ones collapsed in a "Still to discover" section — the Archive should
-     feel like earned photographs, not another species catalogue. */
+     ones listed under a "Still to discover" heading — the Archive should
+     feel like earned photographs, not another species catalogue.
+     v1.5.6: the heading is static text, not a collapsible dropdown. */
   const unlockedRows = [];
   const lockedRows = [];
   SHARKS.forEach(s => {
@@ -129,14 +130,14 @@ function renderArchive() {
     if (isLocked) lockedRows.push(row); else unlockedRows.push(row);
   });
   unlockedRows.forEach(row => list.appendChild(row));
+  /* v1.5.6: "Still to discover" is static descriptive text, not a dropdown —
+     the locked list is always visible below it. */
   if (lockedRows.length) {
-    const det = document.createElement("details");
-    det.className = "archive-still-locked";
-    det.innerHTML = `<summary>Still to discover (${lockedRows.length})</summary>`;
-    const wrap = document.createElement("div");
-    lockedRows.forEach(row => wrap.appendChild(row));
-    det.appendChild(wrap);
-    list.appendChild(det);
+    const head = document.createElement("p");
+    head.className = "archive-still-locked-head";
+    head.textContent = `Still to discover (${lockedRows.length})`;
+    list.appendChild(head);
+    lockedRows.forEach(row => list.appendChild(row));
   }
 }
 
