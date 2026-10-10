@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.30-beta";
+const VERSION = "v1.5.31-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -119,6 +119,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.5.31-beta": [
+    "🌊 <strong>Thinner seafloor.</strong> The ocean-floor wave is now a slim strip in the bottom 5% of the screen instead of a tall band — more ocean, less floor.",
   ],
   "v1.5.29-beta": [
     "🌊 <strong>Blue stays blue longer.</strong> The background gradient keeps its blue tones through ~90% of the screen, fading to black only at the very bottom — no more dark middle.",
