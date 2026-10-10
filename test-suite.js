@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.2-beta', VERSION === 'v1.4.2-beta');
+  ok('version v1.4.3-beta', VERSION === 'v1.4.3-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1570,6 +1570,15 @@ code += `
     ok("caustics has 8 rays", rayCount === 8);
     ok("rays are narrower than v1.4.0", !/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*width:\\s*(8[5-9]|9\\d|10[0-4])px/.test(cssCode));
   })();
+  // v1.4.3: caustics fade at viewport edges — no sliding bars from edge-peeking rays
+  (() => {
+    ok("caustics fade at left/right edges", /\\.caustics\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to right/.test(cssCode));
+    ok("caustics edge fade has webkit prefix", /\\.caustics\\s*\\{[^}]*-webkit-mask-image:/.test(cssCode));
+    // no ray may angle negative — a negative-angle glow sits off-screen and
+    // peeks in during sway, reading as a sliding bar at the edge
+    const negAngles = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*-\\d+deg/g) || []).length;
+    ok("no ray has a negative fan angle", negAngles === 0);
+  })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
     ok("open guide body is absolutely positioned", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
@@ -1579,6 +1588,7 @@ code += `
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
   ok("WHATS_NEW has v1.4.1-beta", !!(WHATS_NEW["v1.4.1-beta"] && WHATS_NEW["v1.4.1-beta"].length));
   ok("WHATS_NEW has v1.4.2-beta", !!(WHATS_NEW["v1.4.2-beta"] && WHATS_NEW["v1.4.2-beta"].length));
+  ok("WHATS_NEW has v1.4.3-beta", !!(WHATS_NEW["v1.4.3-beta"] && WHATS_NEW["v1.4.3-beta"].length));
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
