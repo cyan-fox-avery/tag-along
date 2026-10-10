@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.9-beta', VERSION === 'v1.4.9-beta');
+  ok('version v1.4.10-beta', VERSION === 'v1.4.10-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1597,6 +1597,7 @@ code += `
   ok("WHATS_NEW has v1.4.7-beta", !!(WHATS_NEW["v1.4.7-beta"] && WHATS_NEW["v1.4.7-beta"].length));
   ok("WHATS_NEW has v1.4.8-beta", !!(WHATS_NEW["v1.4.8-beta"] && WHATS_NEW["v1.4.8-beta"].length));
   ok("WHATS_NEW has v1.4.9-beta", !!(WHATS_NEW["v1.4.9-beta"] && WHATS_NEW["v1.4.9-beta"].length));
+  ok("WHATS_NEW has v1.4.10-beta", !!(WHATS_NEW["v1.4.10-beta"] && WHATS_NEW["v1.4.10-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
