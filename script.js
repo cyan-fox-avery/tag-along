@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.7-beta";
+const VERSION = "v1.5.32-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -117,6 +117,92 @@ const WHATS_NEW = {
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
   ],
+  "v1.5.30-beta": [
+    "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.5.32-beta": [
+    "🦈 <strong>Bruce reacts on the first catch.</strong> Naming a shark Bruce now gets Sarah's opener right away — the slow-burn spacing applies between later stages, not before the first one.",
+  ],
+  "v1.5.31-beta": [
+    "🌊 <strong>Thinner seafloor.</strong> The ocean-floor wave is now a slim strip in the bottom 5% of the screen instead of a tall band — more ocean, less floor.",
+  ],
+  "v1.5.29-beta": [
+    "🌊 <strong>Blue stays blue longer.</strong> The background gradient keeps its blue tones through ~90% of the screen, fading to black only at the very bottom — no more dark middle.",
+  ],
+  "v1.5.26-beta": [
+    "⬛ <strong>Black below the seafloor.</strong> The viewport beneath the seafloor wave is now solid black all the way to the bottom edge — no more blue water showing under the ground.",
+  ],
+  "v1.5.28-beta": [
+    "⬛ <strong>True black depths.</strong> The page background now fades to pure black at the bottom — deep ocean, not blue — so the seafloor sits on black all the way down.",
+  ],
+  "v1.5.27-beta": [
+    "🌊 <strong>Seafloor wave rebuilt.</strong> Removed the black overlay layer that was covering content on iPad — the seafloor graphic itself is now taller (400px) with solid black extending to the bottom, and the page tracks Safari's dynamic viewport height.",
+  ],
+  "v1.5.25-beta": [
+    "🌊 <strong>One-screen ocean.</strong> The background gradient is now fixed to the viewport — light at the top of the screen, dark at the bottom, always — so every tab shows the same full gradient whether it's a long list or an empty page.",
+    "📌 <strong>Pinning stays put.</strong> Tapping the pin button no longer makes the page jump — your scroll position is preserved.",
+    "🍋😭 <strong>Lemon Sarah.</strong> Name specifically the lemon shark \"Sarah\" and get a whole separate reaction thread — lemons are her favourite, and she is not okay.",
+    "⬛ <strong>Solid seafloor.</strong> The ground at the bottom of the page is now solid black and fully opaque — no more background showing through like it's floating.",
+    "🦈 <strong>Bruce chain polish.</strong> Later stages now re-establish context (slow-burn threads arrive expeditions apart), and the trigger no longer depends on fragile state.",
+    "💡 <strong>Ask Sarah stays current.</strong> Pinning a shark now refreshes Ask Sarah immediately, and opening the Phone tab re-syncs it — never a stale pin (Mira's review).",
+  ],
+  "v1.5.24-beta": [
+    "\U0001F988 <strong>Bruce, your way.</strong> Sarah's Bruce chain now uses your exact capitalization for your shark, while the original Jaws shark is always \"Bruce\".",
+    "\U0001F49B <strong>Warmer Bruce reaction.</strong> Sarah is delighted by the name now, not scolding — she loves the reference.",
+  ],
+  "v1.5.23-beta": [
+    "\U0001F988 <strong>Thresher faces left.</strong> The thresher illustration was the only shark facing right — flipped to face left like the rest, matching its silhouette.",
+  ],
+  "v1.5.22-beta": [
+    "🗂️ <strong>Archive cards overlay.</strong> Tapping an Archive shark now drops its details in front of the other cards — matching the Research tab — instead of pushing them down.",
+  ],
+  "v1.5.21-beta": [
+    "🍋 <strong>LEMONNNNNNN.</strong> Six new lemon-shark Big Day conversations — Sarah is barely containing herself, with real facts about Bimini, social bonds, and homing. One variant channels the real Sarah's actual reaction.",
+    "💬 <strong>L2 punched up.</strong> The shortest lemon reaction now lands harder.",
+  ],
+  "v1.5.20-beta": [
+    "🦈 <strong>Sarah egg, anywhere.</strong> Naming a shark Sarah from the Collection tab now triggers her reaction and the Best Cousin Ever achievement — not just during expeditions.",
+  ],
+  "v1.5.19-beta": [
+    "💡 <strong>Ask Sarah, about your shark.</strong> The Ask Sarah dropdown now lists only your pinned shark, and the prompt only appears while something is pinned.",
+    "📌 <strong>Pin bar points to Sarah.</strong> The empty pinned slot now mentions that Sarah might know something if you ask her about the pinned shark.",
+    "💬 <strong>No more \"kiddo.\"</strong> The player's thank-you lines to Sarah no longer call her kiddo.",
+  ],
+  "v1.5.18-beta": [
+    "🏷️ <strong>Legend tidy-up.</strong> Removed Data Deficient from the IUCN key (none of our sharks have that status) and gave the legend more breathing room.",
+  ],
+  "v1.5.17-beta": [
+    "👆 <strong>Whole header is tappable.</strong> The IUCN badge is now inside the card's tap area — tapping it expands the entry too.",
+    "🏷️ <strong>IUCN badge key.</strong> A compact legend at the top of the field guide explains what LC, NT, VU, EN and CR mean.",
+  ],
+  "v1.5.16-beta": [
+    "📑 <strong>Tabs, locked in.</strong> The 8-column tab grid is now the base layout on every screen size (phones keep their 4+4) — no more relying on media queries that iPad Safari could ignore.",
+  ],
+  "v1.5.15-beta": [
+    "📖 <strong>Field-guide headers, restacked.</strong> Common name in bold on its own line, with the italic scientific name below it — easier to scan, more room to breathe.",
+  ],
+  "v1.5.14-beta": [
+    "📑 <strong>Tabs fixed with grid — for real this time.</strong> iPad Safari ignored flex-wrap: nowrap, so the tab bar kept wrapping. Tablets and phones now use CSS grid with an explicit column count (8 / 4), which structurally cannot wrap.",
+  ],
+  "v1.5.13-beta": [
+    "📑 <strong>Smaller tabs, tidier bar.</strong> Tablet tabs are smaller (icon, label, padding) so all 8 fit on one iPad row, no wrapping. On phones the tabs now sit in two neat centered rows of four.",
+  ],
+  "v1.5.12-beta": [
+    "📑 <strong>Eight tabs, one row — for real this time.</strong> Tighter type and a shrinkable label stack so all 8 tabs fit a single iPad row with no wrapping.",
+    "📖 <strong>Expanded field-guide cards show everything.</strong> No more internal scrolling — the card grows to fit the full description, and its top corners are rounded to match the bottom.",
+  ],
+  "v1.5.11-beta": [
+    "📸 <strong>Archive tab always visible.</strong> The Archive tab now stays in the tab bar from the start — greyed out and unclickable until Sarah's intro text unlocks it. This keeps all 8 tabs on one row with no layout shift.",
+  ],
+  "v1.5.10-beta": [
+    "🖼️ <strong>Archive is tagged-sharks only.</strong> The \"Still to discover\" locked list is gone — the Archive now shows just the sharks you have actually tagged, with Research-style name + color-coded IUCN badges (no checkmarks).",
+  ],
+  "v1.5.9-beta": [
+    "📑 <strong>All eight tabs, one row.</strong> The tab bar no longer wraps \"Achievements\" to a second line on tablets — the tabs share the row evenly.",
+  ],
+  "v1.5.8-beta": [
+    "📦 <strong>Safe batch.</strong> Seven low-risk fixes: \"Still to discover\" is plain text (no dropdown), release buttons reordered with matching yellow style, \"Follow\" first in encounters, Sarah uses tag IDs for unnamed sharks, double-tap zoom disabled, and tag-along insights live on the Collection card only.",
+  ],
   "v1.5.7-beta": [
     "\uD83D\uDCF1 <strong>Centered tabs everywhere.</strong> The tab bar now centers as a group on tablets and desktops too — no more left-shifted tabs.",
   ],
@@ -199,7 +285,6 @@ function playerHasSaveData() {
 }
 
 /* ---------- SVG art: simplified, real proportions, few colours ---------- */
-
 
 /* ---------- Ambient sea life: small silhouettes that drift through the dive ---------- */
 
@@ -1074,6 +1159,7 @@ const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
 const tabScroll = {};
 document.querySelectorAll(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
+    if (btn.disabled) return; /* v1.5.11: locked Archive tab is unclickable */
     const current = document.querySelector(".tab.active");
     if (current) tabScroll[current.dataset.tab] = window.scrollY;
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
@@ -1089,6 +1175,9 @@ document.querySelectorAll(".tab").forEach(btn => {
       if (badge) badge.classList.add("hidden");
     }
     if (btn.dataset.tab === "phone") {
+      /* v1.5.25-beta (Mira review): defensive sync — Ask Sarah always reflects
+         the current pin when the Phone tab opens, never a stale one. */
+      renderSarahAsk();
       /* v0.12.0: like a real phone — the conversation opens pinned to the
          newest message. renderMessages' own scroll can't do this: it runs
          while the tab is hidden (display:none), where scrollTop has no
@@ -1236,6 +1325,9 @@ function clearGuideFilters() {
 /* v0.20.0: pin one shark as "currently researching". Tapping the pin on a
    pinned shark unpins it. One pin at a time — a focus, not a collection. */
 function togglePin(id) {
+  /* v1.5.25-beta: pinning must not move the page. The list re-render below used
+     to make the page jump/scroll on tap — save and restore the scroll position. */
+  const keepY = window.scrollY;
   state.pinned = (state.pinned === id) ? null : id;
   if (state.pinned) { // v1.0.3-beta: remember the first pin to collapse the explainer later
     state.hasPinnedBefore = true;
@@ -1245,28 +1337,12 @@ function togglePin(id) {
   renderResearch();
   renderExpeditionPin();
   renderPinHint(); // v0.22.0
+  renderSarahAsk(); // v1.5.25-beta (Mira review): Ask Sarah must reflect the new pin immediately
+  window.scrollTo(0, keepY);
 }
 /* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
    clears any filters hiding the shark first, so Jump never silently fails. */
-function jumpToPinned(s, list) {
-  if (!list.querySelector(`[data-entry="${s.id}"]`) && activeFilterCount() > 0) {
-    clearGuideFilters();
-  }
-  const target = list.querySelector(`[data-entry="${s.id}"]`);
-  if (target) {
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
-    const body = target.querySelector(".guide-row-body");
-    const head = target.querySelector(".guide-row-head");
-    if (body && body.classList.contains("hidden")) {
-      body.classList.remove("hidden");
-      head.setAttribute("aria-expanded", "true");
-      target.classList.add("open");
-      target.style.zIndex = String(++guideOverlayZ);
-    }
-    target.classList.add("pin-flash");
-    setTimeout(() => target.classList.remove("pin-flash"), 1200);
-  }
-}
+
 /* v1.4.15-beta: highlight key research clues in bold (same font/size).
    Bolds location, diet, and depth cues — never the expedition answers. */
 function highlightClues(s) {
@@ -1299,8 +1375,8 @@ function renderPinnedCard(list) {
   card.className = "pinned-card" + (s ? "" : " pinned-empty");
   if (!s) {
     card.innerHTML = state.hasPinnedBefore
-      ? `<p class="latin">📌 <em>Pinned sharks appear here.</em></p>`
-      : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
+      ? `<p class="latin">📌 <em>Pinned sharks appear here. Sarah might know something if you ask her about one.</em></p>`
+      : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you. Sarah might know something too, if you ask her about it.</span></p>`;
   } else {
     const done = !!state.tagged[s.id];
     /* v1.4.15-beta: pinned card shows the research description with key clues
@@ -1318,10 +1394,8 @@ function renderPinnedCard(list) {
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
       </div>
-      <p class="pinned-research">${researchPreview}</p>
-      <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
+      <p class="pinned-research">${researchPreview}</p>`;
     card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
-    card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
   }
   target.appendChild(card);
 }
@@ -1484,16 +1558,18 @@ function renderResearch() {
     const row = document.createElement("div");
     row.className = "guide-row";
     row.setAttribute("data-entry", s.id);
-    /* v1.4.15-beta: IUCN pill sits beside the pin (not inside the head button),
-       color-coded by threat level, freeing space for more of the Latin name. */
+    /* v1.5.17-beta: IUCN pill lives INSIDE the head button so the whole header
+       (names + badge) is one tap target. Color-coded by threat level. */
     const iucnAbbr = IUCN_ABBR[s.status] || s.status;
     row.innerHTML = `
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
-          <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
-          <span class="latin">${s.latin}</span>
+          <span class="guide-names">
+            <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
+            <span class="latin">${s.latin}</span>
+          </span>
+          <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
         </button>
-        <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
         <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
           aria-label="${isPinned ? "Unpin" : "Pin"} ${s.name} as currently researching"
           aria-pressed="${isPinned}">📌</button>
@@ -2012,13 +2088,17 @@ function doEncounter(species, plan) {
           }
         });
       });
-      actions.appendChild(followBtn);
+      /* v1.5.8-beta: "Follow" goes first, "Just watch" second. */
+      actions.insertBefore(followBtn, watchBtn);
       /* v0.8.0: it's one of yours — log the re-sighting. */
       const resightBtn = document.createElement("button");
       resightBtn.className = "secondary-button";
       resightBtn.type = "button";
       resightBtn.textContent = "📝 Log re-sighting";
       resightBtn.addEventListener("click", () => {
+        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice. */
+        if (resightBtn.dataset.done) return;
+        resightBtn.dataset.done = "true";
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
@@ -2412,7 +2492,8 @@ function maybeReunionReaction(species, rec) {
   if (state.reunionReacted[species.id]) return;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
-  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : species.name;
+  /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
+  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : (rec.researchId || species.name);
   const thread = [
     { who: "them", text: `WAIT. You saw ${name} again?!?` },
     { who: "me", text: `The tag matched — it's really them.` },
@@ -2774,7 +2855,7 @@ function afterExpedition(plan) {
       { who: "them", text: "How's the shark hunting going?" },
       { who: "me", text: "Honestly? Struck out a few times. The water's been empty." },
       { who: "them", text: COUSIN_NUDGES[s.id] || "You'll get the next one. I believe in you." },
-      { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
+      { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks." }
     ];
     state.failures = 0;
   } else if (state.failures === 1 && !state.sarahAdviceOffered) {
@@ -2807,21 +2888,23 @@ function afterExpedition(plan) {
 }
 
 /* v0.17.1: Ask Sarah — player-initiated advice. The panel appears in the
-   Phone tab after the first failed trip; the player picks the species. */
+   Phone tab after the first failed trip.
+   v1.5.19-beta: the list only ever contains the pinned shark — she's advising
+   on the one you're actively researching, not the whole roster. The panel
+   only appears while there's an active pin. */
 function renderSarahAsk() {
   const panel = $("sarahAsk");
   if (!panel) return;
-  const show = !!state.sarahAdviceOffered && untagged().length > 0;
+  const s = state.pinned ? sharkById(state.pinned) : null;
+  const show = !!state.sarahAdviceOffered && !!s;
   panel.classList.toggle("hidden", !show);
   if (!show) return;
   const sel = $("sarahAskSelect");
   sel.innerHTML = "";
-  untagged().forEach(s => {
-    const o = document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.name;
-    sel.appendChild(o);
-  });
+  const o = document.createElement("option");
+  o.value = s.id;
+  o.textContent = s.name;
+  sel.appendChild(o);
 }
 function askSarahAdvice(sid) {
   const s = sharkById(sid);
@@ -2829,7 +2912,7 @@ function askSarahAdvice(sid) {
   pushThread([
     { who: "me", text: `I'm striking out — any advice on the ${s.name.toLowerCase()}?` },
     { who: "them", text: COUSIN_NUDGES[sid] || "You'll get the next one. I believe in you." },
-    { who: "me", text: "Thanks, kiddo. That's actually really helpful." }
+    { who: "me", text: "Thanks. That's actually really helpful." }
   ]);
   state.sarahAdviceOffered = false;
   saveMsgs(); // v0.17.1 review fix: a used offer stays used across reloads
@@ -3368,15 +3451,11 @@ function doTagAlong() {
     const rec = state.tagged[s.id];
     const displayName = (rec && rec.name) || s.name;
     logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
-    /* v1.4.0-beta: tag-along unlocks a secret fact (or the graceful exhaustion line). */
+    /* v1.5.8-beta: the insight lives on the Collection card only — not in the log. */
     const fact = unlockSecretFact(s.id);
-    if (fact) {
-      logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
-      state.pendingTagAlongFact = { speciesId: s.id, fact, exhausted: false };
-    } else {
-      logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
-      state.pendingTagAlongFact = { speciesId: s.id, fact: null, exhausted: true };
-    }
+    state.pendingTagAlongFact = fact
+      ? { speciesId: s.id, fact, exhausted: false }
+      : { speciesId: s.id, fact: null, exhausted: true };
     logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
   }
   renderAll();
@@ -3774,8 +3853,16 @@ function maybeSarahEgg(speciesId, rec) {
   if (!rec || rec.sarahEgg) return;
   if ((rec.name || "").trim().toLowerCase() === "sarah") {
     rec.sarahEgg = true;
-    store.save(state.tagged);
-    pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
+    /* v1.5.25-beta: naming the LEMON shark "Sarah" gets its own thread —
+       lemons are her favourite. Separate from the regular Sarah thread. */
+    if (speciesId === "lemon" && !rec.lemonSarahEgg) {
+      rec.lemonSarahEgg = true;
+      store.save(state.tagged);
+      pushThread(LEMON_SARAH_EGG_THREAD.map(m => ({ ...m })));
+    } else {
+      store.save(state.tagged);
+      pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
+    }
   }
 }
 
@@ -3811,7 +3898,14 @@ function maybeNameEgg(speciesId, rec) {
     }
     // Bruce: ANY shark. No immediate message — the slow chain begins silently.
     if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
-      state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+      /* v1.5.24: keep the player's exact capitalization for {bruce} in the chain. */
+      /* v1.5.25-beta: defensive expedition count — the trigger must never
+         depend on state.stats being fully formed (first-expedition safety).
+         Previously a missing state.stats would throw inside the try/catch
+         and silently skip setting bruceEgg. */
+      let expCount = 0;
+      try { expCount = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0; } catch {}
+      state.bruceEgg = { stage: 0, sharkId: speciesId, playerName: rec.name.trim(), started: Date.now(), lastAdvance: 0, expeditionsAtStage: expCount };
       try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
       // Deliberately no pushThread here. Sarah will notice... eventually.
     }
@@ -3828,12 +3922,21 @@ function advanceBruceChain() {
   if (!state.bruceEgg || state.bruceChainComplete) return;
   if (typeof BRUCE_CHAIN === "undefined") return;
   const now = Date.now();
-  const expeditionsSince = (state.stats.expeditions || 0) - (state.bruceEgg.expeditionsAtStage || 0);
-  const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
-  // Need either 2+ expeditions or 12+ hours since last stage
-  if (expeditionsSince < 2 && hoursSince < 12) return;
-
+  /* v1.5.25-beta: defensive reads — never let missing stats block the chain. */
+  let _expNow = 0;
+  try { _expNow = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0; } catch {}
   const stage = state.bruceEgg.stage;
+  /* v1.5.32-beta: stage 0 (the opener) fires immediately — Sarah should
+     react when the player names a shark Bruce, not stay silent. The
+     2-expedition/12-hour spacing applies BETWEEN stages, not before the
+     first one. Previously the gate blocked stage 1 too, so naming a shark
+     Bruce on the first catch produced no feedback at all. */
+  if (stage > 0) {
+    const expeditionsSince = _expNow - (state.bruceEgg.expeditionsAtStage || 0);
+    const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
+    // Need either 2+ expeditions or 12+ hours since last stage
+    if (expeditionsSince < 2 && hoursSince < 12) return;
+  }
   if (stage >= BRUCE_CHAIN.length) {
     // Chain complete — unlock hidden achievement
     state.bruceChainComplete = true;
@@ -3848,18 +3951,22 @@ function advanceBruceChain() {
 
   // Push this stage's messages. v0.23.0: personalize {species} with the
   // player's Bruce, so the history attaches to THEIR shark, not a lecture.
+  // v1.5.24: {bruce} uses the player's exact capitalization; OG Jaws/Nemo
+  // references always say "Bruce" in the text itself.
   let bruceSpecies = "shark";
+  let bruceName = "Bruce"; /* fallback for chains started before v1.5.24 */
   try {
     const bs = sharkById(state.bruceEgg.sharkId);
     if (bs && bs.name) bruceSpecies = bs.name.toLowerCase();
+    if (state.bruceEgg.playerName) bruceName = state.bruceEgg.playerName;
   } catch {}
   pushThread(BRUCE_CHAIN[stage].map(m => ({
     who: m.who,
-    text: String(m.text).split("{species}").join(bruceSpecies)
+    text: String(m.text).split("{species}").join(bruceSpecies).split("{bruce}").join(bruceName)
   })));
   state.bruceEgg.stage = stage + 1;
   state.bruceEgg.lastAdvance = now;
-  state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
+  state.bruceEgg.expeditionsAtStage = _expNow;
   // If that was the final stage, complete the chain NOW (not on a later call)
   if (state.bruceEgg.stage >= BRUCE_CHAIN.length) {
     state.bruceChainComplete = true;
@@ -4020,6 +4127,9 @@ function openDetail(id) {
     store.save(state.tagged);
     maybeSarahEgg(id, t);
     maybeNameEgg(id, t); // v0.23.0: Mary Lee / Nicole / Bruce
+    /* v1.5.20-beta: check achievements on any rename — naming a shark
+       "Sarah" outside an expedition must still unlock Best Cousin Ever. */
+    checkAchievements();
     renderCollection();
     renderResearch();
     openDetail(id);

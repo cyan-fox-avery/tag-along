@@ -14,26 +14,44 @@
 
 * { box-sizing: border-box; }
 
+/* Dark fallback for overscroll areas; also keeps body's transparent
+   background off the canvas so the fixed gradient layer paints cleanly. */
+html { background: #000; } /* v1.5.28-beta: pure black — no blue in overscroll */
+
 body {
   margin: 0;
+  /* v1.5.8-beta: kill double-tap zoom on touch devices; pinch zoom still works. */
+  touch-action: manipulation;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
-  /* v0.19.1: the descent — surface light at the top, deep dark below.
-     No background-attachment:fixed — the gradient belongs to the document,
-     so scrolling down genuinely takes you deeper. */
-  /* v1.4.15-beta: full underwater vista — bright surface light up top,
-     deepening through mid-water blues to near-black depths, with a hint
-     of sediment warmth at the very bottom. Static; only bubbles and rays move. */
-  background: linear-gradient(180deg,
-    #1e6a9e 0%,    /* sunlit surface */
-    #155a8a 12%,
-    #0f4470 28%,   /* mid-water */
-    #0a2f52 48%,
-    #071f3a 68%,   /* deep water */
-    #041224 85%,
-    #020a16 100%); /* abyssal dark */
+  /* v1.5.25-beta: viewport-fixed background — the full descent gradient is
+     painted once per screen (light at top, abyssal dark at bottom), identical
+     on every tab regardless of scroll position or content length. Replaces the
+     old v0.19.1 document-scrolling gradient per Avery's request. */
+  background: transparent;
   color: var(--ink);
   min-height: 100vh;
+  min-height: 100dvh; /* v1.5.27-beta: dynamic viewport height tracks iPad Safari's collapsing toolbar */
   position: relative;
+}
+/* v1.5.25-beta: the gradient lives on a viewport-fixed layer behind everything.
+   Plain position:fixed with no transforms or compositing tricks — safe on iPad
+   Safari. background-attachment:fixed is deliberately NOT used (iOS Safari
+   ignores it). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    #1e6a9e 0%,    /* sunlit surface */
+    #155a8a 25%,
+    #0f4470 45%,   /* mid-water */
+    #0a2f52 65%,
+    #071f3a 80%,   /* deep water */
+    #020a16 90%,   /* abyssal dark blue */
+    #000 95%,      /* v1.5.29-beta: fade to pure black only at the very bottom — blue through ~90% */
+    #000 100%);
 }
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
@@ -139,10 +157,17 @@ body {
   36% { transform: translateY(-105vh) translateX(20px); opacity: 0.5; }
   42%, 100% { transform: translateY(-105vh) translateX(20px); opacity: 0; }
 }
-/* Seafloor silhouette along the bottom. */
+/* Seafloor silhouette along the bottom. v1.5.31-beta: thin strip in the
+   bottom 5% of the viewport (was 400px). v1.5.30-beta: viewport-fixed so the
+   ocean bottom is always at the screen bottom — no more floating mid-page
+   with blue below it when scrolled. (position:fixed inside .ocean-decor is
+   safe: like the existing .caustics rays, .ocean-decor is absolute without
+   transforms, so it doesn't trap fixed descendants. Plain CSS, no
+   compositing tricks — iPad-safe.) The background gradient already fades to
+   pure black at 95-100%, so the wave just needs to provide the shape. */
 .seafloor {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
-  fill: #020a14; opacity: 0.95;
+  position: fixed; bottom: 0; left: 0; width: 100%; height: 5vh;
+  fill: #000; opacity: 1;
 }
 .seafloor .kelp { fill: #03141f; }
 .seafloor .kelp-far { fill: #041a28; opacity: 0.7; }
@@ -196,8 +221,14 @@ body { overflow-x: clip; }
 /* v1.5.7: flex (not grid) at ALL breakpoints — grid's justify-content
    left the tab group off-center on iPad Safari; flex-wrap + center
    centers every row reliably. No transforms. */
+/* v1.5.16: grid is now the BASE tab layout. iPad Safari kept ignoring
+   flex-wrap: nowrap AND the tablet media queries didn't reliably match, so
+   tabs wrapped anyway. display:grid + repeat(8, 1fr) on the base rule
+   applies everywhere by default and structurally cannot wrap. Only phones
+   (<560px) override with repeat(4, 1fr) for the 4+4 layout.
+   No transforms, no compositing. */
 .tabs {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;
   margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
@@ -216,6 +247,11 @@ body { overflow-x: clip; }
   min-width: 0; box-sizing: border-box;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
+/* v1.5.11: locked Archive tab — visible but greyed out and unclickable.
+   Keeps the tab count stable at 8 so the bar never re-wraps. */
+.tab[disabled], .tab.tab-locked {
+  opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6);
+}
 .count-badge {
   background: var(--bg-deep); color: var(--ink); border-radius: 999px;
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
@@ -257,17 +293,28 @@ body { overflow-x: clip; }
    (Review fix: this block sits AFTER the general .tab rule — equal
    specificity, so source order decides.) */
 @media (max-width: 559px) {
-  /* v1.5.6/v1.5.7: phone tabs stay flex — every row centers. */
-  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-  .tab { flex: 0 1 108px; font-size: 13px; padding: 10px 2px; }
+  /* v1.5.14: two rows of 4 via grid — repeat(4, 1fr) can't wrap unevenly. */
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tab { font-size: 12px; padding: 10px 2px; min-width: 0; }
   /* v1.4.0: Avery — count tabs keep the column stack on phones too:
      count on top, icon on its own row, label below (Collection, Achievements). */
   .dive-scene { top: 160px; }
 }
-/* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
-   so every tab keeps the same width without squeezing labels. */
-@media (min-width: 560px) and (max-width: 1023px) {
-  .tab { flex-basis: 150px; } /* 4 per row on tablets, rows centered */
+/* v1.5.16: grid(8) now inherited from the base .tabs rule — these queries
+   only tune gap, type size, and label truncation. */
+@media (min-width: 560px) and (max-width: 699px) {
+  .tabs { gap: 4px; }
+  .tab { min-width: 0; font-size: 9px; padding: 8px 1px; }
+  .tab-icon { font-size: 14px; }
+  .tab-stack { min-width: 0; max-width: 100%; }
+  .tab-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+}
+@media (min-width: 700px) and (max-width: 1023px) {
+  .tabs { gap: 6px; }
+  .tab { min-width: 0; font-size: 10px; padding: 8px 2px; }
+  .tab-icon { font-size: 16px; }
+  .tab-stack { min-width: 0; max-width: 100%; }
+  .tab-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 }
 
 .panel { display: none; }
@@ -297,6 +344,9 @@ body { overflow-x: clip; }
 .status-pill.iucn-EN { background: #b03030; border-color: #e04040; }  /* Endangered — red */
 .status-pill.iucn-CR { background: #2a1a3a; border-color: #6a3a9a; color: #e8d8ff; }  /* Critically Endangered — dark purple */
 .status-pill.iucn-DD { background: #4a4a4a; border-color: #6a6a6a; }  /* Data Deficient — grey */
+/* v1.5.17-beta: compact IUCN badge key at the top of the field guide */
+.iucn-legend { font-size: 11px; color: var(--ink-dim); margin: 8px 2px 14px; line-height: 2.1; }
+.iucn-legend .status-pill { font-size: 10px; padding: 1px 8px; margin: 0 2px 0 0; vertical-align: 1px; }
 /* v1.4.2: full IUCN status line inside expanded field-guide entries */
 .iucn-full { font-size: 13px; color: var(--ink-dim); margin: 6px 0; }
 /* v1.4.2: prominent collection count at the top of the collection page */
@@ -337,6 +387,11 @@ select option:disabled { color: #7a8a9e; }
 }
 .primary-button:active { transform: scale(0.98); }
 .primary-button:disabled { opacity: 0.5; cursor: default; }
+/* v1.5.8-beta: "Release & keep diving" matches the tag-along yellow gradient. */
+#releaseBtn {
+  background: linear-gradient(180deg, #ffd166 0%, #f0b429 100%);
+  border: 2px solid #b8860b; color: #3a2b00;
+}
 .secondary-button {
   width: 100%; margin-top: 8px; padding: 11px; font-size: 14px; font-weight: 700;
   border: 2px solid var(--ink-dim); border-radius: 14px; cursor: pointer;
@@ -1034,6 +1089,12 @@ select option:disabled { color: #7a8a9e; }
 /* v0.18.0: locked achievements — dimmed, breadcrumb visible. */
 .guide-row.locked { opacity: 0.55; }
 .guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* v1.5.15: Avery — card headers stack vertically: bold common name on its
+   own line, italic Latin name below it. Scoped to .guide-names so the
+   Achievements rows (same classes, row layout) are untouched. */
+.guide-row-head .guide-names { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.guide-row-head .guide-names .guide-row-name { flex: none; max-width: 100%; }
+.guide-row-head .guide-names .latin { flex: none; font-size: 12px; }
 .guide-row-head .status-pill { margin-bottom: 0; flex: none; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
 .guide-row.open .guide-caret { transform: rotate(180deg); }
@@ -1049,19 +1110,25 @@ select option:disabled { color: #7a8a9e; }
    column widening (absolute elements don't participate in grid sizing). */
 .guide-row { position: relative; min-width: 0; }
 .guide-row.open { overflow: visible; z-index: 20; }
+/* v1.5.12: expanded cards show the full description — no internal scrolling,
+   the card grows to fit its content. Top corners rounded to match the bottom. */
 .guide-row.open .guide-row-body {
   position: absolute; top: 100%; left: 0; width: 100%; max-width: 100%; min-width: 0; z-index: 20;
   background: var(--bg-card);
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius: var(--radius);
   box-shadow: 0 18px 36px rgba(0,0,0,0.55);
-  max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 /* v1.5.2-beta: on small screens the expanded card becomes a centered modal
    so the full content is always reachable — no more cut-off bottoms. */
 @media (max-width: 768px) {
+  /* v1.5.2-beta: on small screens the expanded card becomes a centered modal
+     so the full content is always reachable — no more cut-off bottoms.
+     v1.5.12: top-anchored (not vertically centered) so a tall card can never
+     clip its close button; no max-height, no internal scroll — the card
+     grows to fit its full content. */
   .guide-row.open .guide-row-body {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: calc(100vw - 32px); max-width: 520px; max-height: 80vh;
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    width: calc(100vw - 32px); max-width: 520px;
     border-radius: var(--radius);
   }
 }
@@ -1081,11 +1148,8 @@ select option:disabled { color: #7a8a9e; }
 .guide-close:focus-visible { outline: 2px solid #ffd166; outline-offset: 2px; }
 /* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
 .guide-row-top { display: flex; align-items: stretch; }
-/* v1.4.15-beta: IUCN pill sits beside the pin, outside the head button */
-.guide-row-top .status-pill {
-  margin: 0; flex: none; align-self: center;
-  margin-right: 4px; /* snug against the pin */
-}
+/* v1.5.17-beta: pill moved inside the head button (whole header is one tap
+   target); the .guide-row-head .status-pill rule above covers its sizing. */
 .guide-row-top .guide-row-head { flex: 1; min-width: 0; }
 .pin-btn {
   flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
@@ -1112,17 +1176,7 @@ select option:disabled { color: #7a8a9e; }
 /* v1.4.15-beta: pinned research preview — clues in bold, same font/size */
 .pinned-research { font-size: 13px; line-height: 1.5; color: #dcebf5; margin: 8px 0 4px; }
 .pinned-research strong { font-weight: 700; }
-.pin-jump {
-  width: 100%; min-height: 48px; border-radius: 12px; font-size: 1rem; font-weight: 700;
-  background: rgba(255,209,102,0.15); border: 1px solid rgba(255,209,102,0.4);
-  color: var(--ink); cursor: pointer;
-}
-.pin-flash { animation: pin-flash 1.2s ease; }
-@keyframes pin-flash {
-  0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
-  30% { box-shadow: 0 0 0 3px rgba(255,209,102,0.7); }
-}
-@media (prefers-reduced-motion: reduce) { .pin-flash { animation: none; } }
+
 /* v0.20.0: pinned-shark line on the Expedition tab. */
 .expedition-pin {
   background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.3);
@@ -1393,20 +1447,8 @@ video.archive-media { max-height: 420px; }
   .research-text { font-size: 15px; }
 }
 
-/* v1.2.0-beta: locked archive placeholders (for Mira's review) */
-.archive-locked { text-align: center; padding: 18px 12px; }
-.archive-locked-art { opacity: 0.35; filter: grayscale(1); max-width: 220px; margin: 0 auto 10px; }
-.archive-locked-art svg { width: 100%; height: auto; }
-.locked-pill { background: rgba(255,255,255,0.08); }
-.archive-locked-row .guide-row-name { opacity: 0.75; }
-
-/* v1.2.0-beta Mira review: collapsed "Still to discover" archive section. */
-.archive-still-locked { margin-top: 14px; }
-.archive-still-locked > summary {
-  cursor: pointer; font-weight: 700; font-size: 15px; color: var(--ink-dim, #9db8c9);
-  padding: 10px 4px; list-style-position: inside;
-}
-.archive-still-locked > summary::-webkit-details-marker { color: var(--ink-dim, #9db8c9); }
+/* v1.5.10-beta: locked archive list removed — the Archive shows tagged
+   sharks only. (Placeholder/locked styles retired.) */
 
 /* v1.3.0-beta: field notes from "Just watch" encounters */
 .watch-notes-block {

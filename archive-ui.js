@@ -8,9 +8,15 @@
    photographs (CC BY-NC, with the project non-commercial notice);
    attribution is shown per asset, with the true source labeled.
    Species not yet in the live roster stay hidden until they're added. */
+/* v1.5.11: Archive tab is always visible (stable 8-tab layout). Until
+   unlocked it is greyed out and unclickable; Sarah's intro text enables it. */
 function updateArchiveTab() {
   const btn = document.querySelector('.tab[data-tab="archive"]');
-  if (btn) btn.classList.toggle("hidden", !state.archiveUnlocked);
+  if (!btn) return;
+  const locked = !state.archiveUnlocked;
+  btn.classList.toggle("tab-locked", locked);
+  btn.disabled = locked;
+  btn.setAttribute("aria-disabled", locked ? "true" : "false");
 }
 /* v0.17.0 review fix: canonical license URLs so the Archive's credit line
    links the license itself, not just names it. Public-domain assets get no
@@ -79,64 +85,59 @@ function renderArchive() {
   const list = $("archiveList");
   if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
   list.innerHTML = "";
-  /* v1.2.0-beta Mira review: unlocked species first (the reward), locked
-     ones collapsed in a "Still to discover" section — the Archive should
-     feel like earned photographs, not another species catalogue. */
-  const unlockedRows = [];
-  const lockedRows = [];
+  /* v1.5.10-beta: the Archive shows ONLY sharks the player has tagged.
+     The locked-species teaser list is gone — no tantalizing teasers.
+     It's a gallery of earned photographs, not a catalogue.
+     v1.2.0-beta Mira review: unlocked species first (the reward).
+     v0.17.0 review fix: the archive promise is "the real animals you tagged."
+     A species dossier requires an actual tag, so a future roster expansion
+     (e.g. salmon) can't leak into a returning player's Archive before they
+     tag one. */
+  const abbrFor = (status) => (typeof IUCN_ABBR !== "undefined" && IUCN_ABBR[status]) || status;
   SHARKS.forEach(s => {
     const media = ARCHIVE_MEDIA[s.id];
     if (!media || media.future) return;
-    /* v0.17.0 review fix: the archive promise is "the real animals you tagged."
-       A species dossier requires an actual tag, so a future roster expansion
-       (e.g. salmon) can't leak into a returning player's Archive before they
-       tag one.
-       v1.2.0-beta (for Mira's review): locked species now appear as
-       silhouettes instead of being hidden entirely — the player sees what's
-       still out there to discover. Photos unlock per-tag as before. */
-    const isLocked = !state.tagged[s.id];
-    const t = state.tagged[s.id] || {};
+    const t = state.tagged[s.id];
+    if (!t) return; /* untagged species are not rendered at all */
     const yourShark = t.researchId
       ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
       : "";
-    const lockedHtml = `
-      <div class="archive-locked">
-        <div class="archive-locked-art">${typeof SKETCH !== "undefined" && SKETCH[s.id] ? SKETCH[s.id] : "🦈"}</div>
-        <p class="hook">🔒 Tag a ${s.name} to unlock its archive photos.</p>
-      </div>`;
+    /* v1.5.10-beta: row head matches the Research page — common name first,
+       then the color-coded abbreviated IUCN badge. No checkmark. */
+    const abbr = abbrFor(s.status);
     const row = document.createElement("div");
-    row.className = "guide-row" + (isLocked ? " archive-locked-row" : "");
+    row.className = "guide-row";
     row.innerHTML = `
       <button type="button" class="guide-row-head" aria-expanded="false">
         <span class="guide-row-name">${s.name}</span>
         <span class="latin">${media.scientific}</span>
-        <span class="status-pill">IUCN: ${s.status}</span>
-        ${isLocked ? `<span class="status-pill locked-pill">🔒 Locked</span>` : ""}
+        <span class="status-pill iucn-${abbr}" title="IUCN Red List: ${s.status}">${abbr}</span>
         <span class="guide-caret" aria-hidden="true">\u25be</span>
       </button>
       <div class="guide-row-body hidden">
-        ${isLocked ? lockedHtml : `${yourShark}
+        ${yourShark}
         ${media.comingSoon
           ? `<p class="hook">📸 Wild media coming soon — being curated.</p>`
-          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}`}
+          : media.assets.map((a, i) => archiveAssetHtml(a, i === 0)).join("")}
       </div>`;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
     head.addEventListener("click", () => {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
+      /* v1.5.22-beta: match the Research tab — toggling "open" makes the
+         expanded card overlay its neighbors (absolute/fixed positioning)
+         instead of pushing them down. Rising z-index keeps the most
+         recently opened card on top. */
+      row.classList.toggle("open", !isHidden);
+      if (!isHidden) {
+        try { row.style.zIndex = String(++guideOverlayZ); }
+        catch (e) { row.style.zIndex = "30"; }
+      } else {
+        row.style.zIndex = "";
+      }
     });
-    if (isLocked) lockedRows.push(row); else unlockedRows.push(row);
+    list.appendChild(row);
   });
-  unlockedRows.forEach(row => list.appendChild(row));
-  if (lockedRows.length) {
-    const det = document.createElement("details");
-    det.className = "archive-still-locked";
-    det.innerHTML = `<summary>Still to discover (${lockedRows.length})</summary>`;
-    const wrap = document.createElement("div");
-    lockedRows.forEach(row => wrap.appendChild(row));
-    det.appendChild(wrap);
-    list.appendChild(det);
-  }
 }
 

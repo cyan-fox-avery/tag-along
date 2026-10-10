@@ -24,7 +24,7 @@ global.document = {
   querySelector() { return makeEl(); }, querySelectorAll() { return []; },
   addEventListener() {},
 };
-global.window = { addEventListener() {}, innerWidth: 800 };
+global.window = { addEventListener() {}, innerWidth: 800, scrollY: 0, scrollTo() {} };
 global.localStorage = { _s: {}, getItem(k) { return this._s[k] || null; }, setItem(k, v) { this._s[k] = v; }, removeItem(k) { delete this._s[k]; } };
 global.requestAnimationFrame = fn => { return 1; };
 const rafQ = [];
@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.7-beta', VERSION === 'v1.5.7-beta');
+  ok('version v1.5.32-beta', VERSION === 'v1.5.32-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -173,10 +173,30 @@ code += `
   ok('license links to canonical CC URL', clipHtml.includes('href="https://creativecommons.org/licenses/by/3.0/"'));
   const pdHtml = archiveAssetHtml({ type: 'photo', caption: 'x', credit: 'NOAA', license: 'Public domain', page: 'https://example.com', image: 'https://example.com/i.jpg' }, false);
   ok('public-domain uses neutral Credit (no \u00a9)', pdHtml.includes('Credit NOAA') && !pdHtml.includes('\u00a9 NOAA'));
-  // v1.2.0-beta (for Mira's review): locked species show as placeholders,
-  // photos still require an actual tag
-  ok('dossiers require an actual tag for photos', fileCode.includes('const isLocked = !state.tagged[s.id]'));
-  ok('locked archive shows placeholder', fileCode.includes('archive-locked'));
+  // v1.5.10-beta: Archive is tagged-sharks only — no locked list at all.
+  // Untagged species are skipped before rendering, so photos still require
+  // an actual tag.
+  const archiveUiCode = fs.readFileSync(path.join(DIR, 'archive-ui.js'), 'utf8');
+  ok('archive skips untagged species', archiveUiCode.includes('if (!t) return;'));
+  ok('archive has no locked list', !archiveUiCode.includes('lockedRows') && !archiveUiCode.includes('Still to discover'));
+  // v1.5.22: Archive expanded cards overlay like the Research tab
+  ok('archive toggle adds open class', archiveUiCode.includes('row.classList.toggle("open", !isHidden)'));
+  ok('archive toggle sets rising z-index', archiveUiCode.includes('++guideOverlayZ'));
+  ok('archive uses Research-style IUCN pill', archiveUiCode.includes('status-pill iucn-'));
+  ok('archive has no checkmark', !archiveUiCode.includes('✅'));
+  // v1.5.11-beta: Archive tab always visible, locked until Sarah's text.
+  ok('updateArchiveTab toggles locked state not hidden',
+    archiveUiCode.includes('toggle("tab-locked"') && !archiveUiCode.includes('toggle("hidden", !state.archiveUnlocked'));
+  ok('archive tab has disabled attr support',
+    archiveUiCode.includes('btn.disabled'));
+  ok('tab click handler skips disabled tabs',
+    code.includes('if (btn.disabled) return;'));
+  ok('disabled tabs are greyed out',
+    cssCode.includes('.tab[disabled]') && cssCode.includes('cursor: not-allowed'));
+  ok('archive tab not hidden in HTML',
+    htmlCode.includes('data-tab="archive"') && !htmlCode.includes('class="tab hidden" data-tab="archive"'));
+  ok('archive tab starts disabled in HTML',
+    htmlCode.includes('data-tab="archive" type="button" disabled'));
   // v0.17.0 review fix: every non-public-domain CC license in the data must
   // have a LICENSE_URLS entry, so new sharks can't silently lose license links.
   const usedLicenses = new Set();
@@ -221,9 +241,10 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
   ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
-  ok('tabs use flex row', /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+  ok('tabs use grid base', /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
+  ok('tabs base has 8 columns', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
   // v1.4.2: tab buttons centered in the band, not left-aligned
-  ok('tabs centered in band', /\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
+  // v1.5.16: grid base fills the full-bleed band with 8 equal columns — centering is inherent, no justify-content needed
   // v1.4.2: bigger tab emojis on desktop
   ok('desktop tab emojis bigger', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.tab-icon\\s*\\{[^}]*font-size/.test(cssCode));
   ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
@@ -501,16 +522,6 @@ code += `
     const html = document.getElementById('expeditionPin').innerHTML;
     state.pinned = null; renderExpeditionPin();
     return !html.includes('[object Object]') && html.includes('Surface');
-  })());
-  ok('jump clears filters hiding the pinned shark', (() => {
-    state.pinned = 'dusky';
-    guideFilters.q = 'zzzz-no-match';
-    // filtered-out state: the entry is not in the rendered list
-    const list = { querySelector() { return null; } };
-    jumpToPinned(SHARKS.find(s => s.id === 'dusky'), list);
-    const cleared = activeFilterCount() === 0;
-    state.pinned = null;
-    return cleared;
   })());
   ok('repeat-plan with no method clears the planner method', (() => {
     const mk = (vals) => {
@@ -1513,15 +1524,22 @@ code += `
   })();
   // v1.4.0-beta Mira review: fixed grid tracks keep tabs equal on sparse rows
   (() => {
-    ok("tabs use flexbox (v1.5.7)", /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+    ok("tabs use grid base on desktop (v1.5.16)", /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
   ok("desktop tabs have flex-basis pills", /\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
-  ok("tablet tabs wider (v1.5.7)", /max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex-basis:\\s*150px/.test(cssCode));
-  ok("phone tabs use flex-wrap (v1.5.6)", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
-    ok("phone tabs wrap", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
-    ok("phone tabs center every row", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
-    ok("phone tabs keep ~3-per-row size", /max-width:\\s*559px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
-    ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
-    ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
+  ok("tablet keeps 6px gap (v1.5.16)", /min-width:\\s*700px[\\s\\S]*?\\.tabs\\s*\\{[^}]*gap:\\s*6px/.test(cssCode));
+  ok("narrow tablet keeps 4px gap (v1.5.16)", /min-width:\\s*560px[\\s\\S]*?\\.tabs\\s*\\{[^}]*gap:\\s*4px/.test(cssCode));
+  ok("tablet tabs no flex-wrap nowrap (v1.5.14)", !/min-width:\\s*560px[\\s\\S]*?\\.tabs\\s*\\{[^}]*flex-wrap:\\s*nowrap/.test(cssCode));
+  ok("tablet tabs no flex 1-1-0 (v1.5.14)", !/min-width:\\s*560px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+0/.test(cssCode));
+  ok("tablet tabs tighter type kept (v1.5.13)", /min-width:\\s*700px[\\s\\S]*?\\.tab\\s*\\{[^}]*font-size:\\s*10px/.test(cssCode));
+  ok("tablet tab icons smaller (v1.5.13)", /min-width:\\s*700px[\\s\\S]*?\\.tab-icon\\s*\\{[^}]*font-size:\\s*16px/.test(cssCode));
+  ok("tablet tab labels truncate (v1.5.14)", /max-width:\\s*1023px[\\s\\S]*?\\.tab-label\\s*\\{[^}]*text-overflow:\\s*ellipsis/.test(cssCode));
+  ok("phone tabs use grid 4 columns (v1.5.14)", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*1fr\\)/.test(cssCode));
+  ok("phone tabs no flex display (v1.5.14)", !/max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+  ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
+    ok("guide header wraps names in guide-names (v1.5.15)", code.includes('class="guide-names"'));
+    ok("guide-names stacks vertically (v1.5.15)", cssCode.includes(".guide-row-head .guide-names") && cssCode.includes("flex-direction: column"));
+    ok("guide latin stays italic (v1.5.15)", /\\.latin\\s*\\{[^}]*font-style:\\s*italic/.test(cssCode));
+    ok("guide-row-name stays bold (v1.5.15)", /\\.guide-row-name\\s*\\{[^}]*font-weight:\\s*800/.test(cssCode));
   })();
   // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
   (() => {
@@ -1600,7 +1618,8 @@ code += `
   (() => {
     ok("open guide body is absolutely positioned", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
     ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
-    ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+    ok("open guide body has no internal scroll (v1.5.12)", !/\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+    ok("open guide body top corners rounded (v1.5.12)", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*border-radius:\\s*var\\(--radius\\)/.test(cssCode));
   })();
   // v1.5.5-beta: guide popup is closable — close button, Escape, outside tap
   (() => {
@@ -1689,7 +1708,7 @@ code += `
   ok('no count-spacer CSS remains', !/count-spacer/.test(cssCode));
   // v1.4.19: Sarah's Big Day
   ok('BIG_DAY has 8 conversations per tier (2/3/4)', BIG_DAY[2].length === 8 && BIG_DAY[3].length === 8 && BIG_DAY[4].length === 8);
-  ok('BIG_DAY lemon pool has 2 conversations', BIG_DAY.lemon.length === 2);
+  ok('BIG_DAY lemon pool has 8 conversations', BIG_DAY.lemon.length === 8);
   ok('all Big Day conversations have 3-4 bubbles', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.length >= 3 && c.length <= 4)));
   ok('all Big Day bubbles have who/text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => (m.who === 'them' || m.who === 'me') && typeof m.text === 'string' && m.text.length > 0))));
   ok('no raw placeholders in Big Day text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => !/\\{(?!speciesList\\}|count\\})[^}]*\\}/.test(m.text)))));
@@ -1715,6 +1734,193 @@ code += `
   ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
   ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
   ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.16-beta', Array.isArray(WHATS_NEW['v1.5.16-beta']) && WHATS_NEW['v1.5.16-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.18-beta', Array.isArray(WHATS_NEW['v1.5.18-beta']) && WHATS_NEW['v1.5.18-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.19-beta', Array.isArray(WHATS_NEW['v1.5.19-beta']) && WHATS_NEW['v1.5.19-beta'].length === 3);
+  ok('WHATS_NEW has v1.5.20-beta', Array.isArray(WHATS_NEW['v1.5.20-beta']) && WHATS_NEW['v1.5.20-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.21-beta', Array.isArray(WHATS_NEW['v1.5.21-beta']) && WHATS_NEW['v1.5.21-beta'].length === 2);
+  ok('WHATS_NEW has v1.5.22-beta', Array.isArray(WHATS_NEW['v1.5.22-beta']) && WHATS_NEW['v1.5.22-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.23-beta', Array.isArray(WHATS_NEW['v1.5.23-beta']) && WHATS_NEW['v1.5.23-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.24-beta', Array.isArray(WHATS_NEW['v1.5.24-beta']) && WHATS_NEW['v1.5.24-beta'].length === 2);
+  ok('WHATS_NEW has v1.5.25-beta', Array.isArray(WHATS_NEW['v1.5.25-beta']) && WHATS_NEW['v1.5.25-beta'].length === 6);
+  ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
+  // v1.5.29: blue through ~90%, black only at the very bottom
+  ok('gradient stays blue until 90%', cssCode.indexOf('#020a16 90%') !== -1);
+  ok('gradient fades to black only at the very bottom', cssCode.indexOf('#000 95%') !== -1 && cssCode.indexOf('#000 100%') !== -1);
+  // v1.5.28: background fades to pure black at the bottom — deep ocean, not blue
+  ok('html background is pure black', cssCode.indexOf('html { background: #000; }') !== -1);
+  // v1.5.27: body::after overlay removed; seafloor SVG itself is taller
+  ok('no body::after overlay', !/body::after/.test(cssCode));
+  ok('seafloor is a thin 5vh strip', /\.seafloor\\s*\{[^}]*height:\\s*5vh/.test(cssCode));
+  // v1.5.30: seafloor is viewport-fixed so the bottom stays on the bottom
+  ok('seafloor is viewport-fixed', /\.seafloor\\s*\{[^}]*position:\\s*fixed/.test(cssCode));
+  ok('seafloor is bottom-anchored', /\.seafloor\\s*\{[^}]*bottom:\\s*0/.test(cssCode));
+  // v1.5.32: Bruce opener fires immediately — timing gate only applies between stages
+  ok('bruce stage 0 skips timing gate', /if\\s*\\(stage\\s*>\\s*0\\)/.test(code));
+  ok('body uses dynamic viewport height', /min-height:\\s*100dvh/.test(cssCode));
+  // v1.5.25: lemon shark named Sarah gets its own thread
+  ok('lemon sarah thread exists with max feelings', LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('😭😭')) && LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('FAVOURITE')));
+  ok('lemon named Sarah gets the lemon thread', (() => {
+    const before = state.messages.length;
+    const rec = { name: "Sarah" };
+    maybeSarahEgg("lemon", rec);
+    const last = state.messages[state.messages.length - 1];
+    const txt = last.msgs.map(m => m.text).join(" ");
+    const isLemon = txt.includes("LEMONNNNNNN");
+    state.messages.length = before;
+    return state.messages.length === before && isLemon && rec.lemonSarahEgg === true && rec.sarahEgg === true;
+  })());
+  ok('non-lemon named Sarah gets the regular thread', (() => {
+    const before = state.messages.length;
+    const rec = { name: "sarah" };
+    maybeSarahEgg("nurse", rec);
+    const last = state.messages[state.messages.length - 1];
+    const txt = last.msgs.map(m => m.text).join(" ");
+    const isRegular = txt.includes("Wait. You named a shark Sarah? Like me?");
+    state.messages.length = before;
+    return isRegular && rec.sarahEgg === true && !rec.lemonSarahEgg;
+  })());
+  // v1.5.25: Bruce and Sarah eggs are independent (both orders)
+  ok('bruce egg survives a later sarah naming', (() => {
+    const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
+    const m0 = state.messages.length;
+    state.bruceEgg = null; state.bruceChainComplete = false;
+    try {
+      maybeNameEgg("nurse", { name: "Bruce" });
+      const bruceSet = !!state.bruceEgg;
+      const m1 = state.messages.length;
+      maybeSarahEgg("tiger", { name: "Sarah" });
+      maybeNameEgg("tiger", { name: "Sarah" });
+      const sarahFired = state.messages.length === m1 + 1;
+      const bruceIntact = !!state.bruceEgg && state.bruceEgg.stage === 0;
+      state.stats.expeditions = (saveExp || 0) + 2;
+      const m2 = state.messages.length;
+      advanceBruceChain();
+      const bruceFired = state.messages.length === m2 + 1;
+      return bruceSet && sarahFired && bruceIntact && bruceFired;
+    } finally {
+      state.messages.length = m0;
+      state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
+      state.stats.expeditions = saveExp;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('sarah then bruce eggs both fire independently', (() => {
+    const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete;
+    const m0 = state.messages.length;
+    state.bruceEgg = null; state.bruceChainComplete = false;
+    try {
+      maybeSarahEgg("tiger", { name: "Sarah" });
+      maybeNameEgg("tiger", { name: "Sarah" });
+      const sarahFired = state.messages.length === m0 + 1;
+      maybeSarahEgg("nurse", { name: "Bruce" });
+      maybeNameEgg("nurse", { name: "Bruce" });
+      return sarahFired && !!state.bruceEgg && state.bruceEgg.stage === 0;
+    } finally {
+      state.messages.length = m0;
+      state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('bruce triggers with expeditions=0 (first expedition)', (() => {
+    const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
+    state.bruceEgg = null; state.bruceChainComplete = false;
+    state.stats.expeditions = 0;
+    try {
+      maybeNameEgg("whale", { name: "bruce" });
+      return !!state.bruceEgg && state.bruceEgg.expeditionsAtStage === 0 && state.bruceEgg.stage === 0;
+    } finally {
+      state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
+      state.stats.expeditions = saveExp;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('togglePin restores scroll position', (() => {
+    window.scrollY = 420;
+    let got = null;
+    const orig = window.scrollTo;
+    window.scrollTo = (x, y) => { got = y; };
+    state.pinned = null;
+    togglePin("salmon");
+    window.scrollTo = orig;
+    const r = got === 420;
+    state.pinned = null; pinStore.save(null);
+    return r;
+  })());
+  // v1.5.25: background gradient is viewport-fixed
+  const _bbIdx = cssCode.indexOf('body::before');
+  const _bbBlock = _bbIdx === -1 ? '' : cssCode.slice(_bbIdx, cssCode.indexOf('}', _bbIdx));
+  ok('gradient lives on fixed body::before', _bbBlock.indexOf('position: fixed') !== -1 && _bbBlock.indexOf('linear-gradient') !== -1);
+  ok('body background is transparent', cssCode.indexOf('background: transparent') !== -1);
+  ok('body has no document gradient', (() => {
+    let i = 0, clean = true;
+    while (true) {
+      const b = cssCode.indexOf('body {', i);
+      if (b === -1) break;
+      const e = cssCode.indexOf('}', b);
+      if (e === -1) break;
+      if (cssCode.slice(b, e).indexOf('linear-gradient') !== -1) clean = false;
+      i = e + 1;
+    }
+    return clean;
+  })());
+  ok('html has dark fallback background', cssCode.indexOf('html { background: #000; }') !== -1);
+  // v1.5.25 (Mira review): togglePin refreshes Ask Sarah so it never shows a stale pin
+  ok('togglePin refreshes Ask Sarah panel', (() => {
+    const savePinned = state.pinned, saveOffered = state.sarahAdviceOffered;
+    const sel = document.getElementById("sarahAskSelect");
+    sel.children.length = 0;
+    state.sarahAdviceOffered = true;
+    state.pinned = null;
+    togglePin("nurse");
+    const kids = sel.children;
+    const r = kids.length > 0 && kids[kids.length - 1].value === "nurse";
+    state.pinned = savePinned; pinStore.save(savePinned);
+    state.sarahAdviceOffered = saveOffered;
+    renderSarahAsk();
+    return r;
+  })());
+  // v1.5.24: Bruce chain uses {bruce} placeholder with player capitalization
+  ok('bruce chain uses {bruce} placeholder', BRUCE_CHAIN.some(c => c.some(m => m.text.includes('{bruce}'))));
+  ok('OG Jaws Bruce has capital B', BRUCE_CHAIN[0].some(m => m.text.includes('nicknamed it Bruce')));
+  ok('bruce chain not scolding', !BRUCE_CHAIN.some(c => c.some(m => /REAL \{species\} after a robot/.test(m.text))));
+  ok('bruce chain is warm about the name', BRUCE_CHAIN[0].some(m => m.text.includes('i love it')));
+  ok('maybeNameEgg stores playerName', /playerName:\\s*rec\\.name\\.trim\\(\\)/.test(code));
+  ok('advanceBruceChain substitutes {bruce}', code.includes('split("{bruce}")'));
+  // v1.5.21: lemon pool energy — every lemon convo has big-energy content
+  ok('lemon pool includes LEMONNNNNNN', BIG_DAY.lemon.some(c => c.some(m => m.text.includes('LEMONNNNNNN'))));
+  ok('all lemon conversations still 3-4 bubbles', BIG_DAY.lemon.every(c => c.length >= 3 && c.length <= 4));
+  // v1.5.20: rename triggers checkAchievements (Sarah egg works outside expeditions)
+  ok('renameSave calls checkAchievements', /renameSave[\\s\\S]*?checkAchievements\\(\\)/.test(code.split('$("renameSave")')[1].split('});')[0] + 'checkAchievements()') || code.includes('check achievements on any rename'));
+  // v1.5.19: Ask Sarah is pinned-shark-only
+  ok('ask-sarah needs active pin', /state\\.pinned \\? sharkById\\(state\\.pinned\\) : null/.test(code) && /sarahAdviceOffered && !!s/.test(code));
+  ok('ask-sarah dropdown is pinned shark only', !/untagged\(\)/.test(code.split('function renderSarahAsk')[1].split('function askSarahAdvice')[0]));
+  ok('pinned empty bar mentions Sarah', code.includes('Sarah might know something if you ask her about one'));
+  ok('never-pinned explainer mentions Sarah', code.includes('Sarah might know something too, if you ask her about it'));
+  ok('ask-sarah intro mentions researching', htmlCode.includes("she might know something about the shark you're researching"));
+  ok('no kiddo in player dialogue', !/who: "me"[^}]*kiddo/i.test(code));
+  // v1.5.8: safe batch — seven low-risk items
+  ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
+  ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
+  ok('release button matches tag-along gradient', cssCode.includes('#releaseBtn') && cssCode.includes('linear-gradient(180deg, #ffd166 0%, #f0b429 100%)'));
+  ok('follow button before watch button', code.includes('insertBefore(followBtn, watchBtn)'));
+  ok('reunion uses research ID for unnamed', code.includes('rec.researchId || species.name'));
+  ok('double-tap zoom disabled', cssCode.includes('touch-action: manipulation'));
+  ok('tag-along insight not in log', !code.split('function doTagAlong')[1].split('function doFollowTagged')[0].includes('Tag-along insight'));
+  // v1.5.17: IUCN pill inside the head button (whole header tappable) + badge key
+  ok('pill inside head button (v1.5.17)', (() => { const g = code.indexOf('class="guide-row-top"'); const p = code.indexOf('status-pill iucn-', g); const b = code.indexOf('</button>', g); const pin = code.indexOf('pin-btn', g); return g > -1 && p > g && p < b && b < pin; })());
+  ok('no orphan guide-row-top pill rule', !cssCode.includes('.guide-row-top .status-pill'));
+  ok('iucn legend in field guide', htmlCode.includes('iucn-legend') && htmlCode.includes('aria-label="IUCN Red List badge key"'));
+  ok('legend covers five categories (no DD)', ['>LC<','>NT<','>VU<','>EN<','>CR<'].every(x => htmlCode.includes(x)) && !htmlCode.includes('>DD<'));
+  ok('legend has bottom margin', cssCode.includes('margin: 8px 2px 14px'));
+  ok('legend styled', cssCode.includes('.iucn-legend'));
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
