@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.18-beta";
+const VERSION = "v1.5.19-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,11 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.19-beta": [
+    "💡 <strong>Ask Sarah, about your shark.</strong> The Ask Sarah dropdown now lists only your pinned shark, and the prompt only appears while something is pinned.",
+    "📌 <strong>Pin bar points to Sarah.</strong> The empty pinned slot now mentions that Sarah might know something if you ask her about the pinned shark.",
+    "💬 <strong>No more \"kiddo.\"</strong> The player's thank-you lines to Sarah no longer call her kiddo.",
   ],
   "v1.5.18-beta": [
     "🏷️ <strong>Legend tidy-up.</strong> Removed Data Deficient from the IUCN key (none of our sharks have that status) and gave the legend more breathing room.",
@@ -1316,8 +1321,8 @@ function renderPinnedCard(list) {
   card.className = "pinned-card" + (s ? "" : " pinned-empty");
   if (!s) {
     card.innerHTML = state.hasPinnedBefore
-      ? `<p class="latin">📌 <em>Pinned sharks appear here.</em></p>`
-      : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
+      ? `<p class="latin">📌 <em>Pinned sharks appear here. Sarah might know something if you ask her about one.</em></p>`
+      : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you. Sarah might know something too, if you ask her about it.</span></p>`;
   } else {
     const done = !!state.tagged[s.id];
     /* v1.4.15-beta: pinned card shows the research description with key clues
@@ -2793,7 +2798,7 @@ function afterExpedition(plan) {
       { who: "them", text: "How's the shark hunting going?" },
       { who: "me", text: "Honestly? Struck out a few times. The water's been empty." },
       { who: "them", text: COUSIN_NUDGES[s.id] || "You'll get the next one. I believe in you." },
-      { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks, kiddo." }
+      { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks." }
     ];
     state.failures = 0;
   } else if (state.failures === 1 && !state.sarahAdviceOffered) {
@@ -2826,21 +2831,23 @@ function afterExpedition(plan) {
 }
 
 /* v0.17.1: Ask Sarah — player-initiated advice. The panel appears in the
-   Phone tab after the first failed trip; the player picks the species. */
+   Phone tab after the first failed trip.
+   v1.5.19-beta: the list only ever contains the pinned shark — she's advising
+   on the one you're actively researching, not the whole roster. The panel
+   only appears while there's an active pin. */
 function renderSarahAsk() {
   const panel = $("sarahAsk");
   if (!panel) return;
-  const show = !!state.sarahAdviceOffered && untagged().length > 0;
+  const s = state.pinned ? sharkById(state.pinned) : null;
+  const show = !!state.sarahAdviceOffered && !!s;
   panel.classList.toggle("hidden", !show);
   if (!show) return;
   const sel = $("sarahAskSelect");
   sel.innerHTML = "";
-  untagged().forEach(s => {
-    const o = document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.name;
-    sel.appendChild(o);
-  });
+  const o = document.createElement("option");
+  o.value = s.id;
+  o.textContent = s.name;
+  sel.appendChild(o);
 }
 function askSarahAdvice(sid) {
   const s = sharkById(sid);
@@ -2848,7 +2855,7 @@ function askSarahAdvice(sid) {
   pushThread([
     { who: "me", text: `I'm striking out — any advice on the ${s.name.toLowerCase()}?` },
     { who: "them", text: COUSIN_NUDGES[sid] || "You'll get the next one. I believe in you." },
-    { who: "me", text: "Thanks, kiddo. That's actually really helpful." }
+    { who: "me", text: "Thanks. That's actually really helpful." }
   ]);
   state.sarahAdviceOffered = false;
   saveMsgs(); // v0.17.1 review fix: a used offer stays used across reloads

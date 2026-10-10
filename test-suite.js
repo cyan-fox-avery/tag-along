@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.18-beta', VERSION === 'v1.5.18-beta');
+  ok('version v1.5.19-beta', VERSION === 'v1.5.19-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1736,6 +1736,14 @@ code += `
   ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
   ok('WHATS_NEW has v1.5.16-beta', Array.isArray(WHATS_NEW['v1.5.16-beta']) && WHATS_NEW['v1.5.16-beta'].length > 0);
   ok('WHATS_NEW has v1.5.18-beta', Array.isArray(WHATS_NEW['v1.5.18-beta']) && WHATS_NEW['v1.5.18-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.19-beta', Array.isArray(WHATS_NEW['v1.5.19-beta']) && WHATS_NEW['v1.5.19-beta'].length === 3);
+  // v1.5.19: Ask Sarah is pinned-shark-only
+  ok('ask-sarah needs active pin', /state\\.pinned \\? sharkById\\(state\\.pinned\\) : null/.test(code) && /sarahAdviceOffered && !!s/.test(code));
+  ok('ask-sarah dropdown is pinned shark only', !/untagged\(\)/.test(code.split('function renderSarahAsk')[1].split('function askSarahAdvice')[0]));
+  ok('pinned empty bar mentions Sarah', code.includes('Sarah might know something if you ask her about one'));
+  ok('never-pinned explainer mentions Sarah', code.includes('Sarah might know something too, if you ask her about it'));
+  ok('ask-sarah intro mentions researching', htmlCode.includes("she might know something about the shark you're researching"));
+  ok('no kiddo in player dialogue', !/who: "me"[^}]*kiddo/i.test(code));
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
