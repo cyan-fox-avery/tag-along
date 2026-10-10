@@ -218,6 +218,11 @@ body { overflow-x: clip; }
   min-width: 0; box-sizing: border-box;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
+/* v1.5.11: locked Archive tab — visible but greyed out and unclickable.
+   Keeps the tab count stable at 8 so the bar never re-wraps. */
+.tab[disabled], .tab.tab-locked {
+  opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6);
+}
 .count-badge {
   background: var(--bg-deep); color: var(--ink); border-radius: 999px;
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
@@ -1121,17 +1126,7 @@ select option:disabled { color: #7a8a9e; }
 /* v1.4.15-beta: pinned research preview — clues in bold, same font/size */
 .pinned-research { font-size: 13px; line-height: 1.5; color: #dcebf5; margin: 8px 0 4px; }
 .pinned-research strong { font-weight: 700; }
-.pin-jump {
-  width: 100%; min-height: 48px; border-radius: 12px; font-size: 1rem; font-weight: 700;
-  background: rgba(255,209,102,0.15); border: 1px solid rgba(255,209,102,0.4);
-  color: var(--ink); cursor: pointer;
-}
-.pin-flash { animation: pin-flash 1.2s ease; }
-@keyframes pin-flash {
-  0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
-  30% { box-shadow: 0 0 0 3px rgba(255,209,102,0.7); }
-}
-@media (prefers-reduced-motion: reduce) { .pin-flash { animation: none; } }
+
 /* v0.20.0: pinned-shark line on the Expedition tab. */
 .expedition-pin {
   background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.3);
