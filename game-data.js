@@ -141,11 +141,14 @@ const NICOLE_THREAD = [
 ];
 
 /* v0.23.0: BRUCE easter egg chain — LOCKED DESIGN (2026-10-06).
-   Trigger: player names any tagged shark "Bruce" (maybeNameEgg in script.js).
-   Nothing happens immediately — no popup, no toast. Stages unfold slowly via
-   advanceBruceChain (2+ expeditions or 12+ hours apart), so Sarah "notices"
-   on her own time. {species} is replaced at push time with the Bruce shark's
-   species (lowercase). The hidden achievement unlocks after the final stage.
+   Trigger: player names any tagged shark "bruce" (any caps; maybeNameEgg in
+   script.js). Nothing happens immediately — no popup, no toast. Stages unfold
+   slowly via advanceBruceChain (2+ expeditions or 12+ hours apart), so Sarah
+   "notices" on her own time. {species} is replaced at push time with the Bruce
+   shark's species (lowercase). {bruce} is replaced with the player's exact
+   name input (their capitalization preserved). OG Jaws/Nemo references always
+   use "Bruce" with a capital B. The hidden achievement unlocks after the final
+   stage.
    Voice: Sarah texting — casual, lowercase, warm; precise where facts matter.
    Facts: the Jaws mechanical shark was nicknamed Bruce after Spielberg's
    lawyer; it malfunctioned constantly in salt water; Spielberg showed it
@@ -153,10 +156,10 @@ const NICOLE_THREAD = [
 const BRUCE_CHAIN = [
   /* Stage 1 — the opening + the nickname reveal. */
   [
-    { who: "them", text: "bruce huh" },
+    { who: "them", text: "{bruce} huh" },
     { who: "them", text: "okay. do you know how deep this rabbit hole goes" },
     { who: "me", text: "It's from Jaws. I figured you'd notice eventually." },
-    { who: "them", text: "you named a REAL {species} after a robot. the jaws shark was mechanical — built for the movie — and the crew nicknamed it bruce. after spielberg's lawyer. the bruce you named is out there actually swimming and his namesake was a machine." },
+    { who: "them", text: "oh i noticed. and honestly? i love it. the jaws shark was mechanical — built for the movie — and the crew nicknamed it Bruce, after spielberg's lawyer. but the {bruce} you named is out there actually swimming. a real {species} carrying the best name in the database." },
   ],
   /* Stage 2 — the notorious technical problems. */
   [
@@ -178,9 +181,9 @@ const BRUCE_CHAIN = [
   ],
   /* Stage 5 — the contrast: the player's actual Bruce. The punchline. */
   [
-    { who: "them", text: "and then there's the bruce you named. a real {species}. you found it, tagged it, let it go. you know what it actually does all day." },
+    { who: "them", text: "and then there's the {bruce} you named. a real {species}. you found it, tagged it, let it go. you know what it actually does all day." },
     { who: "me", text: "It's got a research ID and everything." },
-    { who: "them", text: "exactly. they needed a monster so they built one out of metal. you went and met the real animal instead. bruce the robot, bruce the joke — and bruce, just a shark, doing shark things. anyway. 10/10 name." },
+    { who: "them", text: "exactly. they needed a monster so they built one out of metal. you went and met the real animal instead. Bruce the robot, Bruce the joke — and {bruce}, just a shark, doing shark things. anyway. 10/10 name." },
   ],
 ];
 
