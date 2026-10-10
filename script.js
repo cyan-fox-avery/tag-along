@@ -120,6 +120,10 @@ const WHATS_NEW = {
   "v1.5.25-beta": [
     "🌊 <strong>One-screen ocean.</strong> The background gradient is now fixed to the viewport — light at the top of the screen, dark at the bottom, always — so every tab shows the same full gradient whether it's a long list or an empty page.",
     "📌 <strong>Pinning stays put.</strong> Tapping the pin button no longer makes the page jump — your scroll position is preserved.",
+    "🍋😭 <strong>Lemon Sarah.</strong> Name specifically the lemon shark \"Sarah\" and get a whole separate reaction thread — lemons are her favourite, and she is not okay.",
+    "⬛ <strong>Solid seafloor.</strong> The ground at the bottom of the page is now solid black and fully opaque — no more background showing through like it's floating.",
+    "🦈 <strong>Bruce chain polish.</strong> Later stages now re-establish context (slow-burn threads arrive expeditions apart), and the trigger no longer depends on fragile state.",
+    "💡 <strong>Ask Sarah stays current.</strong> Pinning a shark now refreshes Ask Sarah immediately, and opening the Phone tab re-syncs it — never a stale pin (Mira's review).",
   ],
   "v1.5.24-beta": [
     "\U0001F988 <strong>Bruce, your way.</strong> Sarah's Bruce chain now uses your exact capitalization for your shark, while the original Jaws shark is always \"Bruce\".",
@@ -1150,6 +1154,9 @@ document.querySelectorAll(".tab").forEach(btn => {
       if (badge) badge.classList.add("hidden");
     }
     if (btn.dataset.tab === "phone") {
+      /* v1.5.25-beta (Mira review): defensive sync — Ask Sarah always reflects
+         the current pin when the Phone tab opens, never a stale one. */
+      renderSarahAsk();
       /* v0.12.0: like a real phone — the conversation opens pinned to the
          newest message. renderMessages' own scroll can't do this: it runs
          while the tab is hidden (display:none), where scrollTop has no
@@ -1309,6 +1316,7 @@ function togglePin(id) {
   renderResearch();
   renderExpeditionPin();
   renderPinHint(); // v0.22.0
+  renderSarahAsk(); // v1.5.25-beta (Mira review): Ask Sarah must reflect the new pin immediately
   window.scrollTo(0, keepY);
 }
 /* v0.20.0: jump to the pinned shark's field-guide entry. Mira review fix -
@@ -2067,6 +2075,9 @@ function doEncounter(species, plan) {
       resightBtn.type = "button";
       resightBtn.textContent = "📝 Log re-sighting";
       resightBtn.addEventListener("click", () => {
+        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice. */
+        if (resightBtn.dataset.done) return;
+        resightBtn.dataset.done = "true";
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
@@ -3821,8 +3832,16 @@ function maybeSarahEgg(speciesId, rec) {
   if (!rec || rec.sarahEgg) return;
   if ((rec.name || "").trim().toLowerCase() === "sarah") {
     rec.sarahEgg = true;
-    store.save(state.tagged);
-    pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
+    /* v1.5.25-beta: naming the LEMON shark "Sarah" gets its own thread —
+       lemons are her favourite. Separate from the regular Sarah thread. */
+    if (speciesId === "lemon" && !rec.lemonSarahEgg) {
+      rec.lemonSarahEgg = true;
+      store.save(state.tagged);
+      pushThread(LEMON_SARAH_EGG_THREAD.map(m => ({ ...m })));
+    } else {
+      store.save(state.tagged);
+      pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
+    }
   }
 }
 
@@ -3859,7 +3878,13 @@ function maybeNameEgg(speciesId, rec) {
     // Bruce: ANY shark. No immediate message — the slow chain begins silently.
     if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
       /* v1.5.24: keep the player's exact capitalization for {bruce} in the chain. */
-      state.bruceEgg = { stage: 0, sharkId: speciesId, playerName: rec.name.trim(), started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+      /* v1.5.25-beta: defensive expedition count — the trigger must never
+         depend on state.stats being fully formed (first-expedition safety).
+         Previously a missing state.stats would throw inside the try/catch
+         and silently skip setting bruceEgg. */
+      let expCount = 0;
+      try { expCount = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0; } catch {}
+      state.bruceEgg = { stage: 0, sharkId: speciesId, playerName: rec.name.trim(), started: Date.now(), lastAdvance: 0, expeditionsAtStage: expCount };
       try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
       // Deliberately no pushThread here. Sarah will notice... eventually.
     }
@@ -3876,7 +3901,10 @@ function advanceBruceChain() {
   if (!state.bruceEgg || state.bruceChainComplete) return;
   if (typeof BRUCE_CHAIN === "undefined") return;
   const now = Date.now();
-  const expeditionsSince = (state.stats.expeditions || 0) - (state.bruceEgg.expeditionsAtStage || 0);
+  /* v1.5.25-beta: defensive reads — never let missing stats block the chain. */
+  let _expNow = 0;
+  try { _expNow = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0; } catch {}
+  const expeditionsSince = _expNow - (state.bruceEgg.expeditionsAtStage || 0);
   const hoursSince = (now - (state.bruceEgg.lastAdvance || state.bruceEgg.started)) / 3600000;
   // Need either 2+ expeditions or 12+ hours since last stage
   if (expeditionsSince < 2 && hoursSince < 12) return;
@@ -3911,7 +3939,7 @@ function advanceBruceChain() {
   })));
   state.bruceEgg.stage = stage + 1;
   state.bruceEgg.lastAdvance = now;
-  state.bruceEgg.expeditionsAtStage = state.stats.expeditions || 0;
+  state.bruceEgg.expeditionsAtStage = _expNow;
   // If that was the final stage, complete the chain NOW (not on a later call)
   if (state.bruceEgg.stage >= BRUCE_CHAIN.length) {
     state.bruceChainComplete = true;
