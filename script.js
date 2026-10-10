@@ -129,6 +129,11 @@ const WHATS_NEW = {
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
   ],
+  "v1.6.1-beta": [
+    "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",
+    "🃏 <strong>Horizontal collection cards on desktop.</strong> Tagged-shark cards lay out side-by-side (art left, details right) on wide screens.",
+    "⭕ <strong>Checklist-style tag status.</strong> Field-guide rows and the pinned card now show an empty circle that fills green when the shark is tagged — no more ✅.",
+  ],
   "v1.5.32-beta": [
     "🦈 <strong>Bruce reacts on the first catch.</strong> Naming a shark Bruce now gets Sarah's opener right away — the slow-burn spacing applies between later stages, not before the first one.",
   ],
@@ -650,7 +655,8 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
-/* v0.15.0: no explore mode, no pinch — zoom is buttons/wheel only.
+/* v0.15.0: no explore mode — zoom is buttons/wheel.
+   v1.6.1-beta: pinch-to-zoom restored then reverted (iPad: it didn't engage).
    touch-action follows the zoom level, decided before any touch begins:
    at 1x the page owns one-finger drags (the page scrolls); zoomed in,
    the map owns them (one finger pans). No mid-gesture races, no modes. */
@@ -1397,7 +1403,7 @@ function renderPinnedCard(list) {
       </div>
       <div class="pinned-body">
         <div>
-          ${done ? "✅ " : ""}<strong>${s.name}</strong><br>
+          <span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span><strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
@@ -1575,7 +1581,7 @@ function renderResearch() {
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
           <span class="guide-names">
-            <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
+            <span class="guide-row-name"><span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span>${s.name}</span>
             <span class="latin">${s.latin}</span>
           </span>
           <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
@@ -4044,10 +4050,12 @@ function renderCollection() {
     cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}`);
     cell.innerHTML = `
       <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
-      ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
-      <div class="grid-id">${esc(t.researchId)}</div>
-      <h3>${s.name}</h3>
-      <p class="latin">${s.latin}</p>`;
+      <div class="grid-cell-text">
+        ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
+        <div class="grid-id">${esc(t.researchId)}</div>
+        <h3>${s.name}</h3>
+        <p class="latin">${s.latin}</p>
+      </div>`;
     cell.addEventListener("click", () => openDetail(s.id));
     list.appendChild(cell);
   });
@@ -4579,11 +4587,11 @@ onMapBtn("mapZoomReset", () => { mapFocusClear(); mapZoom = 1; mapCX = MAP_W / 2
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
    then applies the new zoom (clamped). Used by wheel; buttons use the
-   fixed-step zoom below. (v0.15.0: pinch removed.) */
+   fixed-step zoom below. */
 let suppressMarkerClick = false;
 let mapRenderQueued = false;
 function requestMapRender() {
-  /* rAF-throttle so pinch/pan stay smooth on phones; direct render where
+  /* rAF-throttle so pan stays smooth on phones; direct render where
      requestAnimationFrame doesn't exist (tests, old webviews). */
   if (typeof requestAnimationFrame === "function") {
     if (mapRenderQueued) return;
@@ -4685,13 +4693,11 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
   mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
-/* v0.15.0: touchscreen gestures — one-finger pan when zoomed, nothing else.
-   Pointer Events give one code path for mouse and touch. Move/up/cancel
-   listen on window so a finger sliding off the map can't strand a pointer.
-   Pinch-to-zoom and explore mode are gone: zoom is +/- buttons (and wheel
-   on desktop) only. At 1x the browser owns one-finger drags (touch-action:
-   pan-y, so the page scrolls); zoomed in, the map takes them (touch-action:
-   none, set by renderMap before any touch begins). */
+/* v1.6.1-beta (revised): pinch-to-zoom removed after iPad testing
+   showed the gesture didn't engage. Buttons/wheel zoom and one-finger
+   pan (when zoomed in) are unchanged. touch-action still follows the zoom
+   level, decided before any touch begins: at 1x the page owns one-finger
+   drags (the page scrolls); zoomed in, the map owns them (one finger pans). */
 (function initMapGestures() {
   const wrap = $("worldMapWrap");
   if (!wrap || typeof window === "undefined") return;
@@ -4727,17 +4733,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0) {
-      if (movedMax > 10) suppressMarkerClick = true;
-    } else if (pts.size === 1) {
-      // A lifted finger during an (unsupported) two-finger touch collapses
-      // back into a normal one-finger pan: re-anchor the remaining finger
-      // so the map doesn't jump from its older position.
-      const p = [...pts.values()][0];
-      downX = panX = p.x;
-      downY = panY = p.y;
-      movedMax = 0;
-    }
+    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
