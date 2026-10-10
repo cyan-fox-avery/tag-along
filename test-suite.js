@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.5-beta', VERSION === 'v1.4.5-beta');
+  ok('version v1.4.6-beta', VERSION === 'v1.4.6-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1593,6 +1593,8 @@ code += `
   ok("WHATS_NEW has v1.4.3-beta", !!(WHATS_NEW["v1.4.3-beta"] && WHATS_NEW["v1.4.3-beta"].length));
   ok("WHATS_NEW has v1.4.4-beta", !!(WHATS_NEW["v1.4.4-beta"] && WHATS_NEW["v1.4.4-beta"].length));
   ok("WHATS_NEW has v1.4.5-beta", !!(WHATS_NEW["v1.4.5-beta"] && WHATS_NEW["v1.4.5-beta"].length));
+  ok("WHATS_NEW has v1.4.6-beta", !!(WHATS_NEW["v1.4.6-beta"] && WHATS_NEW["v1.4.6-beta"].length));
+  ok("collection empty-note spans grid", /\.collection-grid\s+\.empty-note\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/.test(cssCode));
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
