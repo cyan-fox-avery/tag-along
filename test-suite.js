@@ -1745,7 +1745,84 @@ code += `
   ok('WHATS_NEW has v1.5.22-beta', Array.isArray(WHATS_NEW['v1.5.22-beta']) && WHATS_NEW['v1.5.22-beta'].length === 1);
   ok('WHATS_NEW has v1.5.23-beta', Array.isArray(WHATS_NEW['v1.5.23-beta']) && WHATS_NEW['v1.5.23-beta'].length === 1);
   ok('WHATS_NEW has v1.5.24-beta', Array.isArray(WHATS_NEW['v1.5.24-beta']) && WHATS_NEW['v1.5.24-beta'].length === 2);
-  ok('WHATS_NEW has v1.5.25-beta', Array.isArray(WHATS_NEW['v1.5.25-beta']) && WHATS_NEW['v1.5.25-beta'].length === 2);
+  ok('WHATS_NEW has v1.5.25-beta', Array.isArray(WHATS_NEW['v1.5.25-beta']) && WHATS_NEW['v1.5.25-beta'].length === 6);
+  // v1.5.25: lemon shark named Sarah gets its own thread
+  ok('lemon sarah thread exists with max feelings', LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('😭😭')) && LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('FAVOURITE')));
+  ok('lemon named Sarah gets the lemon thread', (() => {
+    const before = state.messages.length;
+    const rec = { name: "Sarah" };
+    maybeSarahEgg("lemon", rec);
+    const last = state.messages[state.messages.length - 1];
+    const txt = last.msgs.map(m => m.text).join(" ");
+    const isLemon = txt.includes("LEMONNNNNNN");
+    state.messages.length = before;
+    return state.messages.length === before && isLemon && rec.lemonSarahEgg === true && rec.sarahEgg === true;
+  })());
+  ok('non-lemon named Sarah gets the regular thread', (() => {
+    const before = state.messages.length;
+    const rec = { name: "sarah" };
+    maybeSarahEgg("nurse", rec);
+    const last = state.messages[state.messages.length - 1];
+    const txt = last.msgs.map(m => m.text).join(" ");
+    const isRegular = txt.includes("Wait. You named a shark Sarah? Like me?");
+    state.messages.length = before;
+    return isRegular && rec.sarahEgg === true && !rec.lemonSarahEgg;
+  })());
+  // v1.5.25: Bruce and Sarah eggs are independent (both orders)
+  ok('bruce egg survives a later sarah naming', (() => {
+    const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
+    const m0 = state.messages.length;
+    state.bruceEgg = null; state.bruceChainComplete = false;
+    try {
+      maybeNameEgg("nurse", { name: "Bruce" });
+      const bruceSet = !!state.bruceEgg;
+      const m1 = state.messages.length;
+      maybeSarahEgg("tiger", { name: "Sarah" });
+      maybeNameEgg("tiger", { name: "Sarah" });
+      const sarahFired = state.messages.length === m1 + 1;
+      const bruceIntact = !!state.bruceEgg && state.bruceEgg.stage === 0;
+      state.stats.expeditions = (saveExp || 0) + 2;
+      const m2 = state.messages.length;
+      advanceBruceChain();
+      const bruceFired = state.messages.length === m2 + 1;
+      return bruceSet && sarahFired && bruceIntact && bruceFired;
+    } finally {
+      state.messages.length = m0;
+      state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
+      state.stats.expeditions = saveExp;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('sarah then bruce eggs both fire independently', (() => {
+    const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete;
+    const m0 = state.messages.length;
+    state.bruceEgg = null; state.bruceChainComplete = false;
+    try {
+      maybeSarahEgg("tiger", { name: "Sarah" });
+      maybeNameEgg("tiger", { name: "Sarah" });
+      const sarahFired = state.messages.length === m0 + 1;
+      maybeSarahEgg("nurse", { name: "Bruce" });
+      maybeNameEgg("nurse", { name: "Bruce" });
+      return sarahFired && !!state.bruceEgg && state.bruceEgg.stage === 0;
+    } finally {
+      state.messages.length = m0;
+      state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('bruce triggers with expeditions=0 (first expedition)', (() => {
+    const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
+    state.bruceEgg = null; state.bruceChainComplete = false;
+    state.stats.expeditions = 0;
+    try {
+      maybeNameEgg("whale", { name: "bruce" });
+      return !!state.bruceEgg && state.bruceEgg.expeditionsAtStage === 0 && state.bruceEgg.stage === 0;
+    } finally {
+      state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
+      state.stats.expeditions = saveExp;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
   ok('togglePin restores scroll position', (() => {
     window.scrollY = 420;
     let got = null;
@@ -1776,6 +1853,21 @@ code += `
     return clean;
   })());
   ok('html has dark fallback background', cssCode.indexOf('html { background: #020a16; }') !== -1);
+  // v1.5.25 (Mira review): togglePin refreshes Ask Sarah so it never shows a stale pin
+  ok('togglePin refreshes Ask Sarah panel', (() => {
+    const savePinned = state.pinned, saveOffered = state.sarahAdviceOffered;
+    const sel = document.getElementById("sarahAskSelect");
+    sel.children.length = 0;
+    state.sarahAdviceOffered = true;
+    state.pinned = null;
+    togglePin("nurse");
+    const kids = sel.children;
+    const r = kids.length > 0 && kids[kids.length - 1].value === "nurse";
+    state.pinned = savePinned; pinStore.save(savePinned);
+    state.sarahAdviceOffered = saveOffered;
+    renderSarahAsk();
+    return r;
+  })());
   // v1.5.24: Bruce chain uses {bruce} placeholder with player capitalization
   ok('bruce chain uses {bruce} placeholder', BRUCE_CHAIN.some(c => c.some(m => m.text.includes('{bruce}'))));
   ok('OG Jaws Bruce has capital B', BRUCE_CHAIN[0].some(m => m.text.includes('nicknamed it Bruce')));
