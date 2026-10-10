@@ -894,13 +894,6 @@ select option:disabled { color: #7a8a9e; }
 .guide-head { display: flex; gap: 12px; align-items: flex-start; }
 .guide-title { flex: 1; min-width: 0; }
 .guide-title h3 { margin: 0; font-size: 18px; }
-.guide-sketch {
-  width: 40%; max-width: 175px; flex: none;
-  background: #0d2438; border: 1px dashed #3d6076; border-radius: 10px;
-  padding: 6px; text-align: center;
-}
-.guide-sketch svg { width: 100%; height: auto; display: block; }
-.sketch-cap { font-size: 10px; color: var(--ink-dim); font-style: italic; margin: 4px 0 0; }
 
 /* v0.6.0: trophy shelf — sits ABOVE the grid, never in it */
 .trophy-shelf {
@@ -1185,7 +1178,6 @@ select option:disabled { color: #7a8a9e; }
   color: var(--ink); cursor: pointer;
 }
 .pinned-body { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
-.pinned-sketch { width: 96px; flex: none; }
 /* v1.4.15-beta: pinned research preview — clues in bold, same font/size */
 .pinned-research { font-size: 13px; line-height: 1.5; color: #dcebf5; margin: 8px 0 4px; }
 .pinned-research strong { font-weight: 700; }
@@ -1209,7 +1201,6 @@ select option:disabled { color: #7a8a9e; }
   font-size: 0.95rem; cursor: pointer; user-select: none;
 }
 .pace-toggle input { width: 22px; height: 22px; accent-color: var(--teal); flex: none; }
-.guide-row-body .guide-sketch { margin: 12px auto; }
 .guide-row-body .research-text { margin-top: 4px; }
 
 /* v0.7.0: sightings log */
