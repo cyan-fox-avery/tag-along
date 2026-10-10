@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.1-beta', VERSION === 'v1.6.1-beta');
+  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -177,7 +177,7 @@ code += `
   // Untagged species are skipped before rendering, so photos still require
   // an actual tag.
   const archiveUiCode = fs.readFileSync(path.join(DIR, 'archive-ui.js'), 'utf8');
-  ok('archive skips untagged species', archiveUiCode.includes('if (!t) return;'));
+  ok('archive skips untagged species', archiveUiCode.includes('if (!state.tagged[s.id]) return false;'));
   ok('archive has no locked list', !archiveUiCode.includes('lockedRows') && !archiveUiCode.includes('Still to discover'));
   // v1.5.22: Archive expanded cards overlay like the Research tab
   ok('archive toggle adds open class', archiveUiCode.includes('row.classList.toggle("open", !isHidden)'));
@@ -1993,6 +1993,26 @@ code += `
   ok('pinch-to-zoom removed (no pinch state)', !/pinchStartDist|pinching|pinchMoved/.test(fileCode));
   ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
   ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
+
+  // v1.6.3-beta: Archive search + sort
+  ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
+  ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
+  ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
+  ok('archiveMatches filters by name', (() => {
+    archiveFilters.q = 'nurse';
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const thresher = SHARKS.find(s => s.id === 'thresher');
+    const r = archiveMatches(nurse) && !archiveMatches(thresher);
+    archiveFilters.q = '';
+    return r;
+  })());
+  ok('archiveSortCompare sorts A-Z', (() => {
+    archiveFilters.sort = 'name';
+    const a = SHARKS.find(s => s.id === 'thresher');
+    const b = SHARKS.find(s => s.id === 'nurse');
+    return archiveSortCompare(a, b) > 0 && archiveSortCompare(b, a) < 0;
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

@@ -265,6 +265,17 @@
           <h2>Wild Archive</h2>
           <p>You know these sharks now. Here they really are — real photographs and footage of the animals you tagged and released, hand-picked for this archive.</p>
         </div>
+        <!-- v1.6.3-beta: Archive search + sort -->
+        <div class="guide-tools">
+          <input id="archiveSearch" type="search" class="guide-search"
+            placeholder="Search your tagged sharks…" aria-label="Search your tagged sharks" autocomplete="off">
+        </div>
+        <div class="chip-row" role="group" aria-label="Sort archive">
+          <button type="button" class="chip" data-asort="name" aria-pressed="true">Name A–Z</button>
+          <button type="button" class="chip" data-asort="newest" aria-pressed="false">Newest first</button>
+          <button type="button" class="chip" data-asort="oldest" aria-pressed="false">Oldest first</button>
+          <button type="button" class="chip" data-asort="iucn" aria-pressed="false">IUCN status</button>
+        </div>
         <div id="archiveList" class="guide-list"></div>
       </section>
       <section id="tab-achievements" class="panel">
