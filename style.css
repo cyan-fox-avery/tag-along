@@ -322,7 +322,7 @@ body { overflow-x: clip; }
 .status-pill.iucn-CR { background: #2a1a3a; border-color: #6a3a9a; color: #e8d8ff; }  /* Critically Endangered — dark purple */
 .status-pill.iucn-DD { background: #4a4a4a; border-color: #6a6a6a; }  /* Data Deficient — grey */
 /* v1.5.17-beta: compact IUCN badge key at the top of the field guide */
-.iucn-legend { font-size: 11px; color: var(--ink-dim); margin: 8px 2px 0; line-height: 2.1; }
+.iucn-legend { font-size: 11px; color: var(--ink-dim); margin: 8px 2px 14px; line-height: 2.1; }
 .iucn-legend .status-pill { font-size: 10px; padding: 1px 8px; margin: 0 2px 0 0; vertical-align: 1px; }
 /* v1.4.2: full IUCN status line inside expanded field-guide entries */
 .iucn-full { font-size: 13px; color: var(--ink-dim); margin: 6px 0; }
