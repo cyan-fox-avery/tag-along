@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.8-beta";
+const VERSION = "v1.5.9-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,10 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.9-beta": [
+    "☀️ <strong>White band fixed for real.</strong> The sun-ray fan is now exactly viewport-sized — the oversized layers were what broke iPad Safari's layout (white cutoff) in the first place.",
+    "📑 <strong>Tabs work again.</strong> Removed the transform that was breaking tap hit-testing on the sticky tab bar. The fan fix above was the real cure.",
   ],
   "v1.5.8-beta": [
     "☀️ <strong>Steadier sun rays.</strong> The light fan now keeps a persistent compositing layer, so it no longer breaks when you scroll down and back up on iPad.",
