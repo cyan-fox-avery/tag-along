@@ -58,16 +58,17 @@ body {
 .caustics span {
   position: absolute; top: -120px; left: 2%; height: 2000px;
   transform-origin: 50% 0; /* pivot around the sun point at far top-left */
-  /* v1.4.5: long soft streak — the glow is a tall narrow ellipse anchored at
-     the sun point, bright near the sun and dissolving along its own length,
-     so each ray visibly fans across the screen. The ellipse fades to
-     transparent at the span's own edges (soft on every side), so no ray can
-     ever draw a hard boundary — no container mask needed. */
-  background: radial-gradient(ellipse 50% 45% at 50% 12%,
+  /* v1.4.13: long soft streak — the glow is a tall narrow ellipse whose peak
+     sits near the sun point and whose light runs nearly the full 2000px length,
+     so each ray visibly sweeps from the top-left sun across the whole screen.
+     The ellipse fades to transparent at the span's own edges (soft on every
+     side), so no ray can ever draw a hard boundary — no container mask needed.
+     Same peak brightness as before; only the reach changed. */
+  background: radial-gradient(ellipse 55% 75% at 50% 18%,
     rgba(218,242,255,0.28) 0%,
-    rgba(205,234,255,0.13) 45%,
-    rgba(195,230,255,0.05) 68%,
-    transparent 88%);
+    rgba(205,234,255,0.14) 45%,
+    rgba(195,230,255,0.06) 72%,
+    transparent 96%);
   opacity: 0;
   animation: ray-life 18s ease-in-out infinite;
 }
@@ -94,31 +95,34 @@ body {
   100% { opacity: 0;    transform: rotate(calc(var(--ray-angle) + 2.5deg)) scaleX(0.55); }
 }
 /* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling.
-   v1.4.7: bubbles travel in little clusters (bursts/trails), like real air bubbles — same 8 bubbles
-   and same rise durations as before (identical total spawn rate), but grouped: cluster-mates share
-   a horizontal lane and staggered delays so they rise together as a burst. Bigger bubbles rise faster. */
+   v1.4.13: bubbles now rise in little COLUMNS — each lane emits a quick vertical burst
+   (3 bubbles appearing one after another, like a real air trail), then goes quiet while
+   another column fires elsewhere. All 8 bubbles share a 44s cycle; each column's burst
+   occupies ~13s with the rest quiet, so there's usually one column active at a time. */
 .bubbles { position: fixed; inset: 0; pointer-events: none; }
 .bubbles span {
   position: absolute; bottom: -20px; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
-  animation: bubble-rise linear infinite;
+  animation: bubble-column 44s linear infinite;
+  opacity: 0;
 }
-/* cluster A — left lane */
-.bubbles span:nth-child(1) { left: 13%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: -3s; }
-.bubbles span:nth-child(3) { left: 16.5%; width: 12px; height: 12px; animation-duration: 19s; animation-delay: -4.2s; }
-.bubbles span:nth-child(7) { left: 19.5%; width: 11px; height: 11px; animation-duration: 21s; animation-delay: -5.4s; }
-/* cluster B — middle lane */
-.bubbles span:nth-child(2) { left: 53%; width: 6px; height: 6px; animation-duration: 22s; animation-delay: -11s; }
-.bubbles span:nth-child(4) { left: 56.5%; width: 7px; height: 7px; animation-duration: 25s; animation-delay: -12.4s; }
-.bubbles span:nth-child(8) { left: 59.5%; width: 6px; height: 6px; animation-duration: 24s; animation-delay: -13.6s; }
-/* cluster C — right lane */
-.bubbles span:nth-child(5) { left: 80%; width: 9px; height: 9px; animation-duration: 17s; animation-delay: -5s; }
-.bubbles span:nth-child(6) { left: 83.5%; width: 5px; height: 5px; animation-duration: 28s; animation-delay: -6.3s; }
-@keyframes bubble-rise {
-  from { transform: translateY(0) translateX(0); opacity: 0; }
-  10% { opacity: 0.8; }
-  90% { opacity: 0.6; }
-  to { transform: translateY(-105vh) translateX(24px); opacity: 0; }
+/* column A — left lane, burst at cycle start */
+.bubbles span:nth-child(1) { left: 13%; width: 10px; height: 10px; animation-delay: -1s; }
+.bubbles span:nth-child(2) { left: 15.5%; width: 12px; height: 12px; animation-delay: -2.5s; }
+.bubbles span:nth-child(3) { left: 18%; width: 8px; height: 8px; animation-delay: -4s; }
+/* column B — middle lane, burst ~15s into the cycle */
+.bubbles span:nth-child(4) { left: 50%; width: 7px; height: 7px; animation-delay: -16s; }
+.bubbles span:nth-child(5) { left: 52.5%; width: 6px; height: 6px; animation-delay: -17.5s; }
+.bubbles span:nth-child(6) { left: 55%; width: 9px; height: 9px; animation-delay: -19s; }
+/* column C — right lane, burst ~30s into the cycle */
+.bubbles span:nth-child(7) { left: 78%; width: 9px; height: 9px; animation-delay: -31s; }
+.bubbles span:nth-child(8) { left: 80.5%; width: 5px; height: 5px; animation-delay: -32.5s; }
+@keyframes bubble-column {
+  /* rise window is the first ~30% of the cycle (~13s); the long tail is quiet */
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  4% { opacity: 0.8; }
+  28% { transform: translateY(-105vh) translateX(24px); opacity: 0.55; }
+  32%, 100% { transform: translateY(-105vh) translateX(24px); opacity: 0; }
 }
 /* Seafloor silhouette along the bottom. */
 .seafloor {
