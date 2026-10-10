@@ -374,6 +374,36 @@ select option:disabled { color: #7a8a9e; }
 @keyframes porthole-shafts {
   from { transform: translateX(12px); opacity: 0.7; }
   to   { transform: translateX(-12px); opacity: 1; }
+
+/* v1.4.2: porthole bubbles — 2-5 small bubbles rising from the bottom at a
+   time, subtle like everything else. Staggered durations/delays keep a few
+   visible while others are between cycles. */
+.dive-scene.porthole .porthole-bubbles {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  overflow: hidden;
+}
+.dive-scene.porthole .porthole-bubbles span {
+  position: absolute; bottom: -14px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.08);
+  animation: porthole-bubble linear infinite;
+}
+/* v1.4.2: bigger bubbles rise faster, like real life */
+.dive-scene.porthole .porthole-bubbles span:nth-child(1) { left: 18%; width: 8px; height: 8px; animation-duration: 7s; animation-delay: -2s; }
+.dive-scene.porthole .porthole-bubbles span:nth-child(2) { left: 42%; width: 5px; height: 5px; animation-duration: 10s; animation-delay: -6s; }
+.dive-scene.porthole .porthole-bubbles span:nth-child(3) { left: 63%; width: 10px; height: 10px; animation-duration: 6s; animation-delay: -4s; }
+.dive-scene.porthole .porthole-bubbles span:nth-child(4) { left: 81%; width: 6px; height: 6px; animation-duration: 9s; animation-delay: -8s; }
+.dive-scene.porthole .porthole-bubbles span:nth-child(5) { left: 30%; width: 7px; height: 7px; animation-duration: 8s; animation-delay: -1s; }
+@keyframes porthole-bubble {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  12% { opacity: 0.7; }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-220px) translateX(10px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dive-scene.porthole .porthole-bubbles { display: none; }
+}
+
 }
 @media (prefers-reduced-motion: reduce) {
   .dive-scene.porthole .porthole-surface,
