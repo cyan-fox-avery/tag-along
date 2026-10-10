@@ -1092,6 +1092,7 @@ function jumpToPinned(s, list) {
       body.classList.remove("hidden");
       head.setAttribute("aria-expanded", "true");
       target.classList.add("open");
+      target.style.zIndex = String(++guideOverlayZ);
     }
     target.classList.add("pin-flash");
     setTimeout(() => target.classList.remove("pin-flash"), 1200);
@@ -1201,6 +1202,9 @@ function renderExpeditionPin() {
     <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>
     <br><span class="dim" style="font-size:12px">📓 Pin hints on — your logbook notes nudge you when the plan is close.</span>`;
 }
+/* v1.4.0-beta: rising z-index so a later-opened overlay always floats
+   above earlier ones, regardless of DOM order. */
+let guideOverlayZ = 30;
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
@@ -1270,6 +1274,10 @@ function renderResearch() {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
       row.classList.toggle("open", !isHidden);
+      /* v1.4.0-beta: overlay floats above neighbors; rising z-index keeps
+         the most recently opened entry on top. */
+      if (!isHidden) row.style.zIndex = String(++guideOverlayZ);
+      else row.style.zIndex = "";
     });
     const pinBtn = row.querySelector("[data-pin]");
     if (pinBtn) pinBtn.addEventListener("click", (e) => {
