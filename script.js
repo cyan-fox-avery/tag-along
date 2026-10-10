@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.6-beta";
+const VERSION = "v1.5.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,13 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.7-beta": [
+    "\U0001F9ED <strong>Encounter dialog order.</strong> In the reunion dialog, Follow comes first and Just watch second.",
+    "\U0001F4E2 <strong>Reunion reactions name your shark.</strong> Sarah uses the research tag ID (e.g. BH-2026-002) when the shark has no nickname — named sharks still get their nickname.",
+    "\U0001F91A <strong>No more accidental zoom.</strong> Double-tap zoom is disabled on touch devices (pinch zoom still works).",
+    "\U0001F5FA <strong>Pinch to zoom the map.</strong> Two-finger pinch zooms the tracking map, centered on your fingers.",
+    "\U0001F9F8 <strong>Wider Collection cards on desktop.</strong> Cards go horizontal (art left, info right) on wide screens — mobile stays vertical.",,
   ],
   "v1.5.6-beta": [
     "☀️ <strong>Sun-ray fan rebuilt.</strong> The conic light fan is back — safe this time, no layout breakage.",
@@ -557,7 +564,8 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
-/* v0.15.0: no explore mode, no pinch — zoom is buttons/wheel only.
+/* v0.15.0: no explore mode — zoom was buttons/wheel only.
+   v1.5.7-beta: two-finger pinch-to-zoom is back (Avery's request).
    touch-action follows the zoom level, decided before any touch begins:
    at 1x the page owns one-finger drags (the page scrolls); zoomed in,
    the map owns them (one finger pans). No mid-gesture races, no modes. */
@@ -2013,7 +2021,8 @@ function doEncounter(species, plan) {
           }
         });
       });
-      actions.appendChild(followBtn);
+      /* v1.5.7-beta: Follow comes FIRST in the reunion dialog, Just watch second. */
+      actions.insertBefore(followBtn, watchBtn);
       /* v0.8.0: it's one of yours — log the re-sighting. */
       const resightBtn = document.createElement("button");
       resightBtn.className = "secondary-button";
@@ -2413,7 +2422,8 @@ function maybeReunionReaction(species, rec) {
   if (state.reunionReacted[species.id]) return;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
-  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : species.name;
+  /* v1.5.7-beta: no nickname -> research tag ID (e.g. BH-2026-002), not the species name. */
+  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : rec.researchId;
   const thread = [
     { who: "them", text: `WAIT. You saw ${name} again?!?` },
     { who: "me", text: `The tag matched — it's really them.` },
@@ -3369,15 +3379,12 @@ function doTagAlong() {
     const rec = state.tagged[s.id];
     const displayName = (rec && rec.name) || s.name;
     logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
-    /* v1.4.0-beta: tag-along unlocks a secret fact (or the graceful exhaustion line). */
+    /* v1.5.7-beta: tag-along still unlocks a secret fact for the Collection
+       card, but the fact itself is no longer printed in the expedition log. */
     const fact = unlockSecretFact(s.id);
-    if (fact) {
-      logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
-      state.pendingTagAlongFact = { speciesId: s.id, fact, exhausted: false };
-    } else {
-      logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
-      state.pendingTagAlongFact = { speciesId: s.id, fact: null, exhausted: true };
-    }
+    state.pendingTagAlongFact = fact
+      ? { speciesId: s.id, fact, exhausted: false }
+      : { speciesId: s.id, fact: null, exhausted: true };
     logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
   }
   renderAll();
@@ -3923,10 +3930,12 @@ function renderCollection() {
     cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}`);
     cell.innerHTML = `
       <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
-      ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
-      <div class="grid-id">${esc(t.researchId)}</div>
-      <h3>${s.name}</h3>
-      <p class="latin">${s.latin}</p>`;
+      <div class="grid-text">
+        ${t.name ? `<div class="grid-name">“${esc(t.name)}”</div>` : ""}
+        <div class="grid-id">${esc(t.researchId)}</div>
+        <h3>${s.name}</h3>
+        <p class="latin">${s.latin}</p>
+      </div>`;
     cell.addEventListener("click", () => openDetail(s.id));
     list.appendChild(cell);
   });
@@ -4561,13 +4570,15 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
   mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
-/* v0.15.0: touchscreen gestures — one-finger pan when zoomed, nothing else.
+/* v0.15.0: touchscreen gestures — one-finger pan when zoomed.
+   v1.5.7-beta: two-finger pinch-to-zoom, anchored on the pinch midpoint.
    Pointer Events give one code path for mouse and touch. Move/up/cancel
    listen on window so a finger sliding off the map can't strand a pointer.
-   Pinch-to-zoom and explore mode are gone: zoom is +/- buttons (and wheel
-   on desktop) only. At 1x the browser owns one-finger drags (touch-action:
-   pan-y, so the page scrolls); zoomed in, the map takes them (touch-action:
-   none, set by renderMap before any touch begins). */
+   The pinch itself is tracked with non-passive touch listeners: when the
+   second finger lands we preventDefault and own the gesture (touch-action
+   stays pan-y at 1x so the page keeps scrolling on one-finger drags).
+   At 1x the browser owns one-finger drags; zoomed in, the map takes them
+   (touch-action: none, set by renderMap before any touch begins). */
 (function initMapGestures() {
   const wrap = $("worldMapWrap");
   if (!wrap || typeof window === "undefined") return;
@@ -4617,6 +4628,36 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);
+  /* v1.5.7-beta: pinch-to-zoom. When the second finger lands we call
+     preventDefault (non-passive) to stop the browser scrolling/zooming and
+     take over the gesture; mapZoomAt() anchors the zoom on the pinch
+     midpoint so the map point under your fingers stays put. */
+  let pinchDist = 0;
+  const pinchTouches = e => [e.touches[0], e.touches[1]];
+  wrap.addEventListener("touchstart", e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      mapGlideCancel();
+      const t = pinchTouches(e);
+      pinchDist = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    }
+  }, { passive: false });
+  wrap.addEventListener("touchmove", e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const t = pinchTouches(e);
+      const d = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      if (pinchDist > 0 && d > 0) {
+        mapZoomAt((t[0].clientX + t[1].clientX) / 2,
+                  (t[0].clientY + t[1].clientY) / 2,
+                  mapZoom * (d / pinchDist));
+      }
+      pinchDist = d;
+    }
+  }, { passive: false });
+  const pinchEnd = e => { if (e.touches.length < 2) pinchDist = 0; };
+  wrap.addEventListener("touchend", pinchEnd);
+  wrap.addEventListener("touchcancel", pinchEnd);
 })();
 $("buildTag").textContent = VERSION;
 /* v0.22.0: What's New — show once per version update for returning players. */
