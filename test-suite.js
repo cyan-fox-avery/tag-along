@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.2-beta', VERSION === 'v1.5.2-beta');
+  ok('version v1.5.3-beta', VERSION === 'v1.5.3-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -214,7 +214,7 @@ code += `
   ok('phone clock ticks', /setInterval\\(tickPhoneClock/.test(fileCode));
   ok('auto-nudge waits for five failures', /state\\.failures >= 5/.test(fileCode));
   ok('ask-Sarah advice path exists', typeof askSarahAdvice === 'function' && typeof renderSarahAsk === 'function');
-  ok('encounter announces tagged status', fileCode.includes('already in your book') && fileCode.includes('new to your book'));
+  ok('encounter announces tagged status', fileCode.includes('new to your book') && (fileCode.includes('tag looks familiar') || fileCode.includes('already in your book')));
   ok('map legend is two-column', /\\.map-legend\\s*\\{\\s*display:\\s*grid/.test(cssCode));
   ok('chip shows common name first', /esc\\(s\\.name\\)\\} · /.test(fileCode));
   ok('overlays scroll when overflowing', /\\.overlay\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
@@ -1572,7 +1572,7 @@ code += `
   })();
   // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column
   (() => {
-    ok("guide row has layout containment", /\\.guide-row\\s*\\{[^}]*contain:\\s*layout/.test(cssCode));
+    ok("guide row has NO layout containment (fixed modal works)", !/\\.guide-row\\s*\\{[^}]*contain:\\s*layout/.test(cssCode));
     ok("open body is absolute with explicit width", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute[^}]*width:\\s*100%/.test(cssCode));
     ok("open body has max-width guard", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*100%/.test(cssCode));
   })();
@@ -1696,6 +1696,7 @@ code += `
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.3-beta', Array.isArray(WHATS_NEW['v1.5.3-beta']) && WHATS_NEW['v1.5.3-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
@@ -1703,6 +1704,27 @@ code += `
   ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
   ok('clouds are defined', /rgba\\(255,255,255,0\\.95\\)/.test(cssCode));
   ok('near orbit is 2x+ faster than far', /pw-orbit-near 16s/.test(cssCode) && /pw-orbit-far 38s/.test(cssCode));
+
+  // v1.5.3-beta: reunion system replaces multi-individual tagging
+  ok('no _individuals writes', !/\\._individuals\\.push/.test(code));
+  ok('no _encounterNewIndividual', !/_encounterNewIndividual\\s*=/.test(code) || /state\\._encounterNewIndividual = null/.test(code) === false);
+  ok('ECOLOGY_TIER covers all 50 species', (() => {
+    if (typeof ECOLOGY_TIER === 'undefined' || typeof SHARKS === 'undefined') return false;
+    return SHARKS.every(s => ECOLOGY_TIER[s.id] && ['resident','coastal','migratory'].includes(ECOLOGY_TIER[s.id]));
+  })());
+  ok('REUNION_ODDS has three tiers', (() => {
+    if (typeof REUNION_ODDS === 'undefined') return false;
+    return REUNION_ODDS.resident === 0.50 && REUNION_ODDS.coastal === 0.25 && REUNION_ODDS.migratory === 0.10;
+  })());
+  ok('maybeReunionReaction defined', /function maybeReunionReaction/.test(code));
+  ok('reunion reaction is one-time per species', /state\\.reunionReacted\\[species\\.id\\]/.test(code));
+  ok('different-shark has species observation path', /Observe species/.test(code));
+  ok('observation unlocks secret facts', /unlockSecretFact\\(species\\.id\\)/.test(code));
+  // Blocker 2: no contain:layout breaking fixed modal
+  ok('guide-row has no contain:layout', !/\\.guide-row\\s*\\{[^}]*contain:\\s*layout/.test(cssCode));
+  // Blocker 3: reset keys include new storage
+  ok('RESET_KEYS includes tyi-pending-celebrations', /tyi-pending-celebrations/.test(code) && /RESET_KEYS[^;]*tyi-pending-celebrations/.test(code));
+  ok('RESET_KEYS includes tyi-reunion-reacted', /RESET_KEYS[^;]*tyi-reunion-reacted/.test(code));
 
   // v1.5.0-beta Mira review: persistence + copy fixes
   ok('celebrationStore persists pending celebrations', (() => {
