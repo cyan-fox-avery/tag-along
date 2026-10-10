@@ -348,6 +348,8 @@ select option:disabled { color: #7a8a9e; }
     #4a9abf 0%, #2f7a9e 38%, #1a5475 72%, #0f3c58 100%);
   overflow: hidden;
 }
+/* v1.4.10: hide the old underwater diagonal-stripe rays in porthole mode only */
+.dive-scene.porthole .rays { display: none; }
 /* deep trough wash — static, gives the water its body */
 .dive-scene.porthole .porthole-surface {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -428,7 +430,6 @@ select option:disabled { color: #7a8a9e; }
   .dive-scene.porthole .porthole-surface,
   .dive-scene.porthole .porthole-crest,
   .dive-scene.porthole .porthole-splash { animation: none; }
-}
 }
 
 .depth-shallow { background: linear-gradient(180deg, #8fd8ef 0%, #2a9db8 100%); }
