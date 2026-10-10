@@ -169,13 +169,18 @@ body { overflow-x: clip; }
   position: sticky; top: 0; z-index: 5;
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
   backdrop-filter: blur(4px);
+  align-items: stretch;
 }
+/* v1.4.0: equal-height tabs — every .tab stretches to the row height
+   (height:100% is the Safari-robust way to fill the grid track) and its
+   content stays vertically centered whether it's 2 rows (icon+label) or
+   3 rows (count+icon+label via .tab-stack). */
 .tab {
   border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
   padding: 10px 4px; font-size: 14px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center; text-align: center;
-  min-width: 0;
+  min-width: 0; align-self: stretch; height: 100%; box-sizing: border-box;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
 .count-badge {
