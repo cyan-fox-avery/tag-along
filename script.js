@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.7-beta";
+const VERSION = "v1.5.8-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.8-beta": [
+    "📦 <strong>Safe batch.</strong> Seven low-risk fixes: \"Still to discover\" is plain text (no dropdown), release buttons reordered with matching yellow style, \"Follow\" first in encounters, Sarah uses tag IDs for unnamed sharks, double-tap zoom disabled, and tag-along insights live on the Collection card only.",
   ],
   "v1.5.7-beta": [
     "\uD83D\uDCF1 <strong>Centered tabs everywhere.</strong> The tab bar now centers as a group on tablets and desktops too — no more left-shifted tabs.",
@@ -2012,7 +2015,8 @@ function doEncounter(species, plan) {
           }
         });
       });
-      actions.appendChild(followBtn);
+      /* v1.5.8-beta: "Follow" goes first, "Just watch" second. */
+      actions.insertBefore(followBtn, watchBtn);
       /* v0.8.0: it's one of yours — log the re-sighting. */
       const resightBtn = document.createElement("button");
       resightBtn.className = "secondary-button";
@@ -2412,7 +2416,8 @@ function maybeReunionReaction(species, rec) {
   if (state.reunionReacted[species.id]) return;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
-  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : species.name;
+  /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
+  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : (rec.researchId || species.name);
   const thread = [
     { who: "them", text: `WAIT. You saw ${name} again?!?` },
     { who: "me", text: `The tag matched — it's really them.` },
@@ -3368,15 +3373,11 @@ function doTagAlong() {
     const rec = state.tagged[s.id];
     const displayName = (rec && rec.name) || s.name;
     logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
-    /* v1.4.0-beta: tag-along unlocks a secret fact (or the graceful exhaustion line). */
+    /* v1.5.8-beta: the insight lives on the Collection card only — not in the log. */
     const fact = unlockSecretFact(s.id);
-    if (fact) {
-      logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
-      state.pendingTagAlongFact = { speciesId: s.id, fact, exhausted: false };
-    } else {
-      logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
-      state.pendingTagAlongFact = { speciesId: s.id, fact: null, exhausted: true };
-    }
+    state.pendingTagAlongFact = fact
+      ? { speciesId: s.id, fact, exhausted: false }
+      : { speciesId: s.id, fact: null, exhausted: true };
     logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
   }
   renderAll();
