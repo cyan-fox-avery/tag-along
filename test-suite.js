@@ -1987,6 +1987,8 @@ code += `
   ok('collection cell has text wrapper', /class="grid-cell-text"/.test(fileCode));
   ok('checklist circle CSS present', /\\.tag-check \\{/.test(cssCode) && /\\.tag-check\\.is-done/.test(cssCode));
   ok('field-guide rows use checklist circles', /class="tag-check/.test(fileCode));
+  ok('sr-only utility CSS present', /\.sr-only \{/.test(cssCode));
+  ok('checklist circles have screen-reader status text', fileCode.indexOf('class="sr-only"') !== -1 && fileCode.indexOf('\${done ? "Tagged" : "Not tagged"}') !== -1);
   ok('no checkmark prefix in field-guide rows', fileCode.indexOf('\${done ? "✅ " : ""}') === -1);
   ok('pinch-to-zoom wired in map gestures', /pinchStartDist/.test(fileCode) && /mapZoomAt\\(mid\\.x, mid\\.y/.test(fileCode));
 
