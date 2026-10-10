@@ -1506,6 +1506,7 @@ code += `
     ok("phone tabs have 3 fixed tracks", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3,\\s*1fr\\)/.test(cssCode));
     ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
     ok("no flex-wrap on tabs", !/\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
+    ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
   })();
   // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
   (() => {
