@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.23-beta";
+const VERSION = "v1.5.24-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,10 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.24-beta": [
+    "\U0001F988 <strong>Bruce, your way.</strong> Sarah's Bruce chain now uses your exact capitalization for your shark, while the original Jaws shark is always \"Bruce\".",
+    "\U0001F49B <strong>Warmer Bruce reaction.</strong> Sarah is delighted by the name now, not scolding — she loves the reference.",
   ],
   "v1.5.23-beta": [
     "\U0001F988 <strong>Thresher faces left.</strong> The thresher illustration was the only shark facing right — flipped to face left like the rest, matching its silhouette.",
@@ -3846,7 +3850,8 @@ function maybeNameEgg(speciesId, rec) {
     }
     // Bruce: ANY shark. No immediate message — the slow chain begins silently.
     if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
-      state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+      /* v1.5.24: keep the player's exact capitalization for {bruce} in the chain. */
+      state.bruceEgg = { stage: 0, sharkId: speciesId, playerName: rec.name.trim(), started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
       try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
       // Deliberately no pushThread here. Sarah will notice... eventually.
     }
@@ -3883,14 +3888,18 @@ function advanceBruceChain() {
 
   // Push this stage's messages. v0.23.0: personalize {species} with the
   // player's Bruce, so the history attaches to THEIR shark, not a lecture.
+  // v1.5.24: {bruce} uses the player's exact capitalization; OG Jaws/Nemo
+  // references always say "Bruce" in the text itself.
   let bruceSpecies = "shark";
+  let bruceName = "Bruce"; /* fallback for chains started before v1.5.24 */
   try {
     const bs = sharkById(state.bruceEgg.sharkId);
     if (bs && bs.name) bruceSpecies = bs.name.toLowerCase();
+    if (state.bruceEgg.playerName) bruceName = state.bruceEgg.playerName;
   } catch {}
   pushThread(BRUCE_CHAIN[stage].map(m => ({
     who: m.who,
-    text: String(m.text).split("{species}").join(bruceSpecies)
+    text: String(m.text).split("{species}").join(bruceSpecies).split("{bruce}").join(bruceName)
   })));
   state.bruceEgg.stage = stage + 1;
   state.bruceEgg.lastAdvance = now;
