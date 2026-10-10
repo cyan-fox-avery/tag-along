@@ -448,7 +448,12 @@ select option:disabled { color: #7a8a9e; }
 /* v1.5.1: pronounced depth gradient — far slowest, near clearly fastest.
    far: 38s, mid: 26s, near: 16s. Faster overall than v1.4.18, near is 2.4x far. */
 .dive-scene.porthole .pw-far .pw-orbit {
-  animation: pw-orbit-far 38s linear infinite;
+  animation: pw-orbit-far-x 38s ease-in-out infinite;
+  animation-delay: -7s;
+}
+/* v1.5.5: far Y oscillation lives on the layer itself (nested with X above) */
+.dive-scene.porthole .pw-far {
+  animation: pw-orbit-far-y 38s ease-in-out infinite;
   animation-delay: -7s;
 }
 
@@ -476,20 +481,30 @@ select option:disabled { color: #7a8a9e; }
   animation-delay: -11s;
 }
 
-/* orbital ellipses: 8 stops trace a smooth closed oval (x=A*cos, y=B*sin).
+/* orbital ellipses: mid/near use 8 stops tracing x=A*cos, y=B*sin;
+   far uses split sinusoidal X/Y (see pw-orbit-far-x/y) for a true ellipse.
    far: slowest/gentlest (±30px, ±8px), 38s. mid: medium (±40px, ±10px), 26s.
    near: fastest/liveliest (±50px, ±12px), 16s — clear parallax gradient.
    The splash is still the fastest thing; the water stays calm. */
-@keyframes pw-orbit-far {
-  0%    { transform: translate(30px, 0); }
-  12.5% { transform: translate(21px, -6px); }
-  25%   { transform: translate(0, -8px); }
-  37.5% { transform: translate(-21px, -6px); }
-  50%   { transform: translate(-30px, 0); }
-  62.5% { transform: translate(-21px, 6px); }
-  75%   { transform: translate(0, 8px); }
-  87.5% { transform: translate(21px, 6px); }
-  100%  { transform: translate(30px, 0); }
+/* v1.5.5: far layer traces a TRUE smooth ellipse. The old 8-stop linear
+   keyframes made the thin (±30px, ±8px) far orbit read as a rectangle —
+   straight chords between stops with such a flat ellipse show visible
+   corners. Now X oscillates on .pw-orbit and Y on .pw-layer, both with
+   ease-in-out (sinusoidal) timing 90° out of phase: x=A*cos, y=B*sin, a
+   mathematically smooth ellipse with no corners. Same 38s period and
+   ±30/±8px amplitude; mid and near keep their 8-stop paths (Avery is
+   happy with those). */
+@keyframes pw-orbit-far-x {
+  0%   { transform: translateX(30px); }
+  50%  { transform: translateX(-30px); }
+  100% { transform: translateX(30px); }
+}
+@keyframes pw-orbit-far-y {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-8px); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(8px); }
+  100% { transform: translateY(0); }
 }
 @keyframes pw-orbit-mid {
   0%    { transform: translate(-40px, 0); }
@@ -554,6 +569,7 @@ select option:disabled { color: #7a8a9e; }
 @media (prefers-reduced-motion: reduce) {
   /* freeze waves at attractive offsets; no bob, no spray */
   .dive-scene.porthole .pw-orbit,
+  .dive-scene.porthole .pw-far,
   .dive-scene.porthole .porthole-spray { animation: none; }
   .dive-scene.porthole .pw-far .pw-orbit { transform: translate(12px, -3px); }
   .dive-scene.porthole .pw-mid .pw-orbit { transform: translate(-15px, 4px); }
