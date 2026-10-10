@@ -1023,7 +1023,11 @@ select option:disabled { color: #7a8a9e; }
    v1.4.16-beta: hard containment — position:absolute removes the body from flow,
    contain:layout on the row adds a boundary, and explicit width/max-width guards
    against any intrinsic-size leakage, so an open entry can never widen its column. */
-.guide-row { position: relative; min-width: 0; contain: layout; }
+/* v1.5.3-beta: REMOVED contain:layout — it establishes a containing block for
+   fixed descendants, breaking the mobile modal centering. The absolute
+   positioning with explicit width/max-width below is sufficient to prevent
+   column widening (absolute elements don't participate in grid sizing). */
+.guide-row { position: relative; min-width: 0; }
 .guide-row.open { overflow: visible; z-index: 20; }
 .guide-row.open .guide-row-body {
   position: absolute; top: 100%; left: 0; width: 100%; max-width: 100%; min-width: 0; z-index: 20;
