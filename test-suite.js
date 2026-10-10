@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.12-beta', VERSION === 'v1.4.12-beta');
+  ok('version v1.4.13-beta', VERSION === 'v1.4.13-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1575,11 +1575,18 @@ code += `
   (() => {
     ok("caustics have no container edge mask", !/\\.caustics\\s*\\{[^}]*mask-image:/.test(cssCode));
     ok("caustic rays are long streaks", /\\.caustics\\s+span\\s*\\{[^}]*height:\\s*2000px/.test(cssCode));
-    ok("caustic glow is a tall narrow ellipse near the top", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse 50% 45% at 50% 12%/.test(cssCode));
+    ok("caustic glow is a tall narrow ellipse reaching full length", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse 55% 75% at 50% 18%/.test(cssCode));
     // no ray may angle negative — a negative-angle ray sweeps off-screen and
     // can peek back in during sway, reading as a sliding bar at the edge
     const negAngles = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*-\\d+deg/g) || []).length;
     ok("no ray has a negative fan angle", negAngles === 0);
+  })();
+  // v1.4.13: bubbles rise in burst columns on a shared cycle
+  (() => {
+    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
+    ok("bubble columns share a cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+44s/.test(cssCode));
+    const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
+    ok("bubbles still number 8", bubbleCount === 8);
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1600,6 +1607,7 @@ code += `
   ok("WHATS_NEW has v1.4.10-beta", !!(WHATS_NEW["v1.4.10-beta"] && WHATS_NEW["v1.4.10-beta"].length));
   ok("WHATS_NEW has v1.4.11-beta", !!(WHATS_NEW["v1.4.11-beta"] && WHATS_NEW["v1.4.11-beta"].length));
   ok("WHATS_NEW has v1.4.12-beta", !!(WHATS_NEW["v1.4.12-beta"] && WHATS_NEW["v1.4.12-beta"].length));
+  ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
@@ -1628,7 +1636,7 @@ code += `
   ok('porthole splash is large', /\\.porthole-spray\\s*\\{[^}]*width:\\s*240px/.test(cssCode));
   ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?\\.porthole-waves/.test(cssCode) || /prefers-reduced-motion[\\s\\S]*?pw-drift/.test(cssCode));
-  ok('bubbles travel in clusters', /bubbles travel in little clusters/.test(cssCode));
+  ok('bubbles rise in burst columns', /bubbles now rise in little COLUMNS/i.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
