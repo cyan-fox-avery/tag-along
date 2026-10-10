@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.4-beta', VERSION === 'v1.4.4-beta');
+  ok('version v1.4.5-beta', VERSION === 'v1.4.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1569,12 +1569,15 @@ code += `
     ok("caustics has 8 rays", rayCount === 8);
     ok("rays are narrower than v1.4.0", !/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*width:\\s*(8[5-9]|9\\d|10[0-4])px/.test(cssCode));
   })();
-  // v1.4.3: caustics fade at viewport edges — no sliding bars from edge-peeking rays
+  // v1.4.5: caustics are long soft streaks anchored at the sun point — each
+  // ray's glow dissolves along its own length (no container mask), so the fan
+  // visibly reaches across the screen and no ray can draw a hard edge
   (() => {
-    ok("caustics fade at left/right edges", /\\.caustics\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to right/.test(cssCode));
-    ok("caustics edge fade has webkit prefix", /\\.caustics\\s*\\{[^}]*-webkit-mask-image:/.test(cssCode));
-    // no ray may angle negative — a negative-angle glow sits off-screen and
-    // peeks in during sway, reading as a sliding bar at the edge
+    ok("caustics have no container edge mask", !/\\.caustics\\s*\\{[^}]*mask-image:/.test(cssCode));
+    ok("caustic rays are long streaks", /\\.caustics\\s+span\\s*\\{[^}]*height:\\s*2000px/.test(cssCode));
+    ok("caustic glow is a tall narrow ellipse near the top", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse 50% 45% at 50% 12%/.test(cssCode));
+    // no ray may angle negative — a negative-angle ray sweeps off-screen and
+    // can peek back in during sway, reading as a sliding bar at the edge
     const negAngles = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*-\\d+deg/g) || []).length;
     ok("no ray has a negative fan angle", negAngles === 0);
   })();
@@ -1589,6 +1592,7 @@ code += `
   ok("WHATS_NEW has v1.4.2-beta", !!(WHATS_NEW["v1.4.2-beta"] && WHATS_NEW["v1.4.2-beta"].length));
   ok("WHATS_NEW has v1.4.3-beta", !!(WHATS_NEW["v1.4.3-beta"] && WHATS_NEW["v1.4.3-beta"].length));
   ok("WHATS_NEW has v1.4.4-beta", !!(WHATS_NEW["v1.4.4-beta"] && WHATS_NEW["v1.4.4-beta"].length));
+  ok("WHATS_NEW has v1.4.5-beta", !!(WHATS_NEW["v1.4.5-beta"] && WHATS_NEW["v1.4.5-beta"].length));
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
