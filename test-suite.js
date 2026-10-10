@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.5-beta', VERSION === 'v1.6.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1800,6 +1800,31 @@ code += `
     state.messages.length = before;
     return isRegular && rec.sarahEgg === true && !rec.lemonSarahEgg;
   })());
+  // v1.6.5: naming a lemon "Sarah" suppresses the queued lemon celebration
+  ok('lemon named Sarah drops the queued lemon celebration', (() => {
+    const savePending = state.pendingCelebrations;
+    const saveMsgs = state.messages.length;
+    state.pendingCelebrations = [
+      { speciesId: "lemon", speciesName: "Lemon Shark" },
+      { speciesId: "nurse", speciesName: "Nurse Shark" }
+    ];
+    const rec = { name: "Sarah" };
+    maybeSarahEgg("lemon", rec);
+    const lemonGone = !state.pendingCelebrations.some(e => e.speciesId === "lemon");
+    const nurseKept = state.pendingCelebrations.some(e => e.speciesId === "nurse");
+    state.pendingCelebrations = savePending;
+    state.messages.length = saveMsgs;
+    return lemonGone && nurseKept && rec.lemonSarahEgg === true;
+  })());
+  ok('lemon celebration kept when name is not Sarah', (() => {
+    const savePending = state.pendingCelebrations;
+    state.pendingCelebrations = [{ speciesId: "lemon", speciesName: "Lemon Shark" }];
+    const rec = { name: "Zest" };
+    maybeSarahEgg("lemon", rec);
+    const kept = state.pendingCelebrations.some(e => e.speciesId === "lemon");
+    state.pendingCelebrations = savePending;
+    return kept && !rec.lemonSarahEgg;
+  })());
   // v1.5.25: Bruce and Sarah eggs are independent (both orders)
   ok('bruce egg survives a later sarah naming', (() => {
     const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
@@ -2015,6 +2040,7 @@ code += `
 
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('WHATS_NEW has v1.6.5-beta', Array.isArray(WHATS_NEW['v1.6.5-beta']) && WHATS_NEW['v1.6.5-beta'].length >= 1);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));

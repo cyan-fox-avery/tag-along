@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.5-beta": [
+    "🍋 <strong>No double lemon freakout.</strong> Naming a lemon shark \"Sarah\" now fires only the special naming reaction — the routine lemon-tagged celebration no longer doubles up.",
   ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
@@ -3884,6 +3887,13 @@ function maybeSarahEgg(speciesId, rec) {
       rec.lemonSarahEgg = true;
       store.save(state.tagged);
       pushThread(LEMON_SARAH_EGG_THREAD.map(m => ({ ...m })));
+      /* v1.6.5-beta: the egg IS the lemon celebration — drop the queued
+         routine/Big-Day lemon thread so Sarah doesn't freak out twice.
+         Other species' celebrations are untouched. */
+      if (state.pendingCelebrations && state.pendingCelebrations.length) {
+        state.pendingCelebrations = state.pendingCelebrations.filter(e => e.speciesId !== "lemon");
+        try { celebrationStore.save(state.pendingCelebrations); } catch {}
+      }
     } else {
       store.save(state.tagged);
       pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
