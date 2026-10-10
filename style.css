@@ -221,10 +221,6 @@ body { overflow-x: clip; }
 .tab-stack .tab-label { font-size: 11px; }
 /* v1.4.0: invisible count-row spacer — same box dimensions as .count-badge
    inside .tab-stack, so every tab is 3 rows tall even without a count. */
-.tab-stack .count-spacer {
-  visibility: hidden; margin-left: 0;
-  font-size: 11px; padding: 1px 8px; border-radius: 999px; line-height: 1.25;
-}
 /* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
    so they used to overflow the page and leave a dead strip on the right.
    Two rows of three keeps every tab visible and tappable with no overflow.
@@ -340,81 +336,93 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene .dive-shark { z-index: 3; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 
-/* v1.4.2: porthole — the expedition observation window is always present.
-   When no expedition is active, it shows the ocean surface as if looking
-   up through a porthole: bright sunlit water above, gentle rippling light.
-   The window frame itself acts as the porthole rim. Alive but calm,
-   matching the caustics aesthetic. Lightweight (transform/opacity only),
-   respects prefers-reduced-motion. */
+/* v1.4.4: porthole — top-down ocean surface, like looking over the side
+   of a boat. Rich blue water, slow swells, foam catching the crests, sun
+   glitter dancing. Calm and subtle, matching the game's aesthetic.
+   Lightweight (transform/opacity only), respects prefers-reduced-motion. */
 .dive-scene.porthole {
   background: linear-gradient(180deg,
-    #bfe9ff 0%, #8fd4f5 30%, #5fb3dd 60%, #3a8ab8 100%);
+    #2a7d9d 0%, #1e6685 45%, #134a66 100%);
 }
 .dive-scene.porthole .porthole-surface {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  /* bright sun glow near the top-center, like the sun through water */
   background:
-    radial-gradient(ellipse 55% 42% at 50% -8%,
-      rgba(255,255,255,0.75) 0%,
-      rgba(240,250,255,0.35) 38%,
-      transparent 68%),
-    /* gentle rippling light bands drifting across */
-    repeating-linear-gradient(100deg,
-      transparent 0 34px,
-      rgba(255,255,255,0.14) 34px 44px,
-      transparent 44px 78px);
-  animation: porthole-ripple 9s ease-in-out infinite alternate;
+    /* sun glitter where the light catches, upper-left */
+    radial-gradient(ellipse 42% 30% at 30% 22%,
+      rgba(255,255,255,0.20) 0%,
+      rgba(230,245,252,0.08) 45%,
+      transparent 70%),
+    /* broad soft swell troughs */
+    radial-gradient(ellipse 70% 26% at 78% 62%,
+      rgba(8,40,60,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 22% at 22% 78%,
+      rgba(8,40,60,0.22) 0%, transparent 70%);
+  animation: porthole-swell 14s ease-in-out infinite alternate;
 }
-@keyframes porthole-ripple {
-  from { transform: translateX(-18px) translateY(0); }
-  to   { transform: translateX(18px) translateY(-6px); }
+@keyframes porthole-swell {
+  from { transform: translateX(-14px) translateY(4px); }
+  to   { transform: translateX(14px) translateY(-4px); }
 }
-/* a few soft light shafts rising toward the surface */
-.dive-scene.porthole .porthole-shafts {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: repeating-linear-gradient(78deg,
-    transparent 0 52px,
-    rgba(255,255,255,0.10) 52px 60px,
-    transparent 60px 112px);
-  animation: porthole-shafts 13s ease-in-out infinite alternate;
+/* lighter swell patches drifting the other way, offset timing */
+.dive-scene.porthole .porthole-swells {
+  position: absolute; inset: -8%; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 20% at 64% 34%,
+      rgba(150,210,235,0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 52% 24% at 30% 58%,
+      rgba(150,210,235,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 18% at 74% 82%,
+      rgba(150,210,235,0.10) 0%, transparent 70%);
+  animation: porthole-swells 19s ease-in-out infinite alternate;
 }
-@keyframes porthole-shafts {
-  from { transform: translateX(12px); opacity: 0.7; }
-  to   { transform: translateX(-12px); opacity: 1; }
-
-/* v1.4.2: porthole bubbles — 2-5 small bubbles rising from the bottom at a
-   time, subtle like everything else. Staggered durations/delays keep a few
-   visible while others are between cycles. */
-.dive-scene.porthole .porthole-bubbles {
+@keyframes porthole-swells {
+  from { transform: translateX(18px) translateY(-6px); }
+  to   { transform: translateX(-18px) translateY(6px); }
+}
+/* foam streaks catching the wave crests — thin, soft, drifting */
+.dive-scene.porthole .porthole-foam {
+  position: absolute; inset: -8%; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 34% 3.5% at 56% 30%,
+      rgba(255,255,255,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 28% 3% at 30% 52%,
+      rgba(255,255,255,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 38% 4% at 68% 72%,
+      rgba(255,255,255,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 24% 2.6% at 44% 88%,
+      rgba(255,255,255,0.18) 0%, transparent 70%);
+  animation: porthole-foam 11s ease-in-out infinite alternate;
+}
+@keyframes porthole-foam {
+  from { transform: translateX(-22px); opacity: 0.75; }
+  to   { transform: translateX(22px); opacity: 1; }
+}
+/* sun glints — tiny sparkles twinkling on the surface */
+.dive-scene.porthole .porthole-glint {
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   overflow: hidden;
 }
-.dive-scene.porthole .porthole-bubbles span {
-  position: absolute; bottom: -14px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.08);
-  animation: porthole-bubble linear infinite;
+.dive-scene.porthole .porthole-glint span {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.9) 0%, transparent 70%);
+  animation: porthole-glint ease-in-out infinite alternate;
 }
-/* v1.4.2: bigger bubbles rise faster, like real life */
-.dive-scene.porthole .porthole-bubbles span:nth-child(1) { left: 18%; width: 8px; height: 8px; animation-duration: 7s; animation-delay: -2s; }
-.dive-scene.porthole .porthole-bubbles span:nth-child(2) { left: 42%; width: 5px; height: 5px; animation-duration: 10s; animation-delay: -6s; }
-.dive-scene.porthole .porthole-bubbles span:nth-child(3) { left: 63%; width: 10px; height: 10px; animation-duration: 6s; animation-delay: -4s; }
-.dive-scene.porthole .porthole-bubbles span:nth-child(4) { left: 81%; width: 6px; height: 6px; animation-duration: 9s; animation-delay: -8s; }
-.dive-scene.porthole .porthole-bubbles span:nth-child(5) { left: 30%; width: 7px; height: 7px; animation-duration: 8s; animation-delay: -1s; }
-@keyframes porthole-bubble {
-  0% { transform: translateY(0) translateX(0); opacity: 0; }
-  12% { opacity: 0.7; }
-  85% { opacity: 0.5; }
-  100% { transform: translateY(-220px) translateX(10px); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .dive-scene.porthole .porthole-bubbles { display: none; }
-}
-
+.dive-scene.porthole .porthole-glint span:nth-child(1) { left: 22%; top: 18%; width: 7px; height: 7px; animation-duration: 3.2s; }
+.dive-scene.porthole .porthole-glint span:nth-child(2) { left: 58%; top: 32%; width: 5px; height: 5px; animation-duration: 4.1s; animation-delay: -1.4s; }
+.dive-scene.porthole .porthole-glint span:nth-child(3) { left: 74%; top: 14%; width: 6px; height: 6px; animation-duration: 2.8s; animation-delay: -0.8s; }
+.dive-scene.porthole .porthole-glint span:nth-child(4) { left: 38%; top: 58%; width: 5px; height: 5px; animation-duration: 3.7s; animation-delay: -2.2s; }
+.dive-scene.porthole .porthole-glint span:nth-child(5) { left: 66%; top: 72%; width: 7px; height: 7px; animation-duration: 4.5s; animation-delay: -3s; }
+.dive-scene.porthole .porthole-glint span:nth-child(6) { left: 14%; top: 44%; width: 4px; height: 4px; animation-duration: 3s; animation-delay: -1.1s; }
+@keyframes porthole-glint {
+  from { opacity: 0.15; transform: scale(0.8); }
+  to   { opacity: 0.85; transform: scale(1.15); }
 }
 @media (prefers-reduced-motion: reduce) {
   .dive-scene.porthole .porthole-surface,
-  .dive-scene.porthole .porthole-shafts { animation: none; }
+  .dive-scene.porthole .porthole-swells,
+  .dive-scene.porthole .porthole-foam,
+  .dive-scene.porthole .porthole-glint { animation: none; }
 }
 
 .depth-shallow { background: linear-gradient(180deg, #8fd8ef 0%, #2a9db8 100%); }
@@ -481,6 +489,10 @@ select option:disabled { color: #7a8a9e; }
   background: #0a1826; border-radius: 26px; border: 1px solid #2c5364;
   overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
   max-width: 430px; margin: 0 auto;
+  /* v1.4.4: realistic phone proportions — nearly double the old height.
+     Flex column so the conversation fills and the composer stays pinned. */
+  display: flex; flex-direction: column;
+  height: min(88vh, 880px); min-height: 620px;
 }
 .phone-statusbar {
   display: flex; justify-content: space-between; align-items: center;
@@ -499,9 +511,9 @@ select option:disabled { color: #7a8a9e; }
 .contact-sub { font-size: 12px; color: var(--ink-dim); }
 .phone-convo {
   padding: 14px 12px 20px; display: grid; gap: 16px;
-  max-height: 62vh; overflow-y: auto;
-  /* v1.4.0-beta: fixed minimum height so the empty state doesn't collapse. */
-  min-height: 320px;
+  overflow-y: auto;
+  /* v1.4.4: fills the taller phone; composer stays pinned at the bottom. */
+  flex: 1 1 auto; min-height: 0; max-height: none;
 }
 
 /* v1.4.0-beta: third release choice — tag along ends the expedition. */
