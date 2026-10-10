@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.3-beta";
+const VERSION = "v1.4.4-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -75,6 +75,10 @@ const WHATS_NEW = {
   ],
   "v1.4.3-beta": [
     "☀️ <strong>Caustics edge fix.</strong> Light rays now fade out near the screen edges — no more dark bars sliding in from the sides."
+  ],
+  "v1.4.4-beta": [
+    "🌊 <strong>New porthole view.</strong> The idle observation window now shows the ocean surface from above — slow swells, foam on the crests, sun glitter.",
+    "📱 <strong>Taller phone.</strong> Sarah's phone mockup is now realistic phone proportions with a much taller conversation area."
   ]
 };
 
@@ -1785,9 +1789,10 @@ function doEncounter(species, plan) {
 /* v0.7.0: a trip is a full day out — descent, wildlife, then 2–4
    encounter slots paced through the day, then day's end. The shark is
    a moment in the day, never the end of it. */
-/* v1.4.2: porthole — the observation window is always present. When no
-   expedition is active it shows the ocean surface (looking up through the
-   window like a porthole). Called on init and when an expedition ends. */
+/* v1.4.2: porthole — the observation window is always present.
+   v1.4.4: when no expedition is active it shows the ocean surface from
+   ABOVE, like looking over the side of a boat — slow swells, foam, sun
+   glitter. Called on init and when an expedition ends. */
 function showPorthole() {
   const scene = $("diveScene");
   scene.className = "dive-scene porthole";
