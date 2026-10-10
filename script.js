@@ -93,7 +93,7 @@ const WHATS_NEW = {
     "🔧 <strong>Edge bar fix.</strong> Fixed the dark vertical bars that slid in and out at the screen edges — the surface shimmer layer is now wider than the viewport so its drift never exposes an edge."
   ],
   "v1.4.9-beta": [
-    "🐋 <strong>New achievement: White Whale.</strong> Tag the elusive megamouth shark — fewer than 300 have ever been seen — and Sarah will absolutely lose her mind."
+    "🐋 <strong>New achievement: White Whale.</strong> Tag the elusive megamouth shark — only around 300 have ever been documented — and Sarah will absolutely lose her mind."
   ],
   "v1.4.10-beta": [
     "🔧 <strong>Porthole cleanup.</strong> The old underwater light-ray layer no longer shows through the boat-window surface view, and a stray bit of malformed CSS is gone."
