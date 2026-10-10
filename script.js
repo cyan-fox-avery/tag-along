@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.4-beta";
+const VERSION = "v1.5.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.5-beta": [
+    "\uD83C\uDF0A <strong>Smoother far waves.</strong> The farthest porthole wave layer now traces a true smooth ellipse instead of a boxy path — same gentle speed, just rounder.",
   ],
   "v1.5.4-beta": [
     "\u274C <strong>Closable guide popups.</strong> The mobile field-guide popup now has a proper close button, plus Escape-key and tap-outside dismissal — no more getting stuck.",
@@ -322,7 +325,7 @@ const EASTER_EGGS = [
 /* v0.22.0: failed trips feel like fieldwork — weather, sea state, and
    wildlife make every expedition a day on the water, not just a miss. */
 const SEA_CONDITIONS = [
-  "Flat calm this morning — the sea is glass, and the boat barely rocks.",
+  "Calm waves this morning — the sea is glass, and the boat barely rocks.",
   "A light chop keeps things interesting; whitecaps glint in the sun.",
   "Overcast and moody — the water looks like hammered pewter.",
   "A fresh breeze out of the east; the swells roll in long and lazy.",
@@ -402,7 +405,7 @@ const FIELD_NOTES = {
     "Field notes: jellyfish pulsing past in the hundreds, lit up by the deck lights. The ocean's lava lamps.",
     "Field notes: the depth sounder showed a bait ball at 40 metres, scattering. Something hunts here — just not today.",
     "Field notes: salt spray, diesel, and kelp. The smell of a working day with nothing to show but the smell.",
-    "Field notes: the moon rose over flat calm water and turned the whole sea to hammered silver.",
+    "Field notes: the moon rose over calm waves and turned the whole sea to hammered silver.",
     "Field notes: a lone albatross followed us for hours without a single wingbeat. Show-off.",
     "Field notes: bioluminescence in the wake tonight — every wave breaks into cold fire.",
     "Field notes: the barometer is falling and the gulls know something we don't. They're all heading in.",
@@ -2054,6 +2057,10 @@ function showPorthole() {
   const scene = $("diveScene");
   scene.className = "dive-scene porthole";
   $("diveScenery").innerHTML = "";
+  /* v1.5.5: clear any lingering ambient creature shadows from the expedition —
+     spawnCreature() appends them to diveScene (not diveScenery), so they
+     survived the trip and haunted the idle porthole waves. */
+  scene.querySelectorAll(".ambient").forEach(el => el.remove());
   $("diveShark").classList.add("hidden");
   const log = $("diveLog");
   if (log) log.innerHTML = '<p class="dive-idle">\u{1F30A} The ocean waits. Plan your expedition above, then launch.</p>';
