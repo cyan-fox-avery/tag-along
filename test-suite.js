@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.1-beta', VERSION === 'v1.6.1-beta');
+  ok('version v1.6.2-beta', VERSION === 'v1.6.2-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1625,7 +1625,7 @@ code += `
   (() => {
     ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
     ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
-    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row\\)/.test(code));
+    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
     ok("collapseGuideRow resets aria-expanded", /collapseGuideRow[\\s\\S]*?setAttribute\\("aria-expanded", "false"\\)/.test(code));
     ok("collapseGuideRow returns focus to header", /collapseGuideRow[\\s\\S]*?head\\.focus\\(\\)/.test(code));
     ok("Escape key closes topmost open row", /keydown[\\s\\S]*?Escape[\\s\\S]*?\\.guide-row\\.open/.test(code));
@@ -1749,6 +1749,19 @@ code += `
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
   ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
   ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
+  ok('WHATS_NEW has v1.6.0-beta', Array.isArray(WHATS_NEW['v1.6.0-beta']) && WHATS_NEW['v1.6.0-beta'].length === 4);
+  // v1.6.0: Research accordion — opening one entry closes the others
+  ok('accordion closes other research rows', /collapseGuideRow\\(other, false\\)/.test(code));
+  // v1.6.0: accordion doesn't steal focus — collapseGuideRow takes a restoreFocus flag
+  ok('collapseGuideRow has restoreFocus flag', /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
+  ok('focus only restored when flag is true', /if \\(restoreFocus\\) head\\.focus\\(\\);/.test(code));
+  // v1.6.0: IUCN badge spacing — more room between badge and pin
+  ok('iucn badge has right margin', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*8px/.test(cssCode));
+  // v1.6.0: full scientific name in expanded Collection/Archive cards
+  ok('detail-scientific class styled', /\\.detail-scientific\\s*\\{[^}]*font-size:\\s*15px/.test(cssCode));
+  ok('collection detail shows scientific name', code.indexOf('detail-scientific') !== -1);
+  // v1.6.0: achievement hints get two lines
+  ok('achievement hints allow two lines', /\\.ach-hint[^}]*-webkit-line-clamp:\\s*2/.test(cssCode));
   ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
   // v1.5.29: blue through ~90%, black only at the very bottom
@@ -1975,7 +1988,13 @@ code += `
     const afterSecond = state.messages.length;
     return (afterFirst - before) === 1 && storeEmpty && afterSecond === afterFirst;
   })());
-  ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
+  ok('WHATS_NEW has v1.6.2-beta', Array.isArray(WHATS_NEW['v1.6.2-beta']) && WHATS_NEW['v1.6.2-beta'].length === 1);
+  // v1.6.2: field sketches removed — expanded cards and pinned card show text only
+  // (check for the class= attribute patterns; plain substrings would match this file's own CSS assertions)
+  ok('no sketch div rendered', code.indexOf('class=\\"guide-' + 'sketch\\"') === -1);
+  ok('no sketch caption rendered', code.indexOf('class=\\"sketch-' + 'cap\\"') === -1);
+  ok('no sketch CSS rules remain', cssCode.indexOf('.guide-sketch') === -1 && cssCode.indexOf('.pinned-sketch') === -1 && cssCode.indexOf('.sketch-cap') === -1);
+    ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
   ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
 
   // v1.6.1-beta: layout & interaction batch

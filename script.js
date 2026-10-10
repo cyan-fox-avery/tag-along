@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.1-beta";
+const VERSION = "v1.6.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,15 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.6.0-beta": [
+    "📖 <strong>Research accordion.</strong> Opening one field-guide entry now closes the others — only one open at a time.",
+    "🏷️ <strong>IUCN badge breathing room.</strong> More space between the IUCN badge and pin icon, so Latin names show more.",
+    "🔬 <strong>Full scientific names.</strong> Collection and Archive expanded cards now show the full scientific name prominently above the description.",
+    "🏆 <strong>Achievement hints get two lines.</strong> No more truncating with \"...\" — hints can breathe.",
+  ],
+  "v1.6.2-beta": [
+    "✏️ <strong>Field sketches removed.</strong> Expanded field-guide cards and the pinned card no longer show the generic sketch placeholder — just the text.",
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
@@ -1393,7 +1402,6 @@ function renderPinnedCard(list) {
         <button type="button" class="pin-btn unpin" data-unpin aria-label="Unpin ${s.name}">✕</button>
       </div>
       <div class="pinned-body">
-        <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
         <div>
           <span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span><strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
@@ -1494,15 +1502,17 @@ function renderExpeditionPin() {
    above earlier ones, regardless of DOM order. */
 let guideOverlayZ = 30;
 /* v1.5.4-beta: shared collapse for guide rows — used by the close button,
-   Escape key, and outside-click dismissal. Returns focus to the row header. */
-function collapseGuideRow(row) {
+   Escape key, and outside-click dismissal. Returns focus to the row header.
+   v1.6.0-beta: restoreFocus flag — the accordion passes false so closing
+   other cards doesn't yank focus (and scroll) back to them. */
+function collapseGuideRow(row, restoreFocus = true) {
   if (!row || !row.classList.contains("open")) return;
   const body = row.querySelector(".guide-row-body");
   const head = row.querySelector(".guide-row-head");
   if (body) body.classList.add("hidden");
   if (head) {
     head.setAttribute("aria-expanded", "false");
-    head.focus();
+    if (restoreFocus) head.focus();
   }
   row.classList.remove("open");
   row.style.zIndex = "";
@@ -1582,7 +1592,6 @@ function renderResearch() {
       </div>
       <div class="guide-row-body hidden">
         <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
-        <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
         <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
@@ -1605,7 +1614,13 @@ function renderResearch() {
       row.classList.toggle("open", !isHidden);
       /* v1.4.0-beta: overlay floats above neighbors; rising z-index keeps
          the most recently opened entry on top. */
-      if (!isHidden) row.style.zIndex = String(++guideOverlayZ);
+      if (!isHidden) {
+        /* v1.6.0-beta: accordion — opening one entry closes the others. */
+        document.querySelectorAll(".guide-row.open").forEach(other => {
+          if (other !== row && other.closest("#researchList")) collapseGuideRow(other, false);
+        });
+        row.style.zIndex = String(++guideOverlayZ);
+      }
       else row.style.zIndex = "";
     });
     const pinBtn = row.querySelector("[data-pin]");
@@ -2994,7 +3009,7 @@ function renderAchievements() {
       <div class="guide-row-head" style="cursor:default">
         <span style="font-size:22px">${unlocked ? a.icon : "🔒"}</span>
         <span class="guide-row-name">${unlocked ? esc(a.name) : "???"}</span>
-        <span class="latin">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
+        <span class="latin ach-hint">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
       </div>`;
     list.appendChild(row);
   });
@@ -4078,7 +4093,7 @@ function openDetail(id) {
       </div>
     </div>
     <h3 style="margin:6px 0 0">${s.name}</h3>
-    <p class="latin">${s.latin}</p>
+    <p class="latin detail-scientific">${s.latin}</p>
     <span class="status-pill">IUCN: ${s.status}</span>
     <p class="book-stats">
       📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
