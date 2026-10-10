@@ -1032,6 +1032,15 @@ select option:disabled { color: #7a8a9e; }
   box-shadow: 0 18px 36px rgba(0,0,0,0.55);
   max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
+/* v1.5.2-beta: on small screens the expanded card becomes a centered modal
+   so the full content is always reachable — no more cut-off bottoms. */
+@media (max-width: 768px) {
+  .guide-row.open .guide-row-body {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: calc(100vw - 32px); max-width: 520px; max-height: 80vh;
+    border-radius: var(--radius);
+  }
+}
 /* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
 .guide-row-top { display: flex; align-items: stretch; }
 /* v1.4.15-beta: IUCN pill sits beside the pin, outside the head button */
@@ -1148,7 +1157,8 @@ select option:disabled { color: #7a8a9e; }
    drags pan the map instead of scrolling the page. */
 #worldMapWrap.exploring { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* v0.10.0: currents overlay — warm/cold hues are real oceanography */
-.current { fill: none; opacity: 0.8; }
+/* v1.5.2-beta: currents are dashed + lower opacity so they're never confused with solid shark track lines */
+.current { fill: none; opacity: 0.45; }
 .current.warm { stroke: #ff9e5e; }
 .current.cold { stroke: #6ecff5; }
 .current-label {
@@ -1246,9 +1256,13 @@ video.archive-media { max-height: 420px; }
 }
 .filter-label { font-size: 12px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
 .filter-select {
-  font-size: 15px; padding: 10px 12px; border-radius: 10px;
+  font-size: 15px; padding: 10px 36px 10px 12px; border-radius: 10px;
   border: 1px solid var(--line); background: var(--bg); color: var(--ink);
   min-height: 44px; /* dyspraxia-friendly touch target */
+  /* v1.5.2-beta: custom dropdown arrow inside the box, not floating */
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
 }
 .logbook-conditions { font-size: 12px; margin-top: 2px; opacity: 0.85; }
 
