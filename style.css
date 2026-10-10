@@ -1518,3 +1518,27 @@ video.archive-media { max-height: 420px; }
   color: var(--gold, #ffd166); margin-bottom: 8px;
 }
 .tagalong-fact-card .fact-text { font-size: 15px; line-height: 1.6; }
+
+/* v1.7.0-beta: derpy mode toggle — win-unlocked completion award. */
+.derpy-toggle {
+  display: block;
+  margin: 8px auto;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 2px solid #f0a030;
+  background: rgba(240, 160, 48, 0.15);
+  color: #f0c060;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.derpy-toggle.active {
+  background: #f0a030;
+  color: #1a1a2e;
+}
+.derpy-toggle:hover {
+  background: rgba(240, 160, 48, 0.3);
+}
+.derpy-toggle.active:hover {
+  background: #e09020;
+}

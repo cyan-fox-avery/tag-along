@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.7.0-beta', VERSION === 'v1.7.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -52,6 +52,18 @@ code += `
   ok('all have nudges', ids.every(id => !!COUSIN_NUDGES[id]));
   ok('all have envelopes', ids.every(id => !!TRACK_ENVELOPES[id]));
   ok('win is full roster', SHARKS.length === 50);
+
+  // v1.7.0-beta: derpy award
+  ok('WHATS_NEW has v1.7.0 entry', !!(WHATS_NEW["v1.7.0-beta"] && WHATS_NEW["v1.7.0-beta"].length));
+  ok('DERPY_AWARD_THREAD exists', typeof DERPY_AWARD_THREAD !== "undefined" && DERPY_AWARD_THREAD.length >= 5);
+  ok('derpy thread has Sarah voice', DERPY_AWARD_THREAD.some(m => m.who === "them" && /derpy/i.test(m.text)));
+  ok('derpyModeOn function exists', typeof derpyModeOn === "function");
+  ok('derpyUnlocked function exists', typeof derpyUnlocked === "function");
+  ok('sharkArtImg uses derpy SVG in derpy mode', fileCode.includes('type === "illustration" && derpyModeOn()'));
+  ok('doWin unlocks derpy', fileCode.includes('tyi-derpy-unlocked'));
+  ok('winStep has beat 5', fileCode.includes('else if (n === 5)'));
+  ok('derpy toggle in renderCollection', fileCode.includes('derpy-toggle'));
+  ok('RESET_KEYS includes derpy keys', fileCode.includes('tyi-derpy-mode'));
 
   // v0.14.0 new sharks
   const new2 = ['frilled', 'zebra'];

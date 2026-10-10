@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.7.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.0-beta": [
+    "\uD83C\uDF89 <strong>Derpy sharks unlocked!</strong> Finish the full roster and Sarah gives you the original derpy art as a completion award — toggle derpy mode in your collection book anytime.",
+  ],
   "v0.22.0": [
     "📓 <strong>Logbook filters.</strong> Filter your expedition log by outcome, region, or species — compare attempts and spot the pattern.",
     "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
@@ -1001,7 +1004,11 @@ const state = {
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
-  deferredTagAlong: null // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
+  deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
+  /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
+     persists the unlock; derpyMode is the player's toggle. */
+  derpyUnlocked: (() => { try { return localStorage.getItem("tyi-derpy-unlocked") === "1"; } catch { return false; } })(),
+  derpyMode: (() => { try { return localStorage.getItem("tyi-derpy-mode") === "1"; } catch { return false; } })()
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -3706,9 +3713,13 @@ function doWin() {
      beat 4. A player who closes mid-ceremony keeps the unlock — beat 4 is
      where they're TOLD about it. */
   state.archiveUnlocked = true;
+  /* v1.7.0-beta: the derpy award — completing the roster unlocks the
+     original derpy art as a toggleable mode. */
+  state.derpyUnlocked = true;
   try {
     localStorage.setItem("tyi-won", "1");
     localStorage.setItem("tyi-archive", "1");
+    localStorage.setItem("tyi-derpy-unlocked", "1");
   } catch {}
   renderCollection();
   renderResearch();
@@ -3754,7 +3765,7 @@ function winStep(n) {
     /* Beat 3: the map finale — "they're all still out there." */
     winMapFinale();
 
-  } else {
+  } else if (n === 4) {
     /* Beat 4: the acknowledgement. v0.24.0: the Archive is no longer a
        win-gated reward — it's been growing all game. This beat celebrates
        the completed collection instead. */
@@ -3767,7 +3778,30 @@ function winStep(n) {
         <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
         <p style="margin-top:8px">🖼️ Your Wild Archive is complete — every species you tagged, face to face with the real animal.</p>
       </div>
+      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+    $("winNext").addEventListener("click", () => winStep(5));
+  } else if (n === 5) {
+    /* Beat 5 (v1.7.0-beta): the derpy award — Sarah gives you the original
+       derpy art as a completion reward. A toggle appears in the collection. */
+    pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
+    box(`
+      <div style="font-size:52px; text-align:center">\uD83E\uDD88</div>
+      <h2 style="text-align:center; margin:8px 0 2px">A gift from Sarah</h2>
+      <p class="latin" style="text-align:center">The original derpy sharks — unlocked!</p>
+      <div class="cert-body">
+        <p>Before the institute sent the real illustrations, these little derpy sharks were the whole game. Sarah saved every single one.</p>
+        <p style="margin-top:8px">\uD83C\uDFA8 <strong>Derpy mode</strong> is now available — toggle it in your collection book to see all ${SHARKS.length} sharks in their original derpy glory.</p>
+      </div>
+      <div class="phone-thread win-thread" style="margin-top:8px"></div>
+      <p class="latin" style="text-align:center; margin:0">Saved in \uD83D\uDCF1 Phone.</p>
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
+    const th5 = ov.querySelector(".win-thread");
+    DERPY_AWARD_THREAD.forEach(m => {
+      const b = document.createElement("div");
+      b.className = "bubble " + m.who;
+      b.textContent = m.text;
+      th5.appendChild(b);
+    });
     $("winNext").addEventListener("click", () => {
       ov.classList.add("hidden");
       /* v1.4.0-beta Mira review (win-path edge case): if the winning tag was
@@ -4042,6 +4076,23 @@ function renderCollection() {
     shelf.appendChild(t);
   }
 
+  /* v1.7.0-beta: derpy mode toggle — win-unlocked completion award. */
+  if (state.derpyUnlocked) {
+    const d = document.createElement("button");
+    d.type = "button";
+    d.className = "derpy-toggle" + (state.derpyMode ? " active" : "");
+    d.setAttribute("aria-pressed", state.derpyMode ? "true" : "false");
+    d.setAttribute("aria-label", "Toggle derpy shark art mode");
+    d.innerHTML = `\uD83E\uDD88 Derpy mode: ${state.derpyMode ? "ON" : "OFF"}`;
+    d.addEventListener("click", () => {
+      state.derpyMode = !state.derpyMode;
+      try { localStorage.setItem("tyi-derpy-mode", state.derpyMode ? "1" : "0"); } catch {}
+      renderCollection();
+      renderResearch();
+    });
+    shelf.appendChild(d);
+  }
+
   if (!ids.length && !state.won) {
     list.innerHTML = `<div class="empty-note">No sharks tagged yet.<br>Do your research, then get out there. 🦈</div>`;
     return;
@@ -4227,7 +4278,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {
