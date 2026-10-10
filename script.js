@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.0-beta";
+const VERSION = "v1.6.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -122,6 +122,9 @@ const WHATS_NEW = {
     "🏷️ <strong>IUCN badge breathing room.</strong> More space between the IUCN badge and pin icon, so Latin names show more.",
     "🔬 <strong>Full scientific names.</strong> Collection and Archive expanded cards now show the full scientific name prominently above the description.",
     "🏆 <strong>Achievement hints get two lines.</strong> No more truncating with \"...\" — hints can breathe.",
+  ],
+  "v1.6.2-beta": [
+    "✏️ <strong>Field sketches removed.</strong> Expanded field-guide cards and the pinned card no longer show the generic sketch placeholder — just the text.",
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
@@ -1393,7 +1396,6 @@ function renderPinnedCard(list) {
         <button type="button" class="pin-btn unpin" data-unpin aria-label="Unpin ${s.name}">✕</button>
       </div>
       <div class="pinned-body">
-        <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
         <div>
           ${done ? "✅ " : ""}<strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
@@ -1584,7 +1586,6 @@ function renderResearch() {
       </div>
       <div class="guide-row-body hidden">
         <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
-        <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
         <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
