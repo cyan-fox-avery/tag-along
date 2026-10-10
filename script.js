@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.2-beta";
+const VERSION = "v1.4.3-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -72,6 +72,9 @@ const WHATS_NEW = {
     "☀️ <strong>Sun-point caustics.</strong> Light rays now radiate from the far top-left corner like real sunlight, with softer overlap brightness.",
     "🏷️ <strong>IUCN abbreviations.</strong> Field guide cards show standard IUCN codes (CR, EN, VU, NT, LC) — tap a shark for the full status.",
     "📱 <strong>Cleaner tabs.</strong> Collection and Achievements tabs show just icon + label; their counts moved to the top of each page."
+  ],
+  "v1.4.3-beta": [
+    "☀️ <strong>Caustics edge fix.</strong> Light rays now fade out near the screen edges — no more dark bars sliding in from the sides."
   ]
 };
 
