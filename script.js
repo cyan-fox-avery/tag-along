@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.10-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.10-beta": [
+    "💬 <strong>Sarah paces herself.</strong> She now congratulates you on a single shark at most once every 3 expeditions — Big Day celebrations still fire every time.",
   ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
@@ -982,6 +985,9 @@ const state = {
   sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
   /* v1.4.19-beta: Big Day no-repeat bags — per-tier shuffled indices. */
   bigDayBags: _savedMsgs.bigDayBags || {},
+  /* v1.6.10-beta: throttle single-shark congratulations — expedition number
+     of Sarah's last single-shark cheer (null until the first one). */
+  lastSingleCheerExp: (typeof _savedMsgs.lastSingleCheerExp === "number") ? _savedMsgs.lastSingleCheerExp : null,
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
@@ -1047,7 +1053,8 @@ function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
     sarahAdviceOffered: state.sarahAdviceOffered,
-    bigDayBags: state.bigDayBags });
+    bigDayBags: state.bigDayBags,
+    lastSingleCheerExp: state.lastSingleCheerExp });
 }
 /* Every new thread gets a timestamp for the Phone tab.
    v1.4.0: if the Phone panel is already open, the new thread renders
@@ -2850,13 +2857,22 @@ function flushPendingCelebrations() {
   celebrationStore.clear();
   if (events.length === 0) return;
   if (events.length === 1) {
-    // Single new species: existing celebration, delivered at trip end.
-    const e = events[0];
-    pushThread([
-      { who: "them", text: e.opener },
-      { who: "me", text: `A ${e.speciesName} — ${e.length} metres, ${e.sex}. Research ID ${e.researchId}.` },
-      { who: "them", text: e.cheer }
-    ]);
+    /* v1.6.10-beta: throttle single-shark congratulations — Sarah cheers a
+       lone tag at most once every 3 expeditions so she doesn't become
+       annoying. The tag itself still counts; she just doesn't always text.
+       Big Day (2+) threads below are NOT throttled. */
+    const exp = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0;
+    const last = state.lastSingleCheerExp;
+    if (last === null || last === undefined || exp - last >= 3) {
+      const e = events[0];
+      pushThread([
+        { who: "them", text: e.opener },
+        { who: "me", text: `A ${e.speciesName} — ${e.length} metres, ${e.sex}. Research ID ${e.researchId}.` },
+        { who: "them", text: e.cheer }
+      ]);
+      state.lastSingleCheerExp = exp;
+      saveMsgs();
+    }
   } else {
     // 2+ new species: one Big Day conversation.
     pushThread(buildBigDayThread(events));

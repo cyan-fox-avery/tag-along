@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.10-beta', VERSION === 'v1.6.10-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1728,6 +1728,86 @@ code += `
   ok('flushPendingCelebrations defined', /function flushPendingCelebrations/.test(code));
   ok('confirmTag queues (no immediate pushThread celebration)', /state\\.pendingCelebrations\\.push/.test(code));
   ok('closeDive flushes celebrations', /flushPendingCelebrations\\(\\);/.test(code));
+  ok('WHATS_NEW has v1.6.10-beta', Array.isArray(WHATS_NEW['v1.6.10-beta']) && WHATS_NEW['v1.6.10-beta'].length === 1);
+  // v1.6.10: single-shark congratulations throttled to once per 3 expeditions
+  ok('single cheer fires on first single tag', (() => {
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveExp = state.stats.expeditions, saveLast = state.lastSingleCheerExp;
+    state.stats.expeditions = 5;
+    state.lastSingleCheerExp = null;
+    state.pendingCelebrations = [{ opener: 'Nice!', speciesName: 'Nurse Shark', length: '2.5', sex: 'female', researchId: 'NS-2026-001', cheer: 'Well done!' }];
+    try {
+      flushPendingCelebrations();
+      return pushed !== null && pushed.length === 3 && state.lastSingleCheerExp === 5;
+    } finally {
+      pushThread = savePush;
+      state.stats.expeditions = saveExp;
+      state.lastSingleCheerExp = saveLast;
+      state.pendingCelebrations = [];
+    }
+  })());
+  ok('single cheer skipped within 3 expeditions', (() => {
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveExp = state.stats.expeditions, saveLast = state.lastSingleCheerExp;
+    state.stats.expeditions = 7;
+    state.lastSingleCheerExp = 5;
+    state.pendingCelebrations = [{ opener: 'Nice!', speciesName: 'Nurse Shark', length: '2.5', sex: 'female', researchId: 'NS-2026-001', cheer: 'Well done!' }];
+    try {
+      flushPendingCelebrations();
+      return pushed === null && state.lastSingleCheerExp === 5;
+    } finally {
+      pushThread = savePush;
+      state.stats.expeditions = saveExp;
+      state.lastSingleCheerExp = saveLast;
+      state.pendingCelebrations = [];
+    }
+  })());
+  ok('single cheer fires again after 3 expeditions', (() => {
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveExp = state.stats.expeditions, saveLast = state.lastSingleCheerExp;
+    state.stats.expeditions = 8;
+    state.lastSingleCheerExp = 5;
+    state.pendingCelebrations = [{ opener: 'Nice!', speciesName: 'Nurse Shark', length: '2.5', sex: 'female', researchId: 'NS-2026-001', cheer: 'Well done!' }];
+    try {
+      flushPendingCelebrations();
+      return pushed !== null && state.lastSingleCheerExp === 8;
+    } finally {
+      pushThread = savePush;
+      state.stats.expeditions = saveExp;
+      state.lastSingleCheerExp = saveLast;
+      state.pendingCelebrations = [];
+    }
+  })());
+  ok('big day (2+) never throttled', (() => {
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveExp = state.stats.expeditions, saveLast = state.lastSingleCheerExp, saveBags = state.bigDayBags;
+    state.stats.expeditions = 6;
+    state.lastSingleCheerExp = 5; // 1 expedition ago — would be throttled if single
+    state.bigDayBags = {};
+    state.pendingCelebrations = [
+      { speciesId: 'nurse', speciesName: 'Nurse Shark' },
+      { speciesId: 'tiger', speciesName: 'Tiger Shark' }
+    ];
+    try {
+      flushPendingCelebrations();
+      return pushed !== null && state.lastSingleCheerExp === 5;
+    } finally {
+      pushThread = savePush;
+      state.stats.expeditions = saveExp;
+      state.lastSingleCheerExp = saveLast;
+      state.bigDayBags = saveBags;
+      state.pendingCelebrations = [];
+    }
+  })());
+  ok('lastSingleCheerExp persisted via saveMsgs', /lastSingleCheerExp: state\\.lastSingleCheerExp/.test(code));
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
