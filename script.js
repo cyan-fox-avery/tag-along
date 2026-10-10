@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.9-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -132,6 +132,9 @@ const WHATS_NEW = {
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
     "↕️ <strong>Archive sort.</strong> Sort the Archive by name (A–Z), date tagged (newest or oldest first), or IUCN conservation status.",
+  ],
+  "v1.6.9-beta": [
+    "🐋 <strong>One White Whale thread.</strong> Tagging a megamouth no longer fires both Sarah's White Whale reaction and the routine species celebration — the special thread is the celebration.",
   ],
   "v1.6.1-beta": [
     "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",
@@ -2972,6 +2975,13 @@ function unlockAchievement(a) {
      over a megamouth. Fires alongside the achievement celebration. */
   if (a.id === "white-whale" && typeof WHITE_WHALE_THREAD !== "undefined") {
     pushThread(WHITE_WHALE_THREAD.map(m => ({ ...m })));
+    /* v1.6.9-beta: the White Whale thread IS the megamouth celebration —
+       drop the queued routine/Big-Day megamouth thread so Sarah doesn't
+       lose her mind twice. Other species' celebrations are untouched. */
+    if (state.pendingCelebrations && state.pendingCelebrations.length) {
+      state.pendingCelebrations = state.pendingCelebrations.filter(e => e.speciesId !== "megamouth");
+      try { celebrationStore.save(state.pendingCelebrations); } catch {}
+    }
   }
 }
 const achieveQueue = [];

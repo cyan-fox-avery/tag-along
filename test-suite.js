@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.9-beta', VERSION === 'v1.6.9-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1654,6 +1654,46 @@ code += `
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
   ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("megamouth"));
+  // v1.6.9-beta: White Whale thread replaces the queued megamouth celebration
+  ok("WHATS_NEW has v1.6.9-beta", Array.isArray(WHATS_NEW["v1.6.9-beta"]) && WHATS_NEW["v1.6.9-beta"].length >= 1);
+  ok("white-whale unlock drops the queued megamouth celebration", (() => {
+    const savePending = state.pendingCelebrations;
+    const saveAch = Object.assign({}, state.achievements);
+    const saveMsgs = state.messages.length;
+    const saveQueue = achieveQueue.length, saveShowing = achieveShowing;
+    state.pendingCelebrations = [
+      { speciesId: "megamouth", speciesName: "Megamouth Shark" },
+      { speciesId: "nurse", speciesName: "Nurse Shark" }
+    ];
+    const a = ACHIEVEMENTS.find(x => x.id === "white-whale");
+    unlockAchievement(a);
+    const megaGone = !state.pendingCelebrations.some(e => e.speciesId === "megamouth");
+    const nurseKept = state.pendingCelebrations.some(e => e.speciesId === "nurse");
+    const threadPushed = state.messages.slice(saveMsgs).some(m => m.msgs.some(x => /MEGAMOUTH/.test(x.text)));
+    const achieved = !!state.achievements["white-whale"];
+    state.pendingCelebrations = savePending;
+    state.achievements = saveAch;
+    state.messages.length = saveMsgs;
+    achieveQueue.length = saveQueue;
+    achieveShowing = saveShowing;
+    return megaGone && nurseKept && threadPushed && achieved;
+  })());
+  ok("non-white-whale achievement leaves celebrations alone", (() => {
+    const savePending = state.pendingCelebrations;
+    const saveAch = Object.assign({}, state.achievements);
+    const saveMsgs = state.messages.length;
+    const saveQueue = achieveQueue.length, saveShowing = achieveShowing;
+    state.pendingCelebrations = [{ speciesId: "megamouth", speciesName: "Megamouth Shark" }];
+    const a = ACHIEVEMENTS.find(x => x.id === "first-tag");
+    unlockAchievement(a);
+    const kept = state.pendingCelebrations.some(e => e.speciesId === "megamouth");
+    state.pendingCelebrations = savePending;
+    state.achievements = saveAch;
+    state.messages.length = saveMsgs;
+    achieveQueue.length = saveQueue;
+    achieveShowing = saveShowing;
+    return kept;
+  })());
   ok("surface-shimmer oversized past viewport", cssCode.indexOf(".surface-shimmer") !== -1 && cssCode.indexOf("left: -4%") !== -1);
   ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
   // v1.4.2: IUCN abbreviations on field-guide pills
