@@ -123,7 +123,6 @@ const WHATS_NEW = {
   "v1.6.1-beta": [
     "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",
     "🃏 <strong>Horizontal collection cards on desktop.</strong> Tagged-shark cards lay out side-by-side (art left, details right) on wide screens.",
-    "🗺️ <strong>Map pinch-to-zoom.</strong> Two fingers zoom the world map in and out, anchored at the pinch point — buttons and wheel still work too.",
     "⭕ <strong>Checklist-style tag status.</strong> Field-guide rows and the pinned card now show an empty circle that fills green when the shark is tagged — no more ✅.",
   ],
   "v1.5.32-beta": [
@@ -647,8 +646,8 @@ function mapPoints(t) {
    Track/tag geometry is unchanged — the equirectangular projection
    already matched, so every coordinate keeps working as before. */
 let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
-/* v0.15.0: no explore mode — zoom is buttons/wheel/pinch.
-   v1.6.1-beta: pinch-to-zoom restored via Pointer Events (see initMapGestures).
+/* v0.15.0: no explore mode — zoom is buttons/wheel.
+   v1.6.1-beta: pinch-to-zoom restored then reverted (iPad: it didn't engage).
    touch-action follows the zoom level, decided before any touch begins:
    at 1x the page owns one-finger drags (the page scrolls); zoomed in,
    the map owns them (one finger pans). No mid-gesture races, no modes. */
@@ -4573,11 +4572,11 @@ onMapBtn("mapZoomReset", () => { mapFocusClear(); mapZoom = 1; mapCX = MAP_W / 2
 onMapBtn("mapCurrentsToggle", () => { mapCurrentsOn = !mapCurrentsOn; renderMap(); });
 /* v0.10.2: shared zoom helper — re-centers on the pointer's map position,
    then applies the new zoom (clamped). Used by wheel; buttons use the
-   fixed-step zoom below. (v1.6.1-beta: pinch restored in initMapGestures.) */
+   fixed-step zoom below. */
 let suppressMarkerClick = false;
 let mapRenderQueued = false;
 function requestMapRender() {
-  /* rAF-throttle so pinch/pan stay smooth on phones; direct render where
+  /* rAF-throttle so pan stays smooth on phones; direct render where
      requestAnimationFrame doesn't exist (tests, old webviews). */
   if (typeof requestAnimationFrame === "function") {
     if (mapRenderQueued) return;
@@ -4679,22 +4678,16 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   e.preventDefault();
   mapZoomAt(e.clientX, e.clientY, mapZoom * (e.deltaY > 0 ? 1 / 1.3 : 1.3));
 }, { passive: false });
-/* v1.6.1-beta: pinch-to-zoom is back (buttons/wheel/one-finger pan unchanged).
-   Two fingers on the map: on the second pointerdown the wrap's touch-action
-   is set to `none`, so the combined two-finger gesture intersects to `none`
-   and Safari won't scroll the page or page-zoom under the fingers. Each
-   pointermove drives the anchor-preserving mapZoomAt() at the pinch
-   midpoint (rAF-throttled, like wheel). Lifting a finger collapses back to
-   a normal one-finger pan, re-anchored so the map doesn't jump. */
+/* v1.6.1-beta (revised): pinch-to-zoom removed after iPad testing
+   showed the gesture didn't engage. Buttons/wheel zoom and one-finger
+   pan (when zoomed in) are unchanged. touch-action still follows the zoom
+   level, decided before any touch begins: at 1x the page owns one-finger
+   drags (the page scrolls); zoomed in, the map owns them (one finger pans). */
 (function initMapGestures() {
   const wrap = $("worldMapWrap");
   if (!wrap || typeof window === "undefined") return;
   const pts = new Map(); // pointerId -> {x, y}
   let panX = 0, panY = 0, downX = 0, downY = 0, movedMax = 0;
-  let pinching = false, pinchStartDist = 0, pinchStartZoom = 1, pinchMoved = false;
-  const pinchDist = () => { const p = [...pts.values()]; return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); };
-  const pinchMid = () => { const p = [...pts.values()]; return { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 }; };
-  const restoreTouchAction = () => { wrap.style.touchAction = mapZoom > 1 ? "none" : "pan-y"; };
   wrap.addEventListener("pointerdown", e => {
     suppressMarkerClick = false; // a stale flag never eats a real tap
     mapGlideCancel(); // grabbing the map mid-glide hands control to the hand
@@ -4702,24 +4695,11 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
     if (pts.size === 1) {
       downX = panX = e.clientX; downY = panY = e.clientY;
       movedMax = 0;
-    } else if (pts.size === 2) {
-      pinching = true; pinchMoved = false;
-      pinchStartDist = pinchDist(); pinchStartZoom = mapZoom;
-      wrap.style.touchAction = "none";
-      mapFocusClear(); // manual zoom breaks the tap-focus toggle contract
     }
   });
   window.addEventListener("pointermove", e => {
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pinching && pts.size === 2) {
-      e.preventDefault();
-      const d = pinchDist(), mid = pinchMid();
-      if (pinchStartDist > 0 && Math.abs(d - pinchStartDist) > 4) pinchMoved = true;
-      mapZoomAt(mid.x, mid.y, pinchStartZoom * (pinchStartDist > 0 ? d / pinchStartDist : 1));
-      wrap.style.touchAction = "none"; // hold it: renderMap may set pan-y at 1x
-      return;
-    }
     if (e.pointerType !== "mouse" && pts.size === 1) {
       movedMax = Math.max(movedMax, Math.hypot(e.clientX - downX, e.clientY - downY));
       if (mapZoom > 1 && movedMax > 10) {
@@ -4738,21 +4718,7 @@ if (mapWrapEl) mapWrapEl.addEventListener("wheel", e => {
   }, { passive: false });
   const endPointer = e => {
     pts.delete(e.pointerId);
-    if (pts.size === 0) {
-      if (movedMax > 10 || pinchMoved) suppressMarkerClick = true;
-      pinching = false;
-      restoreTouchAction();
-    } else if (pts.size === 1) {
-      // A lifted finger during a pinch collapses back into a normal
-      // one-finger pan: re-anchor the remaining finger so the map doesn't
-      // jump from its older position.
-      pinching = false;
-      restoreTouchAction();
-      const p = [...pts.values()][0];
-      downX = panX = p.x;
-      downY = panY = p.y;
-      movedMax = 0;
-    }
+    if (pts.size === 0 && movedMax > 10) suppressMarkerClick = true;
   };
   window.addEventListener("pointerup", endPointer);
   window.addEventListener("pointercancel", endPointer);

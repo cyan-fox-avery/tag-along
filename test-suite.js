@@ -1979,7 +1979,7 @@ code += `
   ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
 
   // v1.6.1-beta: layout & interaction batch
-  ok('WHATS_NEW has v1.6.1-beta with 4 entries', Array.isArray(WHATS_NEW['v1.6.1-beta']) && WHATS_NEW['v1.6.1-beta'].length === 4);
+  ok('WHATS_NEW has v1.6.1-beta with 3 entries', Array.isArray(WHATS_NEW['v1.6.1-beta']) && WHATS_NEW['v1.6.1-beta'].length === 3);
   ok('desktop logo is 190px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 190px/.test(cssCode));
   ok('base logo is 76px', /\\.site-logo \\{ display: block; height: 76px/.test(cssCode));
   ok('desktop collection cards are horizontal', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.grid-cell \\{ display: flex/.test(cssCode));
@@ -1990,7 +1990,9 @@ code += `
   ok('sr-only utility CSS present', /\.sr-only \{/.test(cssCode));
   ok('checklist circles have screen-reader status text', fileCode.indexOf('class="sr-only"') !== -1 && fileCode.indexOf('\${done ? "Tagged" : "Not tagged"}') !== -1);
   ok('no checkmark prefix in field-guide rows', fileCode.indexOf('\${done ? "✅ " : ""}') === -1);
-  ok('pinch-to-zoom wired in map gestures', /pinchStartDist/.test(fileCode) && /mapZoomAt\\(mid\\.x, mid\\.y/.test(fileCode));
+  ok('pinch-to-zoom removed (no pinch state)', !/pinchStartDist|pinching|pinchMoved/.test(fileCode));
+  ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
+  ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
