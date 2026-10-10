@@ -1457,6 +1457,41 @@ code += `
     ok("filter matches followed", logbookTripMatches(trip, { outcome: "followed", region: "all", species: "all", dateRange: "all" }) === true);
     ok("filter rejects non-followed", logbookTripMatches({ encounters: [{ speciesId: "nurse", result: "watched" }], region: "caribbean", ts: Date.now() }, { outcome: "followed", region: "all", species: "all", dateRange: "all" }) === false);
   })();
+  // v1.4.0-beta Mira review: ensureMapFocusedOn does not toggle away
+  (() => {
+    const origTagged = state.tagged;
+    const origMapPoints = mapPoints;
+    const origMapGlideTo = mapGlideTo;
+    const origFocus = mapFocus;
+    state.tagged = { nurse: { researchId: "NS-2026-001" }, lemon: { researchId: "LS-2026-002" } };
+    mapPoints = () => [{ x: 100, y: 100 }];
+    mapGlideTo = () => {}; // no-op: avoid renderMap in test env
+    mapFocus = null;
+    ensureMapFocusedOn("nurse");
+    ok("ensureMapFocusedOn focuses", !!(mapFocus && mapFocus.sid === "nurse"));
+    ensureMapFocusedOn("nurse");
+    ok("ensureMapFocusedOn same shark twice stays focused", !!(mapFocus && mapFocus.sid === "nurse"));
+    ensureMapFocusedOn("lemon");
+    ok("ensureMapFocusedOn switches to different shark", !!(mapFocus && mapFocus.sid === "lemon"));
+    // manual toggle behavior preserved
+    mapFocusOn("lemon");
+    ok("mapFocusOn still toggles away on second tap", mapFocus === null);
+    // restore
+    mapPoints = origMapPoints;
+    mapGlideTo = origMapGlideTo;
+    state.tagged = origTagged;
+    mapFocus = origFocus;
+  })();
+  // v1.4.0-beta Mira review: corrected secret facts
+  (() => {
+    const facts = SECRET_FACTS;
+    ok("lemon fact drops fish-learning trope", !facts.lemon.join(" ").includes("a rare trick for a fish"));
+    ok("hammerhead fact drops 360 claim", !facts.hammerhead.join(" ").includes("360-degree"));
+    ok("hammerhead fact uses binocular overlap", facts.hammerhead.join(" ").includes("binocular overlap"));
+    ok("cookiecutter fact mentions sonar domes", facts.cookiecutter.join(" ").includes("sonar domes"));
+    ok("kitefin fact cites 2021", facts.kitefin.join(" ").includes("2021"));
+    ok("tiger fact drops suit of armor", !facts.tiger.join(" ").includes("suit of armor"));
+  })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
 
 console.log(out.join('\\n'));
