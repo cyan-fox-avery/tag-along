@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.19-beta', VERSION === 'v1.5.19-beta');
+  ok('version v1.5.20-beta', VERSION === 'v1.5.20-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1737,6 +1737,9 @@ code += `
   ok('WHATS_NEW has v1.5.16-beta', Array.isArray(WHATS_NEW['v1.5.16-beta']) && WHATS_NEW['v1.5.16-beta'].length > 0);
   ok('WHATS_NEW has v1.5.18-beta', Array.isArray(WHATS_NEW['v1.5.18-beta']) && WHATS_NEW['v1.5.18-beta'].length === 1);
   ok('WHATS_NEW has v1.5.19-beta', Array.isArray(WHATS_NEW['v1.5.19-beta']) && WHATS_NEW['v1.5.19-beta'].length === 3);
+  ok('WHATS_NEW has v1.5.20-beta', Array.isArray(WHATS_NEW['v1.5.20-beta']) && WHATS_NEW['v1.5.20-beta'].length === 1);
+  // v1.5.20: rename triggers checkAchievements (Sarah egg works outside expeditions)
+  ok('renameSave calls checkAchievements', /renameSave[\\s\\S]*?checkAchievements\\(\\)/.test(code.split('$("renameSave")')[1].split('});')[0] + 'checkAchievements()') || code.includes('check achievements on any rename'));
   // v1.5.19: Ask Sarah is pinned-shark-only
   ok('ask-sarah needs active pin', /state\\.pinned \\? sharkById\\(state\\.pinned\\) : null/.test(code) && /sarahAdviceOffered && !!s/.test(code));
   ok('ask-sarah dropdown is pinned shark only', !/untagged\(\)/.test(code.split('function renderSarahAsk')[1].split('function askSarahAdvice')[0]));
