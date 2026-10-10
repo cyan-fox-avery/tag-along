@@ -51,6 +51,23 @@ body::before {
     #041224 85%,
     #020a16 100%); /* abyssal dark */
 }
+/* v1.5.26-beta: solid black abyss below the seafloor. The seafloor wave sits
+   at the bottom of the document; when the page is shorter than the viewport
+   (or iPad Safari's collapsing toolbar grows the viewport past 100vh), the
+   fixed gradient above would otherwise show blue water below the black
+   ground. This fixed layer guarantees solid black from the lower viewport to
+   the bottom edge. Plain position:fixed, no transforms — iPad-safe. */
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50vh;
+  background: #000;
+  z-index: -1;
+  pointer-events: none;
+}
 
 .app { max-width: 640px; margin: 0 auto; padding: 12px 14px 40px; position: relative; z-index: 1; }
 /* v0.19.1: underwater ambience — sits behind the app, never interactive.
