@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.6.6-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.6-beta": [
+    "🌑 <strong>Shadows match their sharks.</strong> The mystery silhouette in dive encounters now uses the shark's actual illustration with a dark overlay — no more mismatched shadow shapes.",
   ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
@@ -1946,16 +1949,18 @@ function doEncounter(species, plan) {
     }
     const rec = isReunion ? existingRec : null;
     const sharkEl = $("diveShark");
-    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
-       silhouette (mystery — the species is not named yet). Tapping
-       crossfades to the full-colour illustration and reveals the name.
-       The illustration is preloaded so the reveal is instant. */
+    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the mystery
+       silhouette (the species is not named yet). Tapping crossfades
+       to the full-colour illustration and reveals the name.
+       The illustration is preloaded so the reveal is instant.
+       v1.6.6-beta: the shadow now uses the shark's actual illustration
+       with a dark CSS overlay, so the silhouette always matches the shark. */
     preloadSharkArt(species.id);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     sharkEl.innerHTML =
       `<div class="shark-silhouette" role="button" tabindex="0" ` +
       `aria-label="Something is out there — tap to reveal">` +
-      sharkArtImg(species.id, "silhouette", "Mysterious shark silhouette") +
+      `<div class="shark-shadow">` + sharkArtImg(species.id, "illustration", "Mysterious shark silhouette") + `</div>` +
       `<div class="tap-hint">👆 Tap to reveal</div></div>`;
     sharkEl.classList.remove("hidden");
     logLine(`🦈 <span class="found">Something's out there...</span>`, "found");
