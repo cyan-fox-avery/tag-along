@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.32-beta', VERSION === 'v1.5.32-beta');
+  ok('version v1.6.0-beta', VERSION === 'v1.6.0-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1749,7 +1749,16 @@ code += `
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
   ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
   ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
-  ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
+  ok('WHATS_NEW has v1.6.0-beta', Array.isArray(WHATS_NEW['v1.6.0-beta']) && WHATS_NEW['v1.6.0-beta'].length === 4);
+  // v1.6.0: Research accordion — opening one entry closes the others
+  ok('accordion closes other research rows', /collapseGuideRow\\(other\\)/.test(code));
+  // v1.6.0: IUCN badge spacing — more room between badge and pin
+  ok('iucn badge has right margin', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*8px/.test(cssCode));
+  // v1.6.0: full scientific name in expanded Collection/Archive cards
+  ok('detail-scientific class styled', /\\.detail-scientific\\s*\\{[^}]*font-size:\\s*15px/.test(cssCode));
+  ok('collection detail shows scientific name', code.indexOf('detail-scientific') !== -1);
+  // v1.6.0: achievement hints get two lines
+  ok('achievement hints allow two lines', /\\.ach-hint[^}]*-webkit-line-clamp:\\s*2/.test(cssCode));
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
   // v1.5.29: blue through ~90%, black only at the very bottom
   ok('gradient stays blue until 90%', cssCode.indexOf('#020a16 90%') !== -1);
