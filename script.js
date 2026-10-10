@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.17-beta";
+const VERSION = "v1.4.18-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -112,6 +112,10 @@ const WHATS_NEW = {
     "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
     "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll.",
     "🌊 <strong>Calmer porthole.</strong> The far wave sits higher under a new CSS sky (sun + clouds — Mira may art-direct it later), all three wave layers overlap into continuous water, everything drifts much more slowly, and splashes pop and fade instead of sliding down the glass."
+  ],
+  "v1.4.18-beta": [
+    "\uD83C\uDF0A <strong>Waves stacked tight, moving in ovals.</strong> The three porthole wave layers now sit almost on top of each other with no gaps, and each traces a gentle elliptical orbit like real water \u2014 far slowest, near liveliest.",
+    "\uD83D\uDCA6 <strong>Bigger, faster splash.</strong> The on-glass splash is bigger (320px), pops in suddenly, and slides down fast \u2014 the quickest thing in the calm wave scene.",
   ],
   "v1.4.17-beta": [
     "\u2600\uFE0F <strong>Sun rays fixed properly.</strong> The v1.4.16 conic-gradient fan broke the page layout, so rays are back on the safe span-based system — brighter, wider fan (12-72\u00B0), clearly visible sway and breathing, and they never fully vanish.",
