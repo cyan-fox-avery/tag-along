@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.23-beta', VERSION === 'v1.5.23-beta');
+  ok('version v1.5.24-beta', VERSION === 'v1.5.24-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1744,6 +1744,14 @@ code += `
   ok('WHATS_NEW has v1.5.21-beta', Array.isArray(WHATS_NEW['v1.5.21-beta']) && WHATS_NEW['v1.5.21-beta'].length === 2);
   ok('WHATS_NEW has v1.5.22-beta', Array.isArray(WHATS_NEW['v1.5.22-beta']) && WHATS_NEW['v1.5.22-beta'].length === 1);
   ok('WHATS_NEW has v1.5.23-beta', Array.isArray(WHATS_NEW['v1.5.23-beta']) && WHATS_NEW['v1.5.23-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.24-beta', Array.isArray(WHATS_NEW['v1.5.24-beta']) && WHATS_NEW['v1.5.24-beta'].length === 2);
+  // v1.5.24: Bruce chain uses {bruce} placeholder with player capitalization
+  ok('bruce chain uses {bruce} placeholder', BRUCE_CHAIN.some(c => c.some(m => m.text.includes('{bruce}'))));
+  ok('OG Jaws Bruce has capital B', BRUCE_CHAIN[0].some(m => m.text.includes('nicknamed it Bruce')));
+  ok('bruce chain not scolding', !BRUCE_CHAIN.some(c => c.some(m => /REAL \{species\} after a robot/.test(m.text))));
+  ok('bruce chain is warm about the name', BRUCE_CHAIN[0].some(m => m.text.includes('i love it')));
+  ok('maybeNameEgg stores playerName', /playerName:\\s*rec\\.name\\.trim\\(\\)/.test(code));
+  ok('advanceBruceChain substitutes {bruce}', code.includes('split("{bruce}")'));
   // v1.5.21: lemon pool energy — every lemon convo has big-energy content
   ok('lemon pool includes LEMONNNNNNN', BIG_DAY.lemon.some(c => c.some(m => m.text.includes('LEMONNNNNNN'))));
   ok('all lemon conversations still 3-4 bubbles', BIG_DAY.lemon.every(c => c.length >= 3 && c.length <= 4));
