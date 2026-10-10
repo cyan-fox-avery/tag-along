@@ -1537,6 +1537,18 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
+  // v1.4.0-beta: caustics render as soft light — elliptical glow, no hard side edges
+  (() => {
+    ok("caustics use elliptical radial glow", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse/.test(cssCode));
+    ok("caustics have no hard bar edges", !/\\.caustics\\s+span\\s*\\{[^}]*border-radius:\\s*50%/.test(cssCode));
+    ok("caustics core is bright", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(218,242,255,0\\.34\\)/.test(cssCode));
+  })();
+  // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
+  (() => {
+    ok("open guide body is absolutely positioned", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
+    ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
+    ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+  })();
   ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
 
 console.log(out.join('\\n'));
