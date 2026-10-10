@@ -192,15 +192,17 @@ body { overflow-x: clip; }
   border-radius: 999px; padding: 3px 10px; pointer-events: none;
 }
 
-/* v1.5.1: tighter header — less vertical room around the logo/title/tab bar */
-.topbar { text-align: center; padding: 10px 8px 4px; }
-.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 4px; border-radius: 8px; }
+/* v1.5.1: tighter header — less vertical room around the logo/title/tab bar
+   v1.5.6: logo bigger still, margins trimmed to a tight fit — just a small
+   gap between the fins and the page top / tab bar. */
+.topbar { text-align: center; padding: 4px 8px 2px; }
+.site-logo { display: block; height: 84px; width: auto; margin: 0 auto 2px; border-radius: 8px; }
 /* v1.4.0: desktop-only side-by-side title lockup — logo beside (not above)
    the title, bigger logo, less vertical room. Phone/tablet keep the stack. */
 @media (min-width: 1024px) {
-  .topbar { display: flex; align-items: center; justify-content: center; gap: 18px; text-align: left; padding: 8px 8px 4px; }
-  /* v1.4.15-beta: logo 150% bigger — it's a logo, give it presence */
-  .site-logo { height: 156px; margin: 0; flex: none; }
+  .topbar { display: flex; align-items: center; justify-content: center; gap: 18px; text-align: left; padding: 4px 8px 2px; }
+  /* v1.5.6: logo bigger still */
+  .site-logo { height: 190px; margin: 0; flex: none; }
   .topbar-text { min-width: 0; }
   .topbar h1 { margin: 0 0 2px; }
 }
