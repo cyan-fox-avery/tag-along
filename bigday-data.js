@@ -37,7 +37,7 @@ const BIG_DAY = {
     ],
     [ /* 2E */
       { who: "them", text: "you know what's wild? two new species for your collection in a single trip." },
-      { who: "me", text: "And I got two before lunch." },
+      { who: "me", text: "And I got two in a single trip." },
       { who: "them", text: "two! {speciesList}! sharks just keep making teeth — conveyor belt, forever." },
       { who: "me", text: "I'm choosing to take that as a compliment." }
     ],
@@ -95,7 +95,7 @@ const BIG_DAY = {
     [ /* 3F */
       { who: "them", text: "I was literally just telling mom about your research and then the alerts started coming in." },
       { who: "me", text: "Sorry to interrupt the bragging?" },
-      { who: "them", text: "are you kidding, you IMPROVED the bragging. three new species, {speciesList}. some sharks live 70+ years — these three could be out there that whole time." },
+      { who: "them", text: "are you kidding, you IMPROVED the bragging. three new species, {speciesList}. some sharks live 70+ years. wild to think how long one tagged shark\u2019s story can run." },
       { who: "me", text: "Tell mom I said thanks. (The sharks don't say hi. But tell her.)" }
     ],
     [ /* 3G */
