@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.5-beta', VERSION === 'v1.5.5-beta');
+  ok('version v1.5.7-beta', VERSION === 'v1.5.7-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -221,7 +221,7 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
   ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
-  ok('tabs share equal width', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*minmax/.test(cssCode));
+  ok('tabs use flex row', /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
   // v1.4.2: tab buttons centered in the band, not left-aligned
   ok('tabs centered in band', /\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
   // v1.4.2: bigger tab emojis on desktop
@@ -1513,12 +1513,14 @@ code += `
   })();
   // v1.4.0-beta Mira review: fixed grid tracks keep tabs equal on sparse rows
   (() => {
-    ok("tabs use CSS grid", /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
-  ok("desktop tabs have 8 fixed tracks", /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*minmax/.test(cssCode));
-  ok("tablet tabs have 4 fixed tracks", /max-width:\\s*1023px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*minmax/.test(cssCode));
-  ok("phone tabs have 3 fixed tracks", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3,\\s*minmax/.test(cssCode));
+    ok("tabs use flexbox (v1.5.7)", /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+  ok("desktop tabs have flex-basis pills", /\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
+  ok("tablet tabs wider (v1.5.7)", /max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex-basis:\\s*150px/.test(cssCode));
+  ok("phone tabs use flex-wrap (v1.5.6)", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+    ok("phone tabs wrap", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
+    ok("phone tabs center every row", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
+    ok("phone tabs keep ~3-per-row size", /max-width:\\s*559px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
     ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
-    ok("no flex-wrap on tabs", !/\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
     ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
   })();
   // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
@@ -1711,6 +1713,8 @@ code += `
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
   ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
   ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.6-beta', Array.isArray(WHATS_NEW['v1.5.6-beta']) && WHATS_NEW['v1.5.6-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.7-beta', Array.isArray(WHATS_NEW['v1.5.7-beta']) && WHATS_NEW['v1.5.7-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));

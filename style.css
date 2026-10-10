@@ -193,9 +193,11 @@ body { overflow-x: clip; }
    stays display:none, never a fake placeholder. */
 /* v1.4.2: tab buttons centered in the middle of the full-width dark
    band (not left-aligned). Fixed max-width columns, centered as a group. */
+/* v1.5.7: flex (not grid) at ALL breakpoints — grid's justify-content
+   left the tab group off-center on iPad Safari; flex-wrap + center
+   centers every row reliably. No transforms. */
 .tabs {
-  display: grid; grid-template-columns: repeat(8, minmax(0, 108px)); gap: 8px;
-  justify-content: center;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
   margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
@@ -206,6 +208,7 @@ body { overflow-x: clip; }
    (count/icon/label); tabs without a count use an invisible spacer with
    identical dimensions, so all buttons are naturally the same height. */
 .tab {
+  flex: 0 1 108px;
   border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
   padding: 10px 4px; font-size: 14px; font-weight: 700; cursor: pointer;
@@ -254,8 +257,9 @@ body { overflow-x: clip; }
    (Review fix: this block sits AFTER the general .tab rule — equal
    specificity, so source order decides.) */
 @media (max-width: 559px) {
-  .tabs { grid-template-columns: repeat(3, minmax(0, 110px)); gap: 6px; }
-  .tab { font-size: 13px; padding: 10px 2px; }
+  /* v1.5.6/v1.5.7: phone tabs stay flex — every row centers. */
+  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .tab { flex: 0 1 108px; font-size: 13px; padding: 10px 2px; }
   /* v1.4.0: Avery — count tabs keep the column stack on phones too:
      count on top, icon on its own row, label below (Collection, Achievements). */
   .dive-scene { top: 160px; }
@@ -263,7 +267,7 @@ body { overflow-x: clip; }
 /* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
    so every tab keeps the same width without squeezing labels. */
 @media (min-width: 560px) and (max-width: 1023px) {
-  .tabs { grid-template-columns: repeat(4, minmax(0, 150px)); }
+  .tab { flex-basis: 150px; } /* 4 per row on tablets, rows centered */
 }
 
 .panel { display: none; }

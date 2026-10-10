@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.5-beta";
+const VERSION = "v1.5.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,12 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.7-beta": [
+    "\uD83D\uDCF1 <strong>Centered tabs everywhere.</strong> The tab bar now centers as a group on tablets and desktops too — no more left-shifted tabs.",
+  ],
+  "v1.5.6-beta": [
+    "\uD83D\uDCF1 <strong>Centered tabs on phones.</strong> The tab bar now centers every row on small screens — no more left-hanging last row.",
   ],
   "v1.5.5-beta": [
     "\uD83C\uDF0A <strong>Smoother far waves.</strong> The farthest porthole wave layer now traces a true smooth ellipse instead of a boxy path — same gentle speed, just rounder.",
