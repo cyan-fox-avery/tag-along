@@ -153,16 +153,20 @@ body { overflow-x: clip; }
 .topbar h1 { margin: 6px 0 2px; font-size: 34px; letter-spacing: 1px; }
 .subtitle { margin: 0; color: var(--ink-dim); font-size: 14px; }
 
+/* v1.4.0: full-bleed tab band — the dark band spans the viewport edge to edge
+   while the buttons stay aligned to the content column (the inner padding
+   restores the exact content inset). Every tab shares the same width. */
 .tabs {
-  display: flex; gap: 8px; margin: 14px -14px;
+  display: flex; gap: 8px; margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
-  background: rgba(11, 34, 55, 0.92); padding: 8px 14px;
+  background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
   backdrop-filter: blur(4px);
 }
 .tab {
-  flex: 1; border: 2px solid transparent; border-radius: 999px;
+  flex: 1 1 0; border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
   padding: 10px 4px; font-size: 14px; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; text-align: center;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
 .count-badge {
@@ -188,6 +192,12 @@ body { overflow-x: clip; }
 /* v0.24.0: Archive new-photo indicator — a dot plus aria-label, not color alone. */
 .tab-badge { color: var(--accent); font-size: 12px; margin-left: 4px; vertical-align: super; }
 .tab-badge.hidden { display: none; }
+/* v1.4.0: stacked count tabs — count above, icon middle, label below
+   (Collection, Achievements). Inline-flex centering on .tab keeps every
+   other tab's label on one consistent vertical level. */
+.tab-stack { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.25; }
+.tab-stack .count-badge { margin-left: 0; font-size: 11px; }
+.tab-stack .tab-label { font-size: 11px; }
 /* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
    so they used to overflow the page and leave a dead strip on the right.
    Two rows of three keeps every tab visible and tappable with no overflow.
@@ -196,6 +206,16 @@ body { overflow-x: clip; }
 @media (max-width: 559px) {
   .tabs { flex-wrap: wrap; gap: 6px; }
   .tab { flex: 1 1 30%; font-size: 13px; padding: 10px 2px; }
+  /* Phones: no vertical room for stacked rows — count tabs stay inline. */
+  .tab-stack { flex-direction: row; }
+  .tab-stack .tab-label { font-size: 13px; }
+  .dive-scene { top: 160px; }
+}
+/* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
+   so every tab keeps the same width without squeezing labels. */
+@media (min-width: 560px) and (max-width: 1023px) {
+  .tabs { flex-wrap: wrap; }
+  .tab { flex: 1 1 22%; }
 }
 
 .panel { display: none; }
@@ -261,7 +281,7 @@ select option:disabled { color: #7a8a9e; }
 /* Dive view */
 .dive-view { margin-top: 14px; }
 .dive-scene {
-  position: sticky; top: 68px; z-index: 4;
+  position: sticky; top: 196px; z-index: 4;
   height: 190px; border-radius: var(--radius); overflow: hidden;
   border: 2px solid #2c5364;
 }
@@ -970,9 +990,8 @@ video.archive-media { max-height: 420px; }
   .app { max-width: 700px; padding: 12px 20px 48px; }
   .finale { max-width: 700px; }
 
-  /* Tab bar: centered pills instead of stretched */
-  .tabs { justify-content: center; }
-  .tab { flex: 0 1 auto; padding: 12px 16px; }
+  /* Tab bar: equal-width tabs filling the content column (was centered pills). */
+  .tab { padding: 12px 16px; }
 
   /* Research: 2-column grid. v1.4.0-beta: open entries stay in their column —
      expanding must not push neighbors out of their columns. */
@@ -1000,10 +1019,10 @@ video.archive-media { max-height: 420px; }
   .app { max-width: 960px; padding: 16px 28px 56px; }
   .finale { max-width: 960px; }
 
-  /* Tab bar: constrain sticky bar on very wide screens */
-  .tabs { max-width: 900px; margin: 14px auto -14px; }
-  .tab { font-size: 15px; }
-  .dive-scene { top: 76px; }
+  /* Tab bar: full-bleed band from the base rule (no max-width constraint);
+     14px keeps 8 equal tabs' labels fitting in one row. */
+  .tab { font-size: 14px; }
+  .dive-scene { top: 106px; }
 
   /* Research: 3 columns. v1.4.0-beta: open entries stay in their column;
      body stacks vertically within the cell. */
