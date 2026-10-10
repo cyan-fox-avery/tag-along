@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.15-beta', VERSION === 'v1.5.15-beta');
+  ok('version v1.5.16-beta', VERSION === 'v1.5.16-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -238,9 +238,10 @@ code += `
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
   // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
   ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
-  ok('tabs use flex row', /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+  ok('tabs use grid base', /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
+  ok('tabs base has 8 columns', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
   // v1.4.2: tab buttons centered in the band, not left-aligned
-  ok('tabs centered in band', /\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
+  // v1.5.16: grid base fills the full-bleed band with 8 equal columns — centering is inherent, no justify-content needed
   // v1.4.2: bigger tab emojis on desktop
   ok('desktop tab emojis bigger', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.tab-icon\\s*\\{[^}]*font-size/.test(cssCode));
   ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
@@ -1520,10 +1521,10 @@ code += `
   })();
   // v1.4.0-beta Mira review: fixed grid tracks keep tabs equal on sparse rows
   (() => {
-    ok("tabs use flexbox on desktop (v1.5.7)", /\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
+    ok("tabs use grid base on desktop (v1.5.16)", /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
   ok("desktop tabs have flex-basis pills", /\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
-  ok("tablet tabs use grid 8 columns (v1.5.14)", /min-width:\\s*700px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
-  ok("narrow tablet tabs use grid 8 columns (v1.5.14)", /min-width:\\s*560px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*1fr\\)/.test(cssCode));
+  ok("tablet keeps 6px gap (v1.5.16)", /min-width:\\s*700px[\\s\\S]*?\\.tabs\\s*\\{[^}]*gap:\\s*6px/.test(cssCode));
+  ok("narrow tablet keeps 4px gap (v1.5.16)", /min-width:\\s*560px[\\s\\S]*?\\.tabs\\s*\\{[^}]*gap:\\s*4px/.test(cssCode));
   ok("tablet tabs no flex-wrap nowrap (v1.5.14)", !/min-width:\\s*560px[\\s\\S]*?\\.tabs\\s*\\{[^}]*flex-wrap:\\s*nowrap/.test(cssCode));
   ok("tablet tabs no flex 1-1-0 (v1.5.14)", !/min-width:\\s*560px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+0/.test(cssCode));
   ok("tablet tabs tighter type kept (v1.5.13)", /min-width:\\s*700px[\\s\\S]*?\\.tab\\s*\\{[^}]*font-size:\\s*10px/.test(cssCode));
@@ -1733,7 +1734,7 @@ code += `
   ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
   ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
   ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.15-beta', Array.isArray(WHATS_NEW['v1.5.15-beta']) && WHATS_NEW['v1.5.15-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.16-beta', Array.isArray(WHATS_NEW['v1.5.16-beta']) && WHATS_NEW['v1.5.16-beta'].length > 0);
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
