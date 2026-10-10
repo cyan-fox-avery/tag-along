@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.16-beta', VERSION === 'v1.4.16-beta');
+  ok('version v1.4.17-beta', VERSION === 'v1.4.17-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1550,28 +1550,25 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
-  // v1.4.16: caustics REBUILT as a conic-gradient fan radiating from the sun
-  // point — wedges can't miss the screen the way pivoted sticks could
+  // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
+  // iPad layout) — brighter, wider fan, clearly visible motion
   (() => {
-    ok("caustics use conic-gradient fans", /\\.caustics\\s+\\.fan-\\d\\s*\\{[^}]*conic-gradient/.test(cssCode));
-    ok("fan centered at sun point (corner)", /conic-gradient\\(from\\s+\\d+deg\\s+at\\s+0%\\s+0%/.test(cssCode));
-    ok("fan has soft wedge edges", /rgba\\(215,240,255,0\\.1\\d*\\)\\s+\\d+deg[^}]*transparent\\s+\\d+deg/.test(cssCode));
-    ok("fan dissolves with distance (radial mask)", /\\.caustics\\s+\\.fan\\s*\\{[^}]*mask-image:\\s*radial-gradient/.test(cssCode));
-    ok("caustics use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
+    ok("caustics use span-based rays", /\\.caustics\\s+span\\s*\\{/.test(cssCode));
+    ok("no conic fan divs remain", !/\\.caustics\\s+\\.fan/.test(cssCode));
+    ok("rays have diffused soft edges (mask)", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to\\s+right/.test(cssCode));
+    ok("rays use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
     ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
-    const fanCount = (cssCode.match(/\\.caustics\\s+\\.fan-\\d\\s*\\{/g) || []).length;
-    ok("caustics has 3 layered fans", fanCount === 3);
-    ok("no span-based rays remain", !/\\.caustics\\s+span\\s*\\{/.test(cssCode));
+    const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)/g) || []).length;
+    ok("caustics has 8 rays", rayCount === 8);
+    ok("rays never use the scale property (layout-safe)", !/scale:\\s*[\\d.]+/.test(cssCode));
   })();
-  // v1.4.16: rays have VISIBLE life — slow sway plus a grow/shrink breathe
+  // v1.4.17: rays have clearly visible life — sway plus grow/shrink via transform
   (() => {
-    ok("fans have sway keyframes", /@keyframes\\s+fan-sway-1/.test(cssCode));
-    ok("sway visibly rotates", /fan-sway-1\\s*\\{[^}]*rotate\\(/.test(cssCode));
-    ok("fans have breathe keyframes", /@keyframes\\s+fan-breathe-1/.test(cssCode));
-    ok("breathe pulses opacity", /fan-breathe-1\\s*\\{[^}]*opacity:/.test(cssCode));
-    ok("breathe grows/shrinks", /fan-breathe-1\\s*\\{[^}]*scale:/.test(cssCode));
-    ok("sway and breathe on different timelines", /fan-sway-1\\s+\\d+s[^}]*fan-breathe-1\\s+\\d+s/.test(cssCode));
-    ok("reduced-motion freezes fans statically", /\\.surface-shimmer,\\s*\\.caustics\\s+\\.fan,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
+    ok("rays have ray-life keyframes", /@keyframes\\s+ray-life/.test(cssCode));
+    ok("ray-life sways visibly", /ray-life[\\s\\S]{0,800}?rotate\\(calc\\(var\\(--ray-angle\\)\\s*-\\s*4deg/.test(cssCode));
+    ok("ray-life grows/shrinks via scaleX", /ray-life[\\s\\S]{0,800}?scaleX\\(1\\.25\\)/.test(cssCode));
+    ok("rays never fully vanish", /ray-life[\\s\\S]{0,800}?opacity:\\s*0\\.15/.test(cssCode));
+    ok("reduced-motion freezes rays statically", /\\.surface-shimmer,\\s*\\.caustics\\s+span,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
   })();
   // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column
   (() => {
@@ -1619,7 +1616,7 @@ code += `
   ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
-  ok("WHATS_NEW has v1.4.16-beta", !!(WHATS_NEW["v1.4.16-beta"] && WHATS_NEW["v1.4.16-beta"].length));
+  ok("WHATS_NEW has v1.4.17-beta", !!(WHATS_NEW["v1.4.17-beta"] && WHATS_NEW["v1.4.17-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
@@ -1631,7 +1628,7 @@ code += `
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
   // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
-  ok('caustic fan divs in HTML', /class="fan fan-1"/.test(htmlCode) && /class="fan fan-2"/.test(htmlCode) && /class="fan fan-3"/.test(htmlCode));
+  ok('caustic ray spans in HTML', /<div class=\"caustics\"><span><\\/span>/.test(htmlCode));
   ok('porthole has nested drift+bob structure', /class="pw-drift"><div class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
   ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
