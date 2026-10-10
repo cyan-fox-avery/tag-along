@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.13-beta";
+const VERSION = "v1.4.14-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -107,6 +107,10 @@ const WHATS_NEW = {
   "v1.4.13-beta": [
     "🫧 <strong>Bubble columns.</strong> Background bubbles now rise in little burst columns — quick vertical trails that appear one after another, then fade, like real air bubbles.",
     "☀️ <strong>Sun rays span the screen.</strong> The light-ray fan from the top-left sun now visibly sweeps across the whole viewport — same brightness, much longer reach."
+  ],
+  "v1.4.14-beta": [
+    "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
+    "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll."
   ]
 };
 
