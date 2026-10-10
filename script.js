@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.25-beta";
+const VERSION = "v1.5.26-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.26-beta": [
+    "⬛ <strong>Black below the seafloor.</strong> The viewport beneath the seafloor wave is now solid black all the way to the bottom edge — no more blue water showing under the ground.",
   ],
   "v1.5.25-beta": [
     "🌊 <strong>One-screen ocean.</strong> The background gradient is now fixed to the viewport — light at the top of the screen, dark at the bottom, always — so every tab shows the same full gradient whether it's a long list or an empty page.",
