@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.16-beta', VERSION === 'v1.5.16-beta');
+  ok('version v1.5.17-beta', VERSION === 'v1.5.17-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1735,6 +1735,7 @@ code += `
   ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
   ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
   ok('WHATS_NEW has v1.5.16-beta', Array.isArray(WHATS_NEW['v1.5.16-beta']) && WHATS_NEW['v1.5.16-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.17-beta', Array.isArray(WHATS_NEW['v1.5.17-beta']) && WHATS_NEW['v1.5.17-beta'].length === 2);
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
@@ -1743,6 +1744,12 @@ code += `
   ok('reunion uses research ID for unnamed', code.includes('rec.researchId || species.name'));
   ok('double-tap zoom disabled', cssCode.includes('touch-action: manipulation'));
   ok('tag-along insight not in log', !code.split('function doTagAlong')[1].split('function doFollowTagged')[0].includes('Tag-along insight'));
+  // v1.5.17: IUCN pill inside the head button (whole header tappable) + badge key
+  ok('pill inside head button (v1.5.17)', (() => { const g = code.indexOf('class="guide-row-top"'); const p = code.indexOf('status-pill iucn-', g); const b = code.indexOf('</button>', g); const pin = code.indexOf('pin-btn', g); return g > -1 && p > g && p < b && b < pin; })());
+  ok('no orphan guide-row-top pill rule', !cssCode.includes('.guide-row-top .status-pill'));
+  ok('iucn legend in field guide', htmlCode.includes('iucn-legend') && htmlCode.includes('aria-label="IUCN Red List badge key"'));
+  ok('legend covers all six categories', ['>LC<','>NT<','>VU<','>EN<','>CR<','>DD<'].every(x => htmlCode.includes(x)));
+  ok('legend styled', cssCode.includes('.iucn-legend'));
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));

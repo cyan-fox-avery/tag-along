@@ -321,6 +321,9 @@ body { overflow-x: clip; }
 .status-pill.iucn-EN { background: #b03030; border-color: #e04040; }  /* Endangered — red */
 .status-pill.iucn-CR { background: #2a1a3a; border-color: #6a3a9a; color: #e8d8ff; }  /* Critically Endangered — dark purple */
 .status-pill.iucn-DD { background: #4a4a4a; border-color: #6a6a6a; }  /* Data Deficient — grey */
+/* v1.5.17-beta: compact IUCN badge key at the top of the field guide */
+.iucn-legend { font-size: 11px; color: var(--ink-dim); margin: 8px 2px 0; line-height: 2.1; }
+.iucn-legend .status-pill { font-size: 10px; padding: 1px 8px; margin: 0 2px 0 0; vertical-align: 1px; }
 /* v1.4.2: full IUCN status line inside expanded field-guide entries */
 .iucn-full { font-size: 13px; color: var(--ink-dim); margin: 6px 0; }
 /* v1.4.2: prominent collection count at the top of the collection page */
@@ -1122,11 +1125,8 @@ select option:disabled { color: #7a8a9e; }
 .guide-close:focus-visible { outline: 2px solid #ffd166; outline-offset: 2px; }
 /* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
 .guide-row-top { display: flex; align-items: stretch; }
-/* v1.4.15-beta: IUCN pill sits beside the pin, outside the head button */
-.guide-row-top .status-pill {
-  margin: 0; flex: none; align-self: center;
-  margin-right: 4px; /* snug against the pin */
-}
+/* v1.5.17-beta: pill moved inside the head button (whole header is one tap
+   target); the .guide-row-head .status-pill rule above covers its sizing. */
 .guide-row-top .guide-row-head { flex: 1; min-width: 0; }
 .pin-btn {
   flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
