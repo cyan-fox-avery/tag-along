@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.31-beta', VERSION === 'v1.5.31-beta');
+  ok('version v1.5.32-beta', VERSION === 'v1.5.32-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1749,7 +1749,7 @@ code += `
   ok('WHATS_NEW has v1.5.26-beta', Array.isArray(WHATS_NEW['v1.5.26-beta']) && WHATS_NEW['v1.5.26-beta'].length === 1);
   ok('WHATS_NEW has v1.5.27-beta', Array.isArray(WHATS_NEW['v1.5.27-beta']) && WHATS_NEW['v1.5.27-beta'].length === 1);
   ok('WHATS_NEW has v1.5.28-beta', Array.isArray(WHATS_NEW['v1.5.28-beta']) && WHATS_NEW['v1.5.28-beta'].length === 1);
-  ok('WHATS_NEW has v1.5.31-beta', Array.isArray(WHATS_NEW['v1.5.31-beta']) && WHATS_NEW['v1.5.31-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
   // v1.5.29: blue through ~90%, black only at the very bottom
   ok('gradient stays blue until 90%', cssCode.indexOf('#020a16 90%') !== -1);
@@ -1762,6 +1762,8 @@ code += `
   // v1.5.30: seafloor is viewport-fixed so the bottom stays on the bottom
   ok('seafloor is viewport-fixed', /\.seafloor\\s*\{[^}]*position:\\s*fixed/.test(cssCode));
   ok('seafloor is bottom-anchored', /\.seafloor\\s*\{[^}]*bottom:\\s*0/.test(cssCode));
+  // v1.5.32: Bruce opener fires immediately — timing gate only applies between stages
+  ok('bruce stage 0 skips timing gate', /if\\s*\\(stage\\s*>\\s*0\\)/.test(code));
   ok('body uses dynamic viewport height', /min-height:\\s*100dvh/.test(cssCode));
   // v1.5.25: lemon shark named Sarah gets its own thread
   ok('lemon sarah thread exists with max feelings', LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('😭😭')) && LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('FAVOURITE')));
