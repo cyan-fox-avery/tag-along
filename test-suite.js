@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.21-beta', VERSION === 'v1.5.21-beta');
+  ok('version v1.5.22-beta', VERSION === 'v1.5.22-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -179,6 +179,9 @@ code += `
   const archiveUiCode = fs.readFileSync(path.join(DIR, 'archive-ui.js'), 'utf8');
   ok('archive skips untagged species', archiveUiCode.includes('if (!t) return;'));
   ok('archive has no locked list', !archiveUiCode.includes('lockedRows') && !archiveUiCode.includes('Still to discover'));
+  // v1.5.22: Archive expanded cards overlay like the Research tab
+  ok('archive toggle adds open class', archiveUiCode.includes('row.classList.toggle("open", !isHidden)'));
+  ok('archive toggle sets rising z-index', archiveUiCode.includes('++guideOverlayZ'));
   ok('archive uses Research-style IUCN pill', archiveUiCode.includes('status-pill iucn-'));
   ok('archive has no checkmark', !archiveUiCode.includes('✅'));
   // v1.5.11-beta: Archive tab always visible, locked until Sarah's text.
@@ -1739,6 +1742,7 @@ code += `
   ok('WHATS_NEW has v1.5.19-beta', Array.isArray(WHATS_NEW['v1.5.19-beta']) && WHATS_NEW['v1.5.19-beta'].length === 3);
   ok('WHATS_NEW has v1.5.20-beta', Array.isArray(WHATS_NEW['v1.5.20-beta']) && WHATS_NEW['v1.5.20-beta'].length === 1);
   ok('WHATS_NEW has v1.5.21-beta', Array.isArray(WHATS_NEW['v1.5.21-beta']) && WHATS_NEW['v1.5.21-beta'].length === 2);
+  ok('WHATS_NEW has v1.5.22-beta', Array.isArray(WHATS_NEW['v1.5.22-beta']) && WHATS_NEW['v1.5.22-beta'].length === 1);
   // v1.5.21: lemon pool energy — every lemon convo has big-energy content
   ok('lemon pool includes LEMONNNNNNN', BIG_DAY.lemon.some(c => c.some(m => m.text.includes('LEMONNNNNNN'))));
   ok('all lemon conversations still 3-4 bubbles', BIG_DAY.lemon.every(c => c.length >= 3 && c.length <= 4));
