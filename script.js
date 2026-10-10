@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.14-beta";
+const VERSION = "v1.5.15-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,9 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.15-beta": [
+    "📖 <strong>Field-guide headers, restacked.</strong> Common name in bold on its own line, with the italic scientific name below it — easier to scan, more room to breathe.",
   ],
   "v1.5.14-beta": [
     "📑 <strong>Tabs fixed with grid — for real this time.</strong> iPad Safari ignored flex-wrap: nowrap, so the tab bar kept wrapping. Tablets and phones now use CSS grid with an explicit column count (8 / 4), which structurally cannot wrap.",
@@ -1492,8 +1495,10 @@ function renderResearch() {
     row.innerHTML = `
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
-          <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
-          <span class="latin">${s.latin}</span>
+          <span class="guide-names">
+            <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
+            <span class="latin">${s.latin}</span>
+          </span>
         </button>
         <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
         <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"

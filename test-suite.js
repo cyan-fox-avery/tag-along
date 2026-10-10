@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.14-beta', VERSION === 'v1.5.14-beta');
+  ok('version v1.5.15-beta', VERSION === 'v1.5.15-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1532,6 +1532,10 @@ code += `
   ok("phone tabs use grid 4 columns (v1.5.14)", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*1fr\\)/.test(cssCode));
   ok("phone tabs no flex display (v1.5.14)", !/max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
   ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
+    ok("guide header wraps names in guide-names (v1.5.15)", code.includes('class="guide-names"'));
+    ok("guide-names stacks vertically (v1.5.15)", cssCode.includes(".guide-row-head .guide-names") && cssCode.includes("flex-direction: column"));
+    ok("guide latin stays italic (v1.5.15)", /\\.latin\\s*\\{[^}]*font-style:\\s*italic/.test(cssCode));
+    ok("guide-row-name stays bold (v1.5.15)", /\\.guide-row-name\\s*\\{[^}]*font-weight:\\s*800/.test(cssCode));
   })();
   // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
   (() => {
@@ -1729,7 +1733,7 @@ code += `
   ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
   ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
   ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.14-beta', Array.isArray(WHATS_NEW['v1.5.14-beta']) && WHATS_NEW['v1.5.14-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.15-beta', Array.isArray(WHATS_NEW['v1.5.15-beta']) && WHATS_NEW['v1.5.15-beta'].length > 0);
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));

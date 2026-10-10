@@ -1064,6 +1064,12 @@ select option:disabled { color: #7a8a9e; }
 /* v0.18.0: locked achievements — dimmed, breadcrumb visible. */
 .guide-row.locked { opacity: 0.55; }
 .guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* v1.5.15: Avery — card headers stack vertically: bold common name on its
+   own line, italic Latin name below it. Scoped to .guide-names so the
+   Achievements rows (same classes, row layout) are untouched. */
+.guide-row-head .guide-names { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.guide-row-head .guide-names .guide-row-name { flex: none; max-width: 100%; }
+.guide-row-head .guide-names .latin { flex: none; font-size: 12px; }
 .guide-row-head .status-pill { margin-bottom: 0; flex: none; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
 .guide-row.open .guide-caret { transform: rotate(180deg); }
