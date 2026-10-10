@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.12-beta', VERSION === 'v1.6.12-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2104,6 +2104,13 @@ code += `
     /* newest: later-inserted (nurse) first; oldest: earlier-inserted (zebra) first */
     return newestFirst.join(',') === 'nurse,zebra' && oldestFirst.join(',') === 'zebra,nurse';
   })());
+
+  // v1.6.12-beta: seal scent removed, attract defaults to chum
+  ok('WHATS_NEW has v1.6.12-beta', Array.isArray(WHATS_NEW['v1.6.12-beta']) && WHATS_NEW['v1.6.12-beta'].length === 1);
+  ok('seal scent removed from attract opts', !METHODS.attract.opts['seal']);
+  ok('chum still in attract opts', METHODS.attract.opts['chum'] === 'Fish-oil chum');
+  ok('no species lists seal as a method', SHARKS.every(s => !(s.methods && s.methods.attract && s.methods.attract.includes('seal'))));
+  ok('legacy lure label preserved for old logbook entries', LEGACY_LURES['seal'] === 'Seal scent');
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
