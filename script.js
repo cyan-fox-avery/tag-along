@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.0-beta";
+const VERSION = "v1.4.1-beta";
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -51,6 +51,11 @@ const WHATS_NEW = {
     "🔬 <strong>Secret tag-along facts.</strong> Each follow unlocks a special fact about the species (1–3 per species). Find them all in your collection book.",
     "📌 <strong>Pinned shark slot.</strong> The pinned card now sits above the field guide grid, not inside it.",
     "📱 <strong>iPad polish.</strong> Dive buttons repositioned, field-guide columns stay put when expanding, phone keeps its height."
+  ],
+  "v1.4.1-beta": [
+    "☀️ <strong>Sun-ray caustics.</strong> Underwater light now radiates from a sun point above the water, fanning across the screen at angles.",
+    "📱 <strong>Tab bar refinements.</strong> Full-width tab band, equal-width tabs, and stacked count/icon/label on Collection and Achievements.",
+    "🔍 <strong>Field guide overlays.</strong> Expanded shark entries now float over the grid instead of pushing it down."
   ]
 };
 
@@ -4212,12 +4217,22 @@ setInterval(tickPhoneClock, 30000);
    animationiteration, while the ribbon is in its invisible tail, so the
    jump is never seen. Skipped under prefers-reduced-motion (CSS already
    freezes the ribbons there). */
+/* v1.4.1: sun-ray caustics — each ray gets a fresh fan angle after its
+   lifecycle completes, so rays keep fanning from the sun point at new
+   angles. Fires on animationiteration, while the ray is in its invisible
+   tail, so the jump is never seen. Each ray keeps its own lane (home angle
+   from CSS) with a small jitter, so the fan stays spread across the screen.
+   Skipped under prefers-reduced-motion (CSS freezes the rays there). */
 (function initCaustics() {
   if (typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   document.querySelectorAll('.caustics span').forEach(sp => {
+    const home = parseFloat(getComputedStyle(sp).getPropertyValue('--ray-angle')) || 0;
+    sp.dataset.homeAngle = home;
     sp.addEventListener('animationiteration', () => {
-      sp.style.left = (4 + Math.random() * 88).toFixed(1) + '%';
+      const jitter = Math.random() * 16 - 8;
+      sp.style.setProperty('--ray-angle',
+        (parseFloat(sp.dataset.homeAngle) + jitter).toFixed(1) + 'deg');
     });
   });
 })();
