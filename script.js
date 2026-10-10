@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.0-beta";
+const VERSION = "v1.5.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,12 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.1-beta": [
+    "📐 <strong>Tighter header.</strong> Less vertical space around the logo, title, and tab bar — more room for the actual game.",
+    "📱 <strong>Smoother Phone.</strong> Message threads now render in one clean pass instead of visibly growing in stages.",
+    "🖼️ <strong>No more Archive badge.</strong> The Archive tab no longer shows a notification dot.",
+    "🌊 <strong>Porthole tuning.</strong> Splashes are rarer, waves move with a clearer near-fast/far-slow parallax, the tile edge can't peek through, and the clouds are properly puffy.",
   ],
   "v1.4.19-beta": [
     "\uD83E\uDD88 <strong>Sarah's Big Day.</strong> Tag multiple new species in one expedition and Sarah celebrates the extraordinary day with one authored conversation — no more three near-identical texts. 8 variants each for 2, 3, and 4 new species, plus lemon-aware reactions when her favourite is in the mix.",
@@ -2465,29 +2471,26 @@ function updateMsgBadge() {
   }
 }
 
+/* v1.5.1: batched rendering — build the whole thread list as one HTML string
+   and set innerHTML once, so the phone doesn't visibly grow in stages. */
 function renderMessages() {
   const list = $("messagesList");
-  list.innerHTML = "";
   if (!state.messages.length) {
     list.innerHTML = `<div class="empty-note">No messages yet.<br>Sarah will text you between expeditions. 💬</div>`;
     return;
   }
+  let html = "";
   state.messages.forEach(thread => {
-    const wrap = document.createElement("div");
-    wrap.className = "thread";
     const stamp = thread.ts
       ? `<div class="thread-stamp">${esc(fmtTime(thread.ts))}</div>`
       : "";
-    wrap.innerHTML = `${stamp}<div class="phone-thread"></div>`;
-    const th = wrap.querySelector(".phone-thread");
+    html += `<div class="thread">${stamp}<div class="phone-thread">`;
     thread.msgs.forEach(m => {
-      const b = document.createElement("div");
-      b.className = "bubble " + m.who;
-      b.textContent = m.text;
-      th.appendChild(b);
+      html += `<div class="bubble ${esc(m.who)}">${esc(m.text)}</div>`;
     });
-    list.appendChild(wrap);
+    html += `</div></div>`;
   });
+  list.innerHTML = html;
   // Like a real chat: oldest at top, newest at the bottom, pinned to the latest.
   list.scrollTop = list.scrollHeight;
 }
@@ -2917,13 +2920,8 @@ function confirmTag(name) {
       { who: "me", text: "Real photos? Of the actual species?" },
       { who: "them", text: "The real deal! Your field-guide art is for ID work — the Archive is for meeting them. Every tag adds another face to the collection 🩵" }
     ]);
-  } else if (state.archiveUnlocked && !wasFirstTag) {
-    // Quiet notification: Archive tab gets a badge
-    try {
-      const tab = document.querySelector('.tab[data-tab="archive"] .tab-badge');
-      if (tab) { tab.textContent = "•"; tab.classList.remove("hidden"); }
-    } catch {}
   }
+  /* v1.5.1: Archive never shows a notification badge — removed per Avery. */
   checkMilestones();
   checkAchievements(); // v0.18.0
   renderAll();
