@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.13-beta', VERSION === 'v1.4.13-beta');
+  ok('version v1.4.14-beta', VERSION === 'v1.4.14-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1550,13 +1550,15 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
-  // v1.4.0-beta: caustics render as soft light — elliptical glow, no hard side edges
+  // v1.4.14: caustics render as soft DIFFUSED shafts — vertical gradient + horizontal mask, no hard side edges
   (() => {
-    ok("caustics use elliptical radial glow", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse/.test(cssCode));
+    ok("caustics use horizontal soft mask", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to right/.test(cssCode));
+    ok("caustics mask feathers both sides", /\\.caustics\\s+span\\s*\\{[^}]*transparent 0%[^}]*transparent 100%/.test(cssCode));
     ok("caustics have no hard bar edges", !/\\.caustics\\s+span\\s*\\{[^}]*border-radius:\\s*50%/.test(cssCode));
     // v1.4.2: brightness cap — screen blend + softer peak so overlaps only brighten slightly
     ok("caustics use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
-    ok("caustics peak alpha reduced", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(218,242,255,0\\.28\\)/.test(cssCode));
+    ok("caustics peak alpha is soft", /\\.caustics\\s+span\\s*\\{[^}]*rgba\\(215,240,255,0\\.20\\)/.test(cssCode));
+    ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
   })();
   // v1.4.1: sun-ray caustics radiate from a sun point at angled fan positions
   (() => {
@@ -1567,7 +1569,8 @@ code += `
     ok("caustics keyframes rotate around --ray-angle", /rotate\\(calc\\(var\\(--ray-angle\\)/.test(cssCode));
     const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
     ok("caustics has 8 rays", rayCount === 8);
-    ok("rays are narrower than v1.4.0", !/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*width:\\s*(8[5-9]|9\\d|10[0-4])px/.test(cssCode));
+    ok("rays are wide soft shafts", /\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*width:\\s*1\\d\\dpx/.test(cssCode));
+    ok("no near-vertical rays", !/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*[0-7]deg/.test(cssCode));
   })();
   // v1.4.5: caustics are long soft streaks anchored at the sun point — each
   // ray's glow dissolves along its own length (no container mask), so the fan
@@ -1575,18 +1578,18 @@ code += `
   (() => {
     ok("caustics have no container edge mask", !/\\.caustics\\s*\\{[^}]*mask-image:/.test(cssCode));
     ok("caustic rays are long streaks", /\\.caustics\\s+span\\s*\\{[^}]*height:\\s*2000px/.test(cssCode));
-    ok("caustic glow is a tall narrow ellipse reaching full length", /\\.caustics\\s+span\\s*\\{[^}]*radial-gradient\\(ellipse 55% 75% at 50% 18%/.test(cssCode));
+    ok("caustic glow fades along its length", /\\.caustics\\s+span\\s*\\{[^}]*linear-gradient\\(to bottom/.test(cssCode));
     // no ray may angle negative — a negative-angle ray sweeps off-screen and
     // can peek back in during sway, reading as a sliding bar at the edge
     const negAngles = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*--ray-angle:\\s*-\\d+deg/g) || []).length;
     ok("no ray has a negative fan angle", negAngles === 0);
   })();
-  // v1.4.13: bubbles rise in burst columns on a shared cycle
+  // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
   (() => {
     ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
-    ok("bubble columns share a cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+44s/.test(cssCode));
+    ok("bubble columns share a 24s cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+24s/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
-    ok("bubbles still number 8", bubbleCount === 8);
+    ok("bubbles number 16 (4 lanes x 4)", bubbleCount === 16);
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1608,6 +1611,7 @@ code += `
   ok("WHATS_NEW has v1.4.11-beta", !!(WHATS_NEW["v1.4.11-beta"] && WHATS_NEW["v1.4.11-beta"].length));
   ok("WHATS_NEW has v1.4.12-beta", !!(WHATS_NEW["v1.4.12-beta"] && WHATS_NEW["v1.4.12-beta"].length));
   ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
+  ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   // v1.4.9: White Whale achievement — tag a megamouth
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
@@ -1636,7 +1640,7 @@ code += `
   ok('porthole splash is large', /\\.porthole-spray\\s*\\{[^}]*width:\\s*240px/.test(cssCode));
   ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?\\.porthole-waves/.test(cssCode) || /prefers-reduced-motion[\\s\\S]*?pw-drift/.test(cssCode));
-  ok('bubbles rise in burst columns', /bubbles now rise in little COLUMNS/i.test(cssCode));
+  ok('bubbles rise in burst columns', /MORE bubbles in burst columns/i.test(cssCode));
   ok('showPorthole defined', /function showPorthole/.test(code));
   ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
   // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
