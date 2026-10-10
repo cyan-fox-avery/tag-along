@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.1-beta', VERSION === 'v1.5.1-beta');
+  ok('version v1.5.2-beta', VERSION === 'v1.5.2-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1695,7 +1695,7 @@ code += `
   ok('closeDive flushes celebrations', /flushPendingCelebrations\\(\\);/.test(code));
   ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
   ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
-  ok('WHATS_NEW has v1.5.1-beta', Array.isArray(WHATS_NEW['v1.5.1-beta']) && WHATS_NEW['v1.5.1-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
   // v1.5.1: header/phone/archive/porthole batch
   ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
