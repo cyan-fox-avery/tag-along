@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.4.7-beta', VERSION === 'v1.4.7-beta');
+  ok('version v1.4.8-beta', VERSION === 'v1.4.8-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1595,6 +1595,8 @@ code += `
   ok("WHATS_NEW has v1.4.5-beta", !!(WHATS_NEW["v1.4.5-beta"] && WHATS_NEW["v1.4.5-beta"].length));
   ok("WHATS_NEW has v1.4.6-beta", !!(WHATS_NEW["v1.4.6-beta"] && WHATS_NEW["v1.4.6-beta"].length));
   ok("WHATS_NEW has v1.4.7-beta", !!(WHATS_NEW["v1.4.7-beta"] && WHATS_NEW["v1.4.7-beta"].length));
+  ok("WHATS_NEW has v1.4.8-beta", !!(WHATS_NEW["v1.4.8-beta"] && WHATS_NEW["v1.4.8-beta"].length));
+  ok("surface-shimmer oversized past viewport", /\.surface-shimmer\s*\{[^}]*left:\s*-4%/.test(cssCode));
   ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
   // v1.4.2: IUCN abbreviations on field-guide pills
   ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
