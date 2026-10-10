@@ -14,6 +14,8 @@
 
 * { box-sizing: border-box; }
 
+/* v1.5.7-beta: kill double-tap zoom (Avery's nemesis) while keeping pinch zoom. */
+html { touch-action: manipulation; }
 body {
   margin: 0;
   font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
@@ -1441,9 +1443,19 @@ video.archive-media { max-height: 420px; }
      Phone stacked layout untouched. */
   #diveActions { grid-column: 1; grid-row: 2; }
 
-  /* Collection: 6 columns */
-  .collection-grid { grid-template-columns: repeat(6, 1fr); }
-  .grid-cell h3 { font-size: 16px; }
+  /* Collection: 3 wide columns, horizontal cards (v1.5.7-beta).
+     Mobile keeps the vertical card; desktop gets art-left/text-right
+     so the cards breathe instead of squeezing into narrow columns. */
+  .collection-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .grid-cell {
+    display: flex; align-items: center; gap: 14px;
+    text-align: left; padding: 14px;
+  }
+  .grid-cell .shark-art { flex: 0 0 110px; margin: 0; }
+  .grid-cell .shark-art img, .grid-cell .shark-art svg { max-width: 100%; }
+  .grid-cell .grid-text { min-width: 0; }
+  .grid-cell h3 { font-size: 17px; margin-top: 2px; }
+  .grid-cell .grid-name { margin-top: 0; }
 
   /* Logbook: 2 columns */
   .logbook-list { grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
