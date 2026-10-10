@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.11-beta', VERSION === 'v1.5.11-beta');
+  ok('version v1.5.12-beta', VERSION === 'v1.5.12-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1524,6 +1524,8 @@ code += `
   ok("desktop tabs have flex-basis pills", /\\.tab\\s*\\{[^}]*flex:\\s*0\\s+1\\s+108px/.test(cssCode));
   ok("tablet tabs single row (v1.5.9)", /max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+0/.test(cssCode));
   ok("tablet tabs no fixed 150px basis (v1.5.9)", !/max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*flex-basis:\\s*150px/.test(cssCode));
+  ok("tablet tabs tighter type fit 8 in a row (v1.5.12)", /max-width:\\s*1023px[\\s\\S]*?\\.tab\\s*\\{[^}]*font-size:\\s*11px/.test(cssCode));
+  ok("tablet tab-stack shrinkable (v1.5.12)", /max-width:\\s*1023px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*min-width:\\s*0/.test(cssCode));
   ok("phone tabs use flex-wrap (v1.5.6)", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*display:\\s*flex/.test(cssCode));
     ok("phone tabs wrap", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
     ok("phone tabs center every row", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
@@ -1608,7 +1610,8 @@ code += `
   (() => {
     ok("open guide body is absolutely positioned", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
     ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
-    ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+    ok("open guide body has no internal scroll (v1.5.12)", !/\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+    ok("open guide body top corners rounded (v1.5.12)", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*border-radius:\\s*var\\(--radius\\)/.test(cssCode));
   })();
   // v1.5.5-beta: guide popup is closable — close button, Escape, outside tap
   (() => {
@@ -1726,6 +1729,7 @@ code += `
   ok('WHATS_NEW has v1.5.9-beta', Array.isArray(WHATS_NEW['v1.5.9-beta']) && WHATS_NEW['v1.5.9-beta'].length > 0);
   ok('WHATS_NEW has v1.5.10-beta', Array.isArray(WHATS_NEW['v1.5.10-beta']) && WHATS_NEW['v1.5.10-beta'].length > 0);
   ok('WHATS_NEW has v1.5.11-beta', Array.isArray(WHATS_NEW['v1.5.11-beta']) && WHATS_NEW['v1.5.11-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.12-beta', Array.isArray(WHATS_NEW['v1.5.12-beta']) && WHATS_NEW['v1.5.12-beta'].length > 0);
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
