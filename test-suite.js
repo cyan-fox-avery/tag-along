@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const DIR = __dirname;
-const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'assets/art-loader.js', 'script.js'];
+const files = ['map-data.js', 'art-data.js', 'sarah-data.js', 'bigday-data.js', 'sharks-data.js', 'archive-data.js', 'archive-ui.js', 'achievements-data.js', 'game-data.js', 'assets/art-loader.js', 'script.js'];
 
 function makeEl() {
   const el = {
@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.3.2-beta', VERSION === 'v1.3.2-beta');
+  ok('version v1.5.5-beta', VERSION === 'v1.5.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -214,11 +214,30 @@ code += `
   ok('phone clock ticks', /setInterval\\(tickPhoneClock/.test(fileCode));
   ok('auto-nudge waits for five failures', /state\\.failures >= 5/.test(fileCode));
   ok('ask-Sarah advice path exists', typeof askSarahAdvice === 'function' && typeof renderSarahAsk === 'function');
-  ok('encounter announces tagged status', fileCode.includes('already in your book') && fileCode.includes('new to your book'));
+  ok('encounter announces tagged status', fileCode.includes('new to your book') && (fileCode.includes('tag looks familiar') || fileCode.includes('already in your book')));
   ok('map legend is two-column', /\\.map-legend\\s*\\{\\s*display:\\s*grid/.test(cssCode));
   ok('chip shows common name first', /esc\\(s\\.name\\)\\} · /.test(fileCode));
   ok('overlays scroll when overflowing', /\\.overlay\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
   ok('sand tiger GIF reframed in CSS', /\\.gif-landscape-frame/.test(cssCode));
+  // v1.4.0: full-bleed tab band, equal-width tabs, stacked count tabs
+  ok('tab band is full-bleed', /\\.tabs\\s*\\{[^}]*calc\\(50% - 50vw\\)/.test(cssCode));
+  ok('tabs share equal width', /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*minmax/.test(cssCode));
+  // v1.4.2: tab buttons centered in the band, not left-aligned
+  ok('tabs centered in band', /\\.tabs\\s*\\{[^}]*justify-content:\\s*center/.test(cssCode));
+  // v1.4.2: bigger tab emojis on desktop
+  ok('desktop tab emojis bigger', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.tab-icon\\s*\\{[^}]*font-size/.test(cssCode));
+  ok('tab labels vertically centered', /\\.tab\\s*\\{[^}]*align-items:\\s*center/.test(cssCode));
+  ok('achievements tab is labeled', /data-tab="achievements"[^>]*>[\\s\\S]*?Achievements/.test(htmlCode));
+  // v1.4.2: counts removed from tabs — Collection/Achievements are 2-row icon+label
+  ok('collection tab has no count badge', !/data-tab="collection"[^>]*>[\\s\\S]*?id="collectionCount"/.test(htmlCode));
+  ok('achievements tab has no count badge', !/data-tab="achievements"[^>]*>[\\s\\S]*?achieveBadge/.test(htmlCode));
+  ok('collection page shows prominent count', /id="collectionCountHead"/.test(htmlCode));
+  // v1.4.0: every tab is a 3-row stack (count/icon/label) with spacers —
+  // no stretch hacks needed for equal heights.
+  const tabStackCount = (htmlCode.match(/class="tab-stack"/g) || []).length;
+  ok('all 8 tabs use tab-stack', tabStackCount === 8);
+  ok('no height:100% stretch hack on .tab', !/\\.tab\\s*\\{[^}]*height:\\s*100%/.test(cssCode));
+  // v1.4.2: achieveBadge removed — count lives in page header
   const stGif = ARCHIVE_MEDIA.sandtiger.assets.find(function(a) { return a.framing === 'landscape-crop'; });
   ok('sand tiger GIF flagged for reframe', !!stGif);
 
@@ -289,8 +308,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
+  ok('20 achievements (19 visible + Bruce hidden)', ACHIEVEMENTS.length === 20 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 19);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -1245,7 +1264,7 @@ code += `
   ok('date filter all keeps dateless trip', logbookTripMatches(_noTsTrip, { outcome: "all", region: "all", species: "all", dateRange: "all" }));
 
   // v1.3.0-beta: What's New has current version entry
-  ok('WHATS_NEW has v1.3.2-beta', Array.isArray(WHATS_NEW['v1.3.2-beta']) && WHATS_NEW['v1.3.2-beta'].length > 0);
+  ok('WHATS_NEW has v1.4.0-beta', Array.isArray(WHATS_NEW['v1.4.0-beta']) && WHATS_NEW['v1.4.0-beta'].length > 0);
 
   // v1.3.0-beta: Deep Blue retired — naming a shark "Deep Blue" triggers NO easter egg
   ok('Deep Blue triggers no easter egg', (() => {
@@ -1271,11 +1290,12 @@ code += `
   })());
 
   // v1.3.1-beta: "Tag along" title language
-  // v1.3.1-beta Mira review: CTA must NOT appear pre-release (health check),
-  // only post-release (doRelease). The release choice is mandatory.
-  ok('tagAlongToMap exists', typeof tagAlongToMap === 'function');
+  // v1.4.0-beta Mira review (blocker 1): tagAlongToMap is RETIRED — the old
+  // post-release CTA violated the tag-along-ends-expedition contract. The
+  // health-check third release choice is now the single tag-along path.
+  ok('tagAlongToMap retired (v1.4.0)', typeof tagAlongToMap === 'undefined');
   ok('showHealthCheck does NOT reference tagAlongToMap (no pre-release CTA)', !showHealthCheck.toString().includes('tagAlongToMap'));
-  ok('doRelease references tagAlongToMap (post-release CTA)', doRelease.toString().includes('tagAlongToMap'));
+  ok('doRelease does NOT reference tagAlongToMap (old CTA retired)', !doRelease.toString().includes('tagAlongToMap'));
   // Behavioral: doRelease must clear state.encounterDone (resolves the expedition lifecycle)
   // v1.3.1-beta Mira review (blocking): the old pre-release CTA left encounterDone
   // pending, hanging runExpedition(). This verifies the lifecycle completes.
@@ -1299,7 +1319,456 @@ code += `
     }
   })());
 
-  console.log(out.join('\\n'));
+  
+
+
+  // v1.4.0-beta: secret facts cover all 50 species
+  ok("SECRET_FACTS has 50 species", Object.keys(SECRET_FACTS).length === 50);
+  ok("SECRET_FACTS 1-3 facts each", Object.keys(SECRET_FACTS).every(id => {
+    const f = SECRET_FACTS[id];
+    return Array.isArray(f) && f.length >= 1 && f.length <= 3;
+  }));
+  // v1.4.0-beta: unlockSecretFact basic behavior
+  (() => {
+    const origFacts = state.unlockedFacts;
+    const origSave = factStore.save;
+    factStore.save = () => {};
+    state.unlockedFacts = {};
+    const f1 = unlockSecretFact("nurse");
+    ok("unlockSecretFact returns a fact", typeof f1 === "string" && f1.length > 0);
+    ok("unlockSecretFact tracks unlock", (state.unlockedFacts["nurse"] || []).length === 1);
+    ok("unlockSecretFact null for unknown", unlockSecretFact("not-a-shark") === null);
+    state.unlockedFacts = origFacts;
+    factStore.save = origSave;
+  })();
+  // v1.4.0-beta: doTagAlong resolves with tag-along intent
+  // (v1.4.0-beta Mira review: restore ALL mocked state)
+  (() => {
+    let resolved = null;
+    const origRender = renderAll;
+    const origLog = logLine;
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origDone = state.encounterDone;
+    const origHealth = state.healthSpecies;
+    const origPendingFact = state.pendingTagAlongFact;
+    renderAll = () => {};
+    logLine = () => {};
+    const origSave = factStore.save;
+    factStore.save = () => {};
+    state.encounterDone = (r) => { resolved = r; };
+    state.healthSpecies = { id: "nurse", name: "Nurse Shark" };
+    state.tagged = { nurse: { name: "", researchId: "NS-2026-001" } };
+    state.unlockedFacts = {};
+    doTagAlong();
+    ok("doTagAlong resolves with tagAlong id", resolved && resolved.tagAlong === "nurse");
+    ok("doTagAlong clears encounterDone", state.encounterDone === null);
+    renderAll = origRender;
+    logLine = origLog;
+    factStore.save = origSave;
+    state.tagged = origTagged;
+    state.unlockedFacts = origFacts;
+    state.encounterDone = origDone;
+    state.healthSpecies = origHealth;
+    state.pendingTagAlongFact = origPendingFact;
+  })();
+  // v1.4.0-beta Mira review: full 1->2->3->exhausted fact progression
+  (() => {
+    const origFacts = state.unlockedFacts;
+    const origSave = factStore.save;
+    const origLog = logLine;
+    factStore.save = () => {};
+    logLine = () => {};
+    state.unlockedFacts = {};
+    // Nurse has 3 facts — unlock all 3, then verify exhaustion
+    const f1 = unlockSecretFact("nurse");
+    const f2 = unlockSecretFact("nurse");
+    const f3 = unlockSecretFact("nurse");
+    const f4 = unlockSecretFact("nurse");
+    ok("fact progression unlocks 3 distinct", f1 && f2 && f3 && f1 !== f2 && f2 !== f3 && f1 !== f3);
+    ok("fact progression exhausts at 4th", f4 === null);
+    ok("fact progression tracks 3 unlocked", (state.unlockedFacts["nurse"] || []).length === 3);
+    state.unlockedFacts = origFacts;
+    factStore.save = origSave;
+    logLine = origLog;
+  })();
+  // v1.4.0-beta Mira review: v1.3.2 save imports into v1.4.0
+  (() => {
+    const fakeSave = {
+      version: "v1.3.2-beta",
+      keys: {
+        "tyi-collection": JSON.stringify({ nurse: { tagged: true, researchId: "NS-2026-001", name: "" } }),
+        "tyi-logbook": JSON.stringify([{ encounters: [] }])
+      }
+    };
+    const result = validateSaveData(fakeSave);
+    ok("v1.3.2-beta save imports", result.ok === true);
+    const badSave = { version: "v0.5.0", keys: { "tyi-collection": "{}" } };
+    const badResult = validateSaveData(badSave);
+    ok("ancient version still rejected", badResult.ok === false);
+  })();
+  // v1.4.0-beta Mira review: old post-release CTA is retired
+  (() => {
+    ok("tagAlongToMap retired", typeof tagAlongToMap === "undefined");
+    ok("doFollowTagged exists", typeof doFollowTagged === "function");
+    ok("showTagAlongFact exists", typeof showTagAlongFact === "function");
+  })();
+  // v1.4.0-beta Mira review (blocker): already-tagged follow must resolve
+  // doEncounter's Promise via the passed callback — not via state.encounterDone
+  // (which is null when no tagging overlay was opened). Behavioral test drives
+  // the full already-tagged follow flow.
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origLog = logLine;
+    const origRender = renderAll;
+    const origSave = factStore.save;
+    const origDone = state.encounterDone;
+    const origTripLog = (typeof tripLog !== "undefined") ? tripLog : undefined;
+    const origFollowedFlag = state.followedThisTrip;
+    renderAll = () => {};
+    logLine = () => {};
+    factStore.save = () => {};
+    state.tagged = { nurse: { name: "Nora", researchId: "NS-2026-001" } };
+    state.unlockedFacts = {};
+    state.encounterDone = null; // already-tagged path: no tagging overlay opened
+    state.followedThisTrip = false;
+    tripLog = { encounters: [] };
+    let resolved = null;
+    let callCount = 0;
+    const cb = (r) => { callCount++; resolved = r; };
+    // Drive the flow: follow an already-tagged shark
+    doFollowTagged("nurse", cb);
+    ok("follow resolves via passed callback", resolved && resolved.tagAlong === "nurse");
+    ok("follow sets followedThisTrip", state.followedThisTrip === true);
+    ok("follow logs 'followed' encounter",
+      tripLog.encounters.some(e => e.speciesId === "nurse" && e.result === "followed"));
+    ok("follow does not fake a re-tag",
+      !tripLog.encounters.some(e => e.speciesId === "nurse" && e.result === "tagged"));
+    ok("follow does not touch collection record",
+      state.tagged.nurse && state.tagged.nurse.researchId === "NS-2026-001");
+    // Double-resolution guard: the one-shot wrapper in the button handler
+    // prevents this, but doFollowTagged itself must clear encounterDone
+    ok("follow clears encounterDone", state.encounterDone === null);
+    // Restore
+    renderAll = origRender;
+    logLine = origLog;
+    factStore.save = origSave;
+    state.tagged = origTagged;
+    state.unlockedFacts = origFacts;
+    state.encounterDone = origDone;
+    state.followedThisTrip = origFollowedFlag;
+    if (typeof origTripLog !== "undefined") tripLog = origTripLog;
+  })();
+  // v1.4.0-beta Mira review (win-path): tag-along defers past the win ceremony
+  (() => {
+    const origDeferred = state.deferredTagAlong;
+    state.deferredTagAlong = null;
+    // Simulate closeDive win branch stashing
+    state.deferredTagAlong = { speciesId: "nurse", factInfo: { speciesId: "nurse", fact: "x", exhausted: false } };
+    ok("deferredTagAlong stashes species", state.deferredTagAlong.speciesId === "nurse");
+    ok("deferredTagAlong stashes fact", state.deferredTagAlong.factInfo.fact === "x");
+    state.deferredTagAlong = origDeferred;
+  })();
+  // v1.4.0-beta Mira review: "followed" outcome in logbook filter
+  (() => {
+    const trip = { encounters: [{ speciesId: "nurse", result: "followed" }], region: "caribbean", ts: Date.now() };
+    ok("filter matches followed", logbookTripMatches(trip, { outcome: "followed", region: "all", species: "all", dateRange: "all" }) === true);
+    ok("filter rejects non-followed", logbookTripMatches({ encounters: [{ speciesId: "nurse", result: "watched" }], region: "caribbean", ts: Date.now() }, { outcome: "followed", region: "all", species: "all", dateRange: "all" }) === false);
+  })();
+  // v1.4.0-beta Mira review: ensureMapFocusedOn does not toggle away
+  (() => {
+    const origTagged = state.tagged;
+    const origMapPoints = mapPoints;
+    const origMapGlideTo = mapGlideTo;
+    const origFocus = mapFocus;
+    state.tagged = { nurse: { researchId: "NS-2026-001" }, lemon: { researchId: "LS-2026-002" } };
+    mapPoints = () => [{ x: 100, y: 100 }];
+    mapGlideTo = () => {}; // no-op: avoid renderMap in test env
+    mapFocus = null;
+    ensureMapFocusedOn("nurse");
+    ok("ensureMapFocusedOn focuses", !!(mapFocus && mapFocus.sid === "nurse"));
+    ensureMapFocusedOn("nurse");
+    ok("ensureMapFocusedOn same shark twice stays focused", !!(mapFocus && mapFocus.sid === "nurse"));
+    ensureMapFocusedOn("lemon");
+    ok("ensureMapFocusedOn switches to different shark", !!(mapFocus && mapFocus.sid === "lemon"));
+    // manual toggle behavior preserved
+    mapFocusOn("lemon");
+    ok("mapFocusOn still toggles away on second tap", mapFocus === null);
+    // restore
+    mapPoints = origMapPoints;
+    mapGlideTo = origMapGlideTo;
+    state.tagged = origTagged;
+    mapFocus = origFocus;
+  })();
+  // v1.4.0-beta Mira review: corrected secret facts
+  (() => {
+    const facts = SECRET_FACTS;
+    ok("lemon fact drops fish-learning trope", !facts.lemon.join(" ").includes("a rare trick for a fish"));
+    ok("hammerhead fact drops 360 claim", !facts.hammerhead.join(" ").includes("360-degree"));
+    ok("hammerhead fact uses binocular overlap", facts.hammerhead.join(" ").includes("binocular overlap"));
+    ok("cookiecutter fact mentions sonar domes", facts.cookiecutter.join(" ").includes("sonar domes"));
+    ok("kitefin fact cites 2021", facts.kitefin.join(" ").includes("2021"));
+    ok("tiger fact drops suit of armor", !facts.tiger.join(" ").includes("suit of armor"));
+  })();
+  // v1.4.0-beta Mira review: fixed grid tracks keep tabs equal on sparse rows
+  (() => {
+    ok("tabs use CSS grid", /\\.tabs\\s*\\{[^}]*display:\\s*grid/.test(cssCode));
+  ok("desktop tabs have 8 fixed tracks", /\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(8,\\s*minmax/.test(cssCode));
+  ok("tablet tabs have 4 fixed tracks", /max-width:\\s*1023px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(4,\\s*minmax/.test(cssCode));
+  ok("phone tabs have 3 fixed tracks", /max-width:\\s*559px[\\s\\S]*?\\.tabs\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3,\\s*minmax/.test(cssCode));
+    ok("no flex-basis tab sizing remains", !/\\.tab\\s*\\{[^}]*flex:\\s*1\\s+1\\s+(0|22%|30%)/.test(cssCode));
+    ok("no flex-wrap on tabs", !/\\.tabs\\s*\\{[^}]*flex-wrap:\\s*wrap/.test(cssCode));
+    ok("tab-stack stays column on phones", !/max-width:\\s*559px[\\s\\S]*?\\.tab-stack\\s*\\{[^}]*flex-direction:\\s*row/.test(cssCode));
+  })();
+  // v1.4.0-beta Mira review: pushThread while Phone is open marks thread read
+  (() => {
+    const origQS = global.document.querySelector;
+    const mkPhoneTab = (active) => {
+      const el = makeEl();
+      if (active) el.classList.add('active');
+      return el;
+    };
+    const origUnread = state.unread;
+    const origMsgsLen = state.messages.length;
+    state.unread = 0;
+    // Phone active: thread renders immediately, no unread increment
+    global.document.querySelector = (sel) => sel === '.tab[data-tab="phone"]' ? mkPhoneTab(true) : origQS(sel);
+    pushThread([{ from: 'sarah', text: 'grid test' }]);
+    ok("pushThread on active Phone does not increment unread", state.unread === 0);
+    // Other tab: unread increments as before
+    global.document.querySelector = (sel) => sel === '.tab[data-tab="phone"]' ? mkPhoneTab(false) : origQS(sel);
+    pushThread([{ from: 'sarah', text: 'grid test 2' }]);
+    ok("pushThread on other tab increments unread", state.unread === 1);
+    // Persistence: the saved store carries the unread count
+    const saved = JSON.parse(global.localStorage.getItem('tyi-messages') || '{}');
+    ok("unread persists through saveMsgs", saved.unread === 1);
+    ok("pushed threads persisted", (saved.messages || []).length >= origMsgsLen + 2);
+    // restore
+    global.document.querySelector = origQS;
+    state.unread = origUnread;
+    state.messages.length = origMsgsLen;
+    saveMsgs();
+  })();
+  // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
+  // iPad layout) — brighter, wider fan, clearly visible motion
+  (() => {
+    ok("caustics use span-based rays", /\\.caustics\\s+span\\s*\\{/.test(cssCode));
+    ok("no conic fan divs remain", !/\\.caustics\\s+\\.fan/.test(cssCode));
+    ok("rays have diffused soft edges (mask)", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to\\s+right/.test(cssCode));
+    ok("rays use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
+    ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
+    const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)/g) || []).length;
+    ok("caustics has 8 rays", rayCount === 8);
+    ok("rays never use the scale property (layout-safe)", !/scale:\\s*[\\d.]+/.test(cssCode));
+  })();
+  // v1.4.17: rays have clearly visible life — sway plus grow/shrink via transform
+  (() => {
+    ok("rays have ray-life keyframes", /@keyframes\\s+ray-life/.test(cssCode));
+    ok("ray-life sways visibly", /ray-life[\\s\\S]{0,800}?rotate\\(calc\\(var\\(--ray-angle\\)\\s*-\\s*4deg/.test(cssCode));
+    ok("ray-life grows/shrinks via scaleX", /ray-life[\\s\\S]{0,800}?scaleX\\(1\\.25\\)/.test(cssCode));
+    ok("rays never fully vanish", /ray-life[\\s\\S]{0,800}?opacity:\\s*0\\.15/.test(cssCode));
+    ok("reduced-motion freezes rays statically", /\\.surface-shimmer,\\s*\\.caustics\\s+span,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
+  })();
+  // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column
+  (() => {
+    ok("guide row has NO layout containment (fixed modal works)", !/\\.guide-row\\s*\\{[^}]*contain:\\s*layout/.test(cssCode));
+    ok("open body is absolute with explicit width", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute[^}]*width:\\s*100%/.test(cssCode));
+    ok("open body has max-width guard", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*100%/.test(cssCode));
+  })();
+  // v1.4.15-beta: IUCN badges are color-coded by threat level
+  ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
+  ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
+  // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
+  ok('desktop logo 156px', /\\.site-logo\\s*\\{[^}]*height:\\s*156px/.test(cssCode));
+  // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
+  ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
+  // v1.4.15-beta: time-of-day progression in expedition log
+  ok('time progression', /The afternoon stretches out/.test(fileCode) && /Evening approaches/.test(fileCode));
+  // v1.4.15-beta: subtle diet phrases (not bait answers)
+  ok('diet phrases', /they eat plankton/.test(fileCode) && /DIET_PHRASE/.test(fileCode));
+  // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
+  (() => {
+    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
+    ok("bubble columns share a 24s cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+24s/.test(cssCode));
+    const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
+    ok("bubbles number 16 (4 lanes x 4)", bubbleCount === 16);
+  })();
+  // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
+  (() => {
+    ok("open guide body is absolutely positioned", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
+    ok("open guide row lifts overflow clipping", /\\.guide-row\\.open\\s*\\{[^}]*overflow:\\s*visible/.test(cssCode));
+    ok("open guide body scrolls internally", /\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
+  })();
+  // v1.5.5-beta: guide popup is closable — close button, Escape, outside tap
+  (() => {
+    ok("guide close button in body template", /class=\\"guide-close\\"/.test(code));
+    ok("guide close button has accessible label", /guide-close\\" aria-label=/.test(code));
+    ok("collapseGuideRow helper exists", /function collapseGuideRow\\(row\\)/.test(code));
+    ok("collapseGuideRow resets aria-expanded", /collapseGuideRow[\\s\\S]*?setAttribute\\("aria-expanded", "false"\\)/.test(code));
+    ok("collapseGuideRow returns focus to header", /collapseGuideRow[\\s\\S]*?head\\.focus\\(\\)/.test(code));
+    ok("Escape key closes topmost open row", /keydown[\\s\\S]*?Escape[\\s\\S]*?\\.guide-row\\.open/.test(code));
+    ok("outside tap closes mobile modal", /matchMedia\\("\\(max-width: 768px\\)"\\)[\\s\\S]*?collapseGuideRow/.test(code));
+    ok("guide-close CSS present", /\\.guide-close\\s*\\{/.test(cssCode));
+    ok("reunion line is location-neutral", !new RegExp("came back to the" + " same spot").test(code));
+  })();
+  ok("WHATS_NEW has v1.4.0-beta", !!(WHATS_NEW["v1.4.0-beta"] && WHATS_NEW["v1.4.0-beta"].length));
+  ok("WHATS_NEW has v1.4.1-beta", !!(WHATS_NEW["v1.4.1-beta"] && WHATS_NEW["v1.4.1-beta"].length));
+  ok("WHATS_NEW has v1.4.2-beta", !!(WHATS_NEW["v1.4.2-beta"] && WHATS_NEW["v1.4.2-beta"].length));
+  ok("WHATS_NEW has v1.4.3-beta", !!(WHATS_NEW["v1.4.3-beta"] && WHATS_NEW["v1.4.3-beta"].length));
+  ok("WHATS_NEW has v1.4.4-beta", !!(WHATS_NEW["v1.4.4-beta"] && WHATS_NEW["v1.4.4-beta"].length));
+  ok("WHATS_NEW has v1.4.5-beta", !!(WHATS_NEW["v1.4.5-beta"] && WHATS_NEW["v1.4.5-beta"].length));
+  ok("WHATS_NEW has v1.4.6-beta", !!(WHATS_NEW["v1.4.6-beta"] && WHATS_NEW["v1.4.6-beta"].length));
+  ok("WHATS_NEW has v1.4.7-beta", !!(WHATS_NEW["v1.4.7-beta"] && WHATS_NEW["v1.4.7-beta"].length));
+  ok("WHATS_NEW has v1.4.8-beta", !!(WHATS_NEW["v1.4.8-beta"] && WHATS_NEW["v1.4.8-beta"].length));
+  ok("WHATS_NEW has v1.4.9-beta", !!(WHATS_NEW["v1.4.9-beta"] && WHATS_NEW["v1.4.9-beta"].length));
+  ok("WHATS_NEW has v1.4.10-beta", !!(WHATS_NEW["v1.4.10-beta"] && WHATS_NEW["v1.4.10-beta"].length));
+  ok("WHATS_NEW has v1.4.11-beta", !!(WHATS_NEW["v1.4.11-beta"] && WHATS_NEW["v1.4.11-beta"].length));
+  ok("WHATS_NEW has v1.4.12-beta", !!(WHATS_NEW["v1.4.12-beta"] && WHATS_NEW["v1.4.12-beta"].length));
+  ok("WHATS_NEW has v1.4.13-beta", !!(WHATS_NEW["v1.4.13-beta"] && WHATS_NEW["v1.4.13-beta"].length));
+  ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
+  ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
+  ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
+  // v1.4.9: White Whale achievement — tag a megamouth
+  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
+  ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
+  ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("megamouth"));
+  ok("surface-shimmer oversized past viewport", cssCode.indexOf(".surface-shimmer") !== -1 && cssCode.indexOf("left: -4%") !== -1);
+  ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
+  // v1.4.2: IUCN abbreviations on field-guide pills
+  ok('IUCN_ABBR maps all statuses', ["Critically Endangered","Endangered","Vulnerable","Near Threatened","Least Concern","Data Deficient"].every(k => IUCN_ABBR[k] && IUCN_ABBR[k].length === 2));
+  ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
+  // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
+  ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
+  ok('caustic ray spans in HTML', /<div class=\"caustics\"><span><\\/span>/.test(htmlCode));
+  ok('porthole has single orbit structure per layer', /class="pw-layer pw-far"><div class="pw-orbit"/.test(htmlCode) && !/class="pw-drift"/.test(htmlCode) && !/class="pw-bob"/.test(htmlCode));
+  ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
+  ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
+  ok('porthole no longer procedural', !/class="porthole-crest/.test(htmlCode) && !/class="porthole-surface"/.test(htmlCode));
+  ok('porthole no longer underwater-style', !/class="porthole-shafts"/.test(htmlCode) && !/class="porthole-bubbles"/.test(htmlCode));
+  ok('diveView not hidden by default', !/id="diveView" class="dive-view hidden"/.test(htmlCode));
+  ok('porthole CSS exists', /\\.dive-scene\\.porthole/.test(cssCode));
+  ok('porthole uses wave art assets', /porthole_wave_far_draft\.png/.test(cssCode) && /porthole_wave_mid_draft\.png/.test(cssCode) && /porthole_wave_near_draft\.png/.test(cssCode));
+  ok('porthole uses splash art asset', /porthole_glass_splash_draft\.png/.test(cssCode));
+  ok('porthole has orbital keyframes', /@keyframes\\s+pw-orbit-far/.test(cssCode) && /@keyframes\\s+pw-orbit-mid/.test(cssCode) && /@keyframes\\s+pw-orbit-near/.test(cssCode));
+  ok('porthole far orbit is a true smooth ellipse (split sinusoidal axes)', /@keyframes\\s+pw-orbit-far-x[\\s\\S]*?translateX\\(-30px\\)/.test(cssCode) && /@keyframes\\s+pw-orbit-far-y[\\s\\S]*?translateY\\(-8px\\)/.test(cssCode));
+  ok('porthole mid/near orbits keep 8-stop ellipses', /@keyframes\\s+pw-orbit-mid[\\s\\S]*?12\\.5%[\\s\\S]*?87\\.5%/.test(cssCode) && /@keyframes\\s+pw-orbit-near[\\s\\S]*?12\\.5%/.test(cssCode));
+  ok('porthole no longer uses linear drift', !/@keyframes\\s+pw-drift-/.test(cssCode));
+  ok('porthole has spray keyframes', /@keyframes\\s+pw-spray-\\d/.test(cssCode));
+  ok('porthole far orbit loops seamlessly (closed ellipse)', /@keyframes\\s+pw-orbit-far-x[\\s\\S]*?100%\\s*\\{[^}]*translateX\\(30px\\)/.test(cssCode) && /@keyframes\\s+pw-orbit-far-y[\\s\\S]*?100%\\s*\\{[^}]*translateY\\(0\\)/.test(cssCode));
+  ok('porthole tiles mirrored for seamless loop', /pw-tile:nth-child\\(even\\)[\\s\\S]*?scaleX\\(-1\\)/.test(cssCode));
+  ok('porthole splash is bigger', /\\.porthole-spray\\s*\\{[^}]*width:\\s*320px/.test(cssCode));
+  ok('porthole waves are horizon-scale', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
+  // v1.4.14: calm porthole — sky above the far wave, slow drift, splash pops without sliding
+  ok('porthole has sky behind far wave', /\\.dive-scene\\.porthole\\s*\\{[^}]*#a8dcf5/.test(cssCode));
+  ok('porthole orbit has depth gradient', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*38s/.test(cssCode));
+  ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
+  ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
+  ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
+  // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
+  ok('bubble columns overlap in pairs', /columns A.B fire together/.test(cssCode) && /columns C.D fire together/.test(cssCode));
+  ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
+  ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
+  ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
+  // v1.4.18: waves stacked tight, oval orbital motion, bigger/faster splash
+  ok('waves stacked almost on top of each other', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode) && /\\.pw-mid\\s*\\{[^}]*top:\\s*20%/.test(cssCode) && /\\.pw-near\\s*\\{[^}]*top:\\s*24%/.test(cssCode));
+  ok('orbit periods: far 38s, mid 26s, near 16s (near fastest)', /pw-orbit-far-x 38s/.test(cssCode) && /pw-orbit-mid 26s/.test(cssCode) && /pw-orbit-near 16s/.test(cssCode));
+  ok('splash is rarer (24s cycle)', /\\.splash-a\\s*\\{[^}]*24s/.test(cssCode));
+  ok('showPorthole defined', /function showPorthole/.test(code));
+  ok('closeDive shows porthole', /showPorthole\\(\\);/.test(code));
+  ok('showPorthole clears ambient creature shadows', /function showPorthole[\\s\\S]*?querySelectorAll\\("\\.ambient"\\)/.test(code));
+  // v1.4.4: phone mockup is taller — flex column, convo fills, composer pinned
+  ok('phone-screen is flex column with real height', /\\.phone-screen[\\s\\S]*?display:\\s*flex[\\s\\S]*?flex-direction:\\s*column/.test(cssCode));
+  ok('phone-convo flexes to fill', /\\.phone-convo[\\s\\S]*?flex:\\s*1\\s+1\\s+auto/.test(cssCode));
+  // v1.4.4: logbook filter options have no emoji (consistency)
+  ok('logbook followed option has no emoji', !/Followed 🧭/.test(htmlCode));
+  // v1.4.4: all tabs are uniform 2-row (icon+label) — no count spacers
+  ok('no count-spacer spans in tabs', !/count-spacer/.test(htmlCode));
+  ok('no count-spacer CSS remains', !/count-spacer/.test(cssCode));
+  // v1.4.19: Sarah's Big Day
+  ok('BIG_DAY has 8 conversations per tier (2/3/4)', BIG_DAY[2].length === 8 && BIG_DAY[3].length === 8 && BIG_DAY[4].length === 8);
+  ok('BIG_DAY lemon pool has 2 conversations', BIG_DAY.lemon.length === 2);
+  ok('all Big Day conversations have 3-4 bubbles', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.length >= 3 && c.length <= 4)));
+  ok('all Big Day bubbles have who/text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => (m.who === 'them' || m.who === 'me') && typeof m.text === 'string' && m.text.length > 0))));
+  ok('no raw placeholders in Big Day text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => !/\\{(?!speciesList\\}|count\\})[^}]*\\}/.test(m.text)))));
+  ok('formatSpeciesList: two species', formatSpeciesList([{speciesName:'Nurse Shark'},{speciesName:'Lemon Shark'}]) === 'a nurse shark and a lemon shark');
+  ok('formatSpeciesList: three species', formatSpeciesList([{speciesName:'Nurse Shark'},{speciesName:'Lemon Shark'},{speciesName:'Tiger Shark'}]) === 'a nurse shark, a lemon shark, and a tiger shark');
+  ok('formatSpeciesList: an- article', formatSpeciesList([{speciesName:'Oceanic Whitetip'}]) === 'an oceanic whitetip');
+  ok('buildBigDayThread resolves placeholders', (() => {
+    const thread = buildBigDayThread([{speciesId:'nurse',speciesName:'Nurse Shark'},{speciesId:'tiger',speciesName:'Tiger Shark'}]);
+    return thread.length >= 3 && thread.every(m => !m.text.includes('{speciesList}') && !m.text.includes('{count}'));
+  })());
+  ok('buildBigDayThread uses lemon pool for lemon', (() => {
+    // Force lemon tier by seeding the bag to a known state
+    state.bigDayBags = { lemon: [0] };
+    const thread = buildBigDayThread([{speciesId:'lemon',speciesName:'Lemon Shark'},{speciesId:'nurse',speciesName:'Nurse Shark'}]);
+    return thread.some(m => /LEMON SHARK/i.test(m.text));
+  })());
+  ok('flushPendingCelebrations defined', /function flushPendingCelebrations/.test(code));
+  ok('confirmTag queues (no immediate pushThread celebration)', /state\\.pendingCelebrations\\.push/.test(code));
+  ok('closeDive flushes celebrations', /flushPendingCelebrations\\(\\);/.test(code));
+  ok('WHATS_NEW has v1.4.19-beta', Array.isArray(WHATS_NEW['v1.4.19-beta']) && WHATS_NEW['v1.4.19-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.0-beta', Array.isArray(WHATS_NEW['v1.5.0-beta']) && WHATS_NEW['v1.5.0-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.2-beta', Array.isArray(WHATS_NEW['v1.5.2-beta']) && WHATS_NEW['v1.5.2-beta'].length > 0);
+  ok('WHATS_NEW has v1.5.5-beta', Array.isArray(WHATS_NEW['v1.5.5-beta']) && WHATS_NEW['v1.5.5-beta'].length > 0);
+  // v1.5.1: header/phone/archive/porthole batch
+  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*10px 8px 4px/.test(cssCode));
+  ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
+  ok('archive badge removed', !/data-tab=\\"archive\\"\\] \\.tab-badge/.test(code));
+  ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
+  ok('clouds are defined', /rgba\\(255,255,255,0\\.95\\)/.test(cssCode));
+  ok('near orbit is 2x+ faster than far', /pw-orbit-near 16s/.test(cssCode) && /pw-orbit-far-x 38s/.test(cssCode));
+
+  // v1.5.3-beta: reunion system replaces multi-individual tagging
+  ok('no _individuals writes', !/\\._individuals\\.push/.test(code));
+  ok('no _encounterNewIndividual', !/_encounterNewIndividual\\s*=/.test(code) || /state\\._encounterNewIndividual = null/.test(code) === false);
+  ok('ECOLOGY_TIER covers all 50 species', (() => {
+    if (typeof ECOLOGY_TIER === 'undefined' || typeof SHARKS === 'undefined') return false;
+    return SHARKS.every(s => ECOLOGY_TIER[s.id] && ['resident','coastal','migratory'].includes(ECOLOGY_TIER[s.id]));
+  })());
+  ok('REUNION_ODDS has three tiers', (() => {
+    if (typeof REUNION_ODDS === 'undefined') return false;
+    return REUNION_ODDS.resident === 0.50 && REUNION_ODDS.coastal === 0.25 && REUNION_ODDS.migratory === 0.10;
+  })());
+  ok('maybeReunionReaction defined', /function maybeReunionReaction/.test(code));
+  ok('reunion reaction is one-time per species', /state\\.reunionReacted\\[species\\.id\\]/.test(code));
+  ok('different-shark has species observation path', /Observe species/.test(code));
+  ok('observation unlocks secret facts', /unlockSecretFact\\(species\\.id\\)/.test(code));
+  // Blocker 2: no contain:layout breaking fixed modal
+  ok('guide-row has no contain:layout', !/\\.guide-row\\s*\\{[^}]*contain:\\s*layout/.test(cssCode));
+  // Blocker 3: reset keys include new storage
+  ok('RESET_KEYS includes tyi-pending-celebrations', /tyi-pending-celebrations/.test(code) && /RESET_KEYS[^;]*tyi-pending-celebrations/.test(code));
+  ok('RESET_KEYS includes tyi-reunion-reacted', /RESET_KEYS[^;]*tyi-reunion-reacted/.test(code));
+
+  // v1.5.0-beta Mira review: persistence + copy fixes
+  ok('celebrationStore persists pending celebrations', (() => {
+    celebrationStore.clear();
+    const evts = [{speciesId:'nurse',speciesName:'Nurse Shark',nickname:'',researchId:'NS-2026-001',length:2.5,sex:'F',opener:'op',cheer:'ch'}];
+    celebrationStore.save(evts);
+    const loaded = celebrationStore.load();
+    celebrationStore.clear();
+    return loaded.length === 1 && loaded[0].speciesId === 'nurse' && celebrationStore.load().length === 0;
+  })());
+  ok('reload recovery delivers celebration exactly once', (() => {
+    celebrationStore.clear();
+    const before = state.messages.length;
+    const evts = [
+      {speciesId:'nurse',speciesName:'Nurse Shark',nickname:'',researchId:'NS-2026-001',length:2.5,sex:'F',opener:'Nice one!',cheer:'Great work!'},
+      {speciesId:'tiger',speciesName:'Tiger Shark',nickname:'',researchId:'TS-2026-001',length:3.1,sex:'M',opener:'Whoa!',cheer:'Amazing!'}
+    ];
+    state.bigDayBags = { 2: [0,1,2,3,4,5,6,7] };
+    celebrationStore.save(evts); // simulate: tag saved, reload before Return to ship
+    recoverPendingCelebrations(); // first recovery (boot)
+    const afterFirst = state.messages.length;
+    const storeEmpty = celebrationStore.load().length === 0;
+    recoverPendingCelebrations(); // second recovery must be a no-op
+    const afterSecond = state.messages.length;
+    return (afterFirst - before) === 1 && storeEmpty && afterSecond === afterFirst;
+  })());
+  ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
+  ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
+
+console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');
   

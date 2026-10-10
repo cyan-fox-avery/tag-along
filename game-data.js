@@ -208,3 +208,14 @@ const PICK_ICONS = {
     "boat": "🚤", "plane": "✈️", "network": "📻"
   }
 };
+
+/* v1.4.9: White Whale achievement — Sarah's reaction to a megamouth tag.
+   The megamouth is famously elusive (unknown to science until 1976, only
+   around 300 ever documented). Sarah would absolutely lose her mind. */
+const WHITE_WHALE_THREAD = [
+  { who: "them", text: "STOP. STOP EVERYTHING. Did you just tag a MEGAMOUTH?!?" },
+  { who: "me", text: "I did! Is that a big deal?" },
+  { who: "them", text: "A BIG deal?? They didn't even KNOW this shark existed until 1976! A Navy anchor snagged one off Hawaii and scientists were like '...what IS that.' Only around 300 have EVER been documented. THREE HUNDRED. Total. Ever." },
+  { who: "me", text: "That puts it in perspective." },
+  { who: "them", text: "It lives in the twilight zone and just... opens this ENORMOUS mouth and filters krill. Like a whale shark's mysterious goth cousin. And now there's one out there with YOUR tag on it. I'm framing this conversation. 🩵" }
+];

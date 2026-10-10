@@ -5,7 +5,18 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.3.2-beta";
+const VERSION = "v1.5.5-beta";
+
+/* v1.4.2: standard IUCN Red List category abbreviations for the compact
+   field-guide pills. Full category names appear in expanded entries. */
+const IUCN_ABBR = {
+  "Critically Endangered": "CR",
+  "Endangered": "EN",
+  "Vulnerable": "VU",
+  "Near Threatened": "NT",
+  "Least Concern": "LC",
+  "Data Deficient": "DD"
+};
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
@@ -45,7 +56,115 @@ const WHATS_NEW = {
   ],
   "v1.3.2-beta": [
     "🌊 <strong>Conservation note readability.</strong> Fixed the conservation note background so the text is actually readable."
-  ]
+  ],
+  "v1.4.0-beta": [
+    "🧭 <strong>Tag along ends the expedition.</strong> A new third release choice: follow your shark for the rest of the day. The UI tells you explicitly — no more encounters this trip.",
+    "🔬 <strong>Secret tag-along facts.</strong> Each follow unlocks a special fact about the species (1–3 per species). Find them all in your collection book.",
+    "📌 <strong>Pinned shark slot.</strong> The pinned card now sits above the field guide grid, not inside it.",
+    "📱 <strong>iPad polish.</strong> Dive buttons repositioned, field-guide columns stay put when expanding, phone keeps its height."
+  ],
+  "v1.4.1-beta": [
+    "☀️ <strong>Sun-ray caustics.</strong> Underwater light now radiates from a sun point above the water, fanning across the screen at angles.",
+    "📱 <strong>Tab bar refinements.</strong> Full-width tab band, equal-width tabs, and stacked count/icon/label on Collection and Achievements.",
+    "🔍 <strong>Field guide overlays.</strong> Expanded shark entries now float over the grid instead of pushing it down."
+  ],
+  "v1.4.2-beta": [
+    "☀️ <strong>Sun-point caustics.</strong> Light rays now radiate from the far top-left corner like real sunlight, with softer overlap brightness.",
+    "🏷️ <strong>IUCN abbreviations.</strong> Field guide cards show standard IUCN codes (CR, EN, VU, NT, LC) — tap a shark for the full status.",
+    "📱 <strong>Cleaner tabs.</strong> Collection and Achievements tabs show just icon + label; their counts moved to the top of each page."
+  ],
+  "v1.4.3-beta": [
+    "☀️ <strong>Caustics edge fix.</strong> Light rays now fade out near the screen edges — no more dark bars sliding in from the sides."
+  ],
+  "v1.4.4-beta": [
+    "🌊 <strong>New porthole view.</strong> The idle observation window now shows the ocean surface from above — slow swells, foam on the crests, sun glitter.",
+    "📱 <strong>Taller phone.</strong> Sarah's phone mockup is now realistic phone proportions with a much taller conversation area."
+  ],
+  "v1.4.5-beta": [
+    "☀️ <strong>Caustics fixed properly.</strong> Sun rays are long soft streaks again, fanning from the far top-left corner all the way across the screen — no more edge bars."
+  ],
+  "v1.4.6-beta": [
+    "📐 <strong>Centered empty state.</strong> The Collection page's \"No sharks tagged yet\" message is now centered like the sightings one."
+  ],
+  "v1.4.7-beta": [
+    "🌊 <strong>Boat-window waves.</strong> The idle porthole now shows rolling wave crests drifting past at three depths — and spray periodically hits the glass and runs down."
+  ],
+  "v1.4.8-beta": [
+    "🔧 <strong>Edge bar fix.</strong> Fixed the dark vertical bars that slid in and out at the screen edges — the surface shimmer layer is now wider than the viewport so its drift never exposes an edge."
+  ],
+  "v1.4.9-beta": [
+    "🐋 <strong>New achievement: White Whale.</strong> Tag the elusive megamouth shark — only around 300 have ever been documented — and Sarah will absolutely lose her mind."
+  ],
+  "v1.4.10-beta": [
+    "🔧 <strong>Porthole cleanup.</strong> The old underwater light-ray layer no longer shows through the boat-window surface view, and a stray bit of malformed CSS is gone."
+  ],
+  "v1.4.11-beta": [
+    "🌊 <strong>Porthole waves.</strong> The boat-window view now has illustrated wave layers (far/mid/near) drifting as slow parallax, with occasional spray on the glass. Art by Mira."
+  ],
+  "v1.4.12-beta": [
+    "🌊 <strong>Porthole waves, take two.</strong> Bigger, closer-together swells like looking over the horizon; the wave loop is now truly seamless (no more glitch); and the glass gets one big splash at a time instead of scattered droplets. Art by Mira."
+  ],
+  "v1.4.13-beta": [
+    "🫧 <strong>Bubble columns.</strong> Background bubbles now rise in little burst columns — quick vertical trails that appear one after another, then fade, like real air bubbles.",
+    "☀️ <strong>Sun rays span the screen.</strong> The light-ray fan from the top-left sun now visibly sweeps across the whole viewport — same brightness, much longer reach."
+  ],
+  "v1.4.14-beta": [
+    "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
+    "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll.",
+    "🌊 <strong>Calmer porthole.</strong> The far wave sits higher under a new CSS sky (sun + clouds — Mira may art-direct it later), all three wave layers overlap into continuous water, everything drifts much more slowly, and splashes pop and fade instead of sliding down the glass."
+  ],
+  "v1.5.0-beta": [
+    "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
+    "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.5-beta": [
+    "\uD83C\uDF0A <strong>Smoother far waves.</strong> The farthest porthole wave layer now traces a true smooth ellipse instead of a boxy path — same gentle speed, just rounder.",
+  ],
+  "v1.5.4-beta": [
+    "\u274C <strong>Closable guide popups.</strong> The mobile field-guide popup now has a proper close button, plus Escape-key and tap-outside dismissal — no more getting stuck.",
+    "\u{1F979} <strong>Reunion wording.</strong> Sarah's reunion reaction no longer claims the shark returned to the same spot.",
+  ],
+  "v1.5.3-beta": [
+    "\u{1F979} <strong>Shark reunions.</strong> One tagged shark per species — but now you might run into yours again! Resident sharks have a 50% reunion chance, coastal 25%, migratory 10%. Spot the familiar tag for a heartfelt reunion, or meet a different wild shark and observe the species.",
+    "\u{1F4F1} <strong>Mobile field guide fix.</strong> Expanded cards now center properly on small screens.",
+    "\U0001F9F9 <strong>Cleaner resets.</strong> Pending celebrations and reunion history now clear properly on hard reset.",
+  ],
+  "v1.5.2-beta": [
+    "🦈 <strong>Individual sharks.</strong> Encounters with a tagged species are now randomized — 25% chance it's the same individual you know, 75% it's a new shark of the same species with its own name and tag.",
+    "🗺️ <strong>Quieter map.</strong> Ocean currents are off by default (toggle to show), and when visible they're dashed and faded so they're never confused with shark tracks.",
+    "📋 <strong>Cleaner logbook.</strong> Filter dropdowns are proper styled boxes with the arrow inside.",
+    "📖 <strong>Field guide polish.</strong> Expanded cards are fully scrollable on mobile, the ✅ checkmark leads each row, and the IUCN badge sits tight to the pin with no expander arrow — more room for Latin names.",
+    "🛡️ <strong>Easter egg safety.</strong> The Mary Lee/Nicole naming easter eggs are hardened against crashes.",
+  ],
+  "v1.5.1-beta": [
+    "📐 <strong>Tighter header.</strong> Less vertical space around the logo, title, and tab bar — more room for the actual game.",
+    "📱 <strong>Smoother Phone.</strong> Message threads now render in one clean pass instead of visibly growing in stages.",
+    "🖼️ <strong>No more Archive badge.</strong> The Archive tab no longer shows a notification dot.",
+    "🌊 <strong>Porthole tuning.</strong> Splashes are rarer, waves move with a clearer near-fast/far-slow parallax, the tile edge can't peek through, and the clouds are properly puffy.",
+  ],
+  "v1.4.19-beta": [
+    "\uD83E\uDD88 <strong>Sarah's Big Day.</strong> Tag multiple new species in one expedition and Sarah celebrates the extraordinary day with one authored conversation — no more three near-identical texts. 8 variants each for 2, 3, and 4 new species, plus lemon-aware reactions when her favourite is in the mix.",
+  ],
+  "v1.4.18-beta": [
+    "\uD83C\uDF0A <strong>Waves stacked tight, moving in ovals.</strong> The three porthole wave layers now sit almost on top of each other with no gaps, and each traces a gentle elliptical orbit like real water \u2014 far slowest, near liveliest.",
+    "\uD83D\uDCA6 <strong>Bigger, faster splash.</strong> The on-glass splash is bigger (320px), pops in suddenly, and slides down fast \u2014 the quickest thing in the calm wave scene.",
+  ],
+  "v1.4.17-beta": [
+    "\u2600\uFE0F <strong>Sun rays fixed properly.</strong> The v1.4.16 conic-gradient fan broke the page layout, so rays are back on the safe span-based system — brighter, wider fan (12-72\u00B0), clearly visible sway and breathing, and they never fully vanish.",
+    "\ud83d\udd27 <strong>Emergency layout rollback.</strong> The experimental ray rendering that broke the title and tab bar on iPad has been removed."
+  ],
+  "v1.4.16-beta": [
+    "\u2600\uFE0F <strong>Sun rays rebuilt.</strong> The light fan is now a true conic-gradient radiating from the sun point \u2014 it spans the whole screen by construction, with a slow visible sway and breathing pulse. No more frozen bar on the left.",
+    "\ud83d\udcd0 <strong>Field-guide overlay containment.</strong> Expanded entries are hard-contained so opening one can never widen its grid column.",
+    "🌊 <strong>Porthole fills the view.</strong> The far wave sits lower, the near wave is bigger — swells overlap and fill the whole porthole. Bubble columns fire in overlapping pairs with tighter trails, and splashes are quick and snappy."
+  ],
+  "v1.4.15-beta": [
+    "🌊 <strong>Underwater vista.</strong> The background is now a full surface-to-seafloor scene — sunlit top, deepening blues, sediment and kelp silhouettes at the bottom.",
+    "🦈 <strong>Bigger logo.</strong> The shark logo beside the title is 150% bigger on desktop.",
+    "🏷️ <strong>IUCN color coding.</strong> Threat levels now read at a glance — green (LC) through yellow, orange, red, to dark purple (CR). The badge sits snug beside the pin.",
+    "📌 <strong>Smarter pinned hints.</strong> The pinned card shows the shark's description with key clues in bold — and the expedition line hints at diet in plain words instead of giving away answers.",
+    "⏳ <strong>Time passes on expeditions.</strong> The dive log now moves from morning through afternoon to evening across your encounters."
+  ],
 };
 
 function whatsNewSeen() {
@@ -108,6 +227,13 @@ const DEPTH_FLAVOUR = {
     "The surface chop rocks the boat gently. Below, everything glows blue-green.",
     "You can see the boat's shadow drifting above you, a dark shape on the bright ceiling of the sea.",
     "A breeze ruffles the surface into glitter. Gulls cry somewhere far above."
+  ],
+  "v1.4.15-beta": [
+    "🌊 <strong>Underwater vista.</strong> The background is now a full surface-to-seafloor scene — sunlit top, deepening blues, sediment and kelp silhouettes at the bottom.",
+    "🦈 <strong>Bigger logo.</strong> The shark logo beside the title is 150% bigger on desktop.",
+    "🏷️ <strong>IUCN color coding.</strong> Threat levels now read at a glance — green (LC) through yellow, orange, red, to dark purple (CR). The badge sits snug beside the pin.",
+    "📌 <strong>Smarter pinned hints.</strong> The pinned card shows the shark's description with key clues in bold — and the expedition line hints at diet in plain words instead of giving away answers.",
+    "⏳ <strong>Time passes on expeditions.</strong> The dive log now moves from morning through afternoon to evening across your encounters."
   ],
   reef: [
     "Coral heads rise like a drowned city. Small bright fish dart between the branches.",
@@ -199,7 +325,7 @@ const EASTER_EGGS = [
 /* v0.22.0: failed trips feel like fieldwork — weather, sea state, and
    wildlife make every expedition a day on the water, not just a miss. */
 const SEA_CONDITIONS = [
-  "Flat calm this morning — the sea is glass, and the boat barely rocks.",
+  "Calm waves this morning — the sea is glass, and the boat barely rocks.",
   "A light chop keeps things interesting; whitecaps glint in the sun.",
   "Overcast and moody — the water looks like hammered pewter.",
   "A fresh breeze out of the east; the swells roll in long and lazy.",
@@ -279,7 +405,7 @@ const FIELD_NOTES = {
     "Field notes: jellyfish pulsing past in the hundreds, lit up by the deck lights. The ocean's lava lamps.",
     "Field notes: the depth sounder showed a bait ball at 40 metres, scattering. Something hunts here — just not today.",
     "Field notes: salt spray, diesel, and kelp. The smell of a working day with nothing to show but the smell.",
-    "Field notes: the moon rose over flat calm water and turned the whole sea to hammered silver.",
+    "Field notes: the moon rose over calm waves and turned the whole sea to hammered silver.",
     "Field notes: a lone albatross followed us for hours without a single wingbeat. Show-off.",
     "Field notes: bioluminescence in the wake tonight — every wave breaks into cold fire.",
     "Field notes: the barometer is falling and the gulls know something we don't. They're all heading in.",
@@ -428,7 +554,7 @@ let mapZoom = 1, mapCX = MAP_W / 2, mapCY = MAP_H / 2;
    touch-action follows the zoom level, decided before any touch begins:
    at 1x the page owns one-finger drags (the page scrolls); zoomed in,
    the map owns them (one finger pans). No mid-gesture races, no modes. */
-let mapCurrentsOn = true;
+let mapCurrentsOn = false; /* v1.5.2-beta: currents OFF by default */
 const MAP_ZOOM_MIN = 1, MAP_ZOOM_MAX = 4;
 
 function mapViewBox() {
@@ -479,6 +605,7 @@ function renderCurrents(z) {
     segs.forEach((seg, i) => {
       const d = smoothPath(seg.map(pt => mapProj(pt[0], pt[1])));
       s += '<path d="' + d + '" class="current ' + cls + '" stroke-width="' + sw + '"'
+        + ' stroke-dasharray="' + (8/z).toFixed(1) + ' ' + (5/z).toFixed(1) + '"'
         + (i === segs.length - 1 ? ' marker-end="url(#' + mid + ')"' : "") + "/>";
     });
     if (c.label && z >= 1.75) {
@@ -642,6 +769,16 @@ const achieveStore = {
 };
 
 /* v0.7.0: the sightings log — spotted but not tagged. Pure field notes. */
+/* v1.5.0-beta Mira review (blocking): persist pending Big Day/species
+   celebrations so a reload before trip end doesn't lose them. */
+const celebrationStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-pending-celebrations") || "[]"); }
+    catch { return []; }
+  },
+  save(d) { try { localStorage.setItem("tyi-pending-celebrations", JSON.stringify(d)); } catch {} },
+  clear() { try { localStorage.removeItem("tyi-pending-celebrations"); } catch {} }
+};
 const sightStore = {
   load() {
     try { return JSON.parse(localStorage.getItem("tyi-sightings") || "[]"); }
@@ -676,6 +813,18 @@ const pinStore = {
       if (id) localStorage.setItem("tyi-pinned", id);
       else localStorage.removeItem("tyi-pinned");
     } catch {}
+  }
+};
+/* v1.4.0-beta: secret tag-along facts. Tracks which facts have been unlocked
+   per species: {speciesId: [factIndex, ...]}. Persists through export/import
+   via RESET_KEYS. */
+const factStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-facts") || "{}"); }
+    catch { return {}; }
+  },
+  save(d) {
+    try { localStorage.setItem("tyi-facts", JSON.stringify(d)); } catch {}
   }
 };
 /* v1.0.3-beta: collapsible pinned explainer. Tracks whether the player has
@@ -716,10 +865,13 @@ const state = {
   currentPlan: null,      // the trip's region/depth/bait/method (method added v0.8.0 as scent, reworked v0.9.0)
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
   resightedThisTrip: false, // v0.8.0: same skip after a re-sighting celebration
+  followedThisTrip: false,  // v1.4.0-beta: skip random post-trip chat after a tag-along follow
   encounterDone: null,    // v0.7.0: callback that resumes the trip after watch/tag
   /* v0.17.1: Ask Sarah offer persists in the message store — Sarah's saved
      thread promises "pick one below", so the panel must survive a reload. */
   sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
+  /* v1.4.19-beta: Big Day no-repeat bags — per-tier shuffled indices. */
+  bigDayBags: _savedMsgs.bigDayBags || {},
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
@@ -732,9 +884,14 @@ const state = {
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
   pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
   hasPinnedBefore: pinHistoryStore.load(), // v1.0.3-beta: player has pinned at least once
+  unlockedFacts: factStore.load(), // v1.4.0-beta: {speciesId: [factIdx, ...]}
+  /* v1.5.3-beta: reunion reactions — one-time Sarah thread per species. */
+  reunionReacted: (() => { try { return JSON.parse(localStorage.getItem("tyi-reunion-reacted") || "{}"); } catch { return {}; } })(),
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
-  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })()
+  bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
+  pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
+  deferredTagAlong: null // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -779,12 +936,16 @@ const state = {
 function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
-    sarahAdviceOffered: state.sarahAdviceOffered });
+    sarahAdviceOffered: state.sarahAdviceOffered,
+    bigDayBags: state.bigDayBags });
 }
-/* Every new thread gets a timestamp for the Phone tab. */
+/* Every new thread gets a timestamp for the Phone tab.
+   v1.4.0: if the Phone panel is already open, the new thread renders
+   immediately — count it as read instead of leaving a stale badge. */
 function pushThread(msgs) {
   state.messages.push({ ts: Date.now(), msgs });
-  state.unread += 1;
+  const phoneTab = document.querySelector('.tab[data-tab="phone"]');
+  if (!(phoneTab && phoneTab.classList.contains('active'))) state.unread += 1;
   saveMsgs();
   updateMsgBadge();
   renderMessages();
@@ -872,6 +1033,33 @@ function migrateTracks() {
 const $ = (id) => document.getElementById(id);
 const esc = (str) => String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const sharkById = (id) => SHARKS.find(s => s.id === id);
+/* v1.5.3-beta: reunion odds by species ecology. These are game-balance numbers,
+   NOT scientific re-sighting probabilities. Resident/site-faithful sharks are
+   most likely to be recognized; wide-ranging migrants rarely are. */
+const REUNION_ODDS = { resident: 0.50, coastal: 0.25, migratory: 0.10 };
+const ECOLOGY_TIER = {
+  /* Resident/site-faithful (17) — reef residents, bottom-dwellers, site-attached */
+  nurse: "resident", sandtiger: "resident", galapagos: "resident",
+  epaulette: "resident", lemon: "resident", blacktip: "resident",
+  whitetip: "resident", zebra: "resident", bonnethead: "resident",
+  greyreef: "resident", caribbean: "resident", wobbegong: "resident",
+  leopard: "resident", horn: "resident", portjackson: "resident",
+  angelshark: "resident", catshark: "resident",
+  /* Coastal/seasonal (14) — patrol coasts, seasonal aggregations */
+  tiger: "coastal", hammerhead: "coastal", basking: "coastal",
+  porbeagle: "coastal", bronze: "coastal", scalloped: "coastal",
+  smooth: "coastal", bull: "coastal", sandbar: "coastal",
+  salmon: "coastal", dusky: "coastal", silvertip: "coastal",
+  spinner: "coastal", spinydogfish: "coastal",
+  /* Migratory/wide-ranging (19) — open ocean, deep water, vast ranges */
+  thresher: "migratory", whale: "migratory", goblin: "migratory",
+  greatwhite: "migratory", mako: "migratory", blue: "migratory",
+  silky: "migratory", oceanic: "migratory", sevengill: "migratory",
+  frilled: "migratory", megamouth: "migratory", sawshark: "migratory",
+  greenland: "migratory", cookiecutter: "migratory", sixgill: "migratory",
+  velvetbelly: "migratory", dwarflantern: "migratory", kitefin: "migratory",
+  pacificsleeper: "migratory"
+};
 const untagged = () => SHARKS.filter(s => !state.tagged[s.id]);
 /* Migrations run once at boot — see the boot section below. */
 
@@ -1067,12 +1255,39 @@ function jumpToPinned(s, list) {
       body.classList.remove("hidden");
       head.setAttribute("aria-expanded", "true");
       target.classList.add("open");
+      target.style.zIndex = String(++guideOverlayZ);
     }
     target.classList.add("pin-flash");
     setTimeout(() => target.classList.remove("pin-flash"), 1200);
   }
 }
+/* v1.4.15-beta: highlight key research clues in bold (same font/size).
+   Bolds location, diet, and depth cues — never the expedition answers. */
+function highlightClues(s) {
+  let text = s.research || "";
+  // Take the first two sentences for the preview
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  text = sentences.slice(0, 2).join(" ").trim();
+  // Bold the region name
+  const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : null;
+  if (regionName) {
+    const re = new RegExp(`(${regionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+    text = text.replace(re, "<strong>$1</strong>");
+  }
+  // Bold diet keywords
+  const dietWords = ["plankton", "krill", "squid", "crabs", "lobster", "fish", "seals", "rays", "urchins", "shellfish"];
+  for (const w of dietWords) {
+    const re = new RegExp(`\\b(${w})\\b`, "gi");
+    text = text.replace(re, "<strong>$1</strong>");
+  }
+  return text;
+}
 function renderPinnedCard(list) {
+  /* v1.4.0-beta: pinned card lives in its own full-width section above the
+     grid, not as the first grid cell. */
+  const slot = $("pinnedSlot");
+  const target = slot || list;
+  if (slot) slot.innerHTML = "";
   const s = SHARKS.find(x => x.id === state.pinned);
   const card = document.createElement("div");
   card.className = "pinned-card" + (s ? "" : " pinned-empty");
@@ -1082,6 +1297,9 @@ function renderPinnedCard(list) {
       : `<p class="latin">📌 <em>No shark pinned — tap 📌 on any field-guide entry to keep it here while you research.</em><br><span class="dim">Tip: pinning a shark switches on soft logbook hints — when your expedition plan is close for the shark you're researching, your notes will nudge you.</span></p>`;
   } else {
     const done = !!state.tagged[s.id];
+    /* v1.4.15-beta: pinned card shows the research description with key clues
+       in subtle bold — same font and size, just bold. Never the actual answers. */
+    const researchPreview = highlightClues(s);
     card.innerHTML = `
       <div class="pinned-head"><span>📌 Currently researching</span>
         <button type="button" class="pin-btn unpin" data-unpin aria-label="Unpin ${s.name}">✕</button>
@@ -1089,16 +1307,17 @@ function renderPinnedCard(list) {
       <div class="pinned-body">
         <div class="guide-sketch pinned-sketch">${SKETCH[s.id]}</div>
         <div>
-          <strong>${s.name}</strong> ${done ? "✅" : ""}<br>
+          ${done ? "✅ " : ""}<strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
           <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
       </div>
+      <p class="pinned-research">${researchPreview}</p>
       <button type="button" class="pin-jump" data-jump="${s.id}">Jump to field-guide entry ↓</button>`;
     card.querySelector("[data-unpin]").addEventListener("click", () => togglePin(s.id));
     card.querySelector("[data-jump]").addEventListener("click", () => jumpToPinned(s, list));
   }
-  list.appendChild(card);
+  target.appendChild(card);
 }
 /* v0.22.0: pin-gated soft hints. When a shark is pinned and the planned
    expedition matches 3 of its 4 needs (region, depth, bait, method), the
@@ -1157,6 +1376,18 @@ function renderPinHint() {
 
 /* v0.20.0: show the pinned shark on the Expedition tab — a research focus
    to plan around. Never auto-fills the planner; the sea decides. */
+/* v1.4.15-beta: diet phrases for pinned hints — natural language, not answers.
+   "They eat plankton" lets the player infer the bait; "Plankton bloom — no bait"
+   would hand it over. */
+const DIET_PHRASE = {
+  "plankton": "they eat plankton",
+  "crustaceans": "they eat crabs and lobster",
+  "squid": "they hunt squid",
+  "schooling-fish": "they chase schooling fish",
+  "tuna": "they hunt large oily fish",
+  "ray": "they eat rays",
+  "urchins": "they eat urchins and shellfish"
+};
 function renderExpeditionPin() {
   const el = $("expeditionPin");
   if (!el) return;
@@ -1166,11 +1397,46 @@ function renderExpeditionPin() {
   const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region;
   /* v0.20.0: Mira review fix — filter feeders (whale, basking) store bait as a
      string, not an array. baitList() normalizes both. */
-  const baits = baitList(s).map(b => BAITS[b] || b).join(", ");
+  /* v1.4.15-beta: show diet as a natural sentence, not the bait answer. */
+  const dietKeys = baitList(s);
+  const dietText = dietKeys.map(k => DIET_PHRASE[k] || `they eat ${k}`).join("; ");
   el.innerHTML = `📌 Currently researching: <strong>${s.name}</strong>
-    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${baits}</span>
+    <span class="latin">${regionName} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")} · ${dietText}</span>
     <br><span class="dim" style="font-size:12px">📓 Pin hints on — your logbook notes nudge you when the plan is close.</span>`;
 }
+/* v1.4.0-beta: rising z-index so a later-opened overlay always floats
+   above earlier ones, regardless of DOM order. */
+let guideOverlayZ = 30;
+/* v1.5.4-beta: shared collapse for guide rows — used by the close button,
+   Escape key, and outside-click dismissal. Returns focus to the row header. */
+function collapseGuideRow(row) {
+  if (!row || !row.classList.contains("open")) return;
+  const body = row.querySelector(".guide-row-body");
+  const head = row.querySelector(".guide-row-head");
+  if (body) body.classList.add("hidden");
+  if (head) {
+    head.setAttribute("aria-expanded", "false");
+    head.focus();
+  }
+  row.classList.remove("open");
+  row.style.zIndex = "";
+}
+/* v1.5.4-beta: Escape closes the topmost open guide popup. On small screens a
+   tap outside the open popup also dismisses it — the fixed modal can cover
+   its own row header, leaving no other way to close. */
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const openRows = [...document.querySelectorAll(".guide-row.open")];
+  if (!openRows.length) return;
+  openRows.sort((a, b) => (parseInt(b.style.zIndex || "0", 10) || 0) - (parseInt(a.style.zIndex || "0", 10) || 0));
+  collapseGuideRow(openRows[0]);
+});
+document.addEventListener("click", (e) => {
+  if (!window.matchMedia("(max-width: 768px)").matches) return;
+  const openRow = document.querySelector(".guide-row.open");
+  if (!openRow || openRow.contains(e.target)) return;
+  collapseGuideRow(openRow);
+});
 function renderResearch() {
   const list = $("researchList");
   list.innerHTML = "";
@@ -1212,20 +1478,24 @@ function renderResearch() {
     const row = document.createElement("div");
     row.className = "guide-row";
     row.setAttribute("data-entry", s.id);
+    /* v1.4.15-beta: IUCN pill sits beside the pin (not inside the head button),
+       color-coded by threat level, freeing space for more of the Latin name. */
+    const iucnAbbr = IUCN_ABBR[s.status] || s.status;
     row.innerHTML = `
       <div class="guide-row-top">
         <button type="button" class="guide-row-head" aria-expanded="false">
-          <span class="guide-row-name">${s.name} ${done ? "✅" : ""}</span>
+          <span class="guide-row-name">${done ? "✅ " : ""}${s.name}</span>
           <span class="latin">${s.latin}</span>
-          <span class="status-pill">IUCN: ${s.status}</span>
-          <span class="guide-caret" aria-hidden="true">▾</span>
         </button>
+        <span class="status-pill iucn-${iucnAbbr}" title="IUCN Red List: ${s.status}">${iucnAbbr}</span>
         <button type="button" class="pin-btn${isPinned ? " pinned-on" : ""}" data-pin="${s.id}"
           aria-label="${isPinned ? "Unpin" : "Pin"} ${s.name} as currently researching"
           aria-pressed="${isPinned}">📌</button>
       </div>
       <div class="guide-row-body hidden">
+        <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
         <div class="guide-sketch">${SKETCH[s.id]}<p class="sketch-cap">field sketch — ${s.sketchCap}</p></div>
+        <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
         ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
@@ -1236,10 +1506,19 @@ function renderResearch() {
     `;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
+    const closeBtn = body.querySelector(".guide-close");
+    if (closeBtn) closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      collapseGuideRow(row);
+    });
     head.addEventListener("click", () => {
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
       row.classList.toggle("open", !isHidden);
+      /* v1.4.0-beta: overlay floats above neighbors; rising z-index keeps
+         the most recently opened entry on top. */
+      if (!isHidden) row.style.zIndex = String(++guideOverlayZ);
+      else row.style.zIndex = "";
     });
     const pinBtn = row.querySelector("[data-pin]");
     if (pinBtn) pinBtn.addEventListener("click", (e) => {
@@ -1545,7 +1824,20 @@ function pickEncounter(appeared, shown, plan) {
    always allowed). Either way the day goes on. */
 function doEncounter(species, plan) {
   return new Promise(resolve => {
-    const rec = state.tagged[species.id];
+    /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
+       encountering the species rolls: is it YOUR shark (reunion) or a different
+       untagged animal? Odds by ecology tier (game-balance, not science):
+       resident 50%, coastal 25%, migratory 10%. */
+    const existingRec = state.tagged[species.id];
+    let isReunion = false;
+    let isDifferentShark = false;
+    if (existingRec) {
+      const tier = (typeof ECOLOGY_TIER !== "undefined" && ECOLOGY_TIER[species.id]) || "coastal";
+      const odds = (typeof REUNION_ODDS !== "undefined" && REUNION_ODDS[tier]) || 0.25;
+      isReunion = Math.random() < odds;
+      isDifferentShark = !isReunion;
+    }
+    const rec = isReunion ? existingRec : null;
     const sharkEl = $("diveShark");
     /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
        silhouette (mystery — the species is not named yet). Tapping
@@ -1573,9 +1865,17 @@ function doEncounter(species, plan) {
       sil.dataset.revealed = "true";
       /* v0.17.1: the moment a shark appears, say whether it's already in the
          book — no squinting at the small print under the buttons. */
-      const already = rec
-        ? ` — already in your book${rec.name ? ` as \u201c${esc(rec.name)}\u201d` : ""}!`
-        : ` — new to your book!`;
+      /* v1.5.3-beta: reunion vs different-shark presentation. */
+      let already;
+      if (!existingRec) {
+        already = ` — new to your book!`;
+      } else if (isReunion) {
+        const rname = rec.name ? `\u201c${esc(rec.name)}\u201d` : rec.researchId;
+        already = ` — wait... that tag looks familiar. It's ${rname}! 🥹`;
+      } else {
+        const oname = existingRec.name ? `\u201c${esc(existingRec.name)}\u201d` : "yours";
+        already = ` — another ${species.name}! This one has no matching tag — not ${oname}.`;
+      }
       const showIllustration = () => {
         sharkEl.innerHTML =
           `<div class="shark-reveal">` +
@@ -1650,7 +1950,11 @@ function doEncounter(species, plan) {
       finish();
     });
     actions.appendChild(watchBtn);
-    if (!rec) {
+    /* v1.5.3-beta: three encounter states —
+       !existingRec: first tag (Tag button)
+       isReunion: it's YOUR shark (Follow + Log re-sighting)
+       isDifferentShark: another wild shark (Species observation only) */
+    if (!existingRec) {
       const tagBtn = document.createElement("button");
       tagBtn.className = "primary-button";
       tagBtn.type = "button";
@@ -1660,14 +1964,49 @@ function doEncounter(species, plan) {
         actions.innerHTML = "";
         /* v0.17.1: the release buttons resolve the encounter directly —
            no second keep-diving/head-back prompt after the health check. */
-        openTagging(species, (headBack) => {
+        openTagging(species, (result) => {
           actions.classList.add("hidden");
           actions.innerHTML = "";
-          resolve(headBack === true);
+          /* v1.4.0-beta: result is false (keep diving), true (head back),
+             or {tagAlong: speciesId} (tag along — ends expedition). */
+          if (result && typeof result === "object" && result.tagAlong) {
+            resolve({ tagAlong: result.tagAlong });
+          } else {
+            resolve(result === true);
+          }
         });
       });
       actions.appendChild(tagBtn);
-    } else {
+    } else if (isReunion) {
+      /* v1.5.3-beta: REUNION — it's YOUR shark! Log re-sighting and Follow
+         for this actual individual. One-time Sarah reaction per species. */
+      maybeReunionReaction(species, rec);
+      /* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged
+         species — unlocks remaining secret facts without retagging. Ends the
+         expedition (you're spending the rest of the trip following). */
+      const followBtn = document.createElement("button");
+      followBtn.className = "primary-button";
+      followBtn.type = "button";
+      const _followRec = state.tagged[species.id];
+      const _followName = (_followRec && _followRec.name) || species.name;
+      followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>`;
+      followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)`);
+      followBtn.addEventListener("click", () => {
+        actions.classList.add("hidden");
+        actions.innerHTML = "";
+        /* v1.4.0-beta Mira review (blocker): the already-tagged path never
+           calls openTagging(), so state.encounterDone is null. Pass
+           doEncounter's local resolver directly — one-shot guard against
+           double taps. */
+        let _followResolved = false;
+        doFollowTagged(species.id, (result) => {
+          if (!_followResolved) {
+            _followResolved = true;
+            resolve(result);
+          }
+        });
+      });
+      actions.appendChild(followBtn);
       /* v0.8.0: it's one of yours — log the re-sighting. */
       const resightBtn = document.createElement("button");
       resightBtn.className = "secondary-button";
@@ -1682,6 +2021,26 @@ function doEncounter(species, plan) {
         finish();
       });
       actions.appendChild(resightBtn);
+    } else {
+      /* v1.5.3-beta: DIFFERENT SHARK — another wild ${species.name}, not yours.
+         Just watch, or observe the species (may unlock a secret fact).
+         NO tag, NO re-sighting, NO follow — never touches the tagged record. */
+      const observeBtn = document.createElement("button");
+      observeBtn.className = "secondary-button";
+      observeBtn.type = "button";
+      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">study this ${esc(species.name)} — may reveal a secret fact</small>`;
+      observeBtn.setAttribute("aria-label", `Observe this ${species.name} (species study, not your tagged shark)`);
+      observeBtn.addEventListener("click", () => {
+        const fact = unlockSecretFact(species.id);
+        if (fact) {
+          logLine(`🔬 <strong>Species insight:</strong> ${esc(fact)}`);
+        } else {
+          logLine(`🔬 <em>You watch carefully, but learn nothing new about the ${esc(species.name)} today.</em>`);
+        }
+        logTripEncounter(species, "observed");
+        finish();
+      });
+      actions.appendChild(observeBtn);
     }
     }; // end showEncounterActions
   });
@@ -1690,11 +2049,35 @@ function doEncounter(species, plan) {
 /* v0.7.0: a trip is a full day out — descent, wildlife, then 2–4
    encounter slots paced through the day, then day's end. The shark is
    a moment in the day, never the end of it. */
+/* v1.4.2: porthole — the observation window is always present.
+   v1.4.7: when no expedition is active it shows the ocean surface from a
+   boat window — rolling wave crests at three depths, spray hitting the
+   glass. Called on init and when an expedition ends. */
+function showPorthole() {
+  const scene = $("diveScene");
+  scene.className = "dive-scene porthole";
+  $("diveScenery").innerHTML = "";
+  /* v1.5.5: clear any lingering ambient creature shadows from the expedition —
+     spawnCreature() appends them to diveScene (not diveScenery), so they
+     survived the trip and haunted the idle porthole waves. */
+  scene.querySelectorAll(".ambient").forEach(el => el.remove());
+  $("diveShark").classList.add("hidden");
+  const log = $("diveLog");
+  if (log) log.innerHTML = '<p class="dive-idle">\u{1F30A} The ocean waits. Plan your expedition above, then launch.</p>';
+  const actions = $("diveActions");
+  if (actions) { actions.classList.add("hidden"); actions.innerHTML = ""; }
+  $("diveView").classList.remove("hidden");
+}
+
 async function runExpedition(plan) {
   state.currentPlan = plan;
   state.pendingWin = false;
   state.taggedThisTrip = false;
   state.resightedThisTrip = false;
+  state.followedThisTrip = false;
+  /* v1.4.19-beta: Big Day — queue routine species celebrations during the
+     trip; flush one conversation (single or Big Day) at trip end. */
+  state.pendingCelebrations = [];
   /* v0.18.0: feed achievement stats — regions visited, baits used. */
   if (plan.region && !state.stats.regionsVisited.includes(plan.region)) {
     state.stats.regionsVisited.push(plan.region);
@@ -1775,9 +2158,15 @@ async function runExpedition(plan) {
   for (let i = 0; i < slots; i++) {
     $("diveShark").classList.add("hidden");
     if (i > 0) {
+      /* v1.4.15-beta: time progresses across the trip — morning, afternoon, evening */
+      const timeBeats = [
+        `⏳ The morning wears on…`,
+        `⏳ The afternoon stretches out…`,
+        `⏳ Evening approaches…`
+      ];
       logLine(deep
         ? `⏳ The hours slip by. The deep does not hurry, so neither do you.`
-        : `⏳ The morning wears on…`);
+        : (timeBeats[i - 1] || timeBeats[timeBeats.length - 1]));
       await wait(2000);
     }
     await showSighting(plan.depth);
@@ -1786,9 +2175,16 @@ async function runExpedition(plan) {
     if (s) {
       shown.add(s.id);
       sawShark = true;
-      const headBack = await doEncounter(s, plan);
+      const encResult = await doEncounter(s, plan);
       await wait(1200);
-      if (headBack) { endedEarly = true; break; }
+      /* v1.4.0-beta: tag-along ends the expedition. Stash the species so
+         closeDive can focus the map AFTER trip completion. */
+      if (encResult && typeof encResult === "object" && encResult.tagAlong) {
+        endedEarly = true;
+        state.pendingTagAlong = encResult.tagAlong;
+        break;
+      }
+      if (encResult === true) { endedEarly = true; break; }
     } else {
       logLine(`👀 ${deal(tripDecks.waiting, WAITING_LINES)}`);
       await wait(1800);
@@ -1848,14 +2244,39 @@ async function runExpedition(plan) {
   const closeDive = () => {
     actions.classList.add("hidden");
     actions.innerHTML = "";
-    $("diveView").classList.add("hidden");
+    showPorthole();
     $("launchBtn").disabled = false;
     renderAll();
+    /* v1.4.0-beta: tag-along — after the trip fully completes (log, achievements,
+       cleanup all done exactly once), navigate to the map and focus the shark. */
+    const tagAlongSid = state.pendingTagAlong || null;
+    state.pendingTagAlong = null;
+    const factInfo = state.pendingTagAlongFact;
+    state.pendingTagAlongFact = null;
+    /* v1.4.19-beta: Big Day — flush queued routine celebrations as one
+       Phone thread (single or Big Day) before win/afterExpedition branching. */
+    flushPendingCelebrations();
     if (state.pendingWin) {
       state.pendingWin = false;
+      /* v1.4.0-beta Mira review (win-path edge case): the 50th tag + tag-along
+         must not stack the map/fact overlay on the win ceremony. Defer until
+         the finale is acknowledged (handled in winStep beat 4). */
+      if (tagAlongSid) {
+        state.deferredTagAlong = { speciesId: tagAlongSid, factInfo: factInfo };
+      }
       doWin();
     } else {
       afterExpedition(plan);
+      if (tagAlongSid) {
+        goTab("map");
+        setTimeout(() => { try { ensureMapFocusedOn(tagAlongSid); } catch {} }, 200);
+        /* v1.4.0-beta Mira review (important): show the unlocked fact in a
+           readable overlay with learned X/3 progression — at quick pace the
+           dive-log line may never be read before auto-navigation. */
+        if (factInfo) {
+          setTimeout(() => showTagAlongFact(factInfo), 600);
+        }
+      }
     }
   };
   /* v0.13.0: the player already said "head back" once — don't ask again.
@@ -1978,6 +2399,21 @@ function resightThread(species, rec) {
     { who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" }
   ];
 }
+/* v1.5.3-beta: one-time Sarah reaction to first reunion per species.
+   Warm, not spammy — only fires once per species, ever. */
+function maybeReunionReaction(species, rec) {
+  state.reunionReacted = state.reunionReacted || {};
+  if (state.reunionReacted[species.id]) return;
+  state.reunionReacted[species.id] = true;
+  try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
+  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : species.name;
+  const thread = [
+    { who: "them", text: `WAIT. You saw ${name} again?!?` },
+    { who: "me", text: `The tag matched — it's really them.` },
+    { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
+  ];
+  pushThread(thread);
+}
 
 /* ---------- Sarah remembers sharks by name ----------
    v0.8.0: between expeditions she sometimes checks in about one of
@@ -2021,6 +2457,7 @@ const logbookFilters = { outcome: "all", region: "all", species: "all", dateRang
    - "tagged": any tagged encounter (trip may also have others)
    - "resighted": any re-sighted encounter
    - "watched": any watched (just watch) encounter
+   - "followed": any tag-along follow encounter
    - "missed": no shark encounters at all
    A trip with multiple outcomes appears in each relevant filter. */
 function logbookTripMatches(t, f) {
@@ -2029,6 +2466,7 @@ function logbookTripMatches(t, f) {
     if (f.outcome === "tagged" && !enc.some(e => e.result === "tagged")) return false;
     if (f.outcome === "resighted" && !enc.some(e => e.result === "resighted")) return false;
     if (f.outcome === "watched" && !enc.some(e => e.result === "watched")) return false;
+    if (f.outcome === "followed" && !enc.some(e => e.result === "followed")) return false;
     if (f.outcome === "missed" && enc.length > 0) return false;
   }
   if (f.region !== "all" && t.region !== f.region) return false;
@@ -2121,7 +2559,7 @@ function renderLogbook() {
     ];
     const enc = t.encounters.length
       ? t.encounters.map(e => {
-          const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : "👁️";
+          const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : e.result === "followed" ? "🧭" : "👁️";
           const idBit = e.researchId ? ` <span class="dim">🔬 ${esc(e.researchId)}</span>` : "";
           return `${icon} ${esc(e.name)}${idBit} <span class="dim">(${e.result})</span>`;
         }).join("<br>")
@@ -2175,31 +2613,35 @@ function updateMsgBadge() {
   const b = $("msgBadge");
   b.textContent = state.unread;
   b.classList.toggle("hidden", state.unread === 0);
+  /* v1.4.0: the unread state is announced as text, not red-alone. */
+  const tab = document.querySelector('.tab[data-tab="phone"]');
+  if (tab) {
+    tab.setAttribute("aria-label", state.unread > 0
+      ? "Phone, " + state.unread + " unread conversation" + (state.unread === 1 ? "" : "s")
+      : "Phone");
+  }
 }
 
+/* v1.5.1: batched rendering — build the whole thread list as one HTML string
+   and set innerHTML once, so the phone doesn't visibly grow in stages. */
 function renderMessages() {
   const list = $("messagesList");
-  list.innerHTML = "";
   if (!state.messages.length) {
     list.innerHTML = `<div class="empty-note">No messages yet.<br>Sarah will text you between expeditions. 💬</div>`;
     return;
   }
+  let html = "";
   state.messages.forEach(thread => {
-    const wrap = document.createElement("div");
-    wrap.className = "thread";
     const stamp = thread.ts
       ? `<div class="thread-stamp">${esc(fmtTime(thread.ts))}</div>`
       : "";
-    wrap.innerHTML = `${stamp}<div class="phone-thread"></div>`;
-    const th = wrap.querySelector(".phone-thread");
+    html += `<div class="thread">${stamp}<div class="phone-thread">`;
     thread.msgs.forEach(m => {
-      const b = document.createElement("div");
-      b.className = "bubble " + m.who;
-      b.textContent = m.text;
-      th.appendChild(b);
+      html += `<div class="bubble ${esc(m.who)}">${esc(m.text)}</div>`;
     });
-    list.appendChild(wrap);
+    html += `</div></div>`;
   });
+  list.innerHTML = html;
   // Like a real chat: oldest at top, newest at the bottom, pinned to the latest.
   list.scrollTop = list.scrollHeight;
 }
@@ -2227,12 +2669,95 @@ function pickChat() {
   state.chatSeen[s.id] = seen + 1;
   return chats[seen % chats.length];
 }
+/* ---------- Sarah's Big Day (v1.4.19-beta) ----------
+   When an expedition tags multiple first-time species, ONE authored Big Day
+   conversation replaces the routine per-species celebrations. Design: PR #44.
+   - 0 new species: nothing (existing no-tag behavior)
+   - 1 new species: existing opener + research ID + cheer, at trip end
+   - 2/3/4 new species: one Big Day conversation from the tier pool
+   - Lemon shark in the mix: lemon-aware variant (no second thread)
+   No-repeat via per-tier shuffled bags persisted in state.bigDayBags. */
+
+/* "a nurse shark" / "an oceanic whitetip" — simple vowel check. */
+function bigDayArticle(name) {
+  return /^[aeiou]/i.test(name.trim()) ? "an" : "a";
+}
+
+/* "a nurse shark and a lemon shark" / "a, b, and c" — discovery order. */
+function formatSpeciesList(events) {
+  const parts = events.map(e => `${bigDayArticle(e.speciesName)} ${e.speciesName.toLowerCase()}`);
+  if (parts.length === 1) return parts[0];
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1];
+}
+
+/* Deal one conversation index from a tier's no-repeat bag. Reshuffles when
+   exhausted. Bags persist in state so Sarah doesn't repeat across trips. */
+function dealBigDayIndex(tierKey) {
+  if (!state.bigDayBags) state.bigDayBags = {};
+  let bag = state.bigDayBags[tierKey];
+  const poolSize = BIG_DAY[tierKey].length;
+  if (!bag || bag.length === 0) {
+    bag = Array.from({ length: poolSize }, (_, i) => i);
+    // Fisher-Yates shuffle
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+  }
+  const idx = bag.pop();
+  state.bigDayBags[tierKey] = bag;
+  saveMsgs(); // persist the bag
+  return idx;
+}
+
+/* Pure function: build the Big Day thread from queued celebration events.
+   Returns array of {who, text} with placeholders resolved. Testable. */
+function buildBigDayThread(events) {
+  const count = events.length;
+  const hasLemon = events.some(e => e.speciesId === "lemon");
+  const tierKey = hasLemon ? "lemon" : Math.min(count, 4);
+  const pool = BIG_DAY[tierKey];
+  // For tests: allow deterministic selection via last arg; live code deals.
+  const idx = dealBigDayIndex(tierKey);
+  const convo = pool[idx % pool.length];
+  const speciesList = formatSpeciesList(events);
+  return convo.map(m => ({
+    who: m.who,
+    text: m.text.replace(/{speciesList}/g, speciesList).replace(/{count}/g, String(count))
+  }));
+}
+
+/* Flush queued routine celebrations at trip end. Called from closeDive on the
+   guaranteed trip-completion path (normal end + early Head back + tag-along).
+   Fires exactly one Phone thread: single celebration or Big Day. */
+function flushPendingCelebrations() {
+  const events = state.pendingCelebrations || [];
+  state.pendingCelebrations = [];
+  /* v1.5.0-beta: clear persisted copy — flushed means delivered. */
+  celebrationStore.clear();
+  if (events.length === 0) return;
+  if (events.length === 1) {
+    // Single new species: existing celebration, delivered at trip end.
+    const e = events[0];
+    pushThread([
+      { who: "them", text: e.opener },
+      { who: "me", text: `A ${e.speciesName} — ${e.length} metres, ${e.sex}. Research ID ${e.researchId}.` },
+      { who: "them", text: e.cheer }
+    ]);
+  } else {
+    // 2+ new species: one Big Day conversation.
+    pushThread(buildBigDayThread(events));
+  }
+}
+
 function afterExpedition(plan) {
   /* A trip with a successful tag already got its Sarah moment — the
-     species-relevant celebration thread. Same for a re-sighting. Don't
-     follow it minutes later with an unrelated random fact. */
+     species-relevant celebration thread. Same for a re-sighting or a
+     tag-along follow. Don't follow it minutes later with an unrelated
+     random fact. */
   if (plan && plan.region) { state.lastRegion = plan.region; saveMsgs(); }
-  if (state.taggedThisTrip || state.resightedThisTrip) return;
+  if (state.taggedThisTrip || state.resightedThisTrip || state.followedThisTrip) return;
   let thread;
   if (state.failures >= 5) {
     // gentle nudge, genuine-conversation style — about YOUR waters.
@@ -2329,6 +2854,11 @@ function unlockAchievement(a) {
      achievements shows each card in turn instead of overwriting. */
   achieveQueue.push(a);
   showNextAchievement();
+  /* v1.4.9: White Whale gets a Sarah reaction — she'd lose her mind
+     over a megamouth. Fires alongside the achievement celebration. */
+  if (a.id === "white-whale" && typeof WHITE_WHALE_THREAD !== "undefined") {
+    pushThread(WHITE_WHALE_THREAD.map(m => ({ ...m })));
+  }
 }
 const achieveQueue = [];
 let achieveShowing = false;
@@ -2373,11 +2903,7 @@ function renderAchievements() {
       </div>`;
     list.appendChild(row);
   });
-  const badge = $("achieveBadge");
-  if (badge) {
-    badge.textContent = `${unlockedCount}/${visible.length}`;
-    badge.classList.toggle("hidden", unlockedCount === 0);
-  }
+  /* v1.4.2: tab badge removed — the count lives in the page header above. */
 }
 
 /* ---------- Tagging ---------- */
@@ -2483,6 +3009,11 @@ function confirmTag(name) {
     taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
     track: genTrack(s, { location: regionName, date: dateStr })
   };
+  /* v1.4.19-beta: Big Day — determine new-species BEFORE recording the tag. */
+  const wasNewSpecies = !state.tagged[s.id];
+  /* v1.5.3-beta: one tagged shark per species (canonical). The reunion system
+     never creates a second record — _individuals from v1.5.2 betas are left
+     dormant, not deleted. */
   state.tagged[s.id] = rec;
   state.taggedThisTrip = true;
   logTripEncounter(s, "tagged", rec.researchId);
@@ -2510,13 +3041,24 @@ function confirmTag(name) {
     state.stats.depthsTagged.push(state.currentPlan.depth);
     saveStats();
   }
-  // Sarah celebrates wins, not just failures: excitement + a bonus fact.
-  // v0.6.0: the opener varies per species (draft openers — Avery to revise).
-  pushThread([
-    { who: "them", text: s.opener },
-    { who: "me", text: `A ${s.name} — ${rec.length} metres, ${rec.sex}. Research ID ${rec.researchId}.` },
-    { who: "them", text: s.cheer }
-  ]);
+  /* v1.4.19-beta: Big Day — queue the routine celebration instead of pushing
+     immediately. Flushed as one conversation (single or Big Day) at trip end.
+     Special threads (Bruce, Mary Lee, Nicole, Sarah egg, Archive) still push
+     separately below and are never batched. */
+  if (wasNewSpecies) {
+    state.pendingCelebrations.push({
+      speciesId: s.id,
+      speciesName: s.name,
+      nickname: name || "",
+      researchId: rec.researchId,
+      length: rec.length,
+      sex: rec.sex,
+      opener: s.opener,
+      cheer: s.cheer
+    });
+    /* v1.5.0-beta: persist so a reload before trip end doesn't lose it. */
+    celebrationStore.save(state.pendingCelebrations);
+  }
   maybeSarahEgg(s.id, rec);
   maybeNameEgg(s.id, rec); // v0.23.0
   /* v0.24.0: progressive Wild Archive unlock (Mira approved). First tag
@@ -2532,31 +3074,12 @@ function confirmTag(name) {
       { who: "me", text: "Real photos? Of the actual species?" },
       { who: "them", text: "The real deal! Your field-guide art is for ID work — the Archive is for meeting them. Every tag adds another face to the collection 🩵" }
     ]);
-  } else if (state.archiveUnlocked && !wasFirstTag) {
-    // Quiet notification: Archive tab gets a badge
-    try {
-      const tab = document.querySelector('.tab[data-tab="archive"] .tab-badge');
-      if (tab) { tab.textContent = "•"; tab.classList.remove("hidden"); }
-    } catch {}
   }
+  /* v1.5.1: Archive never shows a notification badge — removed per Avery. */
   checkMilestones();
   checkAchievements(); // v0.18.0
   renderAll();
   showHealthCheck(s, rec);
-}
-
-/* v1.3.1-beta: "Tag along" title language — the game's name appears naturally
-   in emotional moments. Tapping it takes you to the Map and focuses on your
-   shark's latest ping, so you're following YOUR animal, not just opening a map.
-   v1.3.1-beta Mira review: only called post-release (from doRelease), never
-   from the health check — the release choice is mandatory. */
-function tagAlongToMap(sid) {
-  try { $("tagOverlay").classList.add("hidden"); } catch {}
-  goTab("map");
-  /* Focus the just-tagged shark after the tab switch settles. */
-  if (sid) {
-    setTimeout(() => { try { mapFocusOn(sid); } catch {} }, 150);
-  }
 }
 
 /* v1.3.1-beta Mira review (blocking): the "Tag along" CTA must NOT appear
@@ -2567,6 +3090,12 @@ function showHealthCheck(s, rec) {
   state.healthSpecies = s;
   $("tagForm").classList.add("hidden");
   $("healthView").classList.remove("hidden");
+  /* v1.4.0-beta: third release choice — tag along ends the expedition. */
+  try {
+    const rec2 = state.tagged[s.id];
+    const nm = (rec2 && rec2.name) || s.name;
+    $("tagAlongName").textContent = nm;
+  } catch {}
   $("healthArt").innerHTML = sharkArtImg(s.id, "illustration", s.name);
   $("healthInfo").innerHTML = `
     <strong>${s.name}</strong> — ${esc(rec.researchId)}<br>
@@ -2588,17 +3117,343 @@ function doRelease(headBack) {
   if (s) {
     /* v1.3.1-beta: warm release moment with the title woven in.
        Personalized CTA ("Tag along with [name]") focuses the map on YOUR shark.
-       This is the ONLY "Tag along" CTA — it appears after the release choice. */
+       (v1.4.0-beta: retired per Mira review — the health-check third release
+       choice is now the single tag-along path.) */
     const rec = state.tagged[s.id];
     const displayName = (rec && rec.name) || s.name;
     logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
-    logLine(`<button type="button" class="tagalong-link" onclick="tagAlongToMap('${s.id}')">Tag along with ${esc(displayName)} →</button>`);
   }
   renderAll();
   if (done) done(headBack);
 }
+/* v1.4.0-beta: secret tag-along facts — 1-3 curated, biologically correct facts
+   per species. Unlock one per tag-along; when exhausted, the graceful line plays.
+   Facts are filled in below (generated content). */
+const SECRET_FACTS = {
+  nurse: [
+    "Nurse sharks can pump water over their gills while sitting perfectly still — most sharks would suffocate doing that, but a nurse shark can nap on the seafloor and breathe easy.",
+    "They hunt by suction, inhaling with such force that prey is vacuumed straight out of holes in the reef — and they often pile on top of each other in sleepy daytime heaps.",
+    "Every summer, nurse sharks gather in the same shallow mating grounds off Florida, returning year after year like a family reunion."
+  ],
+  thresher: [
+    "A thresher hunts with its tail like a whip — high-speed cameras finally caught them in 2013 herding sardines, then stunning them with an overhead tail-slap.",
+    "That scythe of a tail can be as long as the rest of its body, and special warm muscles keep its brain and eyes heated so it can hunt in cold, deep water."
+  ],
+  whale: [
+    "Every whale shark wears a constellation of spots as unique as a fingerprint — researchers photograph them to recognize individuals across decades and oceans.",
+    "They're champion divers, recorded plunging nearly two kilometres straight down into the dark, then cruising back up to feed at the surface after dark."
+  ],
+  goblin: [
+    "A goblin shark's jaws launch forward off its face like a slingshot to snatch prey — one of the fastest bites ever measured in a shark.",
+    "Its pinkish skin is so soft and translucent you can see blood vessels beneath, and its long snout is packed with sensors that feel the faint electric hum of hidden prey."
+  ],
+  tiger: [
+    "Tiger sharks are famous for eating almost anything — license plates, tires, and even sea turtles, whose shells their serrated teeth and powerful jaws can crack, have all turned up in their stomachs.",
+    "The bold stripes that give them their name fade as they age, so the biggest old tigers swim nearly plain grey; some individuals also wander entire ocean basins on years-long journeys."
+  ],
+  sandtiger: [
+    "Sand tigers do something no other shark does: they gulp air at the surface and hold it in their stomachs like a built-in float, letting them hover motionless in the water.",
+    "Before birth, the pups fight a darker battle — the largest embryo in each uterus eats its siblings, so only two sharks, one per side, are ever born."
+  ],
+  galapagos: [
+    "Galapagos sharks are famously curious, often circling divers for a long, deliberate look — researchers consider them one of the most inquisitive reef sharks.",
+    "Despite the name, they roam tropical reefs far beyond the Galápagos, from Hawaii to Bermuda, patrolling clear-water drop-offs in small groups."
+  ],
+  greatwhite: [
+    "Off South Africa's Seal Island, great whites launch their whole multi-ton bodies clean out of the water to ambush seals — a behavior called breaching, perfected through practice.",
+    "They're warm-bodied for a fish, keeping their swimming muscles heated, and some cross entire oceans — tagged whites have commuted from California to Hawaii and back to a patch of open ocean scientists call the White Shark Café."
+  ],
+  hammerhead: [
+    "That hammer isn't just for show — spreading the eyes wide gives hammerheads wider binocular overlap in front than most sharks, and sweeping the head side to side lets them scan the sand for the electric whispers of buried stingrays.",
+    "Great hammerheads are mostly loners — solitary hunters that sweep their wide heads over the sand to pin down stingrays, their favorite prey, before swinging down to scoop them up; their first dorsal fin is exceptionally tall and sickle-shaped."
+  ],
+  mako: [
+    "The shortfin mako is the fastest shark alive, built like a torpedo with a heated engine — its warm muscles let it explode after tuna and even leap clear out of the water.",
+    "Makos think fast too: that warm blood reaches the brain, keeping it sharp in cold water where other predators slow down."
+  ],
+  basking: [
+    "Basking sharks can shed and regrow their bristly gill rakers — like losing and regrowing a built-in sieve — though scientists are still working out how regularly it happens.",
+    "In summer they've been filmed swimming slow nose-to-tail circles in pairs, a stately dance scientists believe is courtship."
+  ],
+  epaulette: [
+    "When the tide drops, epaulette sharks simply walk — paddling across exposed reef on their fins from pool to pool, and surviving hours in water so low in oxygen it would kill most fish.",
+    "They're homebodies with tiny territories, often spending their whole lives on one small patch of reef."
+  ],
+  lemon: [
+    "Lemon sharks have remarkable memories for place: pups born in Bimini's mangrove nurseries return years later as adults, navigating back across open ocean to where they were born.",
+    "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and in lab tests they've shown they can learn and remember visual cues — solid evidence of visual learning and memory."
+  ],
+  blacktip: [
+    "Blacktip sharks hunt in spectacular spinning leaps, corkscrewing out of the water through schools of fish with their mouths open.",
+    "They're sprinters of the shallows, often hunting in packs that herd baitfish against the shoreline."
+  ],
+  whitetip: [
+    "Whitetip reef sharks are night owls — by day they pile together in caves and under ledges, resting in sleepy heaps, and by night they slink out alone to hunt.",
+    "Their slim bodies can wriggle into reef crevices no other shark their size could enter, and like nurse sharks they can pump water to breathe while lying still."
+  ],
+  blue: [
+    "Blue sharks are ocean wanderers, crossing entire oceans on migrations that can span the whole Atlantic, guided by senses we still don't fully understand.",
+    "They're famously curious around divers, circling in slow and deliberate — and a single mother can give birth to litters of more than a hundred pups."
+  ],
+  porbeagle: [
+    "Porbeagles run hot — among the warmest-bodied of all sharks, they keep their core heated well above the icy North Atlantic water they hunt in.",
+    "That internal furnace lets them chase prey in near-freezing seas and power long migrations across whole ocean basins."
+  ],
+  silky: [
+    "Silky sharks are named for their skin: their tiny scales are so smooth the hide feels like silk, unlike the sandpaper of most sharks.",
+    "They're bold and inquisitive, often trailing divers for long stretches just to investigate — and they shadow schools of tuna across the open ocean."
+  ],
+  oceanic: [
+    "Oceanic whitetips were once the most abundant large shark on Earth — bold, curious wanderers that would investigate anything floating in the open sea, from wreckage to research vessels.",
+    "Their long, rounded, white-tipped fins work like wings, letting them cruise the blue desert for months between meals."
+  ],
+  sevengill: [
+    "Most sharks have five gill slits; the broadnose sevengill has seven — an ancient design it shares with only a handful of species.",
+    "Divers in places like La Jolla, California, recognize regulars by their unique spot patterns, and sevengills have been seen teaming up in loose packs to hunt seals."
+  ],
+  bronze: [
+    "Bronze whalers wear their name in their skin — a coppery sheen that flashes as they turn, unique among the grey requiem sharks.",
+    "They're long-distance travelers of the Southern Hemisphere, migrating along entire coastlines between feeding and pupping grounds."
+  ],
+  frilled: [
+    "The frilled shark is a living time capsule — eel-bodied, with 25 rows of needle teeth (about 300 in all), it has barely changed in 80 million years.",
+    "It lives so deep it's almost never seen; one filmed off Japan in 2007 was among the first ever caught on camera alive near the surface, and scientists think it strikes at prey like a snake."
+  ],
+  zebra: [
+    "Baby zebra sharks are born with bold black-and-white stripes — and grow into spotted, leopard-like adults. They essentially change their pattern, and their common name, as they age.",
+    "Gentle bottom-dwellers, they rest on the seafloor by day and use their long tails to corner small prey in reef crevices at night."
+  ],
+  scalloped: [
+    "Scalloped hammerheads gather by day in vast schools around offshore seamounts — Cocos Island and the Galápagos host hundreds swirling together in the blue.",
+    "Females make long migrations to give birth in coastal nurseries, and the pups' hammer-heads are soft and rounded at birth."
+  ],
+  smooth: [
+    "The smooth hammerhead is the cold-water specialist of its family, ranging into temperate seas where other hammerheads won't go — including the Mediterranean and the coasts of New Zealand.",
+    "Its hammer has a smooth, rounded front edge with no central notch, giving it the cleanest profile of any hammerhead."
+  ],
+  bonnethead: [
+    "In 2018 scientists discovered the bonnethead eats and digests seagrass — the first omnivorous shark ever found, getting real nutrition from plants.",
+    "The smallest of the hammerheads, bonnetheads travel in sociable schools, sometimes dozens strong, cruising shallow bays and estuaries."
+  ],
+  bull: [
+    "Bull sharks swim hundreds of kilometres up rivers — they've been found far up the Amazon and Mississippi, and they live year-round in Lake Nicaragua, adjusting their bodies to fresh water like few sharks can.",
+    "That adaptability comes from remarkable kidneys that recycle salt, letting one shark hunt in both the open ocean and a muddy river."
+  ],
+  greyreef: [
+    "When bothered, a grey reef shark performs one of the ocean's clearest warning displays — arching its back, dropping its pectoral fins, and swimming in an exaggerated, swaggering S-shape that says 'back off.'",
+    "They're otherwise curious and social, often approaching divers for a close look before deciding you're not interesting."
+  ],
+  caribbean: [
+    "Caribbean reef sharks have learned to rest in ocean currents, facing into the flow so water streams over their gills — napping while the sea does the breathing for them.",
+    "They're homebodies of the coral reef, patrolling the same stretches of reef edge for years."
+  ],
+  sandbar: [
+    "Sandbar sharks carry one of the tallest dorsal fins of any shark — a proud sail that makes them easy to spot from a boat.",
+    "Their pups grow up in famous nurseries like Delaware Bay, where scientists have tracked generations of young sandbars returning to the same shallow waters."
+  ],
+  salmon: [
+    "Salmon sharks are the Arctic's answer to the mako — warm-bodied hunters that keep their swimming muscles heated in near-freezing northern Pacific water.",
+    "They follow the salmon runs, and their warm red muscle lets them strike with full power in water cold enough to numb most predators."
+  ],
+  dusky: [
+    "Dusky sharks live life in the slow lane — they can take twenty years to mature and may live past forty, among the slowest life cycles of any shark.",
+    "They migrate thousands of kilometres along coastlines, and females gather in warm southern waters to give birth."
+  ],
+  silvertip: [
+    "Silvertip sharks are famously bold around divers, often making close, deliberate passes — curious rather than aggressive, but impossible to ignore.",
+    "Their white-tipped fins flash like signals as they patrol Indo-Pacific reef drop-offs, usually alone or in small groups."
+  ],
+  spinner: [
+    "Spinner sharks feed by charging vertically through bait balls while spinning like a drill — then launching out of the water in a twisting leap.",
+    "Those acrobatic spins aren't play; the rotation lets them snap at fish in every direction as they rocket upward through the school."
+  ],
+  wobbegong: [
+    "A wobbegong is a living rug — its tasseled, mottled camouflage is so perfect that fish swim right up to the fringe of sensory barbels around its mouth, which twitch like worms to lure them closer.",
+    "Then it strikes with one of the fastest bites in the shark world, hinging its huge jaws open to engulf prey nearly its own size."
+  ],
+  leopard: [
+    "Every summer, pregnant female leopard sharks gather in the warm shallows of La Jolla, California, basking to speed up the development of their pups — a maternity ward in the surf.",
+    "They're gentle bottom-feeders, crunching crabs and clam siphons, and their spots are unique enough that researchers can tell individuals apart."
+  ],
+  horn: [
+    "Horn sharks crunch through sea urchins and crabs with rows of flat, molar-like teeth — built for crushing, not slicing.",
+    "Females lay beautiful spiral egg cases, screwing them into rocky crevices where the corkscrew shape wedges them safe from predators."
+  ],
+  portjackson: [
+    "Port Jackson sharks lay corkscrew-shaped egg cases too, wedging them between rocks — and mothers are sometimes seen picking the case up in their mouths to carry it to a safer crevice.",
+    "They make real migrations along Australia's coast, traveling hundreds of kilometres between feeding and breeding grounds."
+  ],
+  angelshark: [
+    "Angel sharks are ambush artists — they vanish beneath the sand with only their eyes showing, then explode upward to engulf passing fish in a fraction of a second.",
+    "Despite the angelic name, they're flattened bottom-dwellers more like rays, and Europe's angelsharks are now critically endangered."
+  ],
+  megamouth: [
+    "The megamouth was unknown to science until 1976, when one tangled in a Navy sea anchor off Hawaii — a 15-foot shark nobody had ever seen.",
+    "It spends days in the deep and rises toward the surface each night to filter-feed on krill, and researchers suspect the pale band inside its huge mouth may glow to lure prey in the dark."
+  ],
+  sawshark: [
+    "A sawshark's saw is studded with sensors — it sweeps the rostrum through the sand feeling for the electric heartbeat of buried prey, then slashes sideways to disable it.",
+    "Those whisker-like barbels halfway along the saw can help sense prey and changes around the seafloor; they appear especially useful for touch."
+  ],
+  greenland: [
+    "Greenland sharks may live 400 years or more — the longest-lived vertebrate known, with one female estimated at nearly four centuries old.",
+    "Greenland sharks can carry parasitic copepods on their eyes, but recent research shows their visual system is adapted for the deep sea — and their flesh is toxic unless fermented, which is how Iceland's hákarl is made."
+  ],
+  cookiecutter: [
+    "The cookiecutter glows from below — light-producing organs in its belly match the faint light from above, hiding its silhouette, except for a dark collar that may mimic a small fish to lure big predators close.",
+    "Then this foot-long shark cuts a single cookie-shaped plug of flesh from whales and tuna — and has even left its signature round bites in the rubber sonar domes of submarines — before vanishing back into the dark."
+  ],
+  sixgill: [
+    "Bluntnose sixgills are deep-sea heavyweights, cruising cold depths down past a kilometre, surfacing only at night in a few special places like Puget Sound.",
+    "They're unhurried scavengers with a slow, powerful build — and those six gill slits mark them as survivors of an ancient lineage."
+  ],
+  velvetbelly: [
+    "The velvet belly lanternshark carries its own dim lighting — rows of light-producing organs along its belly glow to erase its silhouette from predators below.",
+    "It lives in the twilight depths of the eastern Atlantic, a small shark in a very big dark."
+  ],
+  dwarflantern: [
+    "The dwarf lanternshark is the smallest shark in the world — fully grown at about 20 centimetres, it could curl up in your hand.",
+    "It lives in deep water off Colombia and Venezuela and glows with its own bioluminescence, a tiny lantern in the dark."
+  ],
+  kitefin: [
+    "The kitefin shark is the largest glowing vertebrate known — at over a metre and a half long, this deep-sea hunter produces its own blue-green light.",
+    "Its glow was only confirmed in a 2021 study, making it one of the biggest recent surprises in shark science."
+  ],
+  pacificsleeper: [
+    "Pacific sleepers are giants of the deep North Pacific, growing as long as a great white, yet so rarely seen that almost everything about their lives is a mystery.",
+    "They're known to gather at whale falls in the abyss, slow-moving feasts in the dark where these huge sharks scavenge for months."
+  ],
+  spinydogfish: [
+    "Spiny dogfish carry mild venom in the spines ahead of each dorsal fin — a rare defense among sharks, and sharp enough to demand respect.",
+    "They're marathon mothers too: pregnancies last up to two years, among the longest of any vertebrate on Earth."
+  ],
+  catshark: [
+    "Catsharks lay their eggs in leathery purses with curly tendrils at each corner — 'mermaid's purses' that anchor to seaweed until the pups hatch.",
+    "They're nocturnal prowlers with cat-like eyes, and some species can even squeeze their bodies through astonishingly small gaps to hide by day."
+  ]
+};
+
+/* Returns the next unlearned fact for a species, or null if exhausted.
+   Guarantees one unlearned fact if any remain (Mira's guardrail). */
+function unlockSecretFact(speciesId) {
+  const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[speciesId]) || [];
+  if (!pool.length) return null;
+  const unlocked = state.unlockedFacts[speciesId] || [];
+  const remaining = pool.map((_, i) => i).filter(i => !unlocked.includes(i));
+  if (!remaining.length) return null;
+  const idx = remaining[Math.floor(Math.random() * remaining.length)];
+  unlocked.push(idx);
+  state.unlockedFacts[speciesId] = unlocked;
+  factStore.save(state.unlockedFacts);
+  return pool[idx];
+}
+/* v1.4.0-beta: third release choice — "Release & tag along" ENDS the expedition.
+   Lifecycle-safe per Mira's guardrail: resolves the encounter exactly once
+   (with tag-along intent), so trip log, achievements, counters, Sarah batching,
+   and launch-button cleanup all run exactly once. The map focuses the shark
+   AFTER trip completion (in closeDive), not here. */
+function doTagAlong() {
+  const done = state.encounterDone;
+  const s = state.healthSpecies;
+  state.encounterDone = null;
+  state.healthSpecies = null;
+  $("tagOverlay").classList.add("hidden");
+  if (s) {
+    const rec = state.tagged[s.id];
+    const displayName = (rec && rec.name) || s.name;
+    logLine(`🌊 ${esc(displayName)} is back in the water — tag secure, swimming strong.`);
+    /* v1.4.0-beta: tag-along unlocks a secret fact (or the graceful exhaustion line). */
+    const fact = unlockSecretFact(s.id);
+    if (fact) {
+      logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
+      state.pendingTagAlongFact = { speciesId: s.id, fact, exhausted: false };
+    } else {
+      logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+      state.pendingTagAlongFact = { speciesId: s.id, fact: null, exhausted: true };
+    }
+    logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
+  }
+  renderAll();
+  if (done) done({ tagAlong: s ? s.id : null });
+}
 $("releaseBtn").addEventListener("click", () => doRelease(false));
 $("releaseShipBtn").addEventListener("click", () => doRelease(true));
+$("tagAlongBtn").addEventListener("click", doTagAlong);
+/* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged species.
+   Lets the player follow a shark they've already tagged to unlock remaining
+   secret facts (2nd, 3rd) without retagging or replacing the collection record.
+   Ends the expedition like doTagAlong — you're spending the rest of the trip
+   following this shark. */
+function doFollowTagged(speciesId, doneCb) {
+  const s = SHARKS.find(x => x.id === speciesId);
+  if (!s) return;
+  const rec = state.tagged[speciesId];
+  const displayName = (rec && rec.name) || s.name;
+  logLine(`🧭 Following ${esc(displayName)} — tag secure, swimming strong.`);
+  const fact = unlockSecretFact(speciesId);
+  if (fact) {
+    logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
+    /* Stash for the map overlay (readable reward with progression). */
+    state.pendingTagAlongFact = { speciesId, fact, exhausted: false };
+  } else {
+    logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+    state.pendingTagAlongFact = { speciesId, fact: null, exhausted: true };
+  }
+  /* v1.4.0-beta Mira review (related polish): log the follow as a trip
+     encounter with the "followed" outcome — the logbook shows a meaningful
+     event, Sarah's after-trip logic doesn't misclassify the expedition, and
+     the collection record is untouched (no fake re-tag). */
+  logTripEncounter(s, "followed", rec ? rec.researchId : null);
+  state.followedThisTrip = true;
+  logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
+  renderAll();
+  /* Resolve the encounter with tag-along intent, ending the expedition.
+     Prefer the passed callback (already-tagged path from doEncounter);
+     fall back to state.encounterDone for safety. */
+  const done = doneCb || state.encounterDone;
+  state.encounterDone = null;
+  if (done) done({ tagAlong: speciesId });
+}
+/* v1.4.0-beta Mira review (important): readable tag-along reward on the Map.
+   Shows the unlocked fact (or the graceful exhaustion line) in an overlay card
+   with "learned X/3" progression, so the player can actually read it even at
+   quick pace. Dismissed with an explicit button — no auto-close. */
+function showTagAlongFact(info) {
+  const s = SHARKS.find(x => x.id === info.speciesId);
+  if (!s) return;
+  const rec = state.tagged[info.speciesId];
+  const displayName = (rec && rec.name) || s.name;
+  const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[info.speciesId]) || [];
+  const unlocked = state.unlockedFacts[info.speciesId] || [];
+  const total = pool.length;
+  const learned = unlocked.length;
+  let bodyHtml;
+  if (info.fact && !info.exhausted) {
+    bodyHtml = `
+      <div class="tagalong-fact-card">
+        <div class="fact-progress">Tag-along insight — learned ${learned}/${total}</div>
+        <div class="fact-text">🔬 ${esc(info.fact)}</div>
+      </div>
+      <p class="dim">Following ${esc(displayName)} paid off. ${total - learned > 0
+        ? `Follow ${esc(displayName)} again sometime to learn more.`
+        : `That's everything this shark had to teach.`}</p>`;
+  } else {
+    bodyHtml = `
+      <div class="tagalong-fact-card">
+        <div class="fact-progress">Tag-along insight — ${learned}/${total} learned</div>
+        <div class="fact-text"><em>I've learned all I can — the rest is in the specialists' hands now.</em></div>
+      </div>
+      <p class="dim">${esc(displayName)} still appreciates the company. 🧭</p>`;
+  }
+  $("tagAlongFactContent").innerHTML = `
+    <h3 style="margin:4px 0 8px">🧭 Tagging along with ${esc(displayName)}</h3>
+    ${bodyHtml}`;
+  $("tagAlongOverlay").classList.remove("hidden");
+}
+$("tagAlongFactClose").addEventListener("click", () => {
+  $("tagAlongOverlay").classList.add("hidden");
+});
+
 /* v0.17.1: Ask Sarah for advice. */
 $("sarahAskBtn").addEventListener("click", () => {
   const sid = $("sarahAskSelect").value;
@@ -2805,7 +3660,20 @@ function winStep(n) {
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
     $("winNext").addEventListener("click", () => {
       ov.classList.add("hidden");
-      goTab("collection");
+      /* v1.4.0-beta Mira review (win-path edge case): if the winning tag was
+         also a tag-along, go to the map with the fact overlay instead of the
+         collection book — the win ceremony keeps its priority. */
+      const deferred = state.deferredTagAlong;
+      state.deferredTagAlong = null;
+      if (deferred) {
+        goTab("map");
+        setTimeout(() => { try { ensureMapFocusedOn(deferred.speciesId); } catch {} }, 200);
+        if (deferred.factInfo) {
+          setTimeout(() => showTagAlongFact(deferred.factInfo), 600);
+        }
+      } else {
+        goTab("collection");
+      }
     });
   }
 }
@@ -2911,29 +3779,39 @@ function maybeSarahEgg(speciesId, rec) {
    - Deep Blue: RETIRED per Avery's decision 2026-10-08 (was on hold per Mira).
      Do not implement — the great-white naming easter eggs stay Mary Lee and Nicole only. */
 function maybeNameEgg(speciesId, rec) {
-  if (!rec || !rec.name) return;
-  const name = rec.name.trim().toLowerCase();
-  const s = sharkById(speciesId);
+  /* v1.5.2-beta: defensive guards — the Mary Lee/Nicole easter eggs must never
+     crash the game, even if thread data or pushThread is unavailable. */
+  try {
+    if (!rec || !rec.name) return;
+    if (typeof pushThread !== "function") return;
+    const name = rec.name.trim().toLowerCase();
+    const s = typeof sharkById === "function" ? sharkById(speciesId) : null;
 
-  // Mary Lee: great white only
-  if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
-    rec.maryLeeEgg = true;
-    store.save(state.tagged);
-    pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
-    return;
-  }
-  // Nicole: great white only
-  if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
-    rec.nicoleEgg = true;
-    store.save(state.tagged);
-    pushThread(NICOLE_THREAD.map(m => ({ ...m })));
-    return;
-  }
-  // Bruce: ANY shark. No immediate message — the slow chain begins silently.
-  if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
-    state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
-    try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
-    // Deliberately no pushThread here. Sarah will notice... eventually.
+    // Mary Lee: great white only
+    if (speciesId === "greatwhite" && name === "mary lee" && !rec.maryLeeEgg) {
+      if (typeof MARY_LEE_THREAD === "undefined" || !Array.isArray(MARY_LEE_THREAD)) return;
+      rec.maryLeeEgg = true;
+      store.save(state.tagged);
+      pushThread(MARY_LEE_THREAD.map(m => ({ ...m })));
+      return;
+    }
+    // Nicole: great white only
+    if (speciesId === "greatwhite" && name === "nicole" && !rec.nicoleEgg) {
+      if (typeof NICOLE_THREAD === "undefined" || !Array.isArray(NICOLE_THREAD)) return;
+      rec.nicoleEgg = true;
+      store.save(state.tagged);
+      pushThread(NICOLE_THREAD.map(m => ({ ...m })));
+      return;
+    }
+    // Bruce: ANY shark. No immediate message — the slow chain begins silently.
+    if (name === "bruce" && !state.bruceEgg && !state.bruceChainComplete) {
+      state.bruceEgg = { stage: 0, sharkId: speciesId, started: Date.now(), lastAdvance: 0, expeditionsAtStage: state.stats.expeditions || 0 };
+      try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
+      // Deliberately no pushThread here. Sarah will notice... eventually.
+    }
+  } catch (e) {
+    /* v1.5.2-beta: never let an easter egg crash naming — log and continue. */
+    if (typeof console !== "undefined" && console.warn) console.warn("maybeNameEgg:", e);
   }
 }
 
@@ -3007,7 +3885,9 @@ function renderCollection() {
   const shelf = $("trophyShelf");
   shelf.innerHTML = "";
   const ids = Object.keys(state.tagged);
-  $("collectionCount").textContent = `${ids.length}/${SHARKS.length}`;
+  /* v1.4.2: count lives in the page header now, not the tab */
+  const ccHead = $("collectionCountHead");
+  if (ccHead) ccHead.innerHTML = `<strong>${ids.length}</strong> of <strong>${SHARKS.length}</strong> species tagged`;
 
   /* v0.6.0: the trophy sits ABOVE the grid on its own distinguished shelf —
      never as a grid slot that reads like "one more shark to catch". */
@@ -3099,6 +3979,19 @@ function openDetail(id) {
         ${t.notes.map(n => `<li>👁️ ${esc(n)}</li>`).join("")}
       </ul>
     </div>` : ""}
+    ${(() => {
+      /* v1.4.0-beta: show unlocked tag-along facts in the collection detail. */
+      const unlocked = state.unlockedFacts[id] || [];
+      const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[id]) || [];
+      const shown = unlocked.map(i => pool[i]).filter(Boolean);
+      if (!shown.length) return "";
+      return `<div class="secret-facts-block">
+        <h4>🔬 Tag-along insights (${shown.length}/${pool.length})</h4>
+        <ul class="track-stops">
+          ${shown.map(f => `<li>🔬 ${esc(f)}</li>`).join("")}
+        </ul>
+      </div>`;
+    })()}
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
     ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
@@ -3191,7 +4084,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done"];
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {
@@ -3294,7 +4187,9 @@ function validateSaveData(data) {
   }
   // Version: must be a recognized Tag Along version, else reject
   const fv = data.version || "unknown";
-  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || fv === VERSION;
+  /* v1.4.0-beta Mira review (blocker 3): accept the 1.x beta lineage so
+     exported v1.3.x playtest saves import cleanly. */
+  const supported = /^v0\.(1[0-9]|2[0-3])\./.test(fv) || /^v1\.\d+\.\d+-beta$/.test(fv) || fv === VERSION;
   if (!supported) return { ok: false, reason: "unsupported version: " + fv };
   // Progress-bearing payload: importing tyi-pace alone would wipe the collection
   const hasProgress = ["tyi-collection", "tyi-logbook", "tyi-won"].some(k => {
@@ -3637,6 +4532,21 @@ function mapFocusOn(sid) {
   const last = pts[pts.length - 1]; // latest ping: where the shark "is"
   mapGlideTo(last.x, last.y, MAP_FOCUS_ZOOM);
 }
+/* v1.4.0-beta Mira review: non-toggling focus for the follow/tag-along
+   completion path. mapFocusOn() toggles (a second tap glides back out), but
+   following the same shark twice must NOT zoom away from it. Manual map taps
+   keep using mapFocusOn(). */
+function ensureMapFocusedOn(sid) {
+  const t = state.tagged[sid];
+  if (!t) return;
+  const pts = mapPoints(t);
+  if (!pts.length) return;
+  if (mapFocus && mapFocus.sid === sid) return; // already focused — don't toggle away
+  if (!mapFocus) mapFocus = { sid, prevZoom: mapZoom, prevCX: mapCX, prevCY: mapCY };
+  else mapFocus.sid = sid;
+  const last = pts[pts.length - 1]; // latest ping: where the shark "is"
+  mapGlideTo(last.x, last.y, MAP_FOCUS_ZOOM);
+}
 /* Mouse-wheel zoom, centered on the pointer. preventDefault stops the page
    scrolling while the pointer is over the map (standard map-widget behavior). */
 const mapWrapEl = $("worldMapWrap");
@@ -3733,6 +4643,31 @@ tickPhoneClock();
 /* v0.17.1: the phone clock ticks — refresh every 30s so it never goes stale
    next to message timestamps. */
 setInterval(tickPhoneClock, 30000);
+/* v1.4.0: living caustics — each ribbon reappears at a new horizontal
+   position after its lifecycle completes. The reposition fires on
+   animationiteration, while the ribbon is in its invisible tail, so the
+   jump is never seen. Skipped under prefers-reduced-motion (CSS already
+   freezes the ribbons there). */
+/* v1.4.1: sun-ray caustics — each ray gets a fresh fan angle after its
+   lifecycle completes, so rays keep fanning from the sun point at new
+   angles. Fires on animationiteration, while the ray is in its invisible
+   tail, so the jump is never seen. Each ray keeps its own lane (home angle
+   from CSS) with a small jitter, so the fan stays spread across the screen.
+   Skipped under prefers-reduced-motion (CSS freezes the rays there).
+   v1.4.17: restored after the v1.4.16 conic fan broke iPad layout. */
+(function initCaustics() {
+  if (typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.caustics span').forEach(sp => {
+    const home = parseFloat(getComputedStyle(sp).getPropertyValue('--ray-angle')) || 0;
+    sp.dataset.homeAngle = home;
+    sp.addEventListener('animationiteration', () => {
+      const jitter = Math.random() * 16 - 8;
+      sp.style.setProperty('--ray-angle',
+        (parseFloat(sp.dataset.homeAngle) + jitter).toFixed(1) + 'deg');
+    });
+  });
+})();
 /* v0.19.0: field-guide database controls. */
 (function initGuideTools() {
   const search = $("guideSearch");
@@ -3766,5 +4701,18 @@ setInterval(tickPhoneClock, 30000);
 })();
 initCreatureArt(); // v0.26.0: fill CREATURE_ART with WebP shadow sprites
 renderAll();
+/* v1.5.0-beta Mira review (blocking): recover celebrations lost to a reload
+   before trip end. Clear the persisted copy FIRST (idempotent — a crash
+   mid-flush can't double-deliver), then flush once. */
+function recoverPendingCelebrations() {
+  const saved = celebrationStore.load();
+  if (saved && saved.length > 0) {
+    celebrationStore.clear();
+    state.pendingCelebrations = saved;
+    flushPendingCelebrations();
+  }
+}
+recoverPendingCelebrations();
+showPorthole(); // v1.4.2: observation window always present — porthole surface when idle
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();

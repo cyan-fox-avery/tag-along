@@ -193,6 +193,14 @@ const ACHIEVEMENTS = [
     hidden: true,
     check: (st) => !!st.bruceChainComplete
   },
+  {
+    id: "white-whale",
+    name: "White Whale",
+    icon: "🐋",
+    breadcrumb: "the rarest shark in the sea",
+    description: "Tagged a megamouth shark. Only around 300 have ever been documented. This is the big one.",
+    check: (st) => !!st.tagged.megamouth
+  },
 ];
 
 /* v0.18.0 review: the Bruce chain isn't built yet, so this stays out of the

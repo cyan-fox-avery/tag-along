@@ -20,7 +20,17 @@ body {
   /* v0.19.1: the descent — surface light at the top, deep dark below.
      No background-attachment:fixed — the gradient belongs to the document,
      so scrolling down genuinely takes you deeper. */
-  background: linear-gradient(180deg, #17517e 0%, #10395c 22%, #0b2740 48%, #071a2c 72%, #030e1a 100%);
+  /* v1.4.15-beta: full underwater vista — bright surface light up top,
+     deepening through mid-water blues to near-black depths, with a hint
+     of sediment warmth at the very bottom. Static; only bubbles and rays move. */
+  background: linear-gradient(180deg,
+    #1e6a9e 0%,    /* sunlit surface */
+    #155a8a 12%,
+    #0f4470 28%,   /* mid-water */
+    #0a2f52 48%,
+    #071f3a 68%,   /* deep water */
+    #041224 85%,
+    #020a16 100%); /* abyssal dark */
   color: var(--ink);
   min-height: 100vh;
   position: relative;
@@ -33,7 +43,7 @@ body {
 .ocean-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 /* The surface, just below the title card. */
 .surface-shimmer {
-  position: absolute; top: 0; left: 0; right: 0; height: 210px;
+  position: absolute; top: 0; left: -4%; right: -4%; height: 210px; /* v1.4.8: oversized so the ±2% drift never exposes an edge (was showing dark bars) */
   background:
     radial-gradient(60% 90px at 20% 0%, rgba(170,220,255,0.28), transparent 70%),
     radial-gradient(50% 70px at 70% 0%, rgba(170,220,255,0.20), transparent 70%),
@@ -44,51 +54,105 @@ body {
   from { transform: translateX(-2%); opacity: 0.85; }
   to { transform: translateX(2%); opacity: 1; }
 }
-/* God rays slanting down from the surface — document-positioned in the upper water column. */
-.god-rays span {
-  position: absolute; top: 120px; width: 90px; height: 640px;
-  background: linear-gradient(180deg, rgba(180,225,255,0.10), transparent 80%);
-  transform: skewX(-12deg); filter: blur(6px);
-  animation: ray-sway 18s ease-in-out infinite alternate;
+/* v1.4.16: sun-ray caustics REBUILT as a conic-gradient fan. The old 8-span
+   system pivoted each ray around one point on a 2000px stick — at wide fan
+   angles the stick bottoms landed off-screen, so only near-vertical rays ever
+   showed (reading as a bar on the far left, and too faint to see move). A
+   conic gradient centered at the sun point CANNOT miss: every wedge radiates
+   from the sun across the viewport by construction. Three layered fans with
+   different wedge patterns sway and breathe at different rates for organic,
+   clearly-alive light. mix-blend-mode: screen caps overlap brightness.
+   Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
+.caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
+.caustics span {
+  position: absolute; top: -120px; left: 2%; height: 2000px;
+  transform-origin: 50% 0; /* pivot around the sun point at far top-left */
+  /* v1.4.17: span-based rays restored (the v1.4.16 conic fan broke iPad layout).
+     Wide soft DIFFUSED shafts: a vertical linear-gradient gives length falloff
+     (bright near the sun, dissolving with depth) while a horizontal mask
+     feathers both sides — no hard edge can ever render. Brighter than v1.4.15
+     so the fan is actually visible, and rays never fully vanish. */
+  background: linear-gradient(to bottom,
+    rgba(215,240,255,0.32) 0%,
+    rgba(205,235,255,0.18) 38%,
+    rgba(195,228,255,0.08) 62%,
+    transparent 88%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
+  opacity: 0.15;
+  animation: ray-life 18s ease-in-out infinite;
 }
-.god-rays span:nth-child(1) { left: 12%; animation-delay: -4s; }
-.god-rays span:nth-child(2) { left: 38%; width: 130px; animation-delay: -11s; }
-.god-rays span:nth-child(3) { left: 64%; width: 70px; animation-delay: -7s; }
-.god-rays span:nth-child(4) { left: 84%; animation-delay: -2s; }
-@keyframes ray-sway {
-  from { transform: skewX(-14deg) translateX(-12px); opacity: 0.7; }
-  to { transform: skewX(-9deg) translateX(12px); opacity: 1; }
+/* Fan angles from the far-left sun point: wide spread (12-72 deg) so the fan
+   visibly sweeps the screen. Each ray pivots around the shared sun point;
+   wide-angle rays cross the viewport diagonally and exit through the right
+   edge — all visible, none wasted off-screen. */
+.caustics span:nth-child(1) { --ray-angle: 12deg; width: 120px; animation-duration: 17s; animation-delay: -5s; }
+.caustics span:nth-child(2) { --ray-angle: 20deg; width: 95px;  animation-duration: 22s; animation-delay: -14s; }
+.caustics span:nth-child(3) { --ray-angle: 28deg; width: 140px; animation-duration: 15s; animation-delay: -8s; }
+.caustics span:nth-child(4) { --ray-angle: 36deg; width: 105px; animation-duration: 20s; animation-delay: -3s; }
+.caustics span:nth-child(5) { --ray-angle: 46deg; width: 130px; animation-duration: 18s; animation-delay: -11s; }
+.caustics span:nth-child(6) { --ray-angle: 54deg; width: 100px; animation-duration: 24s; animation-delay: -17s; }
+.caustics span:nth-child(7) { --ray-angle: 63deg; width: 145px; animation-duration: 16s; animation-delay: -7s; }
+.caustics span:nth-child(8) { --ray-angle: 72deg; width: 110px; animation-duration: 21s; animation-delay: -13s; }
+@keyframes ray-life {
+  /* v1.4.17: clearly visible life — slow sway (±4 deg) plus a real grow/shrink
+     pulse (scaleX 0.7-1.25). Rays breathe but never fully vanish (min 0.15). */
+  0%   { opacity: 0.15; transform: rotate(calc(var(--ray-angle) - 4deg))   scaleX(0.7); }
+  25%  { opacity: 0.75; transform: rotate(calc(var(--ray-angle) - 1.5deg)) scaleX(1.0); }
+  50%  { opacity: 0.9;  transform: rotate(var(--ray-angle))                scaleX(1.25); }
+  75%  { opacity: 0.6;  transform: rotate(calc(var(--ray-angle) + 2deg))   scaleX(0.9); }
+  100% { opacity: 0.15; transform: rotate(calc(var(--ray-angle) + 4deg))   scaleX(0.7); }
 }
-/* Slow rising bubbles — the one viewport-fixed layer, for a little continuous life while scrolling. */
+/* Slow rising bubbles — viewport-fixed for a little continuous life while scrolling.
+   v1.4.16: columns fire in OVERLAPPING pairs (2 places at once), bubbles
+   within each column on a tight ~0.7s stagger — dense little air trails,
+   never an empty screen. */
 .bubbles { position: fixed; inset: 0; pointer-events: none; }
 .bubbles span {
   position: absolute; bottom: -20px; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
-  animation: bubble-rise linear infinite;
+  animation: bubble-column 24s linear infinite;
+  opacity: 0;
 }
-.bubbles span:nth-child(1) { left: 8%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: -3s; }
-.bubbles span:nth-child(2) { left: 22%; width: 6px; height: 6px; animation-duration: 22s; animation-delay: -11s; }
-.bubbles span:nth-child(3) { left: 41%; width: 12px; height: 12px; animation-duration: 19s; animation-delay: -7s; }
-.bubbles span:nth-child(4) { left: 55%; width: 7px; height: 7px; animation-duration: 25s; animation-delay: -15s; }
-.bubbles span:nth-child(5) { left: 68%; width: 9px; height: 9px; animation-duration: 17s; animation-delay: -5s; }
-.bubbles span:nth-child(6) { left: 79%; width: 5px; height: 5px; animation-duration: 28s; animation-delay: -20s; }
-.bubbles span:nth-child(7) { left: 90%; width: 11px; height: 11px; animation-duration: 21s; animation-delay: -9s; }
-.bubbles span:nth-child(8) { left: 33%; width: 6px; height: 6px; animation-duration: 24s; animation-delay: -13s; }
-@keyframes bubble-rise {
-  from { transform: translateY(0) translateX(0); opacity: 0; }
-  10% { opacity: 0.8; }
-  90% { opacity: 0.6; }
-  to { transform: translateY(-105vh) translateX(24px); opacity: 0; }
+/* columns A+B fire together (2 places at once, left half) */
+.bubbles span:nth-child(1)  { left: 11%;   width: 10px; height: 10px; animation-delay: -0.5s; }
+.bubbles span:nth-child(2)  { left: 13.5%; width: 7px;  height: 7px;  animation-delay: -1.2s; }
+.bubbles span:nth-child(3)  { left: 16%;   width: 12px; height: 12px; animation-delay: -1.9s; }
+.bubbles span:nth-child(4)  { left: 14%;   width: 6px;  height: 6px;  animation-delay: -2.6s; }
+.bubbles span:nth-child(5)  { left: 36%;   width: 8px;  height: 8px;  animation-delay: -1.0s; }
+.bubbles span:nth-child(6)  { left: 38.5%; width: 11px; height: 11px; animation-delay: -1.7s; }
+.bubbles span:nth-child(7)  { left: 41%;   width: 6px;  height: 6px;  animation-delay: -2.4s; }
+.bubbles span:nth-child(8)  { left: 39%;   width: 9px;  height: 9px;  animation-delay: -3.1s; }
+/* columns C+D fire together (2 places at once, right half) */
+.bubbles span:nth-child(9)  { left: 61%;   width: 7px;  height: 7px;  animation-delay: -12.5s; }
+.bubbles span:nth-child(10) { left: 63.5%; width: 12px; height: 12px; animation-delay: -13.2s; }
+.bubbles span:nth-child(11) { left: 66%;   width: 8px;  height: 8px;  animation-delay: -13.9s; }
+.bubbles span:nth-child(12) { left: 64%;   width: 10px; height: 10px; animation-delay: -14.6s; }
+.bubbles span:nth-child(13) { left: 84%;   width: 9px;  height: 9px;  animation-delay: -13.0s; }
+.bubbles span:nth-child(14) { left: 86.5%; width: 6px;  height: 6px;  animation-delay: -13.7s; }
+.bubbles span:nth-child(15) { left: 89%;   width: 11px; height: 11px; animation-delay: -14.4s; }
+.bubbles span:nth-child(16) { left: 87%;   width: 7px;  height: 7px;  animation-delay: -15.1s; }
+@keyframes bubble-column {
+  /* visible rise is the first ~42% of the 24s cycle (~10s); the rest is quiet */
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  5% { opacity: 0.85; }
+  36% { transform: translateY(-105vh) translateX(20px); opacity: 0.5; }
+  42%, 100% { transform: translateY(-105vh) translateX(20px); opacity: 0; }
 }
 /* Seafloor silhouette along the bottom. */
 .seafloor {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
-  fill: #020a14; opacity: 0.9;
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
+  fill: #020a14; opacity: 0.95;
 }
 .seafloor .kelp { fill: #03141f; }
+.seafloor .kelp-far { fill: #041a28; opacity: 0.7; }
+/* v1.4.15-beta: sediment texture — subtle mounds along the seafloor */
+.seafloor .sediment { fill: #0a1a24; opacity: 0.6; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
-  .surface-shimmer, .god-rays span, .bubbles span { animation: none; }
+  .surface-shimmer, .caustics span, .bubbles span { animation: none; }
+  /* v1.4.17: static sun-ray fan for reduced motion */
+  .caustics span { opacity: 0.22; transform: rotate(var(--ray-angle)); }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.
@@ -104,24 +168,49 @@ body { overflow-x: clip; }
   border-radius: 999px; padding: 3px 10px; pointer-events: none;
 }
 
-.topbar { text-align: center; padding: 18px 8px 6px; }
-.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 6px; border-radius: 8px; }
+/* v1.5.1: tighter header — less vertical room around the logo/title/tab bar */
+.topbar { text-align: center; padding: 10px 8px 4px; }
+.site-logo { display: block; height: 64px; width: auto; margin: 0 auto 4px; border-radius: 8px; }
+/* v1.4.0: desktop-only side-by-side title lockup — logo beside (not above)
+   the title, bigger logo, less vertical room. Phone/tablet keep the stack. */
+@media (min-width: 1024px) {
+  .topbar { display: flex; align-items: center; justify-content: center; gap: 18px; text-align: left; padding: 8px 8px 4px; }
+  /* v1.4.15-beta: logo 150% bigger — it's a logo, give it presence */
+  .site-logo { height: 156px; margin: 0; flex: none; }
+  .topbar-text { min-width: 0; }
+  .topbar h1 { margin: 0 0 2px; }
+}
 .eyebrow {
   margin: 0; font-size: 11px; letter-spacing: 3px; color: var(--ink-dim);
 }
-.topbar h1 { margin: 6px 0 2px; font-size: 34px; letter-spacing: 1px; }
+.topbar h1 { margin: 3px 0 2px; font-size: 34px; letter-spacing: 1px; }
 .subtitle { margin: 0; color: var(--ink-dim); font-size: 14px; }
 
+/* v1.4.0: full-bleed tab band — the dark band spans the viewport edge to edge
+   while the buttons stay aligned to the content column (the inner padding
+   restores the exact content inset). Fixed grid tracks keep every tab the
+   same width even on sparse rows (Archive locked: 7 tabs); the locked tab
+   stays display:none, never a fake placeholder. */
+/* v1.4.2: tab buttons centered in the middle of the full-width dark
+   band (not left-aligned). Fixed max-width columns, centered as a group. */
 .tabs {
-  display: flex; gap: 8px; margin: 14px -14px;
+  display: grid; grid-template-columns: repeat(8, minmax(0, 108px)); gap: 8px;
+  justify-content: center;
+  margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
-  background: rgba(11, 34, 55, 0.92); padding: 8px 14px;
+  background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
   backdrop-filter: blur(4px);
+  align-items: stretch;
 }
+/* v1.4.0: equal-height tabs — every .tab is a 3-row stack
+   (count/icon/label); tabs without a count use an invisible spacer with
+   identical dimensions, so all buttons are naturally the same height. */
 .tab {
-  flex: 1; border: 2px solid transparent; border-radius: 999px;
+  border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
   padding: 10px 4px; font-size: 14px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-width: 0; box-sizing: border-box;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
 .count-badge {
@@ -129,17 +218,52 @@ body { overflow-x: clip; }
   padding: 1px 8px; font-size: 12px; margin-left: 2px;
 }
 .tab.active .count-badge { background: rgba(0,0,0,0.15); color: var(--accent-ink); }
+/* v1.4.0: Phone notification badge — a small familiar red circular
+   app-notification badge at the top-right of the Phone icon. The unread
+   count is real text (never red-alone); updateMsgBadge() also sets an
+   aria-label on the tab with the conversation count. Static: no animation. */
+.tab-icon { position: relative; display: inline-block; }
+/* v1.4.2: bigger tab emojis on desktop — icons only, labels unchanged */
+@media (min-width: 1024px) {
+  .tab-icon { font-size: 24px; }
+}
+.phone-badge {
+  position: absolute; top: -8px; right: -12px;
+  min-width: 20px; height: 20px; border-radius: 999px;
+  background: #ff3b30; color: #fff;
+  font-size: 11px; font-weight: 800; line-height: 20px; text-align: center;
+  padding: 0 5px; pointer-events: none;
+  border: 2px solid var(--bg-panel);
+}
+.phone-badge.hidden { display: none; }
+.tab.active .phone-badge { border-color: var(--accent); }
 /* v0.24.0: Archive new-photo indicator — a dot plus aria-label, not color alone. */
 .tab-badge { color: var(--accent); font-size: 12px; margin-left: 4px; vertical-align: super; }
 .tab-badge.hidden { display: none; }
+/* v1.4.0: stacked count tabs — count above, icon middle, label below
+   (Collection, Achievements). Inline-flex centering on .tab keeps every
+   other tab's label on one consistent vertical level. */
+.tab-stack { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.25; }
+.tab-stack .count-badge { margin-left: 0; font-size: 11px; }
+.tab-stack .tab-label { font-size: 11px; }
+/* v1.4.0: invisible count-row spacer — same box dimensions as .count-badge
+   inside .tab-stack, so every tab is 3 rows tall even without a count. */
 /* v0.10.4: on phones the six tab pills' minimum width exceeds the viewport,
    so they used to overflow the page and leave a dead strip on the right.
    Two rows of three keeps every tab visible and tappable with no overflow.
    (Review fix: this block sits AFTER the general .tab rule — equal
    specificity, so source order decides.) */
 @media (max-width: 559px) {
-  .tabs { flex-wrap: wrap; gap: 6px; }
-  .tab { flex: 1 1 30%; font-size: 13px; padding: 10px 2px; }
+  .tabs { grid-template-columns: repeat(3, minmax(0, 110px)); gap: 6px; }
+  .tab { font-size: 13px; padding: 10px 2px; }
+  /* v1.4.0: Avery — count tabs keep the column stack on phones too:
+     count on top, icon on its own row, label below (Collection, Achievements). */
+  .dive-scene { top: 160px; }
+}
+/* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
+   so every tab keeps the same width without squeezing labels. */
+@media (min-width: 560px) and (max-width: 1023px) {
+  .tabs { grid-template-columns: repeat(4, minmax(0, 150px)); }
 }
 
 .panel { display: none; }
@@ -160,7 +284,20 @@ body { overflow-x: clip; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 2px 10px; margin-bottom: 8px;
+  color: #fff; border: 1px solid transparent;
 }
+/* v1.4.15-beta: IUCN threat-level color coding — green (safe) to black (critical) */
+.status-pill.iucn-LC { background: #2d7a3e; border-color: #3d9a52; }  /* Least Concern — green */
+.status-pill.iucn-NT { background: #8a8a1a; border-color: #b0b02a; }  /* Near Threatened — yellow */
+.status-pill.iucn-VU { background: #b86a1a; border-color: #e08a2a; }  /* Vulnerable — orange */
+.status-pill.iucn-EN { background: #b03030; border-color: #e04040; }  /* Endangered — red */
+.status-pill.iucn-CR { background: #2a1a3a; border-color: #6a3a9a; color: #e8d8ff; }  /* Critically Endangered — dark purple */
+.status-pill.iucn-DD { background: #4a4a4a; border-color: #6a6a6a; }  /* Data Deficient — grey */
+/* v1.4.2: full IUCN status line inside expanded field-guide entries */
+.iucn-full { font-size: 13px; color: var(--ink-dim); margin: 6px 0; }
+/* v1.4.2: prominent collection count at the top of the collection page */
+.collection-count { font-size: 16px; margin: 2px 0 8px; }
+.collection-count strong { font-size: 20px; }
 .research-text { font-size: 14px; line-height: 1.55; color: #dcebf5; margin: 8px 0; }
 .hook { font-size: 13px; color: var(--accent); margin: 6px 0 10px; }
 
@@ -204,8 +341,10 @@ select option:disabled { color: #7a8a9e; }
 
 /* Dive view */
 .dive-view { margin-top: 14px; }
+/* v1.4.2: calm idle message in the dive log when showing the porthole */
+.dive-idle { color: var(--ink-dim); font-style: italic; text-align: center; padding: 12px 8px; }
 .dive-scene {
-  position: sticky; top: 68px; z-index: 4;
+  position: sticky; top: 196px; z-index: 4;
   height: 190px; border-radius: var(--radius); overflow: hidden;
   border: 2px solid #2c5364;
 }
@@ -231,6 +370,213 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene .ambient.bg-fish { opacity: 0.45; filter: blur(0.4px); z-index: 1; }
 .dive-scene .dive-shark { z-index: 3; }
 @keyframes sway { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
+
+/* v1.4.14: porthole — asset-led boat-window waves. Illustrated wave strips
+   (far/mid/near, art by Mira) move as slow parallax layers; one big splash
+   hits the glass occasionally. Transform/opacity only, respects
+   prefers-reduced-motion.
+   v1.4.18: (1) layers stacked tight — almost on top of each other, no gaps;
+   (2) OVAL orbital motion — each layer traces a gentle ellipse like real
+   water, replacing the one-direction drift; (3) splash is bigger (320px),
+   more sudden, and slides down fast — the quickest thing in the scene. */
+.dive-scene.porthole {
+  /* v1.4.14: sky above the far wave — sun glow + soft CSS clouds, then the
+     horizon melts into ocean. Placeholder until Mira art-directs the sky.
+     v1.5.1: clouds more defined — harder edges, brighter cores, layered puffs. */
+  background:
+    radial-gradient(90px 90px at 76% 10%, rgba(255,253,235,0.95), rgba(255,250,220,0.4) 45%, transparent 70%),
+    radial-gradient(70px 26px at 14% 8%, rgba(255,255,255,0.95), rgba(255,255,255,0.5) 55%, transparent 85%),
+    radial-gradient(95px 30px at 22% 10%, rgba(255,255,255,0.9), rgba(255,255,255,0.4) 60%, transparent 88%),
+    radial-gradient(60px 24px at 44% 3%, rgba(255,255,255,0.95), rgba(255,255,255,0.45) 55%, transparent 85%),
+    radial-gradient(80px 28px at 52% 5%, rgba(255,255,255,0.85), rgba(255,255,255,0.35) 60%, transparent 88%),
+    radial-gradient(85px 30px at 84% 17%, rgba(255,255,255,0.9), rgba(255,255,255,0.45) 55%, transparent 86%),
+    radial-gradient(110px 34px at 92% 20%, rgba(255,255,255,0.8), rgba(255,255,255,0.3) 60%, transparent 88%),
+    linear-gradient(180deg,
+      #a8dcf5 0%, #c9ecfb 13%, #9fd8ec 23%,
+      #5d9ec2 31%, #2a6f96 48%, #1a4f70 72%, #103a56 100%);
+  overflow: hidden;
+}
+/* v1.4.10: hide the old underwater diagonal-stripe rays in porthole mode only */
+.dive-scene.porthole .rays { display: none; }
+
+/* wave layer container — full-bleed, clips the drifting tiles */
+.dive-scene.porthole .porthole-waves {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  overflow: hidden;
+}
+.dive-scene.porthole .pw-layer {
+  position: absolute; left: 0; right: 0; overflow: hidden;
+}
+/* v1.4.18: OVAL orbital motion — each layer traces a gentle ellipse like
+   real water, instead of scrolling constantly to one side. A single orbital
+   animation per layer (on .pw-orbit) replaces the old drift+bob nesting.
+   The 8-stop keyframes trace x=A*cos, y=B*sin for a smooth closed ellipse;
+   different periods + phase offsets per layer so they never sync up.
+   The strip is 6 tiles wide (way wider than the porthole), so the ±50px
+   orbital swing never exposes an edge. Loops seamlessly by construction. */
+.dive-scene.porthole .pw-orbit {
+  display: flex; width: max-content; height: 100%;
+  will-change: transform;
+  /* v1.5.1: left buffer so the orbital swing never exposes the strip's
+     left edge at the porthole edge — the strip must always cover the view. */
+  margin-left: -70px;
+}
+.dive-scene.porthole .pw-tile {
+  flex: none; height: 100%; aspect-ratio: 3 / 1;
+  margin-right: -1px; /* swallow subpixel hairline gaps between tiles */
+  background-repeat: no-repeat; background-size: 100% 100%;
+}
+/* v1.4.12: mirror every other tile. Each seam then joins an image edge to
+   its own mirror, so the strip tiles seamlessly whatever the PNG edges do.
+   The repeating unit is 2 tiles wide, so the drift loop shifts exactly
+   2 tiles (1/3 of the 6-tile strip) per cycle. */
+.dive-scene.porthole .pw-tile:nth-child(even) {
+  transform: scaleX(-1);
+}
+
+/* v1.4.16: far sits LOWER, near is BIG — the three layers overlap into
+   continuous swells filling the whole porthole, no blue gap underneath.
+   far: drift RIGHT 52s linear, bob ±6px on 18s. */
+
+/* v1.4.18: stacked tight — far DOWN, near UP, almost on top of each other */
+.dive-scene.porthole .pw-far {
+  top: 14%; height: 150px; opacity: 0.7;
+}
+.dive-scene.porthole .pw-far .pw-tile {
+  background-image: url(assets/porthole/drafts/porthole_wave_far_draft.png);
+}
+/* v1.5.1: pronounced depth gradient — far slowest, near clearly fastest.
+   far: 38s, mid: 26s, near: 16s. Faster overall than v1.4.18, near is 2.4x far. */
+.dive-scene.porthole .pw-far .pw-orbit {
+  animation: pw-orbit-far-x 38s ease-in-out infinite;
+  animation-delay: -7s;
+}
+/* v1.5.5: far Y oscillation lives on the layer itself (nested with X above) */
+.dive-scene.porthole .pw-far {
+  animation: pw-orbit-far-y 38s ease-in-out infinite;
+  animation-delay: -7s;
+}
+
+/* mid: pulled up to overlap the far crest — drift LEFT 40s linear, bob ±8px on 15s */
+.dive-scene.porthole .pw-mid {
+  top: 20%; height: 175px; opacity: 0.85;
+}
+.dive-scene.porthole .pw-mid .pw-tile {
+  background-image: url(assets/porthole/drafts/porthole_wave_mid_draft.png);
+}
+.dive-scene.porthole .pw-mid .pw-orbit {
+  animation: pw-orbit-mid 26s linear infinite;
+  animation-delay: -23s;
+}
+
+/* near: pulled up to overlap the mid crest — drift RIGHT 32s linear, bob ±10px on 12s */
+.dive-scene.porthole .pw-near {
+  top: 24%; height: 210px;
+}
+.dive-scene.porthole .pw-near .pw-tile {
+  background-image: url(assets/porthole/drafts/porthole_wave_near_draft.png);
+}
+.dive-scene.porthole .pw-near .pw-orbit {
+  animation: pw-orbit-near 16s linear infinite;
+  animation-delay: -11s;
+}
+
+/* orbital ellipses: mid/near use 8 stops tracing x=A*cos, y=B*sin;
+   far uses split sinusoidal X/Y (see pw-orbit-far-x/y) for a true ellipse.
+   far: slowest/gentlest (±30px, ±8px), 38s. mid: medium (±40px, ±10px), 26s.
+   near: fastest/liveliest (±50px, ±12px), 16s — clear parallax gradient.
+   The splash is still the fastest thing; the water stays calm. */
+/* v1.5.5: far layer traces a TRUE smooth ellipse. The old 8-stop linear
+   keyframes made the thin (±30px, ±8px) far orbit read as a rectangle —
+   straight chords between stops with such a flat ellipse show visible
+   corners. Now X oscillates on .pw-orbit and Y on .pw-layer, both with
+   ease-in-out (sinusoidal) timing 90° out of phase: x=A*cos, y=B*sin, a
+   mathematically smooth ellipse with no corners. Same 38s period and
+   ±30/±8px amplitude; mid and near keep their 8-stop paths (Avery is
+   happy with those). */
+@keyframes pw-orbit-far-x {
+  0%   { transform: translateX(30px); }
+  50%  { transform: translateX(-30px); }
+  100% { transform: translateX(30px); }
+}
+@keyframes pw-orbit-far-y {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-8px); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(8px); }
+  100% { transform: translateY(0); }
+}
+@keyframes pw-orbit-mid {
+  0%    { transform: translate(-40px, 0); }
+  12.5% { transform: translate(-28px, 7px); }
+  25%   { transform: translate(0, 10px); }
+  37.5% { transform: translate(28px, 7px); }
+  50%   { transform: translate(40px, 0); }
+  62.5% { transform: translate(28px, -7px); }
+  75%   { transform: translate(0, -10px); }
+  87.5% { transform: translate(-28px, -7px); }
+  100%  { transform: translate(-40px, 0); }
+}
+@keyframes pw-orbit-near {
+  0%    { transform: translate(0, 12px); }
+  12.5% { transform: translate(35px, 8px); }
+  25%   { transform: translate(50px, 0); }
+  37.5% { transform: translate(35px, -8px); }
+  50%   { transform: translate(0, -12px); }
+  62.5% { transform: translate(-35px, -8px); }
+  75%   { transform: translate(-50px, 0); }
+  87.5% { transform: translate(-35px, 8px); }
+  100%  { transform: translate(0, 12px); }
+}
+
+/* spray on the glass — ONE big splash at a time, brief and snappy.
+   Two instances alternate on a 24s cycle, 12s apart: quick appear, FAST
+   slide down the glass, quick fade. Most of the glass stays clear.
+   v1.5.1: less frequent (was 14s) — the splash is a rare punctuation. */
+/* v1.4.18: BIGGER splash (320px), more sudden, FASTER slide — it's the
+   fastest thing in the wave scene, the quick punctuation in calm water. */
+.dive-scene.porthole .porthole-spray {
+  position: absolute; z-index: 4; pointer-events: none;
+  width: 320px; height: 320px; opacity: 0;
+  background: url(assets/porthole/drafts/porthole_glass_splash_draft.png)
+    center / contain no-repeat;
+  will-change: transform, opacity;
+}
+.dive-scene.porthole .splash-a {
+  left: 12%; top: -4%;
+  animation: pw-spray-1 24s ease-in infinite;
+}
+.dive-scene.porthole .splash-b {
+  left: 56%; top: -6%;
+  animation: pw-spray-2 24s ease-in infinite;
+  animation-delay: -12s;
+}
+@keyframes pw-spray-1 {
+  0%   { opacity: 0; transform: scale(0.92) translateY(0); }
+  2%   { opacity: 0.95; transform: scale(1.08) translateY(0); }
+  8%   { opacity: 0.75; transform: scale(1.08) translateY(110px); }
+  12%  { opacity: 0; transform: scale(1.08) translateY(140px); }
+  100% { opacity: 0; transform: scale(1.08) translateY(140px); }
+}
+@keyframes pw-spray-2 {
+  0%   { opacity: 0; transform: scale(0.88) translateY(0); }
+  2%   { opacity: 0.9; transform: scale(1.04) translateY(0); }
+  8%   { opacity: 0.7; transform: scale(1.04) translateY(100px); }
+  12%  { opacity: 0; transform: scale(1.04) translateY(130px); }
+  100% { opacity: 0; transform: scale(1.04) translateY(130px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* freeze waves at attractive offsets; no bob, no spray */
+  .dive-scene.porthole .pw-orbit,
+  .dive-scene.porthole .pw-far,
+  .dive-scene.porthole .porthole-spray { animation: none; }
+  .dive-scene.porthole .pw-far .pw-orbit { transform: translate(12px, -3px); }
+  .dive-scene.porthole .pw-mid .pw-orbit { transform: translate(-15px, 4px); }
+  .dive-scene.porthole .pw-near .pw-orbit { transform: translate(8px, -5px); }
+  .dive-scene.porthole .porthole-spray { opacity: 0; }
+}
+
 .depth-shallow { background: linear-gradient(180deg, #8fd8ef 0%, #2a9db8 100%); }
 .depth-surface { background: linear-gradient(180deg, #7cc7e8 0%, #2f88b5 100%); }
 .depth-midwater { background: linear-gradient(180deg, #2b6f9e 0%, #10385c 100%); }
@@ -295,6 +641,10 @@ select option:disabled { color: #7a8a9e; }
   background: #0a1826; border-radius: 26px; border: 1px solid #2c5364;
   overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
   max-width: 430px; margin: 0 auto;
+  /* v1.4.4: realistic phone proportions — nearly double the old height.
+     Flex column so the conversation fills and the composer stays pinned. */
+  display: flex; flex-direction: column;
+  height: min(88vh, 880px); min-height: 620px;
 }
 .phone-statusbar {
   display: flex; justify-content: space-between; align-items: center;
@@ -313,7 +663,35 @@ select option:disabled { color: #7a8a9e; }
 .contact-sub { font-size: 12px; color: var(--ink-dim); }
 .phone-convo {
   padding: 14px 12px 20px; display: grid; gap: 16px;
-  max-height: 62vh; overflow-y: auto;
+  overflow-y: auto;
+  /* v1.4.4: fills the taller phone; composer stays pinned at the bottom. */
+  flex: 1 1 auto; min-height: 0; max-height: none;
+}
+
+/* v1.4.0-beta: third release choice — tag along ends the expedition. */
+.tagalong-choice {
+  display: block; width: 100%; margin-top: 10px;
+  padding: 14px 16px; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(180deg, #ffd166 0%, #f0b429 100%);
+  border: 2px solid #b8860b; color: #3a2b00;
+  font-size: 16px; font-weight: 700; text-align: center;
+  font-family: inherit;
+}
+.tagalong-choice .tagalong-sub {
+  display: block; font-size: 12px; font-weight: 400; margin-top: 4px;
+  color: #5a4500;
+}
+.tagalong-choice:active { transform: scale(0.98); }
+
+/* v1.4.0-beta: tag-along insights in collection detail. */
+.secret-facts-block {
+  background: var(--bg-soft); border-left: 3px solid #ffd166;
+  border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 8px 0;
+  font-size: 13px; line-height: 1.55;
+}
+.secret-facts-block h4 { margin: 0 0 6px; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) {
+  .tagalong-choice:active { transform: none; }
 }
 .thread-stamp {
   text-align: center; font-size: 11px; color: var(--ink-dim); margin-bottom: 6px;
@@ -323,16 +701,40 @@ select option:disabled { color: #7a8a9e; }
 /* v0.17.1: Ask Sarah panel — player-initiated advice after a tough trip. */
 .sarah-ask {
   padding: 12px 14px; border-top: 1px solid #2c5364;
-  background: var(--bg-panel); border-radius: 0 0 26px 26px;
+  background: var(--bg-panel);
 }
 .sarah-ask p { margin: 0 0 8px; font-size: 13px; }
-.sarah-ask-row { display: flex; gap: 8px; }
+/* v1.4.0: the row wraps and both children respect the panel's inner width,
+   so long shark names can't push the Ask button past the Phone's edge. */
+.sarah-ask-row { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }
 .sarah-ask-row select {
-  flex: 1; min-width: 0; font-size: 15px; padding: 10px 8px;
+  flex: 1 1 140px; min-width: 0; max-width: 100%; font-size: 15px; padding: 10px 8px;
   border-radius: 10px; border: 1px solid #2c5364;
   background: var(--bg-soft); color: var(--ink);
 }
-.sarah-ask-row .secondary-button { flex: none; }
+.sarah-ask-row .secondary-button { flex: 0 1 auto; max-width: 100%; min-width: 0; }
+
+/* v1.4.0: decorative message composer — visual only. Divs, not inputs, plus
+   aria-hidden and pointer-events:none, so it can never steal focus or
+   accept input. Sits in normal flow below the scrolling conversation, so
+   it never overlaps the final message. */
+.phone-composer {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px 16px; background: var(--bg-panel);
+  border-top: 1px solid #2c5364; border-radius: 0 0 26px 26px;
+  user-select: none; -webkit-user-select: none; pointer-events: none;
+}
+.composer-field {
+  flex: 1; min-width: 0; border-radius: 999px;
+  border: 1px solid #2c5364; background: var(--bg-soft);
+  color: var(--ink-dim); font-size: 14px; padding: 11px 16px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.composer-send {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
 
 /* v0.6.0: field guide entries */
 .guide-list { display: grid; gap: 14px; }
@@ -509,6 +911,7 @@ select option:disabled { color: #7a8a9e; }
 
 /* Collection grid: compact two-across cells, tap for detail */
 .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.collection-grid .empty-note { grid-column: 1 / -1; }
 @media (min-width: 560px) {
   .collection-grid { grid-template-columns: repeat(4, 1fr); }
 }
@@ -618,7 +1021,12 @@ select option:disabled { color: #7a8a9e; }
   padding: 13px 14px; font-size: 15px;
 }
 .guide-row-head:active { background: rgba(255,255,255,0.04); }
-.guide-row-name { font-weight: 800; flex: none; }
+/* v1.4.0: long names (e.g. Oceanic Whitetip) truncate with ellipsis instead of
+   colliding with the pin button. Was flex:none which prevented shrinking. */
+.guide-row-name {
+  font-weight: 800; flex: 0 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 /* v0.18.0: locked achievements — dimmed, breadcrumb visible. */
 .guide-row.locked { opacity: 0.55; }
 .guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -626,8 +1034,54 @@ select option:disabled { color: #7a8a9e; }
 .guide-caret { color: var(--ink-dim); font-size: 13px; flex: none; transition: transform 0.2s ease; }
 .guide-row.open .guide-caret { transform: rotate(180deg); }
 .guide-row-body { padding: 0 14px 14px; border-top: 1px solid #2c5364; }
+/* v1.4.0-beta: expanded entries overlay the grid instead of pushing it down.
+   The row keeps its grid cell; the detail floats above its neighbors.
+   v1.4.16-beta: hard containment — position:absolute removes the body from flow,
+   contain:layout on the row adds a boundary, and explicit width/max-width guards
+   against any intrinsic-size leakage, so an open entry can never widen its column. */
+/* v1.5.3-beta: REMOVED contain:layout — it establishes a containing block for
+   fixed descendants, breaking the mobile modal centering. The absolute
+   positioning with explicit width/max-width below is sufficient to prevent
+   column widening (absolute elements don't participate in grid sizing). */
+.guide-row { position: relative; min-width: 0; }
+.guide-row.open { overflow: visible; z-index: 20; }
+.guide-row.open .guide-row-body {
+  position: absolute; top: 100%; left: 0; width: 100%; max-width: 100%; min-width: 0; z-index: 20;
+  background: var(--bg-card);
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.55);
+  max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+/* v1.5.2-beta: on small screens the expanded card becomes a centered modal
+   so the full content is always reachable — no more cut-off bottoms. */
+@media (max-width: 768px) {
+  .guide-row.open .guide-row-body {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: calc(100vw - 32px); max-width: 520px; max-height: 80vh;
+    border-radius: var(--radius);
+  }
+}
+/* v1.5.4-beta: explicit close button inside the guide popup. On small screens
+   the fixed modal can cover its own row header, leaving no way to dismiss it
+   otherwise. 44px touch target for accessibility. */
+.guide-close {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(2, 12, 20, 0.55); color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 20px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit;
+}
+.guide-close:hover { background: rgba(2, 12, 20, 0.8); }
+.guide-close:focus-visible { outline: 2px solid #ffd166; outline-offset: 2px; }
 /* v0.20.0: pinned shark — pin button beside each row head, focus card on top. */
 .guide-row-top { display: flex; align-items: stretch; }
+/* v1.4.15-beta: IUCN pill sits beside the pin, outside the head button */
+.guide-row-top .status-pill {
+  margin: 0; flex: none; align-self: center;
+  margin-right: 4px; /* snug against the pin */
+}
 .guide-row-top .guide-row-head { flex: 1; min-width: 0; }
 .pin-btn {
   flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
@@ -651,6 +1105,9 @@ select option:disabled { color: #7a8a9e; }
 }
 .pinned-body { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
 .pinned-sketch { width: 96px; flex: none; }
+/* v1.4.15-beta: pinned research preview — clues in bold, same font/size */
+.pinned-research { font-size: 13px; line-height: 1.5; color: #dcebf5; margin: 8px 0 4px; }
+.pinned-research strong { font-weight: 700; }
 .pin-jump {
   width: 100%; min-height: 48px; border-radius: 12px; font-size: 1rem; font-weight: 700;
   background: rgba(255,209,102,0.15); border: 1px solid rgba(255,209,102,0.4);
@@ -734,7 +1191,8 @@ select option:disabled { color: #7a8a9e; }
    drags pan the map instead of scrolling the page. */
 #worldMapWrap.exploring { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* v0.10.0: currents overlay — warm/cold hues are real oceanography */
-.current { fill: none; opacity: 0.8; }
+/* v1.5.2-beta: currents are dashed + lower opacity so they're never confused with solid shark track lines */
+.current { fill: none; opacity: 0.45; }
 .current.warm { stroke: #ff9e5e; }
 .current.cold { stroke: #6ecff5; }
 .current-label {
@@ -832,9 +1290,13 @@ video.archive-media { max-height: 420px; }
 }
 .filter-label { font-size: 12px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
 .filter-select {
-  font-size: 15px; padding: 10px 12px; border-radius: 10px;
+  font-size: 15px; padding: 10px 36px 10px 12px; border-radius: 10px;
   border: 1px solid var(--line); background: var(--bg); color: var(--ink);
   min-height: 44px; /* dyspraxia-friendly touch target */
+  /* v1.5.2-beta: custom dropdown arrow inside the box, not floating */
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
 }
 .logbook-conditions { font-size: 12px; margin-top: 2px; opacity: 0.85; }
 
@@ -862,13 +1324,13 @@ video.archive-media { max-height: 420px; }
   .app { max-width: 700px; padding: 12px 20px 48px; }
   .finale { max-width: 700px; }
 
-  /* Tab bar: centered pills instead of stretched */
-  .tabs { justify-content: center; }
-  .tab { flex: 0 1 auto; padding: 12px 16px; }
+  /* Tab bar: equal-width tabs filling the content column (was centered pills). */
+  .tab { padding: 12px 16px; }
 
-  /* Research: 2-column grid, open rows span full width */
-  .guide-list { grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
-  .guide-row.open { grid-column: 1 / -1; }
+  /* Research: 2-column grid. v1.4.0-beta: open entries stay in their column —
+     expanding must not push neighbors out of their columns. */
+  /* v1.4.15-beta: minmax(0,1fr) so open overlays can never widen a column */
+  .guide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
 
   /* Filter panel: inline instead of bottom sheet */
   .filter-panel.open-sheet {
@@ -892,20 +1354,24 @@ video.archive-media { max-height: 420px; }
   .app { max-width: 960px; padding: 16px 28px 56px; }
   .finale { max-width: 960px; }
 
-  /* Tab bar: constrain sticky bar on very wide screens */
-  .tabs { max-width: 900px; margin: 14px auto -14px; }
-  .tab { font-size: 15px; }
-  .dive-scene { top: 76px; }
+  /* Tab bar: full-bleed band from the base rule (no max-width constraint);
+     14px keeps 8 equal tabs' labels fitting in one row. */
+  .tab { font-size: 14px; }
+  .dive-scene { top: 106px; }
 
-  /* Research: 3 columns, expanded rows get 2-col interior */
-  .guide-list { grid-template-columns: repeat(3, 1fr); }
-  .guide-row.open .guide-row-body { display: grid; grid-template-columns: 320px 1fr; gap: 18px; }
+  /* Research: 3 columns. v1.4.0-beta: open entries stay in their column;
+     body stacks vertically within the cell. */
+  .guide-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   /* Expedition: side-by-side dive */
-  .dive-view { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
-  .dive-scene { height: 260px; }
-  .dive-log { max-height: 400px; margin-top: 0; }
+  .dive-view { display: grid; grid-template-columns: 1.2fr 1fr; grid-template-rows: auto auto; gap: 16px; align-items: start; }
+  .dive-scene { height: 260px; grid-column: 1; grid-row: 1; }
+  .dive-log { max-height: 400px; margin-top: 0; grid-column: 2; grid-row: 1 / 3; }
   .dive-shark img, .dive-shark svg { max-height: 180px; }
+  /* v1.4.0-beta Mira review: action buttons tuck directly under the scene
+     (left column, second row), bottom-aligned via the log spanning both rows.
+     Phone stacked layout untouched. */
+  #diveActions { grid-column: 1; grid-row: 2; }
 
   /* Collection: 6 columns */
   .collection-grid { grid-template-columns: repeat(6, 1fr); }
@@ -970,3 +1436,15 @@ video.archive-media { max-height: 420px; }
   .tagalong-link { transition: none; }
   .tagalong-link:hover, .tagalong-link:active { transform: none; }
 }
+
+/* v1.4.0-beta Mira review: tag-along fact overlay on the Map */
+#tagAlongFactContent { padding: 6px 2px 12px; }
+.tagalong-fact-card {
+  background: var(--bg-soft); border: 2px solid var(--gold, #ffd166);
+  border-radius: 12px; padding: 14px 16px; margin: 8px 0;
+}
+.tagalong-fact-card .fact-progress {
+  font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--gold, #ffd166); margin-bottom: 8px;
+}
+.tagalong-fact-card .fact-text { font-size: 15px; line-height: 1.6; }
