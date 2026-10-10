@@ -2720,7 +2720,7 @@ const SECRET_FACTS = {
   ],
   hammerhead: [
     "That hammer isn't just for show — spreading the eyes wide gives hammerheads wider binocular overlap in front than most sharks, and sweeping the head side to side lets them scan the sand for the electric whispers of buried stingrays.",
-    "By day, scalloped hammerheads gather in shimmering schools hundreds strong around offshore seamounts, then scatter alone into the night to hunt."
+    "Great hammerheads are mostly loners — solitary hunters that sweep their wide heads over the sand to pin down stingrays, their favorite prey, before swinging down to scoop them up; their first dorsal fin is exceptionally tall and sickle-shaped."
   ],
   mako: [
     "The shortfin mako is the fastest shark alive, built like a torpedo with a heated engine — its warm muscles let it explode after tuna and even leap clear out of the water.",
@@ -2848,11 +2848,11 @@ const SECRET_FACTS = {
   ],
   sawshark: [
     "A sawshark's saw is studded with sensors — it sweeps the rostrum through the sand feeling for the electric heartbeat of buried prey, then slashes sideways to disable it.",
-    "Those whisker-like barbels halfway along the saw are taste-testers, confirming a find before the shark digs in."
+    "Those whisker-like barbels halfway along the saw can help sense prey and changes around the seafloor; they appear especially useful for touch."
   ],
   greenland: [
     "Greenland sharks may live 400 years or more — the longest-lived vertebrate known, with one female estimated at nearly four centuries old.",
-    "They're nearly blind, their eyes clouded by parasitic copepods, yet they cruise the Arctic dark as patient scavengers — and their flesh is toxic unless fermented, which is how Iceland's hákarl is made."
+    "Greenland sharks can carry parasitic copepods on their eyes, but recent research shows their visual system is adapted for the deep sea — and their flesh is toxic unless fermented, which is how Iceland's hákarl is made."
   ],
   cookiecutter: [
     "The cookiecutter glows from below — light-producing organs in its belly match the faint light from above, hiding its silhouette, except for a dark collar that may mimic a small fish to lure big predators close.",
