@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.6.7-beta', VERSION === 'v1.6.7-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2058,6 +2058,24 @@ code += `
     return newestFirst.join(',') === 'thresher,nurse,whale' &&
            oldestFirst.join(',') === 'whale,nurse,thresher';
   })());
+
+  // v1.6.7-beta: one resighting = one Sarah thread
+  ok('WHATS_NEW has v1.6.7-beta entry', Array.isArray(WHATS_NEW['v1.6.7-beta']) && WHATS_NEW['v1.6.7-beta'].length >= 1);
+  ok('maybeReunionReaction returns true when it fires, false when already reacted', (() => {
+    const savedReacted = state.reunionReacted;
+    const savedMsgCount = state.messages.length;
+    state.reunionReacted = {};
+    const species = SHARKS.find(s => s.id === 'mako');
+    const rec = { name: '', researchId: 'MK-2026-019', resightings: [] };
+    const first = maybeReunionReaction(species, rec);
+    const second = maybeReunionReaction(species, rec);
+    state.messages.length = savedMsgCount;
+    state.reunionReacted = savedReacted;
+    try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
+    return first === true && second === false;
+  })());
+  ok('resight button skips resightThread when reunion reaction fired', /if\\s*\\(!reunionReactedThisEncounter\\)\\s*pushThread\\(resightThread/.test(fileCode));
+  ok('reunion call site captures return value', /const reunionReactedThisEncounter = maybeReunionReaction\\(species, rec\\)/.test(fileCode));
   ok('archiveSortCompare falls back to insertion order for legacy saves', (() => {
     const saved = state.tagged;
     /* Legacy records have no taggedAt; whale does. Mirrors
