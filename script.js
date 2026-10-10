@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.4.19-beta";
+const VERSION = "v1.5.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -112,6 +112,10 @@ const WHATS_NEW = {
     "🫧 <strong>More bubbles, always.</strong> Twice as many bubbles in overlapping burst columns — there's almost always a trail rising somewhere.",
     "☀️ <strong>Softer sun rays, everywhere.</strong> The light rays are now wide, diffused, diagonal shafts (no more hard bars), and they persist as a true background while you scroll.",
     "🌊 <strong>Calmer porthole.</strong> The far wave sits higher under a new CSS sky (sun + clouds — Mira may art-direct it later), all three wave layers overlap into continuous water, everything drifts much more slowly, and splashes pop and fade instead of sliding down the glass."
+  ],
+  "v1.5.0-beta": [
+    "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
+    "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
   ],
   "v1.4.19-beta": [
     "\uD83E\uDD88 <strong>Sarah's Big Day.</strong> Tag multiple new species in one expedition and Sarah celebrates the extraordinary day with one authored conversation — no more three near-identical texts. 8 variants each for 2, 3, and 4 new species, plus lemon-aware reactions when her favourite is in the mix.",
@@ -739,6 +743,16 @@ const achieveStore = {
 };
 
 /* v0.7.0: the sightings log — spotted but not tagged. Pure field notes. */
+/* v1.5.0-beta Mira review (blocking): persist pending Big Day/species
+   celebrations so a reload before trip end doesn't lose them. */
+const celebrationStore = {
+  load() {
+    try { return JSON.parse(localStorage.getItem("tyi-pending-celebrations") || "[]"); }
+    catch { return []; }
+  },
+  save(d) { try { localStorage.setItem("tyi-pending-celebrations", JSON.stringify(d)); } catch {} },
+  clear() { try { localStorage.removeItem("tyi-pending-celebrations"); } catch {} }
+};
 const sightStore = {
   load() {
     try { return JSON.parse(localStorage.getItem("tyi-sightings") || "[]"); }
@@ -2566,6 +2580,8 @@ function buildBigDayThread(events) {
 function flushPendingCelebrations() {
   const events = state.pendingCelebrations || [];
   state.pendingCelebrations = [];
+  /* v1.5.0-beta: clear persisted copy — flushed means delivered. */
+  celebrationStore.clear();
   if (events.length === 0) return;
   if (events.length === 1) {
     // Single new species: existing celebration, delivered at trip end.
@@ -2883,6 +2899,8 @@ function confirmTag(name) {
       opener: s.opener,
       cheer: s.cheer
     });
+    /* v1.5.0-beta: persist so a reload before trip end doesn't lose it. */
+    celebrationStore.save(state.pendingCelebrations);
   }
   maybeSarahEgg(s.id, rec);
   maybeNameEgg(s.id, rec); // v0.23.0
@@ -4521,6 +4539,18 @@ setInterval(tickPhoneClock, 30000);
 })();
 initCreatureArt(); // v0.26.0: fill CREATURE_ART with WebP shadow sprites
 renderAll();
+/* v1.5.0-beta Mira review (blocking): recover celebrations lost to a reload
+   before trip end. Clear the persisted copy FIRST (idempotent — a crash
+   mid-flush can't double-deliver), then flush once. */
+function recoverPendingCelebrations() {
+  const saved = celebrationStore.load();
+  if (saved && saved.length > 0) {
+    celebrationStore.clear();
+    state.pendingCelebrations = saved;
+    flushPendingCelebrations();
+  }
+}
+recoverPendingCelebrations();
 showPorthole(); // v1.4.2: observation window always present — porthole surface when idle
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();
