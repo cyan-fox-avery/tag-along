@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.0-beta', VERSION === 'v1.6.0-beta');
+  ok('version v1.6.2-beta', VERSION === 'v1.6.2-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1987,7 +1987,13 @@ code += `
     const afterSecond = state.messages.length;
     return (afterFirst - before) === 1 && storeEmpty && afterSecond === afterFirst;
   })());
-  ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
+  ok('WHATS_NEW has v1.6.2-beta', Array.isArray(WHATS_NEW['v1.6.2-beta']) && WHATS_NEW['v1.6.2-beta'].length === 1);
+  // v1.6.2: field sketches removed — expanded cards and pinned card show text only
+  // (check for the class= attribute patterns; plain substrings would match this file's own CSS assertions)
+  ok('no sketch div rendered', code.indexOf('class=\\"guide-' + 'sketch\\"') === -1);
+  ok('no sketch caption rendered', code.indexOf('class=\\"sketch-' + 'cap\\"') === -1);
+  ok('no sketch CSS rules remain', cssCode.indexOf('.guide-sketch') === -1 && cssCode.indexOf('.pinned-sketch') === -1 && cssCode.indexOf('.sketch-cap') === -1);
+    ok('tier 2E is time-neutral', !/before lunch/.test(BIG_DAY[2].map(c => c.map(m => m.text).join(' ')).join(' ')));
   ok('tier 3F longevity is general', !/these three could be out there that whole time/.test(BIG_DAY[3].map(c => c.map(m => m.text).join(' ')).join(' ')));
 
 console.log(out.join('\\n'));
