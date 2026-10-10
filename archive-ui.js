@@ -33,14 +33,38 @@ function archiveMatches(s) {
 }
 /* v1.6.3-beta: IUCN severity rank for sorting (most threatened first). */
 const ARCHIVE_IUCN_RANK = { CR: 0, EN: 1, VU: 2, NT: 3, LC: 4 };
+/* v1.6.3-beta Mira review fix: newest/oldest must not rely on Date.parse of
+   the localized display string — it may return NaN depending on browser
+   language, and same-day tags compare equal. Use the numeric taggedAt
+   timestamp (stored by confirmTag()) instead. Legacy saves without taggedAt
+   fall back to the insertion order of state.tagged, mirroring
+   taggedChronological(); ties break on name so the order is always stable.
+   archiveDateRanks is rebuilt for each sort (reset in renderArchive). */
+let archiveDateRanks = null;
+function archiveBuildDateRanks() {
+  const map = {};
+  Object.keys(state.tagged || {}).forEach((sid, idx) => {
+    const t = state.tagged[sid] || {};
+    map[sid] = { ts: (t.taggedAt != null) ? t.taggedAt : null, idx };
+  });
+  return map;
+}
 function archiveSortCompare(a, b) {
   const mode = archiveFilters.sort;
   if (mode === "newest" || mode === "oldest") {
-    const ta = (state.tagged[a.id] || {});
-    const tb = (state.tagged[b.id] || {});
-    const da = Date.parse(ta.date) || 0;
-    const db = Date.parse(tb.date) || 0;
-    return mode === "newest" ? db - da : da - db;
+    if (!archiveDateRanks) archiveDateRanks = archiveBuildDateRanks();
+    const ra = archiveDateRanks[a.id] || { ts: null, idx: 0 };
+    const rb = archiveDateRanks[b.id] || { ts: null, idx: 0 };
+    const newestFirst = mode === "newest";
+    /* Mirror taggedChronological(): real timestamps when both have them,
+       insertion order otherwise. */
+    if (ra.ts != null && rb.ts != null && ra.ts !== rb.ts) {
+      return newestFirst ? rb.ts - ra.ts : ra.ts - rb.ts;
+    }
+    if (ra.idx !== rb.idx) {
+      return newestFirst ? rb.idx - ra.idx : ra.idx - rb.idx;
+    }
+    return a.name.localeCompare(b.name); /* stable tiebreak, always A-Z */
   }
   if (mode === "iucn") {
     const abbrOf = (s) => (typeof IUCN_ABBR !== "undefined" && IUCN_ABBR[s.status]) || s.status;
@@ -127,7 +151,9 @@ function renderArchive() {
      (e.g. salmon) can't leak into a returning player's Archive before they
      tag one. */
   const abbrFor = (status) => (typeof IUCN_ABBR !== "undefined" && IUCN_ABBR[status]) || status;
-  /* v1.6.3-beta: search filter + sort order applied to tagged sharks. */
+  /* v1.6.3-beta: search filter + sort order applied to tagged sharks.
+     Reset per-sort date ranks so the sort always uses current state. */
+  archiveDateRanks = null;
   const entries = SHARKS.filter(s => {
     const media = ARCHIVE_MEDIA[s.id];
     if (!media || media.future) return false;
