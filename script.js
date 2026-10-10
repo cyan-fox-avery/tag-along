@@ -1709,7 +1709,7 @@ function doEncounter(species, plan) {
       followBtn.type = "button";
       const _followRec = state.tagged[species.id];
       const _followName = (_followRec && _followRec.name) || species.name;
-      followBtn.textContent = `🧭 Follow ${_followName}`;
+      followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>`;
       followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)`);
       followBtn.addEventListener("click", () => {
         actions.classList.add("hidden");
@@ -1937,7 +1937,7 @@ async function runExpedition(plan) {
       afterExpedition(plan);
       if (tagAlongSid) {
         goTab("map");
-        setTimeout(() => { try { mapFocusOn(tagAlongSid); } catch {} }, 200);
+        setTimeout(() => { try { ensureMapFocusedOn(tagAlongSid); } catch {} }, 200);
         /* v1.4.0-beta Mira review (important): show the unlocked fact in a
            readable overlay with learned X/3 progression — at quick pace the
            dive-log line may never be read before auto-navigation. */
@@ -2703,7 +2703,7 @@ const SECRET_FACTS = {
     "Its pinkish skin is so soft and translucent you can see blood vessels beneath, and its long snout is packed with sensors that feel the faint electric hum of hidden prey."
   ],
   tiger: [
-    "Tiger sharks are famous for eating almost anything — license plates, tires, and once an entire suit of armor have all turned up in their stomachs.",
+    "Tiger sharks are famous for eating almost anything — license plates, tires, and even sea turtles, whose shells their serrated teeth and powerful jaws can crack, have all turned up in their stomachs.",
     "The bold stripes that give them their name fade as they age, so the biggest old tigers swim nearly plain grey; some individuals also wander entire ocean basins on years-long journeys."
   ],
   sandtiger: [
@@ -2719,7 +2719,7 @@ const SECRET_FACTS = {
     "They're warm-bodied for a fish, keeping their swimming muscles heated, and some cross entire oceans — tagged whites have commuted from California to Hawaii and back to a patch of open ocean scientists call the White Shark Café."
   ],
   hammerhead: [
-    "That hammer isn't just for show — spreading the eyes wide gives hammerheads a full 360-degree view, and sweeping the head side to side lets them scan the sand for the electric whispers of buried stingrays.",
+    "That hammer isn't just for show — spreading the eyes wide gives hammerheads wider binocular overlap in front than most sharks, and sweeping the head side to side lets them scan the sand for the electric whispers of buried stingrays.",
     "By day, scalloped hammerheads gather in shimmering schools hundreds strong around offshore seamounts, then scatter alone into the night to hunt."
   ],
   mako: [
@@ -2736,7 +2736,7 @@ const SECRET_FACTS = {
   ],
   lemon: [
     "Lemon sharks have remarkable memories for place: pups born in Bimini's mangrove nurseries return years later as adults, navigating back across open ocean to where they were born.",
-    "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and in lab tests they've shown they can learn and remember visual cues, a rare trick for a fish."
+    "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and in lab tests they've shown they can learn and remember visual cues — solid evidence of visual learning and memory."
   ],
   blacktip: [
     "Blacktip sharks hunt in spectacular spinning leaps, corkscrewing out of the water through schools of fish with their mouths open.",
@@ -2856,7 +2856,7 @@ const SECRET_FACTS = {
   ],
   cookiecutter: [
     "The cookiecutter glows from below — light-producing organs in its belly match the faint light from above, hiding its silhouette, except for a dark collar that may mimic a small fish to lure big predators close.",
-    "Then this foot-long shark takes a single cookie-shaped plug of flesh from whales, tuna, and even submarines, and vanishes back into the dark."
+    "Then this foot-long shark cuts a single cookie-shaped plug of flesh from whales and tuna — and has even left its signature round bites in the rubber sonar domes of submarines — before vanishing back into the dark."
   ],
   sixgill: [
     "Bluntnose sixgills are deep-sea heavyweights, cruising cold depths down past a kilometre, surfacing only at night in a few special places like Puget Sound.",
@@ -2872,7 +2872,7 @@ const SECRET_FACTS = {
   ],
   kitefin: [
     "The kitefin shark is the largest glowing vertebrate known — at over a metre and a half long, this deep-sea hunter produces its own blue-green light.",
-    "Its glow was only confirmed in 2020, making it one of the biggest recent surprises in shark science."
+    "Its glow was only confirmed in a 2021 study, making it one of the biggest recent surprises in shark science."
   ],
   pacificsleeper: [
     "Pacific sleepers are giants of the deep North Pacific, growing as long as a great white, yet so rarely seen that almost everything about their lives is a mystery.",
@@ -3222,7 +3222,7 @@ function winStep(n) {
       state.deferredTagAlong = null;
       if (deferred) {
         goTab("map");
-        setTimeout(() => { try { mapFocusOn(deferred.speciesId); } catch {} }, 200);
+        setTimeout(() => { try { ensureMapFocusedOn(deferred.speciesId); } catch {} }, 200);
         if (deferred.factInfo) {
           setTimeout(() => showTagAlongFact(deferred.factInfo), 600);
         }
@@ -4070,6 +4070,21 @@ function mapFocusOn(sid) {
     mapGlideTo(f.prevCX, f.prevCY, f.prevZoom);
     return;
   }
+  if (!mapFocus) mapFocus = { sid, prevZoom: mapZoom, prevCX: mapCX, prevCY: mapCY };
+  else mapFocus.sid = sid;
+  const last = pts[pts.length - 1]; // latest ping: where the shark "is"
+  mapGlideTo(last.x, last.y, MAP_FOCUS_ZOOM);
+}
+/* v1.4.0-beta Mira review: non-toggling focus for the follow/tag-along
+   completion path. mapFocusOn() toggles (a second tap glides back out), but
+   following the same shark twice must NOT zoom away from it. Manual map taps
+   keep using mapFocusOn(). */
+function ensureMapFocusedOn(sid) {
+  const t = state.tagged[sid];
+  if (!t) return;
+  const pts = mapPoints(t);
+  if (!pts.length) return;
+  if (mapFocus && mapFocus.sid === sid) return; // already focused — don't toggle away
   if (!mapFocus) mapFocus = { sid, prevZoom: mapZoom, prevCX: mapCX, prevCY: mapCY };
   else mapFocus.sid = sid;
   const last = pts[pts.length - 1]; // latest ping: where the shark "is"
