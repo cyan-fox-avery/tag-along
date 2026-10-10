@@ -758,7 +758,12 @@ select option:disabled { color: #7a8a9e; }
   padding: 13px 14px; font-size: 15px;
 }
 .guide-row-head:active { background: rgba(255,255,255,0.04); }
-.guide-row-name { font-weight: 800; flex: none; }
+/* v1.4.0: long names (e.g. Oceanic Whitetip) truncate with ellipsis instead of
+   colliding with the pin button. Was flex:none which prevented shrinking. */
+.guide-row-name {
+  font-weight: 800; flex: 0 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 /* v0.18.0: locked achievements — dimmed, breadcrumb visible. */
 .guide-row.locked { opacity: 0.55; }
 .guide-row-head .latin { margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
