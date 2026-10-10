@@ -155,18 +155,22 @@ body { overflow-x: clip; }
 
 /* v1.4.0: full-bleed tab band — the dark band spans the viewport edge to edge
    while the buttons stay aligned to the content column (the inner padding
-   restores the exact content inset). Every tab shares the same width. */
+   restores the exact content inset). Fixed grid tracks keep every tab the
+   same width even on sparse rows (Archive locked: 7 tabs); the locked tab
+   stays display:none, never a fake placeholder. */
 .tabs {
-  display: flex; gap: 8px; margin: 14px calc(50% - 50vw);
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;
+  margin: 14px calc(50% - 50vw);
   position: sticky; top: 0; z-index: 5;
   background: rgba(11, 34, 55, 0.92); padding: 8px calc(50vw - 50%);
   backdrop-filter: blur(4px);
 }
 .tab {
-  flex: 1 1 0; border: 2px solid transparent; border-radius: 999px;
+  border: 2px solid transparent; border-radius: 999px;
   background: var(--bg-panel); color: var(--ink);
   padding: 10px 4px; font-size: 14px; font-weight: 700; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; text-align: center;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-width: 0;
 }
 .tab.active { background: var(--accent); color: var(--accent-ink); }
 .count-badge {
@@ -204,8 +208,8 @@ body { overflow-x: clip; }
    (Review fix: this block sits AFTER the general .tab rule — equal
    specificity, so source order decides.) */
 @media (max-width: 559px) {
-  .tabs { flex-wrap: wrap; gap: 6px; }
-  .tab { flex: 1 1 30%; font-size: 13px; padding: 10px 2px; }
+  .tabs { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tab { font-size: 13px; padding: 10px 2px; }
   /* Phones: no vertical room for stacked rows — count tabs stay inline. */
   .tab-stack { flex-direction: row; }
   .tab-stack .tab-label { font-size: 13px; }
@@ -214,8 +218,7 @@ body { overflow-x: clip; }
 /* v1.4.0: tablets / small landscape — four equal tabs per row, two rows,
    so every tab keeps the same width without squeezing labels. */
 @media (min-width: 560px) and (max-width: 1023px) {
-  .tabs { flex-wrap: wrap; }
-  .tab { flex: 1 1 22%; }
+  .tabs { grid-template-columns: repeat(4, 1fr); }
 }
 
 .panel { display: none; }
