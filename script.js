@@ -2266,6 +2266,13 @@ function updateMsgBadge() {
   const b = $("msgBadge");
   b.textContent = state.unread;
   b.classList.toggle("hidden", state.unread === 0);
+  /* v1.4.0: the unread state is announced as text, not red-alone. */
+  const tab = document.querySelector('.tab[data-tab="phone"]');
+  if (tab) {
+    tab.setAttribute("aria-label", state.unread > 0
+      ? "Phone, " + state.unread + " unread conversation" + (state.unread === 1 ? "" : "s")
+      : "Phone");
+  }
 }
 
 function renderMessages() {
@@ -4186,6 +4193,20 @@ tickPhoneClock();
 /* v0.17.1: the phone clock ticks — refresh every 30s so it never goes stale
    next to message timestamps. */
 setInterval(tickPhoneClock, 30000);
+/* v1.4.0: living caustics — each ribbon reappears at a new horizontal
+   position after its lifecycle completes. The reposition fires on
+   animationiteration, while the ribbon is in its invisible tail, so the
+   jump is never seen. Skipped under prefers-reduced-motion (CSS already
+   freezes the ribbons there). */
+(function initCaustics() {
+  if (typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.caustics span').forEach(sp => {
+    sp.addEventListener('animationiteration', () => {
+      sp.style.left = (4 + Math.random() * 88).toFixed(1) + '%';
+    });
+  });
+})();
 /* v0.19.0: field-guide database controls. */
 (function initGuideTools() {
   const search = $("guideSearch");
