@@ -175,7 +175,43 @@ const BIG_DAY = {
     [ /* L2 */
       { who: "them", text: "{count} new species and one of them is a lemon shark. I need you to understand how spectacular your day was." },
       { who: "me", text: "Which part are you most excited about?" },
-      { who: "them", text: "yes." }
+      { who: "them", text: "the lemon shark. obviously the lemon shark. that was the whole list." }
+    ],
+    [ /* L3 — the real Sarah's actual reaction: LEMONNNNNNN */
+      { who: "them", text: "LEMONNNNNNN" },
+      { who: "me", text: "I take it you saw the report." },
+      { who: "them", text: "a LEMON SHARK. my favourite shark in the entire ocean and you just TAGGED one. the bimini study has followed them for over thirty years and now YOUR shark is part of that story." },
+      { who: "me", text: "I'm framing this reaction." }
+    ],
+    [ /* L4 */
+      { who: "me", text: "trip report: {speciesList}. all tagged, all released." },
+      { who: "them", text: "wait. lemon shark?? in the same trip?" },
+      { who: "me", text: "Same trip. Back to back." },
+      { who: "them", text: "okay so you know they have FRIENDS? actual preferred social bonds — they remember which other lemon sharks they like and hang out with them. your shark has friends and now i know about it. i'm not okay." }
+    ],
+    [ /* L5 */
+      { who: "them", text: "i just got to the lemon shark part of the report." },
+      { who: "me", text: "And?" },
+      { who: "them", text: "AND. pups born in the mangrove nurseries at bimini come back YEARS later as adults — across open ocean, to the exact spot they were born. your shark might have done that. or might do it someday. either way i'm losing it." },
+      { who: "me", text: "I'll make sure the tag data gets to you first." }
+    ],
+    [ /* L6 */
+      { who: "me", text: "guess which species made me think of you." },
+      { who: "them", text: "lemon shark. it has to be a lemon shark. did you SEE one?" },
+      { who: "me", text: "Tagged one. {speciesList}." },
+      { who: "them", text: "I KNEW IT. they can learn and remember visual cues in lab tests — they're smart AND social AND they grow up in mangrove nurseries. that is the coolest shark in the ocean and you got to touch one." }
+    ],
+    [ /* L7 */
+      { who: "them", text: "i'm going to read this report calmly and maturely." },
+      { who: "me", text: "Sure you are." },
+      { who: "them", text: "LEMON SHARK. there it is. thirty-plus years of bimini research, the social bonds, the homing back to their birthplace — and YOU tagged one today. i am not being mature about this." },
+      { who: "me", text: "I never expected you to be." }
+    ],
+    [ /* L8 */
+      { who: "me", text: "{count} new species. one of them is a lemon shark." },
+      { who: "them", text: "..." },
+      { who: "me", text: "Sarah?" },
+      { who: "them", text: "sorry. had to put the phone down for a second. a lemon shark. MY favourite. in your expedition log. with a tag on it. i'm fine. i'm so fine." }
     ]
   ]
 };

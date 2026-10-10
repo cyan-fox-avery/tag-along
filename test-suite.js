@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.5.20-beta', VERSION === 'v1.5.20-beta');
+  ok('version v1.5.21-beta', VERSION === 'v1.5.21-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1705,7 +1705,7 @@ code += `
   ok('no count-spacer CSS remains', !/count-spacer/.test(cssCode));
   // v1.4.19: Sarah's Big Day
   ok('BIG_DAY has 8 conversations per tier (2/3/4)', BIG_DAY[2].length === 8 && BIG_DAY[3].length === 8 && BIG_DAY[4].length === 8);
-  ok('BIG_DAY lemon pool has 2 conversations', BIG_DAY.lemon.length === 2);
+  ok('BIG_DAY lemon pool has 8 conversations', BIG_DAY.lemon.length === 8);
   ok('all Big Day conversations have 3-4 bubbles', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.length >= 3 && c.length <= 4)));
   ok('all Big Day bubbles have who/text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => (m.who === 'them' || m.who === 'me') && typeof m.text === 'string' && m.text.length > 0))));
   ok('no raw placeholders in Big Day text', Object.keys(BIG_DAY).every(k => BIG_DAY[k].every(c => c.every(m => !/\\{(?!speciesList\\}|count\\})[^}]*\\}/.test(m.text)))));
@@ -1738,6 +1738,10 @@ code += `
   ok('WHATS_NEW has v1.5.18-beta', Array.isArray(WHATS_NEW['v1.5.18-beta']) && WHATS_NEW['v1.5.18-beta'].length === 1);
   ok('WHATS_NEW has v1.5.19-beta', Array.isArray(WHATS_NEW['v1.5.19-beta']) && WHATS_NEW['v1.5.19-beta'].length === 3);
   ok('WHATS_NEW has v1.5.20-beta', Array.isArray(WHATS_NEW['v1.5.20-beta']) && WHATS_NEW['v1.5.20-beta'].length === 1);
+  ok('WHATS_NEW has v1.5.21-beta', Array.isArray(WHATS_NEW['v1.5.21-beta']) && WHATS_NEW['v1.5.21-beta'].length === 2);
+  // v1.5.21: lemon pool energy — every lemon convo has big-energy content
+  ok('lemon pool includes LEMONNNNNNN', BIG_DAY.lemon.some(c => c.some(m => m.text.includes('LEMONNNNNNN'))));
+  ok('all lemon conversations still 3-4 bubbles', BIG_DAY.lemon.every(c => c.length >= 3 && c.length <= 4));
   // v1.5.20: rename triggers checkAchievements (Sarah egg works outside expeditions)
   ok('renameSave calls checkAchievements', /renameSave[\\s\\S]*?checkAchievements\\(\\)/.test(code.split('$("renameSave")')[1].split('});')[0] + 'checkAchievements()') || code.includes('check achievements on any rename'));
   // v1.5.19: Ask Sarah is pinned-shark-only

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.5.20-beta";
+const VERSION = "v1.5.21-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -116,6 +116,10 @@ const WHATS_NEW = {
   "v1.5.0-beta": [
     "\uD83D\uDCBE <strong>Celebrations survive a reload.</strong> If the page reloads mid-expedition, Sarah's pending species celebration is recovered and delivered once — never lost, never doubled.",
     "\u270F\uFE0F <strong>Big Day copy polish.</strong> Two small dialogue fixes from Mira's review: time-neutral wording and a general shark-longevity fact.",
+  ],
+  "v1.5.21-beta": [
+    "🍋 <strong>LEMONNNNNNN.</strong> Six new lemon-shark Big Day conversations — Sarah is barely containing herself, with real facts about Bimini, social bonds, and homing. One variant channels the real Sarah's actual reaction.",
+    "💬 <strong>L2 punched up.</strong> The shortest lemon reaction now lands harder.",
   ],
   "v1.5.20-beta": [
     "🦈 <strong>Sarah egg, anywhere.</strong> Naming a shark Sarah from the Collection tab now triggers her reaction and the Best Cousin Ever achievement — not just during expeditions.",
