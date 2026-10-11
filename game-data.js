@@ -86,12 +86,10 @@ const METHODS = {
   "aggregation": {
     name: "Find the aggregation",
     subLabel: "Approach",
-    /* WHY these three (for reviewers): real whale/basking-shark field
-       practice per 2026 research — see research notes below. Boat surveys
-       at seasonal sites, aerial spotter surveys, and local sightings
-       networks are the three genuinely distinct ways researchers locate
-       feeding aggregations. All three boost equally: they are all real,
-       so the choice is about fieldcraft flavor, recorded in the logbook. */
+    /* v1.7.6-beta: the sub-menu is removed from the UI — choosing
+       "Find the aggregation" just works. The opts are kept here so old
+       logbook entries still render sensibly. All three boosted equally;
+       the choice was flavor-only. */
     opts: {
       "boat": "Boat survey of the bloom",
       "plane": "Spotter-plane survey",
