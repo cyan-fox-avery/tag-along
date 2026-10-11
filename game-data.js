@@ -79,7 +79,8 @@ const METHODS = {
     subLabel: "Attractant",
     opts: {
       "none": "No attractant",
-      "chum": "Fish-oil chum"
+      "chum": "Fish-oil chum",
+      "seal": "Seal scent"
     }
   },
   "aggregation": {
@@ -226,7 +227,7 @@ const PICK_ICONS = {
   },
   methodSelect: { "attract": "🪣", "aggregation": "🔍", "": "" },
   methodOptSelect: {
-    "none": "–", "chum": "🪣",
+    "none": "–", "chum": "🪣", "seal": "🦭",
     "boat": "🚤", "plane": "✈️", "network": "📻"
   }
 };
