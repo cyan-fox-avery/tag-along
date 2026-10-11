@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.6-beta";
+const VERSION = "v1.6.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -128,6 +128,9 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.7-beta": [
+    "🔁 <strong>One resighting, one thread.</strong> Logging a re-sighting no longer fires two different Sarah dialogues — the first-ever reunion gets her special reaction, later ones get the routine check-in.",
   ],
   "v1.6.6-beta": [
     "🌑 <strong>Shadows match their sharks.</strong> The mystery silhouette in dive encounters now uses the shark's actual illustration with a dark overlay — no more mismatched shadow shapes.",
@@ -2107,7 +2110,9 @@ function doEncounter(species, plan) {
     } else if (isReunion) {
       /* v1.5.3-beta: REUNION — it's YOUR shark! Log re-sighting and Follow
          for this actual individual. One-time Sarah reaction per species. */
-      maybeReunionReaction(species, rec);
+      /* v1.6.7-beta: capture whether the reunion reaction fired — if it did,
+         the resight button must not push its own thread for this encounter. */
+      const reunionReactedThisEncounter = maybeReunionReaction(species, rec);
       /* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged
          species — unlocks remaining secret facts without retagging. Ends the
          expedition (you're spending the rest of the trip following). */
@@ -2153,7 +2158,10 @@ function doEncounter(species, plan) {
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
-        pushThread(resightThread(species, rec));
+        /* v1.6.7-beta: one resighting = one Sarah thread. The first-ever reunion
+           already got the special "WAIT... again?!?" reaction above; only later
+           resightings use the routine resightThread. */
+        if (!reunionReactedThisEncounter) pushThread(resightThread(species, rec));
         state.resightedThisTrip = true;
         finish();
       });
@@ -2540,7 +2548,9 @@ function resightThread(species, rec) {
    Warm, not spammy — only fires once per species, ever. */
 function maybeReunionReaction(species, rec) {
   state.reunionReacted = state.reunionReacted || {};
-  if (state.reunionReacted[species.id]) return;
+  /* v1.6.7-beta: returns whether the thread fired, so the resight button
+     can skip its own thread when the reunion reaction already spoke. */
+  if (state.reunionReacted[species.id]) return false;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
@@ -2551,6 +2561,7 @@ function maybeReunionReaction(species, rec) {
     { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
   ];
   pushThread(thread);
+  return true;
 }
 
 /* ---------- Sarah remembers sharks by name ----------
