@@ -25,9 +25,9 @@ const REGIONS = {
   "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
   "cornwall":     { name: "Cornwall, UK",         note: "Gannets dive-bomb the water around the boat." },
   "papua-new-guinea": { name: "Papua New Guinea", note: "The reef flat stretches out, impossibly clear and shallow." },
-  /* These unlock once the first six sharks are tagged — new waters earned,
-     not given. v0.7.0: real species live here now, so they are selectable,
-     not teasers. */
+  /* v1.7.9-beta: these unlock at 10 tagged sharks — new waters earned,
+     not given (was: the six original species). Real species live here now,
+     so they are selectable, not teasers. */
   "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
   "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true },
   /* v0.21.0: three new regions for the 18-shark wave. All locked — new waters

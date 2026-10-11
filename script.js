@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.5-beta";
+const VERSION = "v1.7.9-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.9-beta": [
+"🗺️ <strong>Regions unlock by count.</strong> Galápagos and South Africa now unlock after tagging 10 sharks — any 10, not the six specific original species.",
+  ],
   "v1.7.5-beta": [
 "🟡 <strong>Matching release button.</strong> 'Release & return to ship' is now flat yellow like the other release buttons.",
   ],
@@ -660,8 +663,8 @@ function pickWatchNote(species) {
 
 /* v0.7.0: tagging the first six earns new waters. */
 const REGION_UNLOCK_THREAD = [
-  { who: "them", text: "Six sharks. You're officially a real shark scientist now, you know." },
-  { who: "me", text: "Six for six. The institute just cleared two new survey regions for us." },
+  { who: "them", text: "Ten sharks. You're officially a real shark scientist now, you know." },
+  { who: "me", text: "Ten tagged. The institute just cleared two new survey regions for us." },
   { who: "them", text: "The Galápagos and South Africa. I've read everything about those waters. Ask me anything — I mean it." },
   { who: "me", text: "I have a feeling I'm going to. 🦈" }
 ];
@@ -993,8 +996,6 @@ const logStore = {
 
 /* v0.7.0: the first six sharks (the original roster). Tagging all six
    unlocks the Galápagos and South Africa — new waters earned, not given. */
-const ORIGINAL_SIX = ["nurse", "thresher", "whale", "goblin", "tiger", "sandtiger"];
-
 /* v0.20.0: the pinned shark — "currently researching". One shark at a time,
    persisted across sessions. A focus, not a filter. */
 const pinStore = {
@@ -1054,7 +1055,7 @@ const state = {
   pendingTag: null,       // species object awaiting naming
   sightings: sightStore.load(), // v0.7.0: watched-but-not-tagged log
   logbook: logStore.load(),   // v0.8.0: expedition logbook
-  regionsUnlocked: false, // v0.7.0: first six tagged -> Galápagos + South Africa
+  regionsUnlocked: false, // v1.7.9-beta: 10 tagged -> Galápagos + South Africa (was: original six)
   pendingWin: false,      // v0.7.0: final shark tagged mid-trip; ceremony at day's end
   currentPlan: null,      // the trip's region/depth/bait/method (method added v0.8.0 as scent, reworked v0.9.0)
   taggedThisTrip: false,  // v0.7.0: skip the random post-trip chat after a tag
@@ -1693,7 +1694,7 @@ function renderResearch() {
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
-            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag the six original species (nurse, thresher, whale, goblin, tiger, sandtiger) to unlock them.</p>`
+            ? `<p class="latin">🔒 Our vessel hasn't surveyed these waters yet — tag 10 sharks to unlock them.</p>`
             : ``}
       </div>
     `;
@@ -1749,7 +1750,7 @@ function fillRegions() {
     o.value = id;
     if (v.locked) {
       const unlockText = id === "galapagos" || id === "south-africa"
-        ? `🔒 ${v.name} — tag the six original species to unlock`
+        ? `🔒 ${v.name} — unlocks at 10 tags`
         : id === "east-australia"
           ? `🔒 ${v.name} — unlocks at 15 tags`
           : id === "california"
@@ -1795,7 +1796,7 @@ function migrateWinV07() {
     state.won = false;
     try { localStorage.removeItem("tyi-won"); } catch {}
   }
-  if (ORIGINAL_SIX.every(id => state.tagged[id])) {
+  if (Object.keys(state.tagged).length >= 10) {
     state.regionsUnlocked = true;
     try { localStorage.setItem("tyi-regions", "1"); } catch {}
   } else {
@@ -3704,7 +3705,7 @@ $("sarahAskBtn").addEventListener("click", () => {
      v0.11.0: the win moves up with the roster (SHARKS.length), always. */
 function checkMilestones() {
   const taggedIds = Object.keys(state.tagged);
-  if (!state.regionsUnlocked && ORIGINAL_SIX.every(id => taggedIds.includes(id))) {
+  if (!state.regionsUnlocked && taggedIds.length >= 10) {
     state.regionsUnlocked = true;
     try { localStorage.setItem("tyi-regions", "1"); } catch {}
     for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
@@ -3747,7 +3748,7 @@ function showRegionUnlock() {
     <div class="cert-body">
       <p><strong>Galápagos Islands</strong> — marine iguanas slip into the water nearby.</p>
       <p><strong>South Africa</strong> — cape fur seals bark on the rocks above.</p>
-      <p class="latin">The six original species. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
+      <p class="latin">Ten sharks tagged. The institute trusts you with farther waters now — and Sarah texted you about it. 📱</p>
     </div>
     <button id="winNext" class="primary-button" type="button">Back to the water</button>
   </div>`;
