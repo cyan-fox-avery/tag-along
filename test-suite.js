@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.15-beta', VERSION === 'v1.7.15-beta');
+  ok('version v1.7.16-beta', VERSION === 'v1.7.16-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2199,6 +2199,64 @@ code += `
     !fileCode.includes('original-six unlock'));
   ok('WHATS_NEW has v1.7.12-beta', Array.isArray(WHATS_NEW['v1.7.12-beta']) && WHATS_NEW['v1.7.12-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHATS_NEW['v1.7.13-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.16-beta', Array.isArray(WHATS_NEW['v1.7.16-beta']) && WHATS_NEW['v1.7.16-beta'].length >= 1);
+
+  // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
+  ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]*?Object\\.keys\\(state\\.tagged\\)\\.length >= SHARKS\\.length/.test(fileCode));
+  (() => {
+    const _won = state.won, _tagged = state.tagged, _derpy = state.derpyUnlocked,
+          _msgs = state.messages, _unread = state.unread, _regions = state.regionsUnlocked;
+    const _lsWon = localStorage.getItem('tyi-won'), _lsDerpy = localStorage.getItem('tyi-derpy-unlocked'),
+          _lsRegions = localStorage.getItem('tyi-regions');
+    const derpyMarker = 'derpy mode toggle in your collection book';
+    const countDerpyThreads = () => state.messages.filter(t =>
+      (t.msgs || []).some(m => (m.text || '').includes(derpyMarker))).length;
+    const fullTagged = () => Object.fromEntries(SHARKS.map(s => [s.id, { researchId: 'T' }]));
+    const partialTagged = () => Object.fromEntries(SHARKS.slice(0, 6).map(s => [s.id, { researchId: 'T' }]));
+    const reset = () => {
+      state.messages = []; state.unread = 0; state.derpyUnlocked = false;
+      try { localStorage.removeItem('tyi-derpy-unlocked'); } catch {}
+    };
+
+    // Case 1: partial-roster "winner" (6/50) — win reset, NO derpy award/thread
+    reset();
+    try { localStorage.setItem('tyi-won', '1'); } catch {}
+    state.won = true; state.tagged = partialTagged();
+    migrateWinV07(); migrateDerpyUnlock();
+    ok('partial-roster win is reset by migrateWinV07', state.won === false && localStorage.getItem('tyi-won') === null);
+    ok('partial-roster winner gets NO derpy award', state.derpyUnlocked === false && localStorage.getItem('tyi-derpy-unlocked') === null);
+    ok('partial-roster winner gets NO derpy thread', countDerpyThreads() === 0);
+
+    // Case 2: genuine 50/50 winner, no derpy key — unlock once, exactly one thread
+    reset();
+    try { localStorage.setItem('tyi-won', '1'); } catch {}
+    state.won = true; state.tagged = fullTagged();
+    migrateWinV07(); migrateDerpyUnlock();
+    ok('genuine winner keeps win flag', state.won === true);
+    ok('genuine winner gets derpy award', state.derpyUnlocked === true && localStorage.getItem('tyi-derpy-unlocked') === '1');
+    ok('genuine winner gets exactly one derpy thread', countDerpyThreads() === 1);
+
+    // Case 3: already-unlocked winner — no duplicate award/thread on repeated boot
+    const before = countDerpyThreads();
+    migrateWinV07(); migrateDerpyUnlock();
+    ok('no duplicate derpy thread on repeated boot', countDerpyThreads() === before && state.derpyUnlocked === true);
+
+    // Case 4: incomplete save, no win flag — no award
+    reset();
+    try { localStorage.removeItem('tyi-won'); } catch {}
+    state.won = false; state.tagged = partialTagged();
+    migrateWinV07(); migrateDerpyUnlock();
+    ok('non-winner gets NO derpy award', state.derpyUnlocked === false && countDerpyThreads() === 0);
+
+    // Restore
+    state.won = _won; state.tagged = _tagged; state.derpyUnlocked = _derpy;
+    state.messages = _msgs; state.unread = _unread; state.regionsUnlocked = _regions;
+    try {
+      if (_lsWon === null) localStorage.removeItem('tyi-won'); else localStorage.setItem('tyi-won', _lsWon);
+      if (_lsDerpy === null) localStorage.removeItem('tyi-derpy-unlocked'); else localStorage.setItem('tyi-derpy-unlocked', _lsDerpy);
+      if (_lsRegions === null) localStorage.removeItem('tyi-regions'); else localStorage.setItem('tyi-regions', _lsRegions);
+    } catch {}
+  })();
 
   // v1.6.12-beta (re-applied): seal scent removed, attract defaults to chum
   ok('seal scent removed from attract opts', !METHODS.attract.opts['seal']);
@@ -2274,9 +2332,12 @@ ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHA
   ok('migrateDerpyUnlock grants unlock to winner missing it', (() => {
     const savedWon = state.won;
     const savedUnlocked = state.derpyUnlocked;
+    const savedTagged = state.tagged;
     const savedMsgs = state.messages.length;
     state.won = true;
     state.derpyUnlocked = false;
+    // v1.7.16-beta: explicit full-roster gate — set up a genuine 50/50 winner
+    state.tagged = Object.fromEntries(SHARKS.map(s => [s.id, { researchId: 'T' }]));
     try { localStorage.removeItem('tyi-derpy-unlocked'); } catch {}
     migrateDerpyUnlock();
     const granted = state.derpyUnlocked === true;
@@ -2285,21 +2346,26 @@ ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHA
     state.messages.length = savedMsgs;
     state.won = savedWon;
     state.derpyUnlocked = savedUnlocked;
+    state.tagged = savedTagged;
     return granted && persisted && threadPushed;
   })());
   ok('migrateDerpyUnlock does not double-send Sarah thread', (() => {
     const savedWon = state.won;
     const savedUnlocked = state.derpyUnlocked;
+    const savedTagged = state.tagged;
     const savedMsgs = state.messages;
     state.messages = [{ ts: 1, msgs: DERPY_AWARD_THREAD.map(m => ({ ...m })) }];
     state.won = true;
     state.derpyUnlocked = false;
+    // v1.7.16-beta: explicit full-roster gate — set up a genuine 50/50 winner
+    state.tagged = Object.fromEntries(SHARKS.map(s => [s.id, { researchId: 'T' }]));
     migrateDerpyUnlock();
     const count = state.messages.length;
     const granted = state.derpyUnlocked === true;
     state.messages = savedMsgs;
     state.won = savedWon;
     state.derpyUnlocked = savedUnlocked;
+    state.tagged = savedTagged;
     return count === 1 && granted;
   })());
   ok('migrateDerpyUnlock leaves non-winners alone', (() => {
