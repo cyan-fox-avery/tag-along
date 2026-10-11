@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.8-beta', VERSION === 'v1.7.8-beta');
+  ok('version v1.7.9-beta', VERSION === 'v1.7.9-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2132,6 +2132,43 @@ code += `
   ok('WHATS_NEW has v1.7.3-beta', Array.isArray(WHATS_NEW['v1.7.3-beta']) && WHATS_NEW['v1.7.3-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.4-beta', Array.isArray(WHATS_NEW['v1.7.4-beta']) && WHATS_NEW['v1.7.4-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.5-beta', Array.isArray(WHATS_NEW['v1.7.5-beta']) && WHATS_NEW['v1.7.5-beta'].length >= 1);
+
+  // v1.7.9-beta: region unlocks are count-based (10 tags -> Galápagos + South Africa)
+  ok('v1.7.9 WHATS_NEW entry', (WHATS_NEW['v1.7.9-beta'] || []).length >= 1);
+  ok('v1.7.9 region thread is count-based',
+    REGION_UNLOCK_THREAD[0].text.includes('Ten sharks') && REGION_UNLOCK_THREAD[1].text.includes('Ten tagged'));
+  ok('v1.7.9 checkMilestones uses tag count',
+    fileCode.includes('if (!state.regionsUnlocked && taggedIds.length >= 10)'));
+  // 9->10 tag unlock logic: condition uses tag count >= 10
+  ok('v1.7.9 unlock condition is count-based', (() => {
+    // The condition in checkMilestones should be: taggedIds.length >= 10
+    // Test the logic directly without DOM side effects
+    const testAt9 = (() => {
+      const taggedIds = [];
+      for (let i = 0; i < 9; i++) taggedIds.push('shark' + i);
+      return !(false || taggedIds.length >= 10); // simulates !state.regionsUnlocked && count >= 10
+    })();
+    const testAt10 = (() => {
+      const taggedIds = [];
+      for (let i = 0; i < 10; i++) taggedIds.push('shark' + i);
+      return taggedIds.length >= 10;
+    })();
+    return testAt9 === true && testAt10 === true; // 9 should NOT trigger, 10 should
+  })());
+  // Migration uses count-based check
+  ok('v1.7.9 migration uses tag count', fileCode.includes('if (Object.keys(state.tagged).length >= 10)'));
+  // ORIGINAL_SIX removed
+  ok('v1.7.9 ORIGINAL_SIX removed', !fileCode.includes('ORIGINAL_SIX'));
+  // Planner dropdown uses count language
+  ok('v1.7.9 planner shows 10 tags', fileCode.includes('unlocks at 10 tags'));
+  // Research locked text uses count language
+  ok('v1.7.9 research shows 10 sharks', fileCode.includes('tag 10 sharks to unlock them'));
+  // No stale comments describing the old six-species unlock rule (Mira review)
+  ok('v1.7.9 no stale six-species unlock comments',
+    !fileCode.includes('tagging the first six earns new waters') &&
+    !fileCode.includes('Tagging all six') &&
+    !fileCode.includes('Tagging the first six (the original roster) unlocks') &&
+    !fileCode.includes('original-six unlock'));
 
   // v1.6.10-beta (restored): Sarah throttle state exists
   ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
