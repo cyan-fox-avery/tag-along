@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.7-beta', VERSION === 'v1.6.7-beta');
+  ok('version v1.7.8-beta', VERSION === 'v1.7.8-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2128,6 +2128,12 @@ code += `
   })());
   ok('resight button skips resightThread when reunion reaction fired', /if\\s*\\(!reunionReactedThisEncounter\\)\\s*pushThread\\(resightThread/.test(fileCode));
   ok('reunion call site captures return value', /const reunionReactedThisEncounter = maybeReunionReaction\\(species, rec\\)/.test(fileCode));
+
+  // v1.7.8-beta: species insight ends the expedition
+  ok('WHATS_NEW has v1.7.8-beta entry', Array.isArray(WHATS_NEW['v1.7.8-beta']) && WHATS_NEW['v1.7.8-beta'].length >= 1);
+  ok('observe button ends expedition on new insight', /v1\\.7\\.8-beta: a new species insight ends the expedition/.test(fileCode));
+  ok('observe button logs insight when fact unlocked', /Species insight:.*esc/.test(fileCode));
+  ok('observe button warns it ends expedition', /may reveal a secret fact/.test(fileCode));
   ok('archiveSortCompare falls back to insertion order for legacy saves', (() => {
     const saved = state.tagged;
     /* Legacy records have no taggedAt; whale does. Mirrors
