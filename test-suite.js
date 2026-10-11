@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.11-beta', VERSION === 'v1.7.11-beta');
+  ok('version v1.7.12-beta', VERSION === 'v1.7.12-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -1783,6 +1783,10 @@ code += `
   ok('focus only restored when flag is true', /if \\(restoreFocus\\) head\\.focus\\(\\);/.test(code));
   // v1.6.0: IUCN badge spacing — more room between badge and pin
   ok('iucn badge has right margin', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*8px/.test(cssCode));
+  // v1.7.12-beta: IUCN badge text no longer clips vertically on iPad Safari
+  ok('status-pill has explicit line-height', /\\.status-pill\\s*\\{[^}]*line-height:\\s*1\\.35/.test(cssCode));
+  ok('legend pill overrides inherited line-height', /\\.iucn-legend\\s+\\.status-pill[^}]*line-height:\\s*1\\.35/.test(cssCode));
+  ok('legend pill has 2px vertical padding', /\\.iucn-legend\\s+\\.status-pill[^}]*padding:\\s*2px\\s+8px/.test(cssCode));
   // v1.6.0: full scientific name in expanded Collection/Archive cards
   ok('detail-scientific class styled', /\\.detail-scientific\\s*\\{[^}]*font-size:\\s*15px/.test(cssCode));
   ok('collection detail shows scientific name', code.indexOf('detail-scientific') !== -1);
@@ -2193,6 +2197,7 @@ code += `
     !fileCode.includes('Tagging all six') &&
     !fileCode.includes('Tagging the first six (the original roster) unlocks') &&
     !fileCode.includes('original-six unlock'));
+  ok('WHATS_NEW has v1.7.12-beta', Array.isArray(WHATS_NEW['v1.7.12-beta']) && WHATS_NEW['v1.7.12-beta'].length >= 1);
 
   // v1.6.10-beta (restored): Sarah throttle state exists
   ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
