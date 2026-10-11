@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.13-beta";
+const VERSION = "v1.7.16-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.16-beta": [
+"🦈 <strong>Derpy unlock ordering fixed.</strong> The derpy award is now granted before the win migration runs, so valid winners always receive it — even if a later migration would have reset their win flag.",
+  ],
   "v1.7.13-beta": [
 "🎣 <strong>Bait and Switch retired.</strong> The seal-scent achievement is gone, and seal scent itself is properly retired — choosing the attract method now uses fish-oil chum directly, no sub-dropdown.",
   ],
@@ -4759,9 +4762,13 @@ const preMigrationHadSave = (() => {
 })();
 migrateIds();
 migrateTracks();
+/* v1.7.16-beta: migrateDerpyUnlock() must run BEFORE migrateWinV07().
+   migrateWinV07() can reset state.won=false for saves with fewer than 50
+   tagged sharks; the derpy award is for valid winners, so it is granted
+   before any migration touches the win state. */
+migrateDerpyUnlock();
 migrateWinV07();
 migrateArchiveUnlock();
-migrateDerpyUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);

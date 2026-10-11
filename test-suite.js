@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.13-beta', VERSION === 'v1.7.13-beta');
+  ok('version v1.7.16-beta', VERSION === 'v1.7.16-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2195,6 +2195,15 @@ code += `
     !fileCode.includes('original-six unlock'));
   ok('WHATS_NEW has v1.7.12-beta', Array.isArray(WHATS_NEW['v1.7.12-beta']) && WHATS_NEW['v1.7.12-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHATS_NEW['v1.7.13-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.16-beta', Array.isArray(WHATS_NEW['v1.7.16-beta']) && WHATS_NEW['v1.7.16-beta'].length >= 1);
+
+  // v1.7.16-beta: derpy unlock runs before the win migration
+  ok('migrateDerpyUnlock called before migrateWinV07', (() => {
+    const d = fileCode.indexOf('migrateDerpyUnlock();');
+    const w = fileCode.indexOf('migrateWinV07();');
+    return d > 0 && w > 0 && d < w;
+  })());
+  ok('migration ordering comment present', fileCode.includes('v1.7.16-beta: migrateDerpyUnlock() must run BEFORE migrateWinV07()'));
 
   // v1.6.12-beta (re-applied): seal scent removed, attract defaults to chum
   ok('seal scent removed from attract opts', !METHODS.attract.opts['seal']);
