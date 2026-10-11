@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v1.7.16-beta": [
-"🦈 <strong>Derpy unlock ordering fixed.</strong> The derpy award is now granted before the win migration runs, so valid winners always receive it — even if a later migration would have reset their win flag.",
+"🦈 <strong>Derpy award gate hardened.</strong> The retroactive derpy unlock now explicitly requires a full 50-shark roster, so only genuine full-roster winners receive Sarah's derpy thread and the Collection toggle.",
   ],
   "v1.7.13-beta": [
 "🎣 <strong>Bait and Switch retired.</strong> The seal-scent achievement is gone, and seal scent itself is properly retired — choosing the attract method now uses fish-oil chum directly, no sub-dropdown.",
@@ -4731,7 +4731,12 @@ function migrateArchiveUnlock() {
    hasn't sent it yet. */
 function migrateDerpyUnlock() {
   try {
-    if (state.won && !state.derpyUnlocked) {
+    /* v1.7.16-beta: explicit full-roster gate — the derpy award is for
+       genuine full-roster winners only. migrateWinV07() already resets
+       state.won for partial-roster saves; this check is belt-and-braces
+       so the award can never leak to an incomplete win. */
+    const fullRoster = Object.keys(state.tagged).length >= SHARKS.length;
+    if (state.won && fullRoster && !state.derpyUnlocked) {
       state.derpyUnlocked = true;
       localStorage.setItem("tyi-derpy-unlocked", "1");
       /* Only push Sarah's thread if it isn't already in the Phone —
@@ -4762,12 +4767,12 @@ const preMigrationHadSave = (() => {
 })();
 migrateIds();
 migrateTracks();
-/* v1.7.16-beta: migrateDerpyUnlock() must run BEFORE migrateWinV07().
-   migrateWinV07() can reset state.won=false for saves with fewer than 50
-   tagged sharks; the derpy award is for valid winners, so it is granted
-   before any migration touches the win state. */
-migrateDerpyUnlock();
 migrateWinV07();
+/* v1.7.16-beta: derpy retroactive unlock runs after the win migration.
+   migrateWinV07() resets state.won for partial-roster saves, and
+   migrateDerpyUnlock() additionally gates on a full 50-shark roster,
+   so the award only ever reaches genuine full-roster winners. */
+migrateDerpyUnlock();
 migrateArchiveUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
