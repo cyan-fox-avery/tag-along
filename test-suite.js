@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.4-beta', VERSION === 'v1.7.4-beta');
+  ok('version v1.6.7-beta', VERSION === 'v1.6.7-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1442,8 +1442,7 @@ code += `
     const origTripLog = (typeof tripLog !== "undefined") ? tripLog : undefined;
     const origFollowedFlag = state.followedThisTrip;
     renderAll = () => {};
-    const loggedLines = [];
-    logLine = (s) => loggedLines.push(String(s));
+    logLine = () => {};
     factStore.save = () => {};
     state.tagged = { nurse: { name: "Nora", researchId: "NS-2026-001" } };
     state.unlockedFacts = {};
@@ -1466,9 +1465,6 @@ code += `
     // Double-resolution guard: the one-shot wrapper in the button handler
     // prevents this, but doFollowTagged itself must clear encounterDone
     ok("follow clears encounterDone", state.encounterDone === null);
-    // v1.7.4-beta: tag-along insight must not appear in the expedition log
-    ok("follow does not log insight to expedition log",
-      !loggedLines.some(l => /insight/i.test(l)));
     // Restore
     renderAll = origRender;
     logLine = origLog;
@@ -1808,6 +1804,31 @@ code += `
     state.messages.length = before;
     return isRegular && rec.sarahEgg === true && !rec.lemonSarahEgg;
   })());
+  // v1.6.5: naming a lemon "Sarah" suppresses the queued lemon celebration
+  ok('lemon named Sarah drops the queued lemon celebration', (() => {
+    const savePending = state.pendingCelebrations;
+    const saveMsgs = state.messages.length;
+    state.pendingCelebrations = [
+      { speciesId: "lemon", speciesName: "Lemon Shark" },
+      { speciesId: "nurse", speciesName: "Nurse Shark" }
+    ];
+    const rec = { name: "Sarah" };
+    maybeSarahEgg("lemon", rec);
+    const lemonGone = !state.pendingCelebrations.some(e => e.speciesId === "lemon");
+    const nurseKept = state.pendingCelebrations.some(e => e.speciesId === "nurse");
+    state.pendingCelebrations = savePending;
+    state.messages.length = saveMsgs;
+    return lemonGone && nurseKept && rec.lemonSarahEgg === true;
+  })());
+  ok('lemon celebration kept when name is not Sarah', (() => {
+    const savePending = state.pendingCelebrations;
+    state.pendingCelebrations = [{ speciesId: "lemon", speciesName: "Lemon Shark" }];
+    const rec = { name: "Zest" };
+    maybeSarahEgg("lemon", rec);
+    const kept = state.pendingCelebrations.some(e => e.speciesId === "lemon");
+    state.pendingCelebrations = savePending;
+    return kept && !rec.lemonSarahEgg;
+  })());
   // v1.5.25: Bruce and Sarah eggs are independent (both orders)
   ok('bruce egg survives a later sarah naming', (() => {
     const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
@@ -2021,10 +2042,31 @@ code += `
   ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
   ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
 
+  // v1.6.6-beta: Shadows match their sharks
+  ok('WHATS_NEW has v1.6.6-beta with 1 entry', Array.isArray(WHATS_NEW['v1.6.6-beta']) && WHATS_NEW['v1.6.6-beta'].length === 1);
+  ok('dive encounter shadow uses illustration not silhouette webp', (() => {
+    // Phase 1 must use the illustration (darkened by CSS) so the shadow
+    // always matches the shark — no separate silhouette image.
+    const src = doEncounter.toString();
+    return src.includes('shark-shadow') &&
+           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') &&
+           !src.includes('sharkArtImg(species.id, "silhouette"');
+  })());
+  ok('shark-shadow CSS darkens illustration and SVG fallback', (() => {
+    // The dark overlay must apply to both the WebP img and any SVG
+    // fallback, so a failed image load never reveals the species.
+    return /\\.shark-shadow img,\\s*\\.shark-shadow svg\\s*\\{\\s*filter:\\s*brightness\\(0\\)/.test(cssCode);
+  })());
+  ok('preloadSharkArt only preloads illustrations', (() => {
+    // Silhouettes are no longer separate images; preloading them is wasteful.
+    const src = preloadSharkArt.toString();
+    return src.includes('"illustration"') && !src.includes('"silhouette"');
+  })());
+
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('WHATS_NEW has v1.6.5-beta', Array.isArray(WHATS_NEW['v1.6.5-beta']) && WHATS_NEW['v1.6.5-beta'].length >= 1);
   ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
-  ok('WHATS_NEW has v1.7.4-beta', Array.isArray(WHATS_NEW['v1.7.4-beta']) && WHATS_NEW['v1.7.4-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
@@ -2068,6 +2110,24 @@ code += `
     return newestFirst.join(',') === 'thresher,nurse,whale' &&
            oldestFirst.join(',') === 'whale,nurse,thresher';
   })());
+
+  // v1.6.7-beta: one resighting = one Sarah thread
+  ok('WHATS_NEW has v1.6.7-beta entry', Array.isArray(WHATS_NEW['v1.6.7-beta']) && WHATS_NEW['v1.6.7-beta'].length >= 1);
+  ok('maybeReunionReaction returns true when it fires, false when already reacted', (() => {
+    const savedReacted = state.reunionReacted;
+    const savedMsgCount = state.messages.length;
+    state.reunionReacted = {};
+    const species = SHARKS.find(s => s.id === 'mako');
+    const rec = { name: '', researchId: 'MK-2026-019', resightings: [] };
+    const first = maybeReunionReaction(species, rec);
+    const second = maybeReunionReaction(species, rec);
+    state.messages.length = savedMsgCount;
+    state.reunionReacted = savedReacted;
+    try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
+    return first === true && second === false;
+  })());
+  ok('resight button skips resightThread when reunion reaction fired', /if\\s*\\(!reunionReactedThisEncounter\\)\\s*pushThread\\(resightThread/.test(fileCode));
+  ok('reunion call site captures return value', /const reunionReactedThisEncounter = maybeReunionReaction\\(species, rec\\)/.test(fileCode));
   ok('archiveSortCompare falls back to insertion order for legacy saves', (() => {
     const saved = state.tagged;
     /* Legacy records have no taggedAt; whale does. Mirrors

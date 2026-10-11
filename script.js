@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.4-beta";
+const VERSION = "v1.6.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -129,8 +129,14 @@ const WHATS_NEW = {
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
   ],
-  "v1.7.4-beta": [
-    "🔬 <strong>Insights stay on the Collection card.</strong> Tag-along insights no longer appear in the expedition log — find them on the shark's Collection card instead.",
+  "v1.6.7-beta": [
+    "🔁 <strong>One resighting, one thread.</strong> Logging a re-sighting no longer fires two different Sarah dialogues — the first-ever reunion gets her special reaction, later ones get the routine check-in.",
+  ],
+  "v1.6.6-beta": [
+    "🌑 <strong>Shadows match their sharks.</strong> The mystery silhouette in dive encounters now uses the shark's actual illustration with a dark overlay — no more mismatched shadow shapes.",
+  ],
+  "v1.6.5-beta": [
+    "🍋 <strong>No double lemon freakout.</strong> Naming a lemon shark \"Sarah\" now fires only the special naming reaction — the routine lemon-tagged celebration no longer doubles up.",
   ],
   "v1.6.4-beta": [
     "🔁 <strong>Re-sighting, logged once.</strong> The 'Log re-sighting' button is now guarded at the encounter level, not just the button — no more duplicate Sarah messages from double-taps.",
@@ -1961,16 +1967,18 @@ function doEncounter(species, plan) {
     }
     const rec = isReunion ? existingRec : null;
     const sharkEl = $("diveShark");
-    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
-       silhouette (mystery — the species is not named yet). Tapping
-       crossfades to the full-colour illustration and reveals the name.
-       The illustration is preloaded so the reveal is instant. */
+    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the mystery
+       silhouette (the species is not named yet). Tapping crossfades
+       to the full-colour illustration and reveals the name.
+       The illustration is preloaded so the reveal is instant.
+       v1.6.6-beta: the shadow now uses the shark's actual illustration
+       with a dark CSS overlay, so the silhouette always matches the shark. */
     preloadSharkArt(species.id);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     sharkEl.innerHTML =
       `<div class="shark-silhouette" role="button" tabindex="0" ` +
       `aria-label="Something is out there — tap to reveal">` +
-      sharkArtImg(species.id, "silhouette", "Mysterious shark silhouette") +
+      `<div class="shark-shadow">` + sharkArtImg(species.id, "illustration", "Mysterious shark silhouette") + `</div>` +
       `<div class="tap-hint">👆 Tap to reveal</div></div>`;
     sharkEl.classList.remove("hidden");
     logLine(`🦈 <span class="found">Something's out there...</span>`, "found");
@@ -2102,7 +2110,9 @@ function doEncounter(species, plan) {
     } else if (isReunion) {
       /* v1.5.3-beta: REUNION — it's YOUR shark! Log re-sighting and Follow
          for this actual individual. One-time Sarah reaction per species. */
-      maybeReunionReaction(species, rec);
+      /* v1.6.7-beta: capture whether the reunion reaction fired — if it did,
+         the resight button must not push its own thread for this encounter. */
+      const reunionReactedThisEncounter = maybeReunionReaction(species, rec);
       /* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged
          species — unlocks remaining secret facts without retagging. Ends the
          expedition (you're spending the rest of the trip following). */
@@ -2148,7 +2158,10 @@ function doEncounter(species, plan) {
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
-        pushThread(resightThread(species, rec));
+        /* v1.6.7-beta: one resighting = one Sarah thread. The first-ever reunion
+           already got the special "WAIT... again?!?" reaction above; only later
+           resightings use the routine resightThread. */
+        if (!reunionReactedThisEncounter) pushThread(resightThread(species, rec));
         state.resightedThisTrip = true;
         finish();
       });
@@ -2535,7 +2548,9 @@ function resightThread(species, rec) {
    Warm, not spammy — only fires once per species, ever. */
 function maybeReunionReaction(species, rec) {
   state.reunionReacted = state.reunionReacted || {};
-  if (state.reunionReacted[species.id]) return;
+  /* v1.6.7-beta: returns whether the thread fired, so the resight button
+     can skip its own thread when the reunion reaction already spoke. */
+  if (state.reunionReacted[species.id]) return false;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
@@ -2546,6 +2561,7 @@ function maybeReunionReaction(species, rec) {
     { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
   ];
   pushThread(thread);
+  return true;
 }
 
 /* ---------- Sarah remembers sharks by name ----------
@@ -3522,12 +3538,12 @@ function doFollowTagged(speciesId, doneCb) {
   const displayName = (rec && rec.name) || s.name;
   logLine(`🧭 Following ${esc(displayName)} — tag secure, swimming strong.`);
   const fact = unlockSecretFact(speciesId);
-  /* v1.7.4-beta: the insight lives on the Collection card (and the follow
-     overlay) only — never in the expedition log. */
   if (fact) {
+    logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
     /* Stash for the map overlay (readable reward with progression). */
     state.pendingTagAlongFact = { speciesId, fact, exhausted: false };
   } else {
+    logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
     state.pendingTagAlongFact = { speciesId, fact: null, exhausted: true };
   }
   /* v1.4.0-beta Mira review (related polish): log the follow as a trip
@@ -3905,6 +3921,13 @@ function maybeSarahEgg(speciesId, rec) {
       rec.lemonSarahEgg = true;
       store.save(state.tagged);
       pushThread(LEMON_SARAH_EGG_THREAD.map(m => ({ ...m })));
+      /* v1.6.5-beta: the egg IS the lemon celebration — drop the queued
+         routine/Big-Day lemon thread so Sarah doesn't freak out twice.
+         Other species' celebrations are untouched. */
+      if (state.pendingCelebrations && state.pendingCelebrations.length) {
+        state.pendingCelebrations = state.pendingCelebrations.filter(e => e.speciesId !== "lemon");
+        try { celebrationStore.save(state.pendingCelebrations); } catch {}
+      }
     } else {
       store.save(state.tagged);
       pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
