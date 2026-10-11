@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.17-beta";
+const VERSION = "v1.7.18-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.18-beta": [
+"🎁 <strong>Derpy claim button hardened.</strong> The manual derpy award claim button now validates every shark in the roster (not just the count, so stale entries can't pass) and stays hidden while a win ceremony is pending — the ceremony presents Sarah's gift itself. The claim is one-time and can never double-send her thread.",
+  ],
   "v1.7.17-beta": [
 "🎁 <strong>Claim your derpy award.</strong> If you've won but the derpy unlock never fired, a claim button now appears in your Collection trophy shelf — one tap grants the award, Sarah's thread, and the derpy mode toggle.",
   ],
@@ -4281,8 +4284,13 @@ function renderCollection() {
   }
 
   /* v1.7.17-beta: manual derpy claim fallback — if the player has won but
-     the automatic unlock never fired, show a one-time claim button. */
-  if (state.won && !state.derpyUnlocked) {
+     the automatic unlock never fired, show a one-time claim button.
+     v1.7.18-beta: check the tagged roster directly instead of state.won,
+     since the win flag can be reset by migrations.
+     (Mira review): use the shared hasFullRoster() helper — stale keys can
+     never pass — and hide while a win ceremony is pending, since the
+     ceremony presents Sarah's gift itself. */
+  if (hasFullRoster() && !state.derpyUnlocked && !state.pendingWin) {
     const cb = document.createElement("button");
     cb.type = "button";
     cb.className = "derpy-claim";
@@ -4773,14 +4781,21 @@ function migrateArchiveUnlock() {
    so they boot with won=true but no derpy award. Backfill the unlock they
    already earned, and deliver Sarah's derpy thread to the Phone if she
    hasn't sent it yet. */
+/* v1.7.18-beta (Mira review): full-roster check — every current SHARKS id
+   must be genuinely tagged. A bare length check can pass on stale or
+   renamed keys, so validate the actual roster ids. */
+function hasFullRoster() {
+  return SHARKS.length > 0 && SHARKS.every(s => !!state.tagged[s.id]);
+}
 function migrateDerpyUnlock() {
   try {
     /* v1.7.16-beta: explicit full-roster gate — the derpy award is for
        genuine full-roster winners only. migrateWinV07() already resets
        state.won for partial-roster saves; this check is belt-and-braces
-       so the award can never leak to an incomplete win. */
+       so the award can never leak to an incomplete win.
+       v1.7.18-beta: hasFullRoster() validates the actual roster ids. */
     const taggedCount = Object.keys(state.tagged).length;
-    const fullRoster = taggedCount >= SHARKS.length;
+    const fullRoster = hasFullRoster();
     /* v1.7.17-beta: diagnostic logging — Avery's valid 50/50 win wasn't
        unlocking, so log the gate inputs for debugging. */
     try {
@@ -4807,10 +4822,21 @@ function migrateDerpyUnlock() {
   } catch {}
 }
 /* v1.7.17-beta: manual derpy claim — same grant as the automatic migration,
-   callable from the Collection trophy shelf fallback button. */
+   callable from the Collection trophy shelf fallback button.
+   v1.7.18-beta: claiming with a full roster also restores the win flag,
+   since the player is a genuine 50/50 winner.
+   (Mira review): eligibility lives in the function, not just the UI.
+   Returns true when the claim is granted, false otherwise — the claim is
+   idempotent and never fires while a win ceremony is pending, since the
+   ceremony presents Sarah's gift itself. */
 function claimDerpyAward() {
   try {
+    if (state.derpyUnlocked) return false;
+    if (state.pendingWin) return false;
+    if (!hasFullRoster()) return false;
+    state.won = true;
     state.derpyUnlocked = true;
+    localStorage.setItem("tyi-won", "1");
     localStorage.setItem("tyi-derpy-unlocked", "1");
     const derpyMarker = "derpy mode toggle in your collection book";
     const alreadyShown = state.messages.some(thread =>
@@ -4819,7 +4845,9 @@ function claimDerpyAward() {
       pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
     }
     try { console.log("[derpy-claim] manual claim granted"); } catch {}
+    return true;
   } catch {}
+  return false;
 }
 /* v0.22.0 Mira review: capture pre-migration storage state for What's New.
    Migrations write keys (e.g. tyi-collection) even for new players, so we

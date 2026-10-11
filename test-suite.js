@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.17-beta', VERSION === 'v1.7.17-beta');
+  ok('version v1.7.18-beta', VERSION === 'v1.7.18-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2201,14 +2201,21 @@ code += `
 ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHATS_NEW['v1.7.13-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.16-beta', Array.isArray(WHATS_NEW['v1.7.16-beta']) && WHATS_NEW['v1.7.16-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHATS_NEW['v1.7.17-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHATS_NEW['v1.7.18-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
-  ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]*?(?:Object\\.keys\\(state\\.tagged\\)\\.length|taggedCount) >= SHARKS\\.length/.test(fileCode));
+  ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));
+  ok('hasFullRoster helper validates roster ids', typeof hasFullRoster === 'function' && /function hasFullRoster\\(\\)[\\s\\S]*?SHARKS\\.every/.test(fileCode));
   // v1.7.17-beta: manual derpy claim fallback + migration logging
   ok('claimDerpyAward function exists', /function claimDerpyAward\\(\\)/.test(fileCode));
   ok('claimDerpyAward grants unlock and persists', /function claimDerpyAward[\\s\\S]*?state\\.derpyUnlocked = true[\\s\\S]*?tyi-derpy-unlocked/.test(fileCode));
-  ok('claim button rendered for winners missing the unlock',
-    /state\\.won && !state\\.derpyUnlocked[\\s\\S]*?derpy-claim/.test(fileCode));
+  // v1.7.18-beta: claim button checks tagged count directly, not the win flag (old state.won gate removed)
+  ok('v1.7.18 claim button uses roster-id gate',
+    /hasFullRoster\\(\\) && !state\\.derpyUnlocked && !state\\.pendingWin[\\s\\S]*?derpy-claim/.test(fileCode));
+  ok('claimDerpyAward is idempotent and ceremony-safe in source',
+    /function claimDerpyAward[\\s\\S]*?if \\(state\\.derpyUnlocked\\) return false[\\s\\S]*?if \\(state\\.pendingWin\\) return false[\\s\\S]*?if \\(!hasFullRoster\\(\\)\\) return false/.test(fileCode));
+  ok('v1.7.18 claimDerpyAward restores win flag',
+    /function claimDerpyAward[\\s\\S]*?state\\.won = true[\\s\\S]*?tyi-won/.test(fileCode));
   ok('migrateDerpyUnlock logs gate inputs', /\\[derpy-migrate\\]/.test(fileCode));
   ok('.derpy-claim CSS rule present', /\\.derpy-claim\\s*\\{/.test(cssCode));
   (() => {
@@ -2263,6 +2270,70 @@ ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHA
       if (_lsWon === null) localStorage.removeItem('tyi-won'); else localStorage.setItem('tyi-won', _lsWon);
       if (_lsDerpy === null) localStorage.removeItem('tyi-derpy-unlocked'); else localStorage.setItem('tyi-derpy-unlocked', _lsDerpy);
       if (_lsRegions === null) localStorage.removeItem('tyi-regions'); else localStorage.setItem('tyi-regions', _lsRegions);
+    } catch {}
+  })();
+
+  // v1.7.18-beta (Mira review): claimDerpyAward eligibility + idempotence, stateful
+  (() => {
+    const _won = state.won, _tagged = state.tagged, _derpy = state.derpyUnlocked,
+          _pending = state.pendingWin, _msgs = state.messages, _unread = state.unread;
+    const _lsWon = localStorage.getItem('tyi-won'), _lsDerpy = localStorage.getItem('tyi-derpy-unlocked');
+    const derpyMarker = 'derpy mode toggle in your collection book';
+    const countDerpyThreads = () => state.messages.filter(t =>
+      (t.msgs || []).some(m => (m.text || '').includes(derpyMarker))).length;
+    const validTagged = n => Object.fromEntries(SHARKS.slice(0, n).map(s => [s.id, { researchId: 'T' }]));
+    const fullTagged = () => validTagged(SHARKS.length);
+    const reset = () => {
+      state.messages = []; state.unread = 0;
+      state.won = false; state.derpyUnlocked = false; state.pendingWin = false;
+      try { localStorage.removeItem('tyi-won'); localStorage.removeItem('tyi-derpy-unlocked'); } catch {}
+    };
+
+    // hasFullRoster: 49/50 valid -> false
+    reset(); state.tagged = validTagged(49);
+    ok('hasFullRoster false at 49/50', hasFullRoster() === false);
+
+    // hasFullRoster: 49 valid + 1 stale key -> false (stale keys never pass)
+    reset(); state.tagged = Object.assign(validTagged(49), { 'stale-shark-xyz': { researchId: 'T' } });
+    ok('hasFullRoster false with stale key padding the count', hasFullRoster() === false);
+    ok('claimDerpyAward refuses stale-key roster', claimDerpyAward() === false && state.derpyUnlocked === false);
+
+    // 49/50: claim refuses — no award, no thread, no persisted keys
+    reset(); state.tagged = validTagged(49);
+    ok('claimDerpyAward returns false at 49/50', claimDerpyAward() === false);
+    ok('49/50 gets no award, no thread, no keys',
+      state.derpyUnlocked === false && countDerpyThreads() === 0 &&
+      localStorage.getItem('tyi-derpy-unlocked') === null && localStorage.getItem('tyi-won') === null);
+
+    // 50/50 valid, state.won=false -> claim grants, persists, exactly one thread
+    reset(); state.tagged = fullTagged();
+    ok('claim button gate true for 50/50 winner missing award',
+      hasFullRoster() && !state.derpyUnlocked && !state.pendingWin);
+    const before = countDerpyThreads();
+    ok('claimDerpyAward grants to genuine 50/50 winner', claimDerpyAward() === true);
+    ok('claim persists win + derpy keys',
+      state.won === true && localStorage.getItem('tyi-won') === '1' &&
+      state.derpyUnlocked === true && localStorage.getItem('tyi-derpy-unlocked') === '1');
+    ok('claim pushes exactly one Sarah thread', countDerpyThreads() === before + 1);
+
+    // repeat attempt -> no duplicate
+    ok('repeat claim is a no-op', claimDerpyAward() === false && countDerpyThreads() === before + 1);
+
+    // already unlocked -> claim button gate closed
+    ok('no claim button when already unlocked', !(hasFullRoster() && !state.derpyUnlocked && !state.pendingWin));
+
+    // pendingWin edge: 50/50 mid-trip -> no button, claim refused (ceremony owns the gift)
+    reset(); state.tagged = fullTagged(); state.pendingWin = true;
+    ok('no claim button while win ceremony pending', !(hasFullRoster() && !state.derpyUnlocked && !state.pendingWin));
+    ok('claimDerpyAward refuses while win ceremony pending',
+      claimDerpyAward() === false && state.derpyUnlocked === false && countDerpyThreads() === 0);
+
+    // restore
+    state.won = _won; state.tagged = _tagged; state.derpyUnlocked = _derpy; state.pendingWin = _pending;
+    state.messages = _msgs; state.unread = _unread;
+    try {
+      if (_lsWon === null) localStorage.removeItem('tyi-won'); else localStorage.setItem('tyi-won', _lsWon);
+      if (_lsDerpy === null) localStorage.removeItem('tyi-derpy-unlocked'); else localStorage.setItem('tyi-derpy-unlocked', _lsDerpy);
     } catch {}
   })();
 
