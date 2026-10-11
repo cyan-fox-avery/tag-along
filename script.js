@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.5-beta";
+const VERSION = "v1.7.12-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.12-beta": [
+"🏷️ <strong>IUCN badges no longer clip.</strong> The LC / NT / VU / EN / CR badges in the field-guide legend and on shark cards had their text cut off top and bottom on iPad — fixed with proper line-height and padding.",
+  ],
   "v1.7.5-beta": [
 "🟡 <strong>Matching release button.</strong> 'Release & return to ship' is now flat yellow like the other release buttons.",
   ],
