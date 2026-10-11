@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.5-beta";
+const VERSION = "v1.7.10-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.10-beta": [
+"🏆 <strong>Bruce achievement, right away.</strong> 'You Named Him WHAT?' now unlocks the moment you name a shark Bruce — no more waiting for the slow chain to finish.",
+  ],
   "v1.7.5-beta": [
 "🟡 <strong>Matching release button.</strong> 'Release & return to ship' is now flat yellow like the other release buttons.",
   ],
@@ -4130,7 +4133,7 @@ function advanceBruceChain() {
       localStorage.removeItem("tyi-bruce");
     } catch {}
     state.bruceEgg = null;
-    checkAchievements(); // Bruce achievement check uses st.bruceChainComplete
+    checkAchievements(); // v1.7.10-beta: Bruce achievement fires when the chain starts
     return;
   }
 
