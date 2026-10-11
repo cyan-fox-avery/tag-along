@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.17-beta";
+const VERSION = "v1.7.18-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.18-beta": [
+"🎁 <strong>Derpy claim button fixed.</strong> The manual derpy award claim button now checks your tagged shark count directly instead of the win flag — if you've tagged all 50 sharks, the button appears in your Collection trophy shelf.",
+  ],
   "v1.7.17-beta": [
 "🎁 <strong>Claim your derpy award.</strong> If you've won but the derpy unlock never fired, a claim button now appears in your Collection trophy shelf — one tap grants the award, Sarah's thread, and the derpy mode toggle.",
   ],
@@ -4281,8 +4284,10 @@ function renderCollection() {
   }
 
   /* v1.7.17-beta: manual derpy claim fallback — if the player has won but
-     the automatic unlock never fired, show a one-time claim button. */
-  if (state.won && !state.derpyUnlocked) {
+     the automatic unlock never fired, show a one-time claim button.
+     v1.7.18-beta: check the tagged count directly instead of state.won,
+     since the win flag can be reset by migrations. */
+  if (Object.keys(state.tagged).length >= SHARKS.length && !state.derpyUnlocked) {
     const cb = document.createElement("button");
     cb.type = "button";
     cb.className = "derpy-claim";
@@ -4810,7 +4815,11 @@ function migrateDerpyUnlock() {
    callable from the Collection trophy shelf fallback button. */
 function claimDerpyAward() {
   try {
+    /* v1.7.18-beta: claiming with a full roster also restores the win flag,
+       since the player is a genuine 50/50 winner. */
+    state.won = true;
     state.derpyUnlocked = true;
+    localStorage.setItem("tyi-won", "1");
     localStorage.setItem("tyi-derpy-unlocked", "1");
     const derpyMarker = "derpy mode toggle in your collection book";
     const alreadyShown = state.messages.some(thread =>
