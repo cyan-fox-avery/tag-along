@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.4-beta', VERSION === 'v1.6.4-beta');
+  ok('version v1.7.5-beta', VERSION === 'v1.7.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1926,6 +1926,7 @@ code += `
   // v1.5.8: safe batch — seven low-risk items
   ok('still-to-discover heading removed', !archiveUiCode.includes('archive-still-locked-head') && !cssCode.includes('archive-still-locked-head'));
   ok('release buttons reordered', htmlCode.indexOf('id="tagAlongBtn"') < htmlCode.indexOf('id="releaseShipBtn"'));
+  ok('v1.7.5: return-to-ship button is flat yellow', /id="releaseShipBtn"[^>]*class="primary-button"/.test(htmlCode));
   ok('release button matches tag-along gradient', cssCode.includes('#releaseBtn') && cssCode.includes('linear-gradient(180deg, #ffd166 0%, #f0b429 100%)'));
   ok('follow button before watch button', code.includes('insertBefore(followBtn, watchBtn)'));
   ok('reunion uses research ID for unnamed', code.includes('rec.researchId || species.name'));
@@ -2020,6 +2021,7 @@ code += `
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
   ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
+  ok('WHATS_NEW has v1.7.5-beta', Array.isArray(WHATS_NEW['v1.7.5-beta']) && WHATS_NEW['v1.7.5-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
