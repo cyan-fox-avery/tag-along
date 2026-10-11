@@ -5,8 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.10-beta";
-
+const VERSION = "v1.7.11-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -21,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.11-beta": [
+"🦈 <strong>Derpy award for every winner.</strong> If you already won before the derpy sharks existed, the award is now granted retroactively — check your collection book for the derpy mode toggle.",
+  ],
   "v1.7.10-beta": [
 "🏆 <strong>Bruce achievement, right away.</strong> 'You Named Him WHAT?' now unlocks the moment you name a shark Bruce — no more waiting for the slow chain to finish.",
   ],
@@ -4700,6 +4702,27 @@ function migrateArchiveUnlock() {
     }
   } catch {}
 }
+/* v1.7.11-beta: derpy award retroactive unlock — pre-v1.7.0 winners (or any
+   save whose win didn't trigger the derpy unlock) never run doWin() again,
+   so they boot with won=true but no derpy award. Backfill the unlock they
+   already earned, and deliver Sarah's derpy thread to the Phone if she
+   hasn't sent it yet. */
+function migrateDerpyUnlock() {
+  try {
+    if (state.won && !state.derpyUnlocked) {
+      state.derpyUnlocked = true;
+      localStorage.setItem("tyi-derpy-unlocked", "1");
+      /* Only push Sarah's thread if it isn't already in the Phone —
+         avoids double-sending for mid-ceremony saves. */
+      const derpyMarker = "derpy mode toggle in your collection book";
+      const alreadyShown = state.messages.some(thread =>
+        (thread.msgs || []).some(m => (m.text || "").includes(derpyMarker)));
+      if (!alreadyShown) {
+        pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
+      }
+    }
+  } catch {}
+}
 /* v0.22.0 Mira review: capture pre-migration storage state for What's New.
    Migrations write keys (e.g. tyi-collection) even for new players, so we
    snapshot before they run. */
@@ -4719,6 +4742,7 @@ migrateIds();
 migrateTracks();
 migrateWinV07();
 migrateArchiveUnlock();
+migrateDerpyUnlock();
 fillRegions();
 fillSelect($("depthSelect"), DEPTHS);
 fillSelect($("baitSelect"), BAITS);
