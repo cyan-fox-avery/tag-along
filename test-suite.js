@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.13-beta', VERSION === 'v1.7.13-beta');
+  ok('version v1.7.14-beta', VERSION === 'v1.7.14-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2384,6 +2384,59 @@ ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHA
     METHODS.aggregation.opts.boat === "Boat survey of the bloom");
   ok('v1.7.6 WHATS_NEW entry present',
     Array.isArray(WHATS_NEW['v1.7.6-beta']) && WHATS_NEW['v1.7.6-beta'].length > 0);
+
+  /* v1.7.14-beta: UI polish bundle */
+  ok('v1.7.14 version bump', VERSION === 'v1.7.14-beta');
+  ok('v1.7.14 WHATS_NEW entry present',
+    Array.isArray(WHATS_NEW['v1.7.14-beta']) && WHATS_NEW['v1.7.14-beta'].length > 0);
+  ok('encounter badge: new species badge code present',
+    fileCode.includes('encounter-badge') && fileCode.includes('enc-new'));
+  ok('encounter badge: reunion badge code present',
+    fileCode.includes('enc-reunion'));
+  ok('encounter badge: other-individual badge code present',
+    fileCode.includes('enc-other'));
+  ok('encounter badge CSS present',
+    cssCode.includes('.encounter-badge'));
+  ok('horizontal desktop Collection cards CSS present',
+    cssCode.includes('.grid-cell { display: flex'));
+  ok('checklist bubbles fill green CSS present',
+    cssCode.includes('.tag-check.is-done'));
+  ok('Research accordion code present',
+    fileCode.includes('opening one entry closes the others'));
+  ok('achievement hints two-line CSS present',
+    cssCode.includes('.ach-hint'));
+  ok('IUCN badge/pin spacing CSS present',
+    cssCode.includes('more space between IUCN badge and pin'));
+  ok('full scientific names on expanded cards CSS present',
+    cssCode.includes('.detail-scientific'));
+  /* v1.7.14-beta Mira re-review fixes */
+  ok('encounter badge: .shark-reveal is an explicit centered vertical stack',
+    cssCode.includes('.shark-reveal {') &&
+    cssCode.includes('flex-direction: column') &&
+    cssCode.includes('align-items: center'));
+  ok('encounter badge: reveal art height constrained so art+badge fit the scene',
+    cssCode.includes('.shark-reveal img') && cssCode.includes('max-height: 108px'));
+  ok('encounter badge: block layout with wrapping for long nicknames',
+    cssCode.includes('display: block') &&
+    cssCode.includes('overflow-wrap: anywhere'));
+  ok('encounter badge: included in prefers-reduced-motion override',
+    cssCode.includes('.tap-hint, .encounter-badge { transition: none; animation: none; }'));
+  ok('encounter badge: reunion nickname escaped exactly once at insertion',
+    fileCode.indexOf('\${esc(rname)}') !== -1 &&
+    (function(){
+      var parts = fileCode.split('badgeClass = "enc-reunion"');
+      var badgeBlock = parts[0].split('} else if (isReunion) {').pop();
+      return badgeBlock.indexOf('esc(rec.name)') === -1;
+    })());
+  ok('encounter badge: tricky nickname (&, <, quotes) renders safely, not double-escaped',
+    (function(){
+      var rec = { name: 'Tom & "Jerry" <3' };
+      var rname = '\u201c' + rec.name + '\u201d';
+      var badgeText = 'YOUR SHARK ' + esc(rname);
+      return badgeText.indexOf('&amp;amp;') === -1 &&
+             badgeText.indexOf('&lt;') !== -1 &&
+             badgeText.indexOf('Tom &amp; &quot;Jerry&quot; &lt;3') !== -1;
+    })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
