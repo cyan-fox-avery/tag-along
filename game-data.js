@@ -25,9 +25,9 @@ const REGIONS = {
   "open-atlantic":{ name: "Open Atlantic",        note: "Shearwaters wheel above the swells." },
   "cornwall":     { name: "Cornwall, UK",         note: "Gannets dive-bomb the water around the boat." },
   "papua-new-guinea": { name: "Papua New Guinea", note: "The reef flat stretches out, impossibly clear and shallow." },
-  /* These unlock once the first six sharks are tagged — new waters earned,
-     not given. v0.7.0: real species live here now, so they are selectable,
-     not teasers. */
+  /* v1.7.9-beta: these unlock at 10 tagged sharks — new waters earned,
+     not given (was: the six original species). Real species live here now,
+     so they are selectable, not teasers. */
   "galapagos":    { name: "Galápagos Islands",    note: "Marine iguanas slip into the water nearby.", locked: true },
   "south-africa": { name: "South Africa",         note: "Cape fur seals bark on the rocks above.", locked: true },
   /* v0.21.0: three new regions for the 18-shark wave. All locked — new waters
@@ -241,18 +241,4 @@ const WHITE_WHALE_THREAD = [
   { who: "them", text: "A BIG deal?? They didn't even KNOW this shark existed until 1976! A Navy anchor snagged one off Hawaii and scientists were like '...what IS that.' Only around 300 have EVER been documented. THREE HUNDRED. Total. Ever." },
   { who: "me", text: "That puts it in perspective." },
   { who: "them", text: "It lives in the twilight zone and just... opens this ENORMOUS mouth and filters krill. Like a whale shark's mysterious goth cousin. And now there's one out there with YOUR tag on it. I'm framing this conversation. 🩵" }
-];
-
-/* v1.7.0-beta: derpy award — Sarah reacts to the win-unlocked derpy art.
-   She certified the aesthetic back when these were the placeholder sharks. */
-const DERPY_AWARD_THREAD = [
-  { who: "them", text: "Okay so. I have a confession." },
-  { who: "me", text: "This should be good." },
-  { who: "them", text: "Remember what the sharks looked like when you started? Before the institute sent over the real illustrations?" },
-  { who: "me", text: "The little derpy ones? With the googly eyes?" },
-  { who: "them", text: "THEY WERE PERFECT. I loved them SO much. The thresher looked perpetually nervous and I would die for him." },
-  { who: "me", text: "Sarah. You certified the aesthetic." },
-  { who: "them", text: "I DID and I would do it again!! Anyway — I saved every single one. They are YOURS now. There is a derpy mode toggle in your collection book whenever you want to see them." },
-  { who: "me", text: "This is the best award." },
-  { who: "them", text: "I know. I am very good at gifts. \uD83E\uDD88" }
 ];
