@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.13-beta', VERSION === 'v1.7.13-beta');
+  ok('version v1.7.15-beta', VERSION === 'v1.7.15-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -1786,8 +1786,12 @@ code += `
   // v1.6.0: full scientific name in expanded Collection/Archive cards
   ok('detail-scientific class styled', /\\.detail-scientific\\s*\\{[^}]*font-size:\\s*15px/.test(cssCode));
   ok('collection detail shows scientific name', code.indexOf('detail-scientific') !== -1);
-  // v1.6.0: achievement hints get two lines
-  ok('achievement hints allow two lines', /\\.ach-hint[^}]*-webkit-line-clamp:\\s*2/.test(cssCode));
+  // v1.7.15-beta: achievement hints wrap fully — no line-clamp truncation
+  ok('achievement hint line-clamp removed', !/-webkit-line-clamp/.test(cssCode));
+  ok('achievement hint wraps normally', /\\.guide-row-head\\s+\\.latin\\.ach-hint[^}]*white-space:\\s*normal/.test(cssCode));
+  ok('achievement hint overflow visible', /\\.guide-row-head\\s+\\.latin\\.ach-hint[^}]*overflow:\\s*visible/.test(cssCode));
+  ok('VERSION is v1.7.15-beta', /const VERSION = "v1.7.15-beta"/.test(code));
+  ok('WHATS_NEW has v1.7.15-beta', Array.isArray(WHATS_NEW['v1.7.15-beta']) && WHATS_NEW['v1.7.15-beta'].length === 1);
   ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
   // v1.5.29: blue through ~90%, black only at the very bottom

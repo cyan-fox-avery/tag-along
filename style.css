@@ -340,13 +340,14 @@ body { overflow-x: clip; }
 /* v1.6.0-beta: full scientific name in expanded Collection/Archive cards —
    larger and more prominent than the inline latin. */
 .detail-scientific { font-size: 15px; margin: 4px 0 10px; }
-/* v1.6.0-beta: achievement hints get two lines instead of truncating with "...". */
+/* v1.7.15-beta: achievement hints wrap fully. Two lines still truncated
+   hints like "The collection book is officially…" into unreadability —
+   now the hint takes as many lines as it needs, on mobile and iPad. */
 .guide-row-head .latin.ach-hint {
   white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
+  text-overflow: clip;
 }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
