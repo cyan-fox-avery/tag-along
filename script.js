@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.18-beta";
+const VERSION = "v1.7.19-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,11 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.19-beta": [
+"🏅 <strong>Achievement cards, tidied.</strong> The achievement name now sits above its description instead of beside it — roomier cards, easier scanning.",
+"🏆 <strong>Trophy moved.</strong> Your Master Shark Tagger certificate button now lives in the Achievements tab, where it belongs. The derpy mode toggle stays in your Collection.",
+"🦈 <strong>Bukangi.</strong> Encounter a dusky shark and Sarah will tell you about the most famous shark in the world right now — a real dusky living in a Busan canal.",
+  ],
   "v1.7.18-beta": [
 "🎁 <strong>Derpy claim button hardened.</strong> The manual derpy award claim button now validates every shark in the roster (not just the count, so stale entries can't pass) and stays hidden while a win ceremony is pending — the ceremony presents Sarah's gift itself. The claim is one-time and can never double-send her thread.",
   ],
@@ -1127,6 +1132,8 @@ const state = {
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
+  /* v1.7.19-beta: Bukangi easter egg — one-time flag for the first dusky encounter. */
+  bukangiEgg: (() => { try { return localStorage.getItem("tyi-bukangi") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
   deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
   /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
@@ -2161,6 +2168,18 @@ function doEncounter(species, plan) {
           `<div class="encounter-badge ${badgeClass}">${badgeText}</div>` +
           `</div>`;
         logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
+        /* v1.7.19-beta: Bukangi easter egg — first dusky encounter, one-time.
+           Defensive guards like the naming eggs: this must never crash the
+           encounter, even if thread data or pushThread is unavailable. */
+        try {
+          if (species.id === "dusky" && !state.bukangiEgg &&
+              typeof pushThread === "function" &&
+              typeof BUKANGI_THREAD !== "undefined" && Array.isArray(BUKANGI_THREAD)) {
+            state.bukangiEgg = true;
+            try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
+            pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
+          }
+        } catch {}
         showEncounterActions();
       };
       if (reducedMotion) {
@@ -3211,16 +3230,39 @@ function renderAchievements() {
   const unlockedCount = visible.filter(a => state.achievements[a.id]).length;
   const head = $("achieveHead");
   if (head) head.innerHTML = `<h2>Achievements</h2><p>${unlockedCount} of ${visible.length} unlocked</p>`;
+  /* v1.7.19-beta: the Master Shark Tagger trophy lives here now (moved from
+     the Collection trophy shelf). The derpy toggle stays in Collection. */
+  const trophyShelf = $("achieveTrophyShelf");
+  if (trophyShelf) {
+    trophyShelf.innerHTML = "";
+    if (state.won) {
+      const t = document.createElement("button");
+      t.type = "button";
+      t.className = "trophy-shelf";
+      t.setAttribute("aria-label", "Open your Master Shark Tagger certificate");
+      t.innerHTML = `
+        <div class="cert-trophy">🏆</div>
+        <h3>Master Shark Tagger</h3>
+        <p class="latin">Official certificate — tap to view</p>`;
+      t.addEventListener("click", openCertificate);
+      trophyShelf.appendChild(t);
+    }
+  }
   list.innerHTML = "";
   visible.forEach(a => {
     const unlocked = !!state.achievements[a.id];
     const row = document.createElement("div");
     row.className = "guide-row" + (unlocked ? "" : " locked");
+    /* v1.7.19-beta: achievement cards stack — icon beside a vertical
+       name/hint stack instead of name and hint side-by-side. Saves
+       horizontal room and scans cleaner. */
     row.innerHTML = `
-      <div class="guide-row-head" style="cursor:default">
-        <span style="font-size:22px">${unlocked ? a.icon : "🔒"}</span>
-        <span class="guide-row-name">${unlocked ? esc(a.name) : "???"}</span>
-        <span class="latin ach-hint">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
+      <div class="guide-row-head ach-stack" style="cursor:default">
+        <span class="ach-icon" style="font-size:22px">${unlocked ? a.icon : "🔒"}</span>
+        <span class="ach-texts">
+          <span class="guide-row-name">${unlocked ? esc(a.name) : "???"}</span>
+          <span class="latin ach-hint">${unlocked ? esc(a.description) : esc(a.breadcrumb)}</span>
+        </span>
       </div>`;
     list.appendChild(row);
   });
@@ -4268,20 +4310,8 @@ function renderCollection() {
   const ccHead = $("collectionCountHead");
   if (ccHead) ccHead.innerHTML = `<strong>${ids.length}</strong> of <strong>${SHARKS.length}</strong> species tagged`;
 
-  /* v0.6.0: the trophy sits ABOVE the grid on its own distinguished shelf —
-     never as a grid slot that reads like "one more shark to catch". */
-  if (state.won) {
-    const t = document.createElement("button");
-    t.type = "button";
-    t.className = "trophy-shelf";
-    t.setAttribute("aria-label", "Open your Master Shark Tagger certificate");
-    t.innerHTML = `
-      <div class="cert-trophy">🏆</div>
-      <h3>Master Shark Tagger</h3>
-      <p class="latin">Official certificate — tap to view</p>`;
-    t.addEventListener("click", openCertificate);
-    shelf.appendChild(t);
-  }
+  /* v1.7.19-beta: the Master Shark Tagger trophy moved to the Achievements
+     tab (renderAchievements) — the derpy toggle/claim stay on this shelf. */
 
   /* v1.7.17-beta: manual derpy claim fallback — if the player has won but
      the automatic unlock never fired, show a one-time claim button.
@@ -4506,7 +4536,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {

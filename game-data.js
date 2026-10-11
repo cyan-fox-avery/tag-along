@@ -147,6 +147,17 @@ const NICOLE_THREAD = [
   { who: "me",   text: "But it wasn't?" },
   { who: "them", text: "SHE CAME BACK. August 2004, back in Gansbaai. Over 20,000 km round trip. They published it in Science — it proved white sharks cross entire ocean basins. Before Nicole, nobody knew they did that. Your Nicole's got explorer genes. 🗺️🦈" }
 ];
+/* v1.7.19-beta: Bukangi easter egg — DRAFT dialogue, placeholder for Avery's
+   revision. Trigger: first dusky shark encounter (maybeEncounterEgg in
+   script.js). Facts (Oct 2026): Busan North Port canal, resident since
+   Sept 18 2026, 1.3M+ visitors, two failed guide-back-to-sea attempts,
+   named honorary ambassador, ~3m female, Endangered species. */
+const BUKANGI_THREAD = [
+  { who: "them", text: "WAIT wait wait. A DUSKY?! \uD83E\uDD88" },
+  { who: "them", text: "Do you know about Bukangi?? There's a dusky in Busan that's been living in a canal since September and over a MILLION people have gone to see her" },
+  { who: "them", text: "They tried to guide her back to sea TWICE and she just... stayed. They made her an honorary ambassador \uD83D\uDE2D" },
+  { who: "them", text: "She's literally the most famous shark in the world right now and she's just vibing in a waterway. Icon behavior honestly." }
+];
 
 /* v0.23.0: BRUCE easter egg chain — LOCKED DESIGN (2026-10-06).
    Trigger: player names any tagged shark "bruce" (any caps; maybeNameEgg in

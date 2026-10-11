@@ -349,6 +349,15 @@ body { overflow-x: clip; }
   overflow: visible;
   text-overflow: clip;
 }
+/* v1.7.19-beta: achievement cards stack — icon beside a vertical name/hint
+   stack instead of name and hint side-by-side. Saves horizontal room. */
+.guide-row-head.ach-stack { align-items: flex-start; }
+.guide-row-head .ach-icon { flex: none; line-height: 1.25; }
+.guide-row-head .ach-texts {
+  display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 3px;
+}
+.guide-row-head .ach-texts .guide-row-name { flex: none; }
+.guide-row-head .ach-texts .ach-hint { flex: none; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 3px 10px; margin-bottom: 8px;

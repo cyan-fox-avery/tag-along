@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.18-beta', VERSION === 'v1.7.18-beta');
+  ok('version v1.7.19-beta', VERSION === 'v1.7.19-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2585,6 +2585,47 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
              badgeText.indexOf('&lt;') !== -1 &&
              badgeText.indexOf('Tom &amp; &quot;Jerry&quot; &lt;3') !== -1;
     })());
+
+  /* v1.7.19-beta: achievement cards stack name above hint */
+  ok('v1.7.19 WHATS_NEW entry present',
+    Array.isArray(WHATS_NEW['v1.7.19-beta']) && WHATS_NEW['v1.7.19-beta'].length === 3);
+  ok('v1.7.19 achievement cards use stacked markup',
+    fileCode.includes('guide-row-head ach-stack') &&
+    fileCode.includes('class="ach-texts"'));
+  ok('v1.7.19 achievement stack CSS present',
+    cssCode.includes('.guide-row-head.ach-stack') &&
+    cssCode.includes('.guide-row-head .ach-texts') &&
+    cssCode.includes('flex-direction: column'));
+  /* v1.7.19-beta: trophy moved to Achievements, derpy stays in Collection */
+  ok('v1.7.19 achieveTrophyShelf div in HTML',
+    htmlCode.includes('id="achieveTrophyShelf"'));
+  ok('v1.7.19 trophy renders in Achievements',
+    fileCode.includes('achieveTrophyShelf') &&
+    fileCode.includes('v1.7.19-beta: the Master Shark Tagger trophy lives here now'));
+  ok('v1.7.19 trophy moved out of Collection render',
+    fileCode.indexOf('v1.7.19-beta: the Master Shark Tagger trophy moved to the Achievements') !== -1 &&
+    fileCode.indexOf('trophy-shelf') > fileCode.indexOf('function renderAchievements()'));
+  ok('v1.7.19 derpy toggle still in Collection',
+    fileCode.includes('derpy-toggle') &&
+    fileCode.indexOf('derpy-toggle') > fileCode.indexOf('function renderCollection()'));
+  /* v1.7.19-beta: Bukangi easter egg */
+  ok('v1.7.19 BUKANGI_THREAD defined with 4 draft messages',
+    typeof BUKANGI_THREAD !== 'undefined' && Array.isArray(BUKANGI_THREAD) &&
+    BUKANGI_THREAD.length === 4 &&
+    BUKANGI_THREAD.every(function(m){ return m.who === 'them'; }));
+  ok('v1.7.19 Bukangi mentions Busan canal facts',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('Busan') !== -1; }) &&
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('ambassador') !== -1; }));
+  ok('v1.7.19 bukangiEgg state flag with tyi-bukangi persistence',
+    fileCode.includes('bukangiEgg') &&
+    fileCode.includes('tyi-bukangi'));
+  ok('v1.7.19 tyi-bukangi in RESET_KEYS',
+    fileCode.includes('"tyi-bukangi"]'));
+  ok('v1.7.19 dusky encounter hook present',
+    fileCode.includes('species.id === "dusky"') &&
+    fileCode.includes('BUKANGI_THREAD'));
+  ok('v1.7.19 dusky species exists in roster',
+    SHARKS.some(function(s){ return s.id === 'dusky'; }));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
