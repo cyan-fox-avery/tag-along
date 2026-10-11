@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.4-beta', VERSION === 'v1.6.4-beta');
+  ok('version v1.7.2-beta', VERSION === 'v1.7.2-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2109,6 +2109,13 @@ code += `
     /* newest: later-inserted (nurse) first; oldest: earlier-inserted (zebra) first */
     return newestFirst.join(',') === 'nurse,zebra' && oldestFirst.join(',') === 'zebra,nurse';
   })());
+
+  // v1.7.2-beta: close button floats in text flow, never covers description
+  ok('WHATS_NEW has v1.7.2-beta', Array.isArray(WHATS_NEW['v1.7.2-beta']) && WHATS_NEW['v1.7.2-beta'].length > 0);
+  ok('guide-close floats right (not absolute)', /\\.guide-close\\s*\\{[^}]*float:\\s*right/.test(cssCode));
+  ok('guide-close has no absolute positioning', !/\\.guide-close\\s*\\{[^}]*position:\\s*absolute/.test(cssCode));
+  ok('guide-close keeps 44px touch target', /\\.guide-close\\s*\\{[^}]*width:\\s*44px/.test(cssCode) && /\\.guide-close\\s*\\{[^}]*height:\\s*44px/.test(cssCode));
+  ok('guide-close still in body template', /class=\\"guide-close\\"/.test(code));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
