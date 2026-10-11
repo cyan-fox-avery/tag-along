@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.14-beta";
+const VERSION = "v1.7.15-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,11 +20,14 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.15-beta": [
+"📜 <strong>Achievement hints no longer truncate.</strong> Full hint text now wraps to as many lines as it needs — no more unreadable \"…\" cutoffs in the Achievements tab.",
+  ],
   "v1.7.14-beta": [
 "🔍 <strong>Encounter status you can't miss.</strong> When a shark appears, a prominent badge now shows right under the illustration: NEW SPECIES, YOUR SHARK, or ANOTHER individual — no more squinting at the log line.",
-"✨ <strong>UI polish bundle.</strong> Verified and kept: horizontal Collection cards on desktop, green checklist bubbles, one-at-a-time Research accordion, two-line achievement hints, IUCN badge spacing, and full scientific names on expanded cards.",
+"✨ <strong>UI polish bundle.</strong> Verified and kept: horizontal Collection cards on desktop, green checklist bubbles, one-at-a-time Research accordion, IUCN badge spacing, and full scientific names on expanded cards.",
   ],
-  "v1.7.13-beta": [
+"v1.7.13-beta": [
 "🎣 <strong>Bait and Switch retired.</strong> The seal-scent achievement is gone, and seal scent itself is properly retired — choosing the attract method now uses fish-oil chum directly, no sub-dropdown.",
   ],
   "v1.7.12-beta": [
