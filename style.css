@@ -678,6 +678,11 @@ select option:disabled { color: #7a8a9e; }
 .shark-silhouette { position: relative; cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
+/* v1.6.6-beta: the mystery shadow uses the shark's actual illustration with a
+   dark overlay, so the silhouette always matches the shark. The filter applies
+   to both the WebP image and any SVG fallback, so the mystery is never spoiled
+   by a failed image load. */
+.shark-shadow img, .shark-shadow svg { filter: brightness(0); }
 .tap-hint {
   position: absolute; bottom: 2px; left: 0; right: 0;
   text-align: center; font-size: 15px; font-weight: 600;
@@ -1518,27 +1523,3 @@ video.archive-media { max-height: 420px; }
   color: var(--gold, #ffd166); margin-bottom: 8px;
 }
 .tagalong-fact-card .fact-text { font-size: 15px; line-height: 1.6; }
-
-/* v1.7.0-beta: derpy mode toggle — win-unlocked completion award. */
-.derpy-toggle {
-  display: block;
-  margin: 8px auto;
-  padding: 10px 20px;
-  border-radius: 999px;
-  border: 2px solid #f0a030;
-  background: rgba(240, 160, 48, 0.15);
-  color: #f0c060;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.derpy-toggle.active {
-  background: #f0a030;
-  color: #1a1a2e;
-}
-.derpy-toggle:hover {
-  background: rgba(240, 160, 48, 0.3);
-}
-.derpy-toggle.active:hover {
-  background: #e09020;
-}

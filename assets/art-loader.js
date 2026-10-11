@@ -50,38 +50,22 @@ function BG_URL(name) {
   return `assets/backgrounds-webp/${name}.webp`;
 }
 
-/* Preloads both the illustration and silhouette for a species so the
-   tap-to-reveal encounter is instant. Safe to call repeatedly. */
+/* Preloads the illustration for a species so the tap-to-reveal encounter
+   is instant. v1.6.6-beta: silhouettes are no longer separate images — the
+   shadow uses the illustration with a dark CSS overlay. Safe to call
+   repeatedly. */
 const _preloaded = new Set();
 function preloadSharkArt(id) {
   if (_preloaded.has(id)) return;
   _preloaded.add(id);
-  for (const type of ["illustration", "silhouette"]) {
-    const img = new Image();
-    img.src = ART_URL(id, type);
-  }
-}
-
-/* v1.7.0-beta: derpy mode — the win-unlocked completion award. When the
-   player has finished the full roster, they can toggle the original derpy
-   SVG art. Checked via localStorage directly so this works regardless of
-   script.js load order. */
-function derpyModeOn() {
-  try { return localStorage.getItem("tyi-derpy-mode") === "1"; } catch { return false; }
-}
-function derpyUnlocked() {
-  try { return localStorage.getItem("tyi-derpy-unlocked") === "1"; } catch { return false; }
+  const img = new Image();
+  img.src = ART_URL(id, "illustration");
 }
 
 /* Returns an <img> HTML string for a shark's art, with onerror fallback
    to the inline SVG. The fallback keeps the game playable if an asset
    is missing or fails to load (offline, CDN hiccup, etc.). */
 function sharkArtImg(id, type, alt) {
-  /* v1.7.0-beta: derpy mode shows the original derpy SVG art instead of
-     the WebP illustration. Silhouettes stay mysterious. */
-  if (type === "illustration" && derpyModeOn() && typeof ART !== "undefined" && ART[id]) {
-    return ART[id];
-  }
   const url = ART_URL(id, type);
   const safeAlt = (alt || id).replace(/"/g, "&quot;");
   /* The onerror swaps in the SVG from ART[id] if it exists; otherwise

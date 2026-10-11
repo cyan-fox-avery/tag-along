@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.0-beta";
+const VERSION = "v1.6.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,9 +20,6 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
-  "v1.7.0-beta": [
-    "\uD83C\uDF89 <strong>Derpy sharks unlocked!</strong> Finish the full roster and Sarah gives you the original derpy art as a completion award — toggle derpy mode in your collection book anytime.",
-  ],
   "v0.22.0": [
     "📓 <strong>Logbook filters.</strong> Filter your expedition log by outcome, region, or species — compare attempts and spot the pattern.",
     "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
@@ -131,6 +128,18 @@ const WHATS_NEW = {
   ],
   "v1.5.30-beta": [
     "🌊 <strong>Seafloor stays on the bottom.</strong> The ocean-floor wave is now fixed to the bottom of the screen — it can't float up mid-page with blue below it anymore, no matter how far you scroll.",
+  ],
+  "v1.6.7-beta": [
+    "🔁 <strong>One resighting, one thread.</strong> Logging a re-sighting no longer fires two different Sarah dialogues — the first-ever reunion gets her special reaction, later ones get the routine check-in.",
+  ],
+  "v1.6.6-beta": [
+    "🌑 <strong>Shadows match their sharks.</strong> The mystery silhouette in dive encounters now uses the shark's actual illustration with a dark overlay — no more mismatched shadow shapes.",
+  ],
+  "v1.6.5-beta": [
+    "🍋 <strong>No double lemon freakout.</strong> Naming a lemon shark \"Sarah\" now fires only the special naming reaction — the routine lemon-tagged celebration no longer doubles up.",
+  ],
+  "v1.6.4-beta": [
+    "🔁 <strong>Re-sighting, logged once.</strong> The 'Log re-sighting' button is now guarded at the encounter level, not just the button — no more duplicate Sarah messages from double-taps.",
   ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
@@ -1004,11 +1013,7 @@ const state = {
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
-  deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
-  /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
-     persists the unlock; derpyMode is the player's toggle. */
-  derpyUnlocked: (() => { try { return localStorage.getItem("tyi-derpy-unlocked") === "1"; } catch { return false; } })(),
-  derpyMode: (() => { try { return localStorage.getItem("tyi-derpy-mode") === "1"; } catch { return false; } })()
+  deferredTagAlong: null // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -1936,8 +1941,17 @@ function pickEncounter(appeared, shown, plan) {
 /* One encounter: the shark appears, and the player chooses to WATCH
    (a sighting, logged) or TAG (if untagged — opportunistic tagging is
    always allowed). Either way the day goes on. */
+/* v1.6.4-beta: encounter-level one-shot for "Log re-sighting". The v1.5.25
+   guard lived on the button's dataset — if the encounter UI ever re-rendered
+   (or iOS retargeted the tap), a fresh button lost the guard and Sarah's
+   resighting thread could fire twice. This key lives outside the DOM. */
+let lastResightEncounterId = null;
 function doEncounter(species, plan) {
   return new Promise(resolve => {
+    /* v1.6.4-beta: unique ID for this encounter instance. The resight guard
+       keys on it, so exactly one re-sighting can be logged per encounter
+       no matter how many buttons get rendered. */
+    const encounterId = "enc-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 46656).toString(36);
     /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
        encountering the species rolls: is it YOUR shark (reunion) or a different
        untagged animal? Odds by ecology tier (game-balance, not science):
@@ -1953,16 +1967,18 @@ function doEncounter(species, plan) {
     }
     const rec = isReunion ? existingRec : null;
     const sharkEl = $("diveShark");
-    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the steel-blue
-       silhouette (mystery — the species is not named yet). Tapping
-       crossfades to the full-colour illustration and reveals the name.
-       The illustration is preloaded so the reveal is instant. */
+    /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the mystery
+       silhouette (the species is not named yet). Tapping crossfades
+       to the full-colour illustration and reveals the name.
+       The illustration is preloaded so the reveal is instant.
+       v1.6.6-beta: the shadow now uses the shark's actual illustration
+       with a dark CSS overlay, so the silhouette always matches the shark. */
     preloadSharkArt(species.id);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     sharkEl.innerHTML =
       `<div class="shark-silhouette" role="button" tabindex="0" ` +
       `aria-label="Something is out there — tap to reveal">` +
-      sharkArtImg(species.id, "silhouette", "Mysterious shark silhouette") +
+      `<div class="shark-shadow">` + sharkArtImg(species.id, "illustration", "Mysterious shark silhouette") + `</div>` +
       `<div class="tap-hint">👆 Tap to reveal</div></div>`;
     sharkEl.classList.remove("hidden");
     logLine(`🦈 <span class="found">Something's out there...</span>`, "found");
@@ -2094,7 +2110,9 @@ function doEncounter(species, plan) {
     } else if (isReunion) {
       /* v1.5.3-beta: REUNION — it's YOUR shark! Log re-sighting and Follow
          for this actual individual. One-time Sarah reaction per species. */
-      maybeReunionReaction(species, rec);
+      /* v1.6.7-beta: capture whether the reunion reaction fired — if it did,
+         the resight button must not push its own thread for this encounter. */
+      const reunionReactedThisEncounter = maybeReunionReaction(species, rec);
       /* v1.4.0-beta Mira review (blocker 2): follow option for already-tagged
          species — unlocks remaining secret facts without retagging. Ends the
          expedition (you're spending the rest of the trip following). */
@@ -2128,13 +2146,22 @@ function doEncounter(species, plan) {
       resightBtn.type = "button";
       resightBtn.textContent = "📝 Log re-sighting";
       resightBtn.addEventListener("click", () => {
-        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice. */
+        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice.
+           v1.6.4-beta: hardened — the dataset guard alone wasn't enough (Avery
+           still saw duplicates on iPad). The encounter-ID check lives outside
+           the DOM, so a re-rendered button can't lose it. */
+        if (lastResightEncounterId === encounterId) return;
+        lastResightEncounterId = encounterId;
         if (resightBtn.dataset.done) return;
         resightBtn.dataset.done = "true";
+        resightBtn.disabled = true;
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
-        pushThread(resightThread(species, rec));
+        /* v1.6.7-beta: one resighting = one Sarah thread. The first-ever reunion
+           already got the special "WAIT... again?!?" reaction above; only later
+           resightings use the routine resightThread. */
+        if (!reunionReactedThisEncounter) pushThread(resightThread(species, rec));
         state.resightedThisTrip = true;
         finish();
       });
@@ -2521,7 +2548,9 @@ function resightThread(species, rec) {
    Warm, not spammy — only fires once per species, ever. */
 function maybeReunionReaction(species, rec) {
   state.reunionReacted = state.reunionReacted || {};
-  if (state.reunionReacted[species.id]) return;
+  /* v1.6.7-beta: returns whether the thread fired, so the resight button
+     can skip its own thread when the reunion reaction already spoke. */
+  if (state.reunionReacted[species.id]) return false;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
@@ -2532,6 +2561,7 @@ function maybeReunionReaction(species, rec) {
     { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
   ];
   pushThread(thread);
+  return true;
 }
 
 /* ---------- Sarah remembers sharks by name ----------
@@ -3713,13 +3743,9 @@ function doWin() {
      beat 4. A player who closes mid-ceremony keeps the unlock — beat 4 is
      where they're TOLD about it. */
   state.archiveUnlocked = true;
-  /* v1.7.0-beta: the derpy award — completing the roster unlocks the
-     original derpy art as a toggleable mode. */
-  state.derpyUnlocked = true;
   try {
     localStorage.setItem("tyi-won", "1");
     localStorage.setItem("tyi-archive", "1");
-    localStorage.setItem("tyi-derpy-unlocked", "1");
   } catch {}
   renderCollection();
   renderResearch();
@@ -3765,7 +3791,7 @@ function winStep(n) {
     /* Beat 3: the map finale — "they're all still out there." */
     winMapFinale();
 
-  } else if (n === 4) {
+  } else {
     /* Beat 4: the acknowledgement. v0.24.0: the Archive is no longer a
        win-gated reward — it's been growing all game. This beat celebrates
        the completed collection instead. */
@@ -3778,30 +3804,7 @@ function winStep(n) {
         <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
         <p style="margin-top:8px">🖼️ Your Wild Archive is complete — every species you tagged, face to face with the real animal.</p>
       </div>
-      <button id="winNext" class="primary-button" type="button">Continue</button>`);
-    $("winNext").addEventListener("click", () => winStep(5));
-  } else if (n === 5) {
-    /* Beat 5 (v1.7.0-beta): the derpy award — Sarah gives you the original
-       derpy art as a completion reward. A toggle appears in the collection. */
-    pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
-    box(`
-      <div style="font-size:52px; text-align:center">\uD83E\uDD88</div>
-      <h2 style="text-align:center; margin:8px 0 2px">A gift from Sarah</h2>
-      <p class="latin" style="text-align:center">The original derpy sharks — unlocked!</p>
-      <div class="cert-body">
-        <p>Before the institute sent the real illustrations, these little derpy sharks were the whole game. Sarah saved every single one.</p>
-        <p style="margin-top:8px">\uD83C\uDFA8 <strong>Derpy mode</strong> is now available — toggle it in your collection book to see all ${SHARKS.length} sharks in their original derpy glory.</p>
-      </div>
-      <div class="phone-thread win-thread" style="margin-top:8px"></div>
-      <p class="latin" style="text-align:center; margin:0">Saved in \uD83D\uDCF1 Phone.</p>
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
-    const th5 = ov.querySelector(".win-thread");
-    DERPY_AWARD_THREAD.forEach(m => {
-      const b = document.createElement("div");
-      b.className = "bubble " + m.who;
-      b.textContent = m.text;
-      th5.appendChild(b);
-    });
     $("winNext").addEventListener("click", () => {
       ov.classList.add("hidden");
       /* v1.4.0-beta Mira review (win-path edge case): if the winning tag was
@@ -3918,6 +3921,13 @@ function maybeSarahEgg(speciesId, rec) {
       rec.lemonSarahEgg = true;
       store.save(state.tagged);
       pushThread(LEMON_SARAH_EGG_THREAD.map(m => ({ ...m })));
+      /* v1.6.5-beta: the egg IS the lemon celebration — drop the queued
+         routine/Big-Day lemon thread so Sarah doesn't freak out twice.
+         Other species' celebrations are untouched. */
+      if (state.pendingCelebrations && state.pendingCelebrations.length) {
+        state.pendingCelebrations = state.pendingCelebrations.filter(e => e.speciesId !== "lemon");
+        try { celebrationStore.save(state.pendingCelebrations); } catch {}
+      }
     } else {
       store.save(state.tagged);
       pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
@@ -4074,23 +4084,6 @@ function renderCollection() {
       <p class="latin">Official certificate — tap to view</p>`;
     t.addEventListener("click", openCertificate);
     shelf.appendChild(t);
-  }
-
-  /* v1.7.0-beta: derpy mode toggle — win-unlocked completion award. */
-  if (state.derpyUnlocked) {
-    const d = document.createElement("button");
-    d.type = "button";
-    d.className = "derpy-toggle" + (state.derpyMode ? " active" : "");
-    d.setAttribute("aria-pressed", state.derpyMode ? "true" : "false");
-    d.setAttribute("aria-label", "Toggle derpy shark art mode");
-    d.innerHTML = `\uD83E\uDD88 Derpy mode: ${state.derpyMode ? "ON" : "OFF"}`;
-    d.addEventListener("click", () => {
-      state.derpyMode = !state.derpyMode;
-      try { localStorage.setItem("tyi-derpy-mode", state.derpyMode ? "1" : "0"); } catch {}
-      renderCollection();
-      renderResearch();
-    });
-    shelf.appendChild(d);
   }
 
   if (!ids.length && !state.won) {
@@ -4278,7 +4271,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {

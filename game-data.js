@@ -242,17 +242,3 @@ const WHITE_WHALE_THREAD = [
   { who: "me", text: "That puts it in perspective." },
   { who: "them", text: "It lives in the twilight zone and just... opens this ENORMOUS mouth and filters krill. Like a whale shark's mysterious goth cousin. And now there's one out there with YOUR tag on it. I'm framing this conversation. 🩵" }
 ];
-
-/* v1.7.0-beta: derpy award — Sarah reacts to the win-unlocked derpy art.
-   She certified the aesthetic back when these were the placeholder sharks. */
-const DERPY_AWARD_THREAD = [
-  { who: "them", text: "Okay so. I have a confession." },
-  { who: "me", text: "This should be good." },
-  { who: "them", text: "Remember what the sharks looked like when you started? Before the institute sent over the real illustrations?" },
-  { who: "me", text: "The little derpy ones? With the googly eyes?" },
-  { who: "them", text: "THEY WERE PERFECT. I loved them SO much. The thresher looked perpetually nervous and I would die for him." },
-  { who: "me", text: "Sarah. You certified the aesthetic." },
-  { who: "them", text: "I DID and I would do it again!! Anyway — I saved every single one. They are YOURS now. There is a derpy mode toggle in your collection book whenever you want to see them." },
-  { who: "me", text: "This is the best award." },
-  { who: "them", text: "I know. I am very good at gifts. \uD83E\uDD88" }
-];
