@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.4-beta', VERSION === 'v1.6.4-beta');
+  ok('version v1.7.4-beta', VERSION === 'v1.7.4-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1442,7 +1442,8 @@ code += `
     const origTripLog = (typeof tripLog !== "undefined") ? tripLog : undefined;
     const origFollowedFlag = state.followedThisTrip;
     renderAll = () => {};
-    logLine = () => {};
+    const loggedLines = [];
+    logLine = (s) => loggedLines.push(String(s));
     factStore.save = () => {};
     state.tagged = { nurse: { name: "Nora", researchId: "NS-2026-001" } };
     state.unlockedFacts = {};
@@ -1465,6 +1466,9 @@ code += `
     // Double-resolution guard: the one-shot wrapper in the button handler
     // prevents this, but doFollowTagged itself must clear encounterDone
     ok("follow clears encounterDone", state.encounterDone === null);
+    // v1.7.4-beta: tag-along insight must not appear in the expedition log
+    ok("follow does not log insight to expedition log",
+      !loggedLines.some(l => /insight/i.test(l)));
     // Restore
     renderAll = origRender;
     logLine = origLog;
@@ -2020,6 +2024,7 @@ code += `
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
   ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
+  ok('WHATS_NEW has v1.7.4-beta', Array.isArray(WHATS_NEW['v1.7.4-beta']) && WHATS_NEW['v1.7.4-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
