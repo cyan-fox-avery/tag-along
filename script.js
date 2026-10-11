@@ -132,6 +132,12 @@ const WHATS_NEW = {
   "v1.6.6-beta": [
     "🌑 <strong>Shadows match their sharks.</strong> The mystery silhouette in dive encounters now uses the shark's actual illustration with a dark overlay — no more mismatched shadow shapes.",
   ],
+  "v1.6.5-beta": [
+    "🍋 <strong>No double lemon freakout.</strong> Naming a lemon shark \"Sarah\" now fires only the special naming reaction — the routine lemon-tagged celebration no longer doubles up.",
+  ],
+  "v1.6.4-beta": [
+    "🔁 <strong>Re-sighting, logged once.</strong> The 'Log re-sighting' button is now guarded at the encounter level, not just the button — no more duplicate Sarah messages from double-taps.",
+  ],
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
     "↕️ <strong>Archive sort.</strong> Sort the Archive by name (A–Z), date tagged (newest or oldest first), or IUCN conservation status.",
@@ -1932,8 +1938,17 @@ function pickEncounter(appeared, shown, plan) {
 /* One encounter: the shark appears, and the player chooses to WATCH
    (a sighting, logged) or TAG (if untagged — opportunistic tagging is
    always allowed). Either way the day goes on. */
+/* v1.6.4-beta: encounter-level one-shot for "Log re-sighting". The v1.5.25
+   guard lived on the button's dataset — if the encounter UI ever re-rendered
+   (or iOS retargeted the tap), a fresh button lost the guard and Sarah's
+   resighting thread could fire twice. This key lives outside the DOM. */
+let lastResightEncounterId = null;
 function doEncounter(species, plan) {
   return new Promise(resolve => {
+    /* v1.6.4-beta: unique ID for this encounter instance. The resight guard
+       keys on it, so exactly one re-sighting can be logged per encounter
+       no matter how many buttons get rendered. */
+    const encounterId = "enc-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 46656).toString(36);
     /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
        encountering the species rolls: is it YOUR shark (reunion) or a different
        untagged animal? Odds by ecology tier (game-balance, not science):
@@ -2126,9 +2141,15 @@ function doEncounter(species, plan) {
       resightBtn.type = "button";
       resightBtn.textContent = "📝 Log re-sighting";
       resightBtn.addEventListener("click", () => {
-        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice. */
+        /* v1.5.25-beta: one-shot — a double-tap must not log (and thread) twice.
+           v1.6.4-beta: hardened — the dataset guard alone wasn't enough (Avery
+           still saw duplicates on iPad). The encounter-ID check lives outside
+           the DOM, so a re-rendered button can't lose it. */
+        if (lastResightEncounterId === encounterId) return;
+        lastResightEncounterId = encounterId;
         if (resightBtn.dataset.done) return;
         resightBtn.dataset.done = "true";
+        resightBtn.disabled = true;
         const entry = recordResighting(species, plan);
         logTripEncounter(species, "resighted");
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
@@ -3889,6 +3910,13 @@ function maybeSarahEgg(speciesId, rec) {
       rec.lemonSarahEgg = true;
       store.save(state.tagged);
       pushThread(LEMON_SARAH_EGG_THREAD.map(m => ({ ...m })));
+      /* v1.6.5-beta: the egg IS the lemon celebration — drop the queued
+         routine/Big-Day lemon thread so Sarah doesn't freak out twice.
+         Other species' celebrations are untouched. */
+      if (state.pendingCelebrations && state.pendingCelebrations.length) {
+        state.pendingCelebrations = state.pendingCelebrations.filter(e => e.speciesId !== "lemon");
+        try { celebrationStore.save(state.pendingCelebrations); } catch {}
+      }
     } else {
       store.save(state.tagged);
       pushThread(SARAH_EGG_THREAD.map(m => ({ ...m })));
