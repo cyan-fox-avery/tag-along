@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.16-beta', VERSION === 'v1.7.16-beta');
+  ok('version v1.7.17-beta', VERSION === 'v1.7.17-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2200,9 +2200,17 @@ code += `
   ok('WHATS_NEW has v1.7.12-beta', Array.isArray(WHATS_NEW['v1.7.12-beta']) && WHATS_NEW['v1.7.12-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHATS_NEW['v1.7.13-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.16-beta', Array.isArray(WHATS_NEW['v1.7.16-beta']) && WHATS_NEW['v1.7.16-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHATS_NEW['v1.7.17-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
-  ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]*?Object\\.keys\\(state\\.tagged\\)\\.length >= SHARKS\\.length/.test(fileCode));
+  ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]*?(?:Object\\.keys\\(state\\.tagged\\)\\.length|taggedCount) >= SHARKS\\.length/.test(fileCode));
+  // v1.7.17-beta: manual derpy claim fallback + migration logging
+  ok('claimDerpyAward function exists', /function claimDerpyAward\\(\\)/.test(fileCode));
+  ok('claimDerpyAward grants unlock and persists', /function claimDerpyAward[\\s\\S]*?state\\.derpyUnlocked = true[\\s\\S]*?tyi-derpy-unlocked/.test(fileCode));
+  ok('claim button rendered for winners missing the unlock',
+    /state\\.won && !state\\.derpyUnlocked[\\s\\S]*?derpy-claim/.test(fileCode));
+  ok('migrateDerpyUnlock logs gate inputs', /\\[derpy-migrate\\]/.test(fileCode));
+  ok('.derpy-claim CSS rule present', /\\.derpy-claim\\s*\\{/.test(cssCode));
   (() => {
     const _won = state.won, _tagged = state.tagged, _derpy = state.derpyUnlocked,
           _msgs = state.messages, _unread = state.unread, _regions = state.regionsUnlocked;

@@ -1570,6 +1570,20 @@ video.archive-media { max-height: 420px; }
   font-weight: 600;
   cursor: pointer;
 }
+/* v1.7.17-beta: manual derpy claim fallback button — same trophy-shelf
+   styling family as the derpy toggle. */
+.derpy-claim {
+  display: block;
+  margin: 8px auto;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 2px solid #f0a030;
+  background: rgba(240, 160, 48, 0.35);
+  color: #ffe0a0;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
 .derpy-toggle.active {
   background: #f0a030;
   color: #1a1a2e;
