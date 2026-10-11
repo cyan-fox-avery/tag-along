@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.18-beta', VERSION === 'v1.7.18-beta');
+  ok('version v1.7.20-beta', VERSION === 'v1.7.20-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2075,7 +2075,7 @@ code += `
     // always matches the shark — no separate silhouette image.
     const src = doEncounter.toString();
     return src.includes('shark-shadow') &&
-           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') &&
+           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette", true)') &&
            !src.includes('sharkArtImg(species.id, "silhouette"');
   })());
   ok('shark-shadow CSS darkens illustration and SVG fallback', (() => {
@@ -2202,6 +2202,7 @@ ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHA
 ok('WHATS_NEW has v1.7.16-beta', Array.isArray(WHATS_NEW['v1.7.16-beta']) && WHATS_NEW['v1.7.16-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHATS_NEW['v1.7.17-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHATS_NEW['v1.7.18-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
   ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));
@@ -2585,6 +2586,35 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
              badgeText.indexOf('&lt;') !== -1 &&
              badgeText.indexOf('Tom &amp; &quot;Jerry&quot; &lt;3') !== -1;
     })());
+
+
+  // v1.7.20-beta: expedition mystery shadow opts out of derpy art
+  ok('sharkArtImg declares skipDerpy 4th param', sharkArtImg.length >= 4);
+  ok('shadow call site passes skipDerpy=true', fileCode.indexOf('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette", true)') !== -1);
+  ok('reveal call site keeps derpy behavior (no skipDerpy)', fileCode.indexOf('sharkArtImg(species.id, "illustration", species.name)') !== -1);
+  ok('derpy shadow opt-out returns standard img tag in derpy mode', (function(){
+    var prev = localStorage._s['tyi-derpy-mode'];
+    localStorage._s['tyi-derpy-mode'] = '1';
+    var html = sharkArtImg('nurse', 'illustration', 'Mysterious shark silhouette', true);
+    if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
+    else { localStorage._s['tyi-derpy-mode'] = prev; }
+    return html.indexOf('<img') === 0 && html.indexOf('data-shark-art="nurse"') !== -1;
+  })());
+  ok('derpy reveal keeps derpy SVG without skipDerpy', (function(){
+    var prev = localStorage._s['tyi-derpy-mode'];
+    localStorage._s['tyi-derpy-mode'] = '1';
+    var html = sharkArtImg('nurse', 'illustration', 'Nurse Shark');
+    if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
+    else { localStorage._s['tyi-derpy-mode'] = prev; }
+    return html === ART['nurse'];
+  })());
+  ok('non-derpy mode returns standard img tag', (function(){
+    var prev = localStorage._s['tyi-derpy-mode'];
+    if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
+    var html = sharkArtImg('nurse', 'illustration', 'Nurse Shark');
+    if (prev !== undefined) { localStorage._s['tyi-derpy-mode'] = prev; }
+    return html.indexOf('<img') === 0 && html.indexOf('data-shark-art="nurse"') !== -1;
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
