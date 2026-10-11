@@ -2622,10 +2622,75 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
   ok('v1.7.19 tyi-bukangi in RESET_KEYS',
     fileCode.includes('"tyi-bukangi"]'));
   ok('v1.7.19 dusky encounter hook present',
-    fileCode.includes('species.id === "dusky"') &&
+    fileCode.includes('maybeBukangiEgg(species)') &&
+    fileCode.includes('function maybeBukangiEgg') &&
     fileCode.includes('BUKANGI_THREAD'));
   ok('v1.7.19 dusky species exists in roster',
     SHARKS.some(function(s){ return s.id === 'dusky'; }));
+  /* v1.7.19-beta Mira review: trophy refreshes without a reload */
+  ok('v1.7.19 doWin renders Achievements',
+    (function(){
+      var start = fileCode.indexOf('function doWin()');
+      var end = fileCode.indexOf('function winStep(');
+      return fileCode.slice(start, end).indexOf('renderAchievements()') !== -1;
+    })());
+  ok('v1.7.19 claim button re-renders Achievements on success',
+    fileCode.indexOf('if (claimDerpyAward())') !== -1 &&
+    (function(){
+      var i = fileCode.indexOf('if (claimDerpyAward())');
+      return fileCode.slice(i, i + 120).indexOf('renderAchievements()') !== -1;
+    })());
+  /* v1.7.19-beta Mira review: achievement names wrap in the stack */
+  ok('v1.7.19 achievement names wrap instead of truncating',
+    cssCode.indexOf('.guide-row-head .ach-texts .guide-row-name { flex: none; white-space: normal; overflow: visible; text-overflow: clip; }') !== -1);
+  /* v1.7.19-beta Mira review: Bukangi thread is welfare-first */
+  ok('v1.7.19 Bukangi thread has no flippant "vibing" framing',
+    !BUKANGI_THREAD.some(function(m){ return /vibing|icon behavior/i.test(m.text); }));
+  ok('v1.7.19 Bukangi thread mentions snout abrasions and not disturbing her',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('abrasions') !== -1; }) &&
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('not to disturb') !== -1; }));
+  ok('v1.7.19 Bukangi thread says the canal does not mean she is happy',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf("doesn't mean she's happy") !== -1; }));
+  ok('v1.7.19 WHATS_NEW Bukangi avoids "most famous shark" claim',
+    WHATS_NEW['v1.7.19-beta'].some(function(e){ return e.indexOf('captivating Busan') !== -1; }) &&
+    !WHATS_NEW['v1.7.19-beta'].some(function(e){ return e.indexOf('most famous shark') !== -1; }));
+  /* v1.7.19-beta Mira review: behavioral Bukangi one-shot tests */
+  (function(){
+    var _egg = state.bukangiEgg;
+    var _len = state.messages.length;
+    // push failure → flag NOT set, egg not consumed (run first: no thread yet)
+    var _push = pushThread;
+    state.bukangiEgg = false;
+    var _threw = false;
+    try {
+      pushThread = function(){ throw new Error('simulated push failure'); };
+      var r0 = maybeBukangiEgg({ id: 'dusky' });
+    } catch (e) { _threw = true; }
+    pushThread = _push;
+    ok('v1.7.19 Bukangi push failure does not consume the egg',
+      _threw === false && r0 === false && state.bukangiEgg === false && state.messages.length === _len);
+    // first dusky reveal → exactly one thread, flag set
+    state.bukangiEgg = false;
+    var r1 = maybeBukangiEgg({ id: 'dusky' });
+    ok('v1.7.19 Bukangi first dusky reveal pushes exactly one thread',
+      r1 === true && state.messages.length === _len + 1 && state.bukangiEgg === true);
+    // second reveal → none
+    var r2 = maybeBukangiEgg({ id: 'dusky' });
+    ok('v1.7.19 Bukangi second dusky reveal pushes nothing',
+      r2 === false && state.messages.length === _len + 1);
+    // other species → none
+    state.bukangiEgg = false;
+    var r3 = maybeBukangiEgg({ id: 'nurse' });
+    ok('v1.7.19 Bukangi other species pushes nothing',
+      r3 === false && state.messages.length === _len + 1);
+    // dedup: thread present but flag unset (interrupted reload) → no duplicate, flag set
+    state.bukangiEgg = false;
+    var r4 = maybeBukangiEgg({ id: 'dusky' });
+    ok('v1.7.19 Bukangi dedup skips duplicate push but sets flag',
+      r4 === true && state.messages.length === _len + 1 && state.bukangiEgg === true);
+    state.bukangiEgg = _egg;
+    state.messages.length = _len;
+  })();
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

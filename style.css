@@ -356,7 +356,9 @@ body { overflow-x: clip; }
 .guide-row-head .ach-texts {
   display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 3px;
 }
-.guide-row-head .ach-texts .guide-row-name { flex: none; }
+/* v1.7.19-beta Mira review: achievement names wrap within the vertical stack
+   instead of truncating — the stack has room, so no ellipsis needed here. */
+.guide-row-head .ach-texts .guide-row-name { flex: none; white-space: normal; overflow: visible; text-overflow: clip; }
 .guide-row-head .ach-texts .ach-hint { flex: none; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;

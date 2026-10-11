@@ -23,7 +23,7 @@ const WHATS_NEW = {
   "v1.7.19-beta": [
 "🏅 <strong>Achievement cards, tidied.</strong> The achievement name now sits above its description instead of beside it — roomier cards, easier scanning.",
 "🏆 <strong>Trophy moved.</strong> Your Master Shark Tagger certificate button now lives in the Achievements tab, where it belongs. The derpy mode toggle stays in your Collection.",
-"🦈 <strong>Bukangi.</strong> Encounter a dusky shark and Sarah will tell you about the most famous shark in the world right now — a real dusky living in a Busan canal.",
+"🦈 <strong>Bukangi.</strong> Encounter a dusky shark and Sarah will tell you about the shark captivating Busan — a real dusky in a canal, and why watching wildlife respectfully matters.",
   ],
   "v1.7.18-beta": [
 "🎁 <strong>Derpy claim button hardened.</strong> The manual derpy award claim button now validates every shark in the roster (not just the count, so stale entries can't pass) and stays hidden while a win ceremony is pending — the ceremony presents Sarah's gift itself. The claim is one-time and can never double-send her thread.",
@@ -2171,15 +2171,7 @@ function doEncounter(species, plan) {
         /* v1.7.19-beta: Bukangi easter egg — first dusky encounter, one-time.
            Defensive guards like the naming eggs: this must never crash the
            encounter, even if thread data or pushThread is unavailable. */
-        try {
-          if (species.id === "dusky" && !state.bukangiEgg &&
-              typeof pushThread === "function" &&
-              typeof BUKANGI_THREAD !== "undefined" && Array.isArray(BUKANGI_THREAD)) {
-            state.bukangiEgg = true;
-            try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
-            pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
-          }
-        } catch {}
+        maybeBukangiEgg(species);
         showEncounterActions();
       };
       if (reducedMotion) {
@@ -3966,6 +3958,10 @@ function doWin() {
   renderCollection();
   renderResearch();
   renderSightings();
+  /* v1.7.19-beta Mira review: the Master Shark Tagger trophy lives in the
+     Achievements tab now — render it at win time so it appears without a
+     reload. */
+  renderAchievements();
   winStep(1);
 }
 
@@ -4223,6 +4219,41 @@ function maybeNameEgg(speciesId, rec) {
   }
 }
 
+/* v1.7.19-beta: Bukangi easter egg — first dusky shark encounter, one-time.
+   Extracted as a named helper (like maybeNameEgg) so the one-shot behavior
+   is behaviorally testable. Defensive guards: this must never crash the
+   encounter, even if thread data or pushThread is unavailable. */
+function maybeBukangiEgg(species) {
+  try {
+    if (!species || species.id !== "dusky") return false;
+    if (state.bukangiEgg) return false;
+    if (typeof pushThread !== "function") return false;
+    if (typeof BUKANGI_THREAD === "undefined" || !Array.isArray(BUKANGI_THREAD)) return false;
+    /* v1.7.19-beta Mira review: dedup against the saved thread marker. If a
+       previous attempt pushed the thread but crashed before persisting the
+       flag, don't send Sarah's thread a second time — just record the flag. */
+    const bukangiMarker = "Bukangi";
+    let alreadyShown = false;
+    try {
+      alreadyShown = state.messages.some(thread =>
+        (thread.msgs || []).some(m => (m.text || "").includes(bukangiMarker)));
+    } catch {}
+    if (!alreadyShown) {
+      pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
+    }
+    /* v1.7.19-beta Mira review: mark the trigger complete only AFTER delivery
+       was attempted without throwing. If pushThread throws, the flag stays
+       unset so a later dusky encounter retries instead of silently consuming
+       the easter egg. */
+    state.bukangiEgg = true;
+    try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
+    return true;
+  } catch (e) {
+    if (typeof console !== "undefined" && console.warn) console.warn("maybeBukangiEgg:", e);
+    return false;
+  }
+}
+
 /* v0.23.0: advance the Bruce chain. Called on expedition completion and game
    load. Stages are spaced: at least 2 expeditions OR 12 hours between stages,
    so it unfolds slowly over multiple sessions. */
@@ -4327,7 +4358,12 @@ function renderCollection() {
     cb.setAttribute("aria-label", "Claim your derpy shark award");
     cb.innerHTML = `\uD83C\uDF81 Claim your derpy award`;
     cb.addEventListener("click", () => {
-      claimDerpyAward();
+      /* v1.7.19-beta Mira review: only re-render on a successful claim, and
+         render Achievements too — the relocated trophy appears immediately
+         for legacy winners without a reload. */
+      if (claimDerpyAward()) {
+        renderAchievements();
+      }
       renderCollection();
       renderResearch();
     });
