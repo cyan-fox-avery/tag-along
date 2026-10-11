@@ -2409,6 +2409,34 @@ ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHA
     cssCode.includes('more space between IUCN badge and pin'));
   ok('full scientific names on expanded cards CSS present',
     cssCode.includes('.detail-scientific'));
+  /* v1.7.14-beta Mira re-review fixes */
+  ok('encounter badge: .shark-reveal is an explicit centered vertical stack',
+    cssCode.includes('.shark-reveal {') &&
+    cssCode.includes('flex-direction: column') &&
+    cssCode.includes('align-items: center'));
+  ok('encounter badge: reveal art height constrained so art+badge fit the scene',
+    cssCode.includes('.shark-reveal img') && cssCode.includes('max-height: 108px'));
+  ok('encounter badge: block layout with wrapping for long nicknames',
+    cssCode.includes('display: block') &&
+    cssCode.includes('overflow-wrap: anywhere'));
+  ok('encounter badge: included in prefers-reduced-motion override',
+    cssCode.includes('.tap-hint, .encounter-badge { transition: none; animation: none; }'));
+  ok('encounter badge: reunion nickname escaped exactly once at insertion',
+    fileCode.indexOf('\${esc(rname)}') !== -1 &&
+    (function(){
+      var parts = fileCode.split('badgeClass = "enc-reunion"');
+      var badgeBlock = parts[0].split('} else if (isReunion) {').pop();
+      return badgeBlock.indexOf('esc(rec.name)') === -1;
+    })());
+  ok('encounter badge: tricky nickname (&, <, quotes) renders safely, not double-escaped',
+    (function(){
+      var rec = { name: 'Tom & "Jerry" <3' };
+      var rname = '\u201c' + rec.name + '\u201d';
+      var badgeText = 'YOUR SHARK ' + esc(rname);
+      return badgeText.indexOf('&amp;amp;') === -1 &&
+             badgeText.indexOf('&lt;') !== -1 &&
+             badgeText.indexOf('Tom &amp; &quot;Jerry&quot; &lt;3') !== -1;
+    })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

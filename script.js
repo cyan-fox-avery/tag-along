@@ -2134,7 +2134,9 @@ function doEncounter(species, plan) {
           badgeClass = "enc-new";
           badgeText = "✨ NEW SPECIES — new to your book!";
         } else if (isReunion) {
-          const rname = rec.name ? `\u201c${esc(rec.name)}\u201d` : rec.researchId;
+          /* v1.7.14-beta Mira fix: escape once, at the HTML insertion boundary.
+             rname stays raw here; esc() is applied in badgeText below. */
+          const rname = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
           badgeClass = "enc-reunion";
           badgeText = `🥹 YOUR SHARK — ${esc(rname)}`;
         } else {

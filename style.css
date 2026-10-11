@@ -695,21 +695,38 @@ select option:disabled { color: #7a8a9e; }
   pointer-events: none;
 }
 @keyframes tapPulse { 0%,100% { opacity: 0.75; } 50% { opacity: 1; } }
-.shark-reveal { animation: revealIn 0.4s ease; }
+/* v1.7.14-beta: explicit centered vertical stack — art above, badge below.
+   The badge was inline-block after the img with no column layout, so on wide
+   views they could share a line and on mobile the 190px scene clipped the
+   badge. Now both are constrained to the .dive-shark container. */
+.shark-reveal {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  max-width: 100%; max-height: 100%;
+  animation: revealIn 0.4s ease;
+}
+/* v1.7.14-beta Mira fix: cap the reveal art lower than the 130px silhouette
+   cap so art + badge together fit inside the 190px dive scene. Later in the
+   stylesheet than .dive-shark img, so it wins the specificity tie. */
+.shark-reveal img, .shark-reveal svg {
+  max-width: 100%; max-height: 108px; width: auto; height: auto; object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4));
+}
 @keyframes revealIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 /* v1.7.14-beta: prominent encounter status badge — new species / your shark /
    another individual, right under the illustration where it can't be missed. */
 .encounter-badge {
-  display: inline-block; margin-top: 8px; padding: 8px 16px;
+  display: block; margin-top: 8px; padding: 8px 16px;
+  max-width: 100%; box-sizing: border-box;
   border-radius: 999px; font-size: 14px; font-weight: 700;
   color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  text-align: center; overflow-wrap: anywhere;
   animation: revealIn 0.4s ease;
 }
 .encounter-badge.enc-new { background: #2d7a3e; border: 2px solid #3d9a52; }
 .encounter-badge.enc-reunion { background: #8a6d1a; border: 2px solid #b8962a; }
 .encounter-badge.enc-other { background: #2c5364; border: 2px solid #3d7a8c; }
 @media (prefers-reduced-motion: reduce) {
-  .shark-silhouette, .shark-reveal, .tap-hint { transition: none; animation: none; }
+  .shark-silhouette, .shark-reveal, .tap-hint, .encounter-badge { transition: none; animation: none; }
 }
 @keyframes swim { 0%,100% { transform: translate(-50%,-52%); } 50% { transform: translate(-50%,-46%); } }
 
