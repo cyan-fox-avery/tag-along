@@ -2136,6 +2136,44 @@ code += `
   // v1.7.13-beta: Bait and Switch retired
   ok('bait-switch achievement removed', !ACHIEVEMENTS.some(a => a.id === 'bait-switch'));
 
+  // v1.7.13-beta Mira review fixes: research copy + logbook legacy labels + behavioral tests
+  ok('great white research recommends fish-oil chum, not seal scent', (() => {
+    const gw = SHARKS.find(s => s.id === 'greatwhite');
+    return gw.research.includes('fish oil') && !gw.research.includes('Seal scent in the water');
+  })());
+  ok('sevengill research recommends fish-oil, not seal scent', (() => {
+    const sg = SHARKS.find(s => s.id === 'sevengill');
+    return sg.research.includes('fish-oil') && !sg.research.includes('seal scent in the water');
+  })());
+  ok('no research text recommends seal scent as an option', SHARKS.every(s =>
+    !/seal scent (in the water )?(is|as)/i.test(s.research || '')));
+  ok('logbook renders old seal methodOpt as Seal scent', (() => {
+    const t = { method: 'attract', methodOpt: 'seal' };
+    const label = METHODS[t.method].opts[t.methodOpt] || LEGACY_LURES[t.methodOpt] || t.methodOpt;
+    return label === 'Seal scent';
+  })());
+  ok('logbook renders pre-v0.9 seal lure as Seal scent', (() => {
+    const t = { lure: 'seal' };
+    const label = (t.lure && t.lure !== 'none' ? LEGACY_LURES[t.lure] || t.lure : 'No lure');
+    return label === 'Seal scent';
+  })());
+  ok('launch with attract resolves methodOpt chum (behavioral)', (() => {
+    els['methodSelect'].value = 'attract';
+    els['methodOptSelect'].value = '';
+    return resolveLaunchMethodOpt() === 'chum';
+  })());
+  ok('launch with aggregation keeps sub-option (behavioral)', (() => {
+    els['methodSelect'].value = 'aggregation';
+    els['methodOptSelect'].value = 'boat';
+    return resolveLaunchMethodOpt() === 'boat';
+  })());
+  ok('stored seal plan restores as chum (behavioral)', (() => {
+    return resolveRestoredMethodOpt({ method: 'attract', methodOpt: 'seal' }) === 'chum';
+  })());
+  ok('stored chum plan restores as chum (behavioral)', (() => {
+    return resolveRestoredMethodOpt({ method: 'attract', methodOpt: 'chum' }) === 'chum';
+  })());
+
   // v1.6.10-beta (restored): Sarah throttle state exists
   ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
 

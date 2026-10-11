@@ -1818,6 +1818,12 @@ function renderPlanner() {
   fillRegions();
 }
 
+/* v1.7.13-beta: resolve the method option at launch — attract always
+   uses chum since the sub-dropdown was retired. Extracted for testability. */
+function resolveLaunchMethodOpt() {
+  return $("methodSelect").value === "attract" ? "chum" : $("methodOptSelect").value;
+}
+
 $("launchBtn").addEventListener("click", () => {
   const region = $("regionSelect").value;
   if (!region || !REGIONS[region] || REGIONS[region].locked) return;
@@ -1827,7 +1833,7 @@ $("launchBtn").addEventListener("click", () => {
     bait: $("baitSelect").value,
     method: $("methodSelect").value,
     /* v1.6.12-beta: attract always uses chum — no sub-dropdown. */
-    methodOpt: $("methodSelect").value === "attract" ? "chum" : $("methodOptSelect").value
+    methodOpt: resolveLaunchMethodOpt()
   });
 });
 
@@ -2786,7 +2792,7 @@ function renderLogbook() {
          v0.9.1: the planner lets Method stay unpicked (sub-menu hidden) —
          those trips log method:"" and read as "No method chosen". */
       (t.method && METHODS[t.method])
-        ? `${METHODS[t.method].name} — ${METHODS[t.method].opts[t.methodOpt] || t.methodOpt}`
+        ? `${METHODS[t.method].name} — ${METHODS[t.method].opts[t.methodOpt] || LEGACY_LURES[t.methodOpt] || t.methodOpt}`
         : ("method" in t ? "No method chosen"
           : (t.lure && t.lure !== "none" ? LEGACY_LURES[t.lure] || t.lure : "No lure"))
     ];
@@ -2809,6 +2815,12 @@ function renderLogbook() {
     if (rb) rb.addEventListener("click", () => repeatPlan(t));
     list.appendChild(div);
   });
+}
+
+/* v1.7.13-beta: resolve the restored method option — legacy "seal" plans
+   map to chum. Extracted for testability. */
+function resolveRestoredMethodOpt(t) {
+  return t.method === "attract" ? "chum" : (t.methodOpt || "none");
 }
 
 /* v0.20.0: repeat a logged expedition's plan — restores region, depth, bait
@@ -2835,8 +2847,7 @@ function repeatPlan(t) {
      whatever was previously picked in the planner. */
   if (set("methodSelect", t.method || "")) {
     /* v1.6.12-beta: attract restores as chum; legacy "seal" plans map to chum. */
-    const restoredOpt = t.method === "attract" ? "chum" : (t.methodOpt || "none");
-    set("methodOptSelect", restoredOpt);
+    set("methodOptSelect", resolveRestoredMethodOpt(t));
   } else {
     const ms = $("methodSelect");
     if (ms && !t.method) { ms.value = ""; ms.dispatchEvent(new Event("change")); }
