@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.6-beta', VERSION === 'v1.7.6-beta');
+  ok('version v1.7.7-beta', VERSION === 'v1.7.7-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2068,6 +2068,11 @@ code += `
   ok('WHATS_NEW has v1.7.6-beta', Array.isArray(WHATS_NEW['v1.7.6-beta']) && WHATS_NEW['v1.7.6-beta'].length > 0);
   ok('WHATS_NEW has v1.6.5-beta', Array.isArray(WHATS_NEW['v1.6.5-beta']) && WHATS_NEW['v1.6.5-beta'].length >= 1);
   ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
+  // v1.7.7-beta: notification badge vertical alignment
+  ok('WHATS_NEW has v1.7.7-beta', Array.isArray(WHATS_NEW['v1.7.7-beta']) && WHATS_NEW['v1.7.7-beta'].length > 0);
+  ok('phone-badge uses flexbox centering', /\\.phone-badge[^}]*display:\\s*inline-flex/.test(cssCode));
+  ok('phone-badge has align-items center', /\\.phone-badge[^}]*align-items:\\s*center/.test(cssCode));
+  ok('phone-badge has box-sizing border-box', /\\.phone-badge[^}]*box-sizing:\\s*border-box/.test(cssCode));
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
