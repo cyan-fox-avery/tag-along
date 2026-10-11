@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.5-beta', VERSION === 'v1.7.5-beta');
+  ok('version v1.7.6-beta', VERSION === 'v1.7.6-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2065,6 +2065,7 @@ code += `
 
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('WHATS_NEW has v1.7.6-beta', Array.isArray(WHATS_NEW['v1.7.6-beta']) && WHATS_NEW['v1.7.6-beta'].length > 0);
   ok('WHATS_NEW has v1.6.5-beta', Array.isArray(WHATS_NEW['v1.6.5-beta']) && WHATS_NEW['v1.6.5-beta'].length >= 1);
   ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
@@ -2208,6 +2209,13 @@ code += `
     /* newest: later-inserted (nurse) first; oldest: earlier-inserted (zebra) first */
     return newestFirst.join(',') === 'nurse,zebra' && oldestFirst.join(',') === 'zebra,nurse';
   })());
+
+  /* v1.7.6-beta: aggregation sub-menu removed */
+  ok('aggregation opts kept for backward compat',
+    METHODS.aggregation && METHODS.aggregation.opts &&
+    METHODS.aggregation.opts.boat === "Boat survey of the bloom");
+  ok('v1.7.6 WHATS_NEW entry present',
+    Array.isArray(WHATS_NEW['v1.7.6-beta']) && WHATS_NEW['v1.7.6-beta'].length > 0);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
