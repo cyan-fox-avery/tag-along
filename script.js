@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.13-beta";
+const VERSION = "v1.7.14-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.14-beta": [
+"🔍 <strong>Encounter status you can't miss.</strong> When a shark appears, a prominent badge now shows right under the illustration: NEW SPECIES, YOUR SHARK, or ANOTHER individual — no more squinting at the log line.",
+"✨ <strong>UI polish bundle.</strong> Verified and kept: horizontal Collection cards on desktop, green checklist bubbles, one-at-a-time Research accordion, two-line achievement hints, IUCN badge spacing, and full scientific names on expanded cards.",
+  ],
   "v1.7.13-beta": [
 "🎣 <strong>Bait and Switch retired.</strong> The seal-scent achievement is gone, and seal scent itself is properly retired — choosing the attract method now uses fish-oil chum directly, no sub-dropdown.",
   ],
@@ -2122,9 +2126,25 @@ function doEncounter(species, plan) {
         already = ` — another ${species.name}! This one has no matching tag — not ${oname}.`;
       }
       const showIllustration = () => {
+        /* v1.7.14-beta: prominent encounter status badge — the already-in-book
+           info was a tiny log-line suffix, easy to miss. Now it's a visual
+           badge right under the shark illustration. */
+        let badgeClass, badgeText;
+        if (!existingRec) {
+          badgeClass = "enc-new";
+          badgeText = "✨ NEW SPECIES — new to your book!";
+        } else if (isReunion) {
+          const rname = rec.name ? `\u201c${esc(rec.name)}\u201d` : rec.researchId;
+          badgeClass = "enc-reunion";
+          badgeText = `🥹 YOUR SHARK — ${esc(rname)}`;
+        } else {
+          badgeClass = "enc-other";
+          badgeText = `🦈 ANOTHER ${esc(species.name.toUpperCase())}`;
+        }
         sharkEl.innerHTML =
           `<div class="shark-reveal">` +
           sharkArtImg(species.id, "illustration", species.name) +
+          `<div class="encounter-badge ${badgeClass}">${badgeText}</div>` +
           `</div>`;
         logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
         showEncounterActions();
