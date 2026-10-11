@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.7-beta";
+const VERSION = "v1.7.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,43 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.5-beta": [
+"🟡 <strong>Matching release button.</strong> 'Release & return to ship' is now flat yellow like the other release buttons.",
+  ],
+  "v1.7.4-beta": [
+"🔬 <strong>Insights stay on the Collection card.</strong> Tag-along insights no longer appear in the expedition log — find them on the shark's Collection card instead.",
+  ],
+  "v1.7.3-beta": [
+"🔤 <strong>Sarah's name, capitalized.</strong> The lemon-shark Sarah easter egg now spells her name right: 'you named the LEMON shark Sarah??'",
+  ],
+  "v1.7.2-beta": [
+"\u274c <strong>Close button no longer covers text.</strong> The X on expanded field-guide cards now sits in the text flow at the top-right instead of floating over the description.",
+  ],
+  "v1.7.1-beta": [
+"🦈 <strong>Bruce works after winning.</strong> Naming a shark Bruce now triggers Sarah's Jaws reaction immediately — even after you've completed the game. No more waiting for an expedition that never comes.",
+  ],
+  "v1.7.0-beta": [
+"\uD83C\uDF89 <strong>Derpy sharks unlocked!</strong> Finish the full roster and Sarah gives you the original derpy art as a completion award — toggle derpy mode in your collection book anytime.",
+  ],
+  "v1.6.13-beta": [
+"🗺️ <strong>Bigger follow map.</strong> The \"they're all still out there\" map finale now fills much more of the screen on iPad and desktop.",
+  ],
+  "v1.6.12-beta": [
+"🪣 <strong>Simpler attractants.</strong> Choosing the attract method now uses fish-oil chum directly — no more attractant-type dropdown. (Seal scent retired.)",
+  ],
+  "v1.6.11-beta": [
+"🗺️ <strong>Fixed trans-Pacific tracks crossing continents.</strong> Shark tracks that cross the antimeridian (like a salmon shark's Alaska ↔ Japan run) now exit one map edge and re-enter the other — no more lines streaking across Asia, Europe and the Atlantic.",
+  ],
+  "v1.6.10-beta": [
+"💬 <strong>Sarah paces herself.</strong> She now congratulates you on a single shark at most once every 3 expeditions — Big Day celebrations still fire every time.",
+  ],
+  "v1.6.9-beta": [
+"🐋 <strong>One White Whale thread.</strong> Tagging a megamouth no longer fires both Sarah's White Whale reaction and the routine species celebration — the special thread is the celebration.",
+  ],
+  "v1.6.8-beta": [
+"📓 <strong>More re-sighting notes.</strong> Four new field observations for re-sighted sharks — the note pool was repeating too often.",
+  ],
+  
   "v0.22.0": [
     "📓 <strong>Logbook filters.</strong> Filter your expedition log by outcome, region, or species — compare attempts and spot the pattern.",
     "📌 <strong>Pin-gated soft hints.</strong> Pin a shark you're researching, and your logbook notes will gently nudge you when an expedition plan is close — observational hints only, never answers.",
@@ -697,6 +734,34 @@ function splitAntimeridian(pts) {
   return segs.filter(s => s.length > 1);
 }
 
+/* v1.6.11-beta: split track legs at the antimeridian (+/-180) so a
+   trans-Pacific leg never draws as a straight line across Asia, Europe and
+   the Atlantic — one shark apparently crossing continents. The shark really
+   does cross the North Pacific (documented); only the rendering was wrong. */
+function splitTrackAntimeridian(ll) {
+  if (!ll || ll.length < 2) return [];
+  const segs = [];
+  let cur = [ll[0]];
+  for (let i = 1; i < ll.length; i++) {
+    const a = ll[i - 1], b = ll[i];
+    const dLon = b[1] - a[1];
+    if (Math.abs(dLon) > 180) {
+      const eastward = dLon < 0; /* e.g. 150 -> -145 crosses +180 going east */
+      const edgeLon = eastward ? 180 : -180;
+      const lonB = eastward ? b[1] + 360 : b[1] - 360;
+      const t = (edgeLon - a[1]) / (lonB - a[1]);
+      const edgeLat = a[0] + t * (b[0] - a[0]);
+      cur.push([edgeLat, edgeLon]);
+      segs.push(cur);
+      cur = [[edgeLat, -edgeLon], b];
+    } else {
+      cur.push(b);
+    }
+  }
+  segs.push(cur);
+  return segs.filter(s => s.length > 1);
+}
+
 /* Catmull-Rom -> cubic Bezier smoothing, so currents curve instead of kinking. */
 function smoothPath(p) {
   const f = q => q[0].toFixed(1) + "," + q[1].toFixed(1);
@@ -771,14 +836,21 @@ function renderMap() {
     const pts = mapPoints(t);
     if (pts.length < 2) return;
     /* Illustrative track: envelope walk only (points[1..]). The tag site
-       gets its own pin below — no line implying a migration between them. */
-    const path = pts.slice(1);
-    if (path.length >= 2) {
-      const d = path.map((p, i) => (i ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
-      const archival = t.track.kind === "archival";
-      svg += `<path class="map-track" d="${d}" stroke="${color}" stroke-width="${tsw}"`
-        + (archival ? ` stroke-dasharray="${(5 / z).toFixed(1)} ${(4 / z).toFixed(1)}"` : "") + "/>";
-    }
+       gets its own pin below — no line implying a migration between them.
+       v1.6.11-beta: legs crossing the antimeridian are split at +/-180 and
+       run to the map edge, so a trans-Pacific leg never streaks across
+       continents the long way round. */
+    const ll = (t.track.points || []).slice(1)
+      .map(p => MAP_COORDS[p.label]).filter(Boolean);
+    const archival = t.track.kind === "archival";
+    const dash = archival ? ` stroke-dasharray="${(5 / z).toFixed(1)} ${(4 / z).toFixed(1)}"` : "";
+    splitTrackAntimeridian(ll).forEach(seg => {
+      const d = seg.map((c, i) => {
+        const xy = mapProj(c[0], c[1]);
+        return (i ? "L" : "M") + xy[0].toFixed(1) + "," + xy[1].toFixed(1);
+      }).join(" ");
+      svg += `<path class="map-track" d="${d}" stroke="${color}" stroke-width="${tsw}"${dash}/>`;
+    });
   });
   /* Markers: hollow pin = tag site, filled dot = latest position.
      Sizes are divided by zoom so they stay readable, not gigantic. */
@@ -994,6 +1066,9 @@ const state = {
   sarahAdviceOffered: !!_savedMsgs.sarahAdviceOffered,
   /* v1.4.19-beta: Big Day no-repeat bags — per-tier shuffled indices. */
   bigDayBags: _savedMsgs.bigDayBags || {},
+  /* v1.6.10-beta: throttle single-shark congratulations — expedition number
+     of Sarah's last single-shark cheer (null until the first one). */
+  lastSingleCheerExp: (typeof _savedMsgs.lastSingleCheerExp === "number") ? _savedMsgs.lastSingleCheerExp : null,
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
@@ -1013,7 +1088,11 @@ const state = {
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
-  deferredTagAlong: null // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
+  deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
+  /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
+     persists the unlock; derpyMode is the player's toggle. */
+  derpyUnlocked: (() => { try { return localStorage.getItem("tyi-derpy-unlocked") === "1"; } catch { return false; } })(),
+  derpyMode: (() => { try { return localStorage.getItem("tyi-derpy-mode") === "1"; } catch { return false; } })()
 };
 /* v0.18.0 review: migrate pre-achievement saves — seed stats from the logbook
    and existing tags so established players get credit for their history. */
@@ -1059,7 +1138,8 @@ function saveMsgs() {
   msgStore.save({ messages: state.messages, unread: state.unread, chatIdx: state.chatIdx,
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
     sarahAdviceOffered: state.sarahAdviceOffered,
-    bigDayBags: state.bigDayBags });
+    bigDayBags: state.bigDayBags,
+    lastSingleCheerExp: state.lastSingleCheerExp });
 }
 /* Every new thread gets a timestamp for the Phone tab.
    v1.4.0: if the Phone panel is already open, the new thread renders
@@ -2887,13 +2967,22 @@ function flushPendingCelebrations() {
   celebrationStore.clear();
   if (events.length === 0) return;
   if (events.length === 1) {
-    // Single new species: existing celebration, delivered at trip end.
-    const e = events[0];
-    pushThread([
-      { who: "them", text: e.opener },
-      { who: "me", text: `A ${e.speciesName} — ${e.length} metres, ${e.sex}. Research ID ${e.researchId}.` },
-      { who: "them", text: e.cheer }
-    ]);
+    /* v1.6.10-beta: throttle single-shark congratulations — Sarah cheers a
+       lone tag at most once every 3 expeditions so she doesn't become
+       annoying. The tag itself still counts; she just doesn't always text.
+       Big Day (2+) threads below are NOT throttled. */
+    const exp = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0;
+    const last = state.lastSingleCheerExp;
+    if (last === null || last === undefined || exp - last >= 3) {
+      const e = events[0];
+      pushThread([
+        { who: "them", text: e.opener },
+        { who: "me", text: `A ${e.speciesName} — ${e.length} metres, ${e.sex}. Research ID ${e.researchId}.` },
+        { who: "them", text: e.cheer }
+      ]);
+      state.lastSingleCheerExp = exp;
+      saveMsgs();
+    }
   } else {
     // 2+ new species: one Big Day conversation.
     pushThread(buildBigDayThread(events));
@@ -3743,9 +3832,13 @@ function doWin() {
      beat 4. A player who closes mid-ceremony keeps the unlock — beat 4 is
      where they're TOLD about it. */
   state.archiveUnlocked = true;
+  /* v1.7.0-beta: the derpy award — completing the roster unlocks the
+     original derpy art as a toggleable mode. */
+  state.derpyUnlocked = true;
   try {
     localStorage.setItem("tyi-won", "1");
     localStorage.setItem("tyi-archive", "1");
+    localStorage.setItem("tyi-derpy-unlocked", "1");
   } catch {}
   renderCollection();
   renderResearch();
@@ -3791,7 +3884,7 @@ function winStep(n) {
     /* Beat 3: the map finale — "they're all still out there." */
     winMapFinale();
 
-  } else {
+  } else if (n === 4) {
     /* Beat 4: the acknowledgement. v0.24.0: the Archive is no longer a
        win-gated reward — it's been growing all game. This beat celebrates
        the completed collection instead. */
@@ -3804,7 +3897,30 @@ function winStep(n) {
         <p>who finished Rockhound at 1:26 AM and loves sharks. 🦈</p>
         <p style="margin-top:8px">🖼️ Your Wild Archive is complete — every species you tagged, face to face with the real animal.</p>
       </div>
+      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+    $("winNext").addEventListener("click", () => winStep(5));
+  } else if (n === 5) {
+    /* Beat 5 (v1.7.0-beta): the derpy award — Sarah gives you the original
+       derpy art as a completion reward. A toggle appears in the collection. */
+    pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
+    box(`
+      <div style="font-size:52px; text-align:center">\uD83E\uDD88</div>
+      <h2 style="text-align:center; margin:8px 0 2px">A gift from Sarah</h2>
+      <p class="latin" style="text-align:center">The original derpy sharks — unlocked!</p>
+      <div class="cert-body">
+        <p>Before the institute sent the real illustrations, these little derpy sharks were the whole game. Sarah saved every single one.</p>
+        <p style="margin-top:8px">\uD83C\uDFA8 <strong>Derpy mode</strong> is now available — toggle it in your collection book to see all ${SHARKS.length} sharks in their original derpy glory.</p>
+      </div>
+      <div class="phone-thread win-thread" style="margin-top:8px"></div>
+      <p class="latin" style="text-align:center; margin:0">Saved in \uD83D\uDCF1 Phone.</p>
       <button id="winNext" class="primary-button" type="button">Back to the collection book</button>`);
+    const th5 = ov.querySelector(".win-thread");
+    DERPY_AWARD_THREAD.forEach(m => {
+      const b = document.createElement("div");
+      b.className = "bubble " + m.who;
+      b.textContent = m.text;
+      th5.appendChild(b);
+    });
     $("winNext").addEventListener("click", () => {
       ov.classList.add("hidden");
       /* v1.4.0-beta Mira review (win-path edge case): if the winning tag was
@@ -4086,6 +4202,23 @@ function renderCollection() {
     shelf.appendChild(t);
   }
 
+  /* v1.7.0-beta: derpy mode toggle — win-unlocked completion award. */
+  if (state.derpyUnlocked) {
+    const d = document.createElement("button");
+    d.type = "button";
+    d.className = "derpy-toggle" + (state.derpyMode ? " active" : "");
+    d.setAttribute("aria-pressed", state.derpyMode ? "true" : "false");
+    d.setAttribute("aria-label", "Toggle derpy shark art mode");
+    d.innerHTML = `\uD83E\uDD88 Derpy mode: ${state.derpyMode ? "ON" : "OFF"}`;
+    d.addEventListener("click", () => {
+      state.derpyMode = !state.derpyMode;
+      try { localStorage.setItem("tyi-derpy-mode", state.derpyMode ? "1" : "0"); } catch {}
+      renderCollection();
+      renderResearch();
+    });
+    shelf.appendChild(d);
+  }
+
   if (!ids.length && !state.won) {
     list.innerHTML = `<div class="empty-note">No sharks tagged yet.<br>Do your research, then get out there. 🦈</div>`;
     return;
@@ -4271,7 +4404,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {

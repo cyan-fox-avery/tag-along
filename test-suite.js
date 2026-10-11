@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.7-beta', VERSION === 'v1.6.7-beta');
+  ok('version v1.7.5-beta', VERSION === 'v1.7.5-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2113,6 +2113,40 @@ code += `
 
   // v1.6.7-beta: one resighting = one Sarah thread
   ok('WHATS_NEW has v1.6.7-beta entry', Array.isArray(WHATS_NEW['v1.6.7-beta']) && WHATS_NEW['v1.6.7-beta'].length >= 1);
+
+  // v1.6.8-beta through v1.7.5-beta: WHATS_NEW entries present
+  ok('WHATS_NEW has v1.6.8-beta', Array.isArray(WHATS_NEW['v1.6.8-beta']) && WHATS_NEW['v1.6.8-beta'].length >= 1);
+  ok('WHATS_NEW has v1.6.9-beta', Array.isArray(WHATS_NEW['v1.6.9-beta']) && WHATS_NEW['v1.6.9-beta'].length >= 1);
+  ok('WHATS_NEW has v1.6.10-beta', Array.isArray(WHATS_NEW['v1.6.10-beta']) && WHATS_NEW['v1.6.10-beta'].length >= 1);
+  ok('WHATS_NEW has v1.6.11-beta', Array.isArray(WHATS_NEW['v1.6.11-beta']) && WHATS_NEW['v1.6.11-beta'].length >= 1);
+  ok('WHATS_NEW has v1.6.12-beta', Array.isArray(WHATS_NEW['v1.6.12-beta']) && WHATS_NEW['v1.6.12-beta'].length >= 1);
+  ok('WHATS_NEW has v1.6.13-beta', Array.isArray(WHATS_NEW['v1.6.13-beta']) && WHATS_NEW['v1.6.13-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.0-beta', Array.isArray(WHATS_NEW['v1.7.0-beta']) && WHATS_NEW['v1.7.0-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.1-beta', Array.isArray(WHATS_NEW['v1.7.1-beta']) && WHATS_NEW['v1.7.1-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.2-beta', Array.isArray(WHATS_NEW['v1.7.2-beta']) && WHATS_NEW['v1.7.2-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.3-beta', Array.isArray(WHATS_NEW['v1.7.3-beta']) && WHATS_NEW['v1.7.3-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.4-beta', Array.isArray(WHATS_NEW['v1.7.4-beta']) && WHATS_NEW['v1.7.4-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.5-beta', Array.isArray(WHATS_NEW['v1.7.5-beta']) && WHATS_NEW['v1.7.5-beta'].length >= 1);
+
+  // v1.6.10-beta (restored): Sarah throttle state exists
+  ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
+
+  // v1.6.11-beta (restored): splitTrackAntimeridian exists and works
+  ok('splitTrackAntimeridian defined', typeof splitTrackAntimeridian === 'function');
+  ok('splitTrackAntimeridian splits crossing leg', (() => {
+    const segs = splitTrackAntimeridian([[50, 150], [50, -145]]);
+    return segs.length === 2 && segs.every(s => s.length >= 2);
+  })());
+  ok('splitTrackAntimeridian leaves normal leg alone', (() => {
+    const segs = splitTrackAntimeridian([[50, 10], [51, 12]]);
+    return segs.length === 1;
+  })());
+
+  // v1.7.0-beta (restored): derpy award
+  ok('DERPY_AWARD_THREAD defined', typeof DERPY_AWARD_THREAD !== 'undefined' && DERPY_AWARD_THREAD.length === 9);
+  ok('derpyUnlocked in state', 'derpyUnlocked' in state);
+  ok('derpyMode in state', 'derpyMode' in state);
+  ok('derpy keys in RESET_KEYS', RESET_KEYS.includes('tyi-derpy-unlocked') && RESET_KEYS.includes('tyi-derpy-mode'));
   ok('maybeReunionReaction returns true when it fires, false when already reacted', (() => {
     const savedReacted = state.reunionReacted;
     const savedMsgCount = state.messages.length;
