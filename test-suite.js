@@ -235,6 +235,10 @@ code += `
   ok('auto-nudge waits for five failures', /state\\.failures >= 5/.test(fileCode));
   ok('ask-Sarah advice path exists', typeof askSarahAdvice === 'function' && typeof renderSarahAsk === 'function');
   ok('encounter announces tagged status', fileCode.includes('new to your book') && (fileCode.includes('tag looks familiar') || fileCode.includes('already in your book')));
+  ok('resight uses encounter-level one-shot guard (v1.6.4)', fileCode.includes('lastResightEncounterId'));
+  ok('resight guard keys on encounterId', fileCode.includes('lastResightEncounterId === encounterId'));
+  ok('doEncounter mints encounterId', fileCode.includes('const encounterId = "enc-"'));
+  ok('resight button disabled after tap (v1.6.4)', fileCode.includes('resightBtn.disabled = true'));
   ok('map legend is two-column', /\\.map-legend\\s*\\{\\s*display:\\s*grid/.test(cssCode));
   ok('chip shows common name first', /esc\\(s\\.name\\)\\} · /.test(fileCode));
   ok('overlays scroll when overflowing', /\\.overlay\\s*\\{[^}]*overflow-y:\\s*auto/.test(cssCode));
@@ -1800,6 +1804,31 @@ code += `
     state.messages.length = before;
     return isRegular && rec.sarahEgg === true && !rec.lemonSarahEgg;
   })());
+  // v1.6.5: naming a lemon "Sarah" suppresses the queued lemon celebration
+  ok('lemon named Sarah drops the queued lemon celebration', (() => {
+    const savePending = state.pendingCelebrations;
+    const saveMsgs = state.messages.length;
+    state.pendingCelebrations = [
+      { speciesId: "lemon", speciesName: "Lemon Shark" },
+      { speciesId: "nurse", speciesName: "Nurse Shark" }
+    ];
+    const rec = { name: "Sarah" };
+    maybeSarahEgg("lemon", rec);
+    const lemonGone = !state.pendingCelebrations.some(e => e.speciesId === "lemon");
+    const nurseKept = state.pendingCelebrations.some(e => e.speciesId === "nurse");
+    state.pendingCelebrations = savePending;
+    state.messages.length = saveMsgs;
+    return lemonGone && nurseKept && rec.lemonSarahEgg === true;
+  })());
+  ok('lemon celebration kept when name is not Sarah', (() => {
+    const savePending = state.pendingCelebrations;
+    state.pendingCelebrations = [{ speciesId: "lemon", speciesName: "Lemon Shark" }];
+    const rec = { name: "Zest" };
+    maybeSarahEgg("lemon", rec);
+    const kept = state.pendingCelebrations.some(e => e.speciesId === "lemon");
+    state.pendingCelebrations = savePending;
+    return kept && !rec.lemonSarahEgg;
+  })());
   // v1.5.25: Bruce and Sarah eggs are independent (both orders)
   ok('bruce egg survives a later sarah naming', (() => {
     const saveBruce = state.bruceEgg, saveDone = state.bruceChainComplete, saveExp = state.stats.expeditions;
@@ -2013,8 +2042,31 @@ code += `
   ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
   ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
 
+  // v1.6.6-beta: Shadows match their sharks
+  ok('WHATS_NEW has v1.6.6-beta with 1 entry', Array.isArray(WHATS_NEW['v1.6.6-beta']) && WHATS_NEW['v1.6.6-beta'].length === 1);
+  ok('dive encounter shadow uses illustration not silhouette webp', (() => {
+    // Phase 1 must use the illustration (darkened by CSS) so the shadow
+    // always matches the shark — no separate silhouette image.
+    const src = doEncounter.toString();
+    return src.includes('shark-shadow') &&
+           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') &&
+           !src.includes('sharkArtImg(species.id, "silhouette"');
+  })());
+  ok('shark-shadow CSS darkens illustration and SVG fallback', (() => {
+    // The dark overlay must apply to both the WebP img and any SVG
+    // fallback, so a failed image load never reveals the species.
+    return /\\.shark-shadow img,\\s*\\.shark-shadow svg\\s*\\{\\s*filter:\\s*brightness\\(0\\)/.test(cssCode);
+  })());
+  ok('preloadSharkArt only preloads illustrations', (() => {
+    // Silhouettes are no longer separate images; preloading them is wasteful.
+    const src = preloadSharkArt.toString();
+    return src.includes('"illustration"') && !src.includes('"silhouette"');
+  })());
+
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
+  ok('WHATS_NEW has v1.6.5-beta', Array.isArray(WHATS_NEW['v1.6.5-beta']) && WHATS_NEW['v1.6.5-beta'].length >= 1);
+  ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
