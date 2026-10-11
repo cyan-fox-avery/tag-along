@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.5-beta', VERSION === 'v1.7.5-beta');
+  ok('version v1.7.11-beta', VERSION === 'v1.7.11-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2127,6 +2127,7 @@ code += `
   ok('WHATS_NEW has v1.7.3-beta', Array.isArray(WHATS_NEW['v1.7.3-beta']) && WHATS_NEW['v1.7.3-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.4-beta', Array.isArray(WHATS_NEW['v1.7.4-beta']) && WHATS_NEW['v1.7.4-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.5-beta', Array.isArray(WHATS_NEW['v1.7.5-beta']) && WHATS_NEW['v1.7.5-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.11-beta', Array.isArray(WHATS_NEW['v1.7.11-beta']) && WHATS_NEW['v1.7.11-beta'].length >= 1);
 
   // v1.6.10-beta (restored): Sarah throttle state exists
   ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
@@ -2147,6 +2148,52 @@ code += `
   ok('derpyUnlocked in state', 'derpyUnlocked' in state);
   ok('derpyMode in state', 'derpyMode' in state);
   ok('derpy keys in RESET_KEYS', RESET_KEYS.includes('tyi-derpy-unlocked') && RESET_KEYS.includes('tyi-derpy-mode'));
+
+  // v1.7.11-beta: derpy retroactive unlock for winners
+  ok('migrateDerpyUnlock is defined', typeof migrateDerpyUnlock === 'function');
+  ok('migrateDerpyUnlock grants unlock to winner missing it', (() => {
+    const savedWon = state.won;
+    const savedUnlocked = state.derpyUnlocked;
+    const savedMsgs = state.messages.length;
+    state.won = true;
+    state.derpyUnlocked = false;
+    try { localStorage.removeItem('tyi-derpy-unlocked'); } catch {}
+    migrateDerpyUnlock();
+    const granted = state.derpyUnlocked === true;
+    const persisted = (() => { try { return localStorage.getItem('tyi-derpy-unlocked') === '1'; } catch { return false; } })();
+    const threadPushed = state.messages.length === savedMsgs + 1;
+    state.messages.length = savedMsgs;
+    state.won = savedWon;
+    state.derpyUnlocked = savedUnlocked;
+    return granted && persisted && threadPushed;
+  })());
+  ok('migrateDerpyUnlock does not double-send Sarah thread', (() => {
+    const savedWon = state.won;
+    const savedUnlocked = state.derpyUnlocked;
+    const savedMsgs = state.messages;
+    state.messages = [{ ts: 1, msgs: DERPY_AWARD_THREAD.map(m => ({ ...m })) }];
+    state.won = true;
+    state.derpyUnlocked = false;
+    migrateDerpyUnlock();
+    const count = state.messages.length;
+    const granted = state.derpyUnlocked === true;
+    state.messages = savedMsgs;
+    state.won = savedWon;
+    state.derpyUnlocked = savedUnlocked;
+    return count === 1 && granted;
+  })());
+  ok('migrateDerpyUnlock leaves non-winners alone', (() => {
+    const savedWon = state.won;
+    const savedUnlocked = state.derpyUnlocked;
+    const savedMsgs = state.messages.length;
+    state.won = false;
+    state.derpyUnlocked = false;
+    migrateDerpyUnlock();
+    const untouched = state.derpyUnlocked === false && state.messages.length === savedMsgs;
+    state.won = savedWon;
+    state.derpyUnlocked = savedUnlocked;
+    return untouched;
+  })());
   ok('maybeReunionReaction returns true when it fires, false when already reacted', (() => {
     const savedReacted = state.reunionReacted;
     const savedMsgCount = state.messages.length;
