@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.5-beta";
+const VERSION = "v1.7.13-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.13-beta": [
+"🎣 <strong>Bait and Switch retired.</strong> The seal-scent achievement is gone, and seal scent itself is properly retired — choosing the attract method now uses fish-oil chum directly, no sub-dropdown.",
+  ],
   "v1.7.5-beta": [
 "🟡 <strong>Matching release button.</strong> 'Release & return to ship' is now flat yellow like the other release buttons.",
   ],
@@ -1823,7 +1826,8 @@ $("launchBtn").addEventListener("click", () => {
     depth: $("depthSelect").value,
     bait: $("baitSelect").value,
     method: $("methodSelect").value,
-    methodOpt: $("methodOptSelect").value
+    /* v1.6.12-beta: attract always uses chum — no sub-dropdown. */
+    methodOpt: $("methodSelect").value === "attract" ? "chum" : $("methodOptSelect").value
   });
 });
 
@@ -2830,7 +2834,9 @@ function repeatPlan(t) {
      expedition with no method restores NO method — it must not retain
      whatever was previously picked in the planner. */
   if (set("methodSelect", t.method || "")) {
-    set("methodOptSelect", t.methodOpt || "none");
+    /* v1.6.12-beta: attract restores as chum; legacy "seal" plans map to chum. */
+    const restoredOpt = t.method === "attract" ? "chum" : (t.methodOpt || "none");
+    set("methodOptSelect", restoredOpt);
   } else {
     const ms = $("methodSelect");
     if (ms && !t.method) { ms.value = ""; ms.dispatchEvent(new Event("change")); }
@@ -4724,7 +4730,8 @@ function updateAllVisuals() {
   });
   const fillOpts = () => {
     const m = METHODS[mSel.value];
-    if (!m) {
+    /* v1.6.12-beta: attract uses chum by default — no sub-dropdown shown. */
+    if (!m || mSel.value === "attract") {
       field.classList.add("hidden");
       oSel.innerHTML = "";
       updateVisual("methodOptSelect");
