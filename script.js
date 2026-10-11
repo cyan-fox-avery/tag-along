@@ -661,7 +661,8 @@ function pickWatchNote(species) {
   return pick(pool);
 }
 
-/* v0.7.0: tagging the first six earns new waters. */
+/* v1.7.9-beta: tagging any 10 sharks unlocks new waters
+   (was v0.7.0: tagging the six original species). */
 const REGION_UNLOCK_THREAD = [
   { who: "them", text: "Ten sharks. You're officially a real shark scientist now, you know." },
   { who: "me", text: "Ten tagged. The institute just cleared two new survey regions for us." },
@@ -994,8 +995,9 @@ const logStore = {
   save(d) { localStorage.setItem("tyi-logbook", JSON.stringify(d)); }
 };
 
-/* v0.7.0: the first six sharks (the original roster). Tagging all six
-   unlocks the Galápagos and South Africa — new waters earned, not given. */
+/* v1.7.9-beta: tagging any 10 sharks unlocks the Galápagos and South
+   Africa — new waters earned, not given
+   (was v0.7.0: the six original species, via a removed species-list const). */
 /* v0.20.0: the pinned shark — "currently researching". One shark at a time,
    persisted across sessions. A focus, not a filter. */
 const pinStore = {
@@ -1769,13 +1771,13 @@ function fillRegions() {
 }
 
 /* v0.7.0: regions unlock in two stages now.
-   - Tagging the first six (the original roster) unlocks the Galápagos and
-     South Africa as real, selectable waters.
+   - v1.7.9-beta: tagging any 10 sharks unlocks the Galápagos and
+     South Africa as real, selectable waters (was: the six original species).
    - Tagging the full roster wins the game (Master Shark Tagger).
      v0.11.0: the win keeps moving up with the roster — always SHARKS.length. */
 function applyRegions() {
-  /* v0.21.0 Mira review: 15/25/35 milestones are genuinely count-based,
-     independent of the original-six unlock. */
+  /* v0.21.0 Mira review: 15/25/35 milestones are count-based,
+     independent of the 10-tag Galápagos/South Africa unlock. */
   const n = Object.keys(state.tagged).length;
   if (state.regionsUnlocked) {
     for (const id of ["galapagos", "south-africa"]) REGIONS[id].locked = false;
@@ -3699,8 +3701,8 @@ $("sarahAskBtn").addEventListener("click", () => {
 
 /* ---------- Milestones & win state ----------
    v0.7.0: two stages.
-   - Tagging the first six (the original roster) unlocks the Galápagos and
-     South Africa as real, selectable waters.
+   - v1.7.9-beta: tagging any 10 sharks unlocks the Galápagos and
+     South Africa as real, selectable waters (was: the six original species).
    - Tagging the full roster wins the game: Master Shark Tagger.
      v0.11.0: the win moves up with the roster (SHARKS.length), always. */
 function checkMilestones() {
@@ -3714,7 +3716,7 @@ function checkMilestones() {
     showRegionUnlock();
   }
   /* v0.21.0 sharknado: progressive region unlocks by tag count.
-     v0.21.0 Mira review: independent of original-six unlock. */
+     v0.21.0 Mira review: independent of the 10-tag Galápagos/South Africa unlock. */
   const n = taggedIds.length;
   if (n >= 15 && REGIONS["east-australia"].locked) {
     REGIONS["east-australia"].locked = false;

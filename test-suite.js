@@ -2158,6 +2158,12 @@ code += `
   ok('v1.7.9 planner shows 10 tags', fileCode.includes('unlocks at 10 tags'));
   // Research locked text uses count language
   ok('v1.7.9 research shows 10 sharks', fileCode.includes('tag 10 sharks to unlock them'));
+  // No stale comments describing the old six-species unlock rule (Mira review)
+  ok('v1.7.9 no stale six-species unlock comments',
+    !fileCode.includes('tagging the first six earns new waters') &&
+    !fileCode.includes('Tagging all six') &&
+    !fileCode.includes('Tagging the first six (the original roster) unlocks') &&
+    !fileCode.includes('original-six unlock'));
 
   // v1.6.10-beta (restored): Sarah throttle state exists
   ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
