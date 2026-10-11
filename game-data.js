@@ -120,7 +120,7 @@ const SARAH_EGG_THREAD = [
    reaction to lemon sharks was literally "LEMONNNNNNN" — this thread is
    separate from the regular Sarah-naming thread, and has maximum feelings. */
 const LEMON_SARAH_EGG_THREAD = [
-  { who: "them", text: "wait. WAIT. you named the LEMON shark sarah??" },
+  { who: "them", text: "wait. WAIT. you named the LEMON shark Sarah??" },
   { who: "me",   text: "Seemed like the right shark for your name." },
   { who: "them", text: "LEMONNNNNNN 😭😭 lemons are my FAVOURITE shark. my absolute favourite shark in the whole ocean. and now there's one out there with MY name and i am not okay." },
   { who: "me",   text: "She's a good one. She knows." },

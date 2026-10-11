@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.4-beta', VERSION === 'v1.6.4-beta');
+  ok('version v1.7.3-beta', VERSION === 'v1.7.3-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1784,6 +1784,7 @@ code += `
   ok('body uses dynamic viewport height', /min-height:\\s*100dvh/.test(cssCode));
   // v1.5.25: lemon shark named Sarah gets its own thread
   ok('lemon sarah thread exists with max feelings', LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('😭😭')) && LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('FAVOURITE')));
+  ok('lemon sarah opener capitalizes Sarah', LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('shark Sarah??')) && !LEMON_SARAH_EGG_THREAD.some(m => m.text.includes('shark sarah??')));
   ok('lemon named Sarah gets the lemon thread', (() => {
     const before = state.messages.length;
     const rec = { name: "Sarah" };
@@ -2019,7 +2020,7 @@ code += `
 
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
-  ok('WHATS_NEW has v1.6.4-beta', Array.isArray(WHATS_NEW['v1.6.4-beta']) && WHATS_NEW['v1.6.4-beta'].length > 0);
+  ok('WHATS_NEW has v1.7.3-beta', Array.isArray(WHATS_NEW['v1.7.3-beta']) && WHATS_NEW['v1.7.3-beta'].length > 0);
   ok('archiveFilters exists with defaults', typeof archiveFilters === 'object' && archiveFilters.q === '' && archiveFilters.sort === 'name');
   ok('archive sort buttons in HTML', /data-asort="name"/.test(htmlCode) && /data-asort="newest"/.test(htmlCode) && /data-asort="oldest"/.test(htmlCode) && /data-asort="iucn"/.test(htmlCode));
   ok('archive search input in HTML', /id="archiveSearch"/.test(htmlCode));
