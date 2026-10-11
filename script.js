@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.6.3-beta";
+const VERSION = "v1.7.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -132,6 +132,9 @@ const WHATS_NEW = {
   "v1.6.3-beta": [
     "🔍 <strong>Archive search.</strong> The Wild Archive now has a search box like the field guide — filter your tagged sharks by common or scientific name.",
     "↕️ <strong>Archive sort.</strong> Sort the Archive by name (A–Z), date tagged (newest or oldest first), or IUCN conservation status.",
+  ],
+  "v1.7.1-beta": [
+    "🦈 <strong>Bruce works after winning.</strong> Naming a shark Bruce now triggers Sarah's Jaws reaction immediately — even after you've completed the game. No more waiting for an expedition that never comes.",
   ],
   "v1.6.1-beta": [
     "🦈 <strong>Bigger logo, tighter header.</strong> The shark logo has more presence and the header takes up less vertical room.",
@@ -3932,7 +3935,12 @@ function maybeNameEgg(speciesId, rec) {
       try { expCount = (state.stats && typeof state.stats.expeditions === "number") ? state.stats.expeditions : 0; } catch {}
       state.bruceEgg = { stage: 0, sharkId: speciesId, playerName: rec.name.trim(), started: Date.now(), lastAdvance: 0, expeditionsAtStage: expCount };
       try { localStorage.setItem("tyi-bruce", JSON.stringify(state.bruceEgg)); } catch {}
-      // Deliberately no pushThread here. Sarah will notice... eventually.
+      /* v1.7.1-beta: fire the stage-0 opener immediately. Previously the chain
+         waited for the next expedition completion or page load — post-win the
+         player runs few expeditions, so naming a shark Bruce produced no
+         feedback at all. The 2-expedition/12-hour spacing still applies
+         BETWEEN later stages, not before the first one. */
+      try { if (typeof advanceBruceChain === "function") advanceBruceChain(); } catch {}
     }
   } catch (e) {
     /* v1.5.2-beta: never let an easter egg crash naming — log and continue. */

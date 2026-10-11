@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.3-beta', VERSION === 'v1.6.3-beta');
+  ok('version v1.7.1-beta', VERSION === 'v1.7.1-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -928,7 +928,7 @@ code += `
       global.sharkById = origSharkById;
     }
   })());
-  ok('v0.23.0: Bruce starts chain silently (no immediate message)', (() => {
+  ok('v1.7.1-beta: Bruce opener fires immediately on trigger', (() => {
     const rec = { name: "Bruce" };
     let pushed = null;
     const savePush = pushThread;
@@ -941,8 +941,8 @@ code += `
     try {
       maybeNameEgg("nurse", rec);
       return state.bruceEgg !== null &&
-             state.bruceEgg.stage === 0 &&
-             pushed === null; // NO immediate message!
+             state.bruceEgg.stage === 1 && // opener fired, advanced to stage 1
+             pushed !== null && pushed.length > 0; // immediate message!
     } finally {
       pushThread = savePush;
       state.bruceEgg = saveBruce;
@@ -950,6 +950,62 @@ code += `
       try { localStorage.removeItem("tyi-bruce"); } catch {}
     }
   })());
+  ok('v1.7.1-beta: Bruce trigger works post-win', (() => {
+    const rec = { name: "bruce" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveBruce = state.bruceEgg;
+    const saveDone = state.bruceChainComplete;
+    const saveWon = state.won;
+    state.bruceEgg = null;
+    state.bruceChainComplete = false;
+    state.won = true; // post-win!
+    try {
+      maybeNameEgg("tiger", rec);
+      return state.bruceEgg !== null && pushed !== null && pushed.length > 0;
+    } finally {
+      pushThread = savePush;
+      state.bruceEgg = saveBruce;
+      state.bruceChainComplete = saveDone;
+      state.won = saveWon;
+      try { localStorage.removeItem("tyi-bruce"); } catch {}
+    }
+  })());
+  ok('v1.7.1-beta: Bruce does not retrigger when chain complete', (() => {
+    const rec = { name: "Bruce" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveBruce = state.bruceEgg;
+    const saveDone = state.bruceChainComplete;
+    state.bruceEgg = null;
+    state.bruceChainComplete = true; // chain already done
+    try {
+      maybeNameEgg("nurse", rec);
+      return state.bruceEgg === null && pushed === null;
+    } finally {
+      pushThread = savePush;
+      state.bruceEgg = saveBruce;
+      state.bruceChainComplete = saveDone;
+    }
+  })());
+  ok('v1.7.1-beta: Sarah egg works post-win', (() => {
+    const rec = { name: "Sarah" };
+    let pushed = null;
+    const savePush = pushThread;
+    pushThread = (msgs) => { pushed = msgs; };
+    const saveWon = state.won;
+    state.won = true; // post-win!
+    try {
+      maybeSarahEgg("nurse", rec);
+      return rec.sarahEgg === true && pushed !== null && pushed.length > 0;
+    } finally {
+      pushThread = savePush;
+      state.won = saveWon;
+    }
+  })());
+  ok('v1.7.1-beta: WHATS_NEW has v1.7.1-beta', Array.isArray(WHATS_NEW['v1.7.1-beta']) && WHATS_NEW['v1.7.1-beta'].length >= 1);
   ok('v0.23.0: export captures RESET_KEYS', (() => {
     return typeof exportSave === "function" &&
            typeof importSave === "function" &&
@@ -1812,7 +1868,7 @@ code += `
       maybeSarahEgg("tiger", { name: "Sarah" });
       maybeNameEgg("tiger", { name: "Sarah" });
       const sarahFired = state.messages.length === m1 + 1;
-      const bruceIntact = !!state.bruceEgg && state.bruceEgg.stage === 0;
+      const bruceIntact = !!state.bruceEgg && state.bruceEgg.stage === 1; // v1.7.1: opener fires immediately
       state.stats.expeditions = (saveExp || 0) + 2;
       const m2 = state.messages.length;
       advanceBruceChain();
@@ -1835,7 +1891,7 @@ code += `
       const sarahFired = state.messages.length === m0 + 1;
       maybeSarahEgg("nurse", { name: "Bruce" });
       maybeNameEgg("nurse", { name: "Bruce" });
-      return sarahFired && !!state.bruceEgg && state.bruceEgg.stage === 0;
+      return sarahFired && !!state.bruceEgg && state.bruceEgg.stage === 1; // v1.7.1: opener fires immediately
     } finally {
       state.messages.length = m0;
       state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
@@ -1848,7 +1904,7 @@ code += `
     state.stats.expeditions = 0;
     try {
       maybeNameEgg("whale", { name: "bruce" });
-      return !!state.bruceEgg && state.bruceEgg.expeditionsAtStage === 0 && state.bruceEgg.stage === 0;
+      return !!state.bruceEgg && state.bruceEgg.expeditionsAtStage === 0 && state.bruceEgg.stage === 1; // v1.7.1: opener fires immediately
     } finally {
       state.bruceEgg = saveBruce; state.bruceChainComplete = saveDone;
       state.stats.expeditions = saveExp;
