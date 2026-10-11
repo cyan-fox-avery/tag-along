@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.12-beta";
+const VERSION = "v1.7.13-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.13-beta": [
+"🎣 <strong>Bait and Switch retired.</strong> The seal-scent achievement is gone, and seal scent itself is properly retired — choosing the attract method now uses fish-oil chum directly, no sub-dropdown.",
+  ],
   "v1.7.12-beta": [
 "🏷️ <strong>IUCN badges no longer clip.</strong> The LC / NT / VU / EN / CR badges in the field-guide legend and on shark cards had their text cut off top and bottom on iPad — fixed with proper line-height and padding.",
   ],
@@ -1836,20 +1839,26 @@ function renderPlanner() {
   fillRegions();
 }
 
+/* v1.7.13-beta: resolve the method option at launch — attract always
+   uses chum since the sub-dropdown was retired. v1.7.6-beta: aggregation
+   has no sub-menu either — default to "boat" for backward-compatible
+   stats/logbook (the choice was flavor-only). Extracted for testability. */
+function resolveLaunchMethodOpt() {
+  const method = $("methodSelect").value;
+  if (method === "aggregation" && !$("methodOptSelect").value) return "boat";
+  return method === "attract" ? "chum" : $("methodOptSelect").value;
+}
+
 $("launchBtn").addEventListener("click", () => {
   const region = $("regionSelect").value;
   if (!region || !REGIONS[region] || REGIONS[region].locked) return;
-  /* v1.7.6-beta: aggregation has no sub-menu — default methodOpt to "boat"
-     for backward-compatible stats/logbook. The choice was flavor-only. */
-  const method = $("methodSelect").value;
-  let methodOpt = $("methodOptSelect").value;
-  if (method === "aggregation" && !methodOpt) methodOpt = "boat";
   runExpedition({
     region,
     depth: $("depthSelect").value,
     bait: $("baitSelect").value,
-    method,
-    methodOpt
+    method: $("methodSelect").value,
+    /* v1.7.13-beta + v1.7.6-beta: attract→chum, aggregation→boat, via helper. */
+    methodOpt: resolveLaunchMethodOpt()
   });
 });
 
@@ -2813,7 +2822,7 @@ function renderLogbook() {
          v0.9.1: the planner lets Method stay unpicked (sub-menu hidden) —
          those trips log method:"" and read as "No method chosen". */
       (t.method && METHODS[t.method])
-        ? `${METHODS[t.method].name} — ${METHODS[t.method].opts[t.methodOpt] || t.methodOpt}`
+        ? `${METHODS[t.method].name} — ${METHODS[t.method].opts[t.methodOpt] || LEGACY_LURES[t.methodOpt] || t.methodOpt}`
         : ("method" in t ? "No method chosen"
           : (t.lure && t.lure !== "none" ? LEGACY_LURES[t.lure] || t.lure : "No lure"))
     ];
@@ -2836,6 +2845,12 @@ function renderLogbook() {
     if (rb) rb.addEventListener("click", () => repeatPlan(t));
     list.appendChild(div);
   });
+}
+
+/* v1.7.13-beta: resolve the restored method option — legacy "seal" plans
+   map to chum. Extracted for testability. */
+function resolveRestoredMethodOpt(t) {
+  return t.method === "attract" ? "chum" : (t.methodOpt || "none");
 }
 
 /* v0.20.0: repeat a logged expedition's plan — restores region, depth, bait
@@ -2861,7 +2876,8 @@ function repeatPlan(t) {
      expedition with no method restores NO method — it must not retain
      whatever was previously picked in the planner. */
   if (set("methodSelect", t.method || "")) {
-    set("methodOptSelect", t.methodOpt || "none");
+    /* v1.6.12-beta: attract restores as chum; legacy "seal" plans map to chum. */
+    set("methodOptSelect", resolveRestoredMethodOpt(t));
   } else {
     const ms = $("methodSelect");
     if (ms && !t.method) { ms.value = ""; ms.dispatchEvent(new Event("change")); }
@@ -4777,7 +4793,8 @@ function updateAllVisuals() {
   });
   const fillOpts = () => {
     const m = METHODS[mSel.value];
-    if (!m) {
+    /* v1.6.12-beta: attract uses chum by default — no sub-dropdown shown. */
+    if (!m || mSel.value === "attract") {
       field.classList.add("hidden");
       oSel.innerHTML = "";
       updateVisual("methodOptSelect");

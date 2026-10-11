@@ -87,7 +87,7 @@ const SHARKS = [
        easier than others. */
     combo: { region: "maldives", bait: ["schooling-fish", "squid", "crustaceans", "tuna"] },
     depths: ["surface", "reef"],
-    methods: { attract: ["chum", "seal"] },
+    methods: { attract: ["chum"] },
     sizeRange: [3.0, 5.5],
     research: "Tiger sharks patrol tropical and subtropical waters worldwide \u2014 everywhere except the Mediterranean. Around the Maldives they cruise the atoll lagoons and reef edges, mostly in the sunlit shallows from the surface down through the reefs. They'll eat almost anything that crosses their path: schooling fish, squid, crabs, turtles, seabirds, tuna \u2014 even seals, and the occasional floating oddity. Researchers have found license plates in their stomachs.\n\nWith tigers, bait is the easy part \u2014 anything meaty will do, from schooling fish to tuna. The real question is where, not what. A fish-oil chum slick drifting through a Maldivian lagoon speaks directly to the curiosity that makes them try everything once.",
     hook: "Pups wear bold dark stripes that fade with age — a tiger costume they eventually outgrow.",
@@ -138,9 +138,9 @@ const SHARKS = [
     code: "GW",
     combo: { region: "south-africa", bait: ["tuna", "schooling-fish"] },
     depths: ["surface", "reef"],
-    methods: { attract: ["seal", "chum"] },
+    methods: { attract: ["chum"] },
     sizeRange: [3.5, 6.0],
-    research: "The ocean's most famous hunter cruises temperate coasts worldwide \u2014 and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water.\n\nThey eat seals and big oily fish like tuna, hunting mostly in the sunlit upper layers. Seal scent in the water is the classic attractant here \u2014 it speaks to what they're already following \u2014 though a chum slick of tuna turns heads too.",
+    research: "The ocean's most famous hunter cruises temperate coasts worldwide \u2014 and off South Africa, great whites gather where the seals haul out. They patrol the surface waters and reef edges, sometimes breaching clean out of the sea in pursuit of prey. Unusually for a fish, they keep their swimming muscles warm, which keeps them fast in cool water.\n\nThey eat seals and big oily fish like tuna, hunting mostly in the sunlit upper layers. A slick of fish oil is the classic attractant here \u2014 it plays on the oily scent trail their seal and tuna meals already leave behind. Oily fish bait like tuna rounds out the spread.",
     hook: "Warm-bodied hunter; can breach fully out of the water.",
     bonus: "Humans are often released after a great white's first bite, but scientists still debate why those bites happen — investigation is one hypothesis among several.",
     conservation: "Listed as Vulnerable — protected in South Africa, Australia, the US, and the Mediterranean; cage-diving tourism turned fear into coastal revenue, and tagging has revealed ocean-basin migrations.",
@@ -359,13 +359,13 @@ const SHARKS = [
     name: "Broadnose Sevengill", latin: "Notorynchus cepedianus", status: "Vulnerable",
     code: "SG",
     /* A shark out of deep time: seven gills, one far-back dorsal, Jurassic
-       lineage. South African kelp forests and bays. Seal scent is honest
+       lineage. South African kelp forests and bays. Fish-oil chum is honest
        here \u2014 Cape fur seals are documented prey. */
     combo: { region: "south-africa", bait: ["tuna", "schooling-fish", "squid"] },
     depths: ["surface", "reef"],
-    methods: { attract: ["chum", "seal"] },
+    methods: { attract: ["chum"] },
     sizeRange: [1.2, 3.0],
-    research: "The broadnose sevengill is a shark out of deep time \u2014 seven gill slits instead of five, a single dorsal fin set far back near the tail, and a lineage, the Hexanchiformes, whose Jurassic fossils already wore seven gills. In South Africa they haunt kelp forests, bays and estuary mouths, mostly shallower than 136 metres, sometimes cruising water barely a metre deep. They are aggressive, opportunistic apex predators: seals, bony fish, rays, even other sharks, plus carrion. Their teeth come in two toolkits \u2014 jagged and cusped above, comb-shaped below, built for sawing through seal blubber.\n\nFish the South African shallows with oily fish or squid and a chum slick; seal scent in the water is honest here too, since Cape fur seals are genuine prey. One caution from the field guides: sevengills get pushy around food, so this is a careful-boat tag. They move seasonally between the bays and deeper water, and show strong fidelity to their seasonal aggregations \u2014 the same sharks returning to the same bays.",
+    research: "The broadnose sevengill is a shark out of deep time \u2014 seven gill slits instead of five, a single dorsal fin set far back near the tail, and a lineage, the Hexanchiformes, whose Jurassic fossils already wore seven gills. In South Africa they haunt kelp forests, bays and estuary mouths, mostly shallower than 136 metres, sometimes cruising water barely a metre deep. They are aggressive, opportunistic apex predators: seals, bony fish, rays, even other sharks, plus carrion. Their teeth come in two toolkits \u2014 jagged and cusped above, comb-shaped below, built for sawing through seal blubber.\n\nFish the South African shallows with oily fish or squid and fish-oil chum \u2014 an honest option here, since Cape fur seals are genuine prey. One caution from the field guides: sevengills get pushy around food, so this is a careful-boat tag. They move seasonally between the bays and deeper water, and show strong fidelity to their seasonal aggregations \u2014 the same sharks returning to the same bays.",
     hook: "Seven gills, one far-back dorsal fin, and a lineage older than the dinosaurs' heyday \u2014 the cow shark of the kelp forests.",
     bonus: "Sevengill relatives with seven gills were already swimming in the Jurassic \u2014 fossils 200 to 145 million years old show the same layout. Females bear litters of 67 to 104 pups, among the largest of any shark.",
     conservation: "Listed as Vulnerable — a coastal shark that's easy to catch; San Francisco Bay tagging shows they use the same spots year after year, which makes local protections powerful.",

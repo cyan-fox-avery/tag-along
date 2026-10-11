@@ -137,17 +137,6 @@ const ACHIEVEMENTS = [
     check: (st) => Object.keys(st.tagged).length >= SHARKS.length && SHARKS.length > 0
   },
   {
-    id: "bait-switch",
-    name: "Bait and Switch",
-    icon: "🎣",
-    breadcrumb: "every tool in the kit",
-    description: "Used every method in the field manual: chum, seal scent, boat survey, spotter plane, and the sightings network.",
-    check: (st) => {
-      const opts = ["chum", "seal", "boat", "plane", "network"];
-      return opts.every(o => (st.stats.methodsUsed || []).includes(o));
-    }
-  },
-  {
     id: "pen-pal",
     name: "Pen Pal",
     icon: "💌",

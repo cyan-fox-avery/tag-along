@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.12-beta', VERSION === 'v1.7.12-beta');
+  ok('version v1.7.13-beta', VERSION === 'v1.7.13-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -355,8 +355,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('20 achievements (19 visible + Bruce hidden)', ACHIEVEMENTS.length === 20 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 19);
+  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -369,10 +369,6 @@ code += `
   state.tagged = Object.fromEntries(SHARKS.map(s => [s.id, { name: "X", researchId: "R" }]));
   checkAchievements();
   ok('Fin-ished unlocks on full roster', !!state.achievements['finished']);
-  resetA();
-  state.stats.methodsUsed = ["chum", "seal", "boat", "plane", "network"];
-  checkAchievements();
-  ok('Bait and Switch unlocks', !!state.achievements['bait-switch']);
   resetA();
   state.tagged = { nurse: { name: "B", researchId: "R", resightings: [{}, {}, {}] } };
   checkAchievements();
@@ -388,7 +384,7 @@ code += `
   checkAchievements();
   ok('Every Shade unlocks across statuses', !!state.achievements['every-shade']);
   ok('new breadcrumbs stay hints',
-    ["full-fathom","finished","bait-switch","pen-pal","off-map","every-shade"].every(id => {
+    ["full-fathom","finished","pen-pal","off-map","every-shade"].every(id => {
       const a = ACHIEVEMENTS.find(x => x.id === id);
       return a && a.breadcrumb && !/tag your first|complete \d+|visit every/i.test(a.breadcrumb);
     }));
@@ -2198,6 +2194,56 @@ code += `
     !fileCode.includes('Tagging the first six (the original roster) unlocks') &&
     !fileCode.includes('original-six unlock'));
   ok('WHATS_NEW has v1.7.12-beta', Array.isArray(WHATS_NEW['v1.7.12-beta']) && WHATS_NEW['v1.7.12-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.13-beta', Array.isArray(WHATS_NEW['v1.7.13-beta']) && WHATS_NEW['v1.7.13-beta'].length >= 1);
+
+  // v1.6.12-beta (re-applied): seal scent removed, attract defaults to chum
+  ok('seal scent removed from attract opts', !METHODS.attract.opts['seal']);
+  ok('chum still in attract opts', METHODS.attract.opts['chum'] === 'Fish-oil chum');
+  ok('no species lists seal as a method', SHARKS.every(s => !(s.methods && s.methods.attract && s.methods.attract.includes('seal'))));
+  ok('legacy lure label preserved for old logbook entries', LEGACY_LURES['seal'] === 'Seal scent');
+  ok('launch handler defaults attract to chum', /methodSelect.*attract.*chum.*methodOptSelect/.test(fileCode) || fileCode.includes('method === "attract" ? "chum"'));
+  ok('fillOpts hides sub-dropdown for attract', fileCode.includes('mSel.value === "attract"'));
+
+  // v1.7.13-beta: Bait and Switch retired
+  ok('bait-switch achievement removed', !ACHIEVEMENTS.some(a => a.id === 'bait-switch'));
+
+  // v1.7.13-beta Mira review fixes: research copy + logbook legacy labels + behavioral tests
+  ok('great white research recommends fish-oil chum, not seal scent', (() => {
+    const gw = SHARKS.find(s => s.id === 'greatwhite');
+    return gw.research.includes('fish oil') && !gw.research.includes('Seal scent in the water');
+  })());
+  ok('sevengill research recommends fish-oil, not seal scent', (() => {
+    const sg = SHARKS.find(s => s.id === 'sevengill');
+    return sg.research.includes('fish-oil') && !sg.research.includes('seal scent in the water');
+  })());
+  ok('no research text recommends seal scent as an option', SHARKS.every(s =>
+    !/seal scent (in the water )?(is|as)/i.test(s.research || '')));
+  ok('logbook renders old seal methodOpt as Seal scent', (() => {
+    const t = { method: 'attract', methodOpt: 'seal' };
+    const label = METHODS[t.method].opts[t.methodOpt] || LEGACY_LURES[t.methodOpt] || t.methodOpt;
+    return label === 'Seal scent';
+  })());
+  ok('logbook renders pre-v0.9 seal lure as Seal scent', (() => {
+    const t = { lure: 'seal' };
+    const label = (t.lure && t.lure !== 'none' ? LEGACY_LURES[t.lure] || t.lure : 'No lure');
+    return label === 'Seal scent';
+  })());
+  ok('launch with attract resolves methodOpt chum (behavioral)', (() => {
+    els['methodSelect'].value = 'attract';
+    els['methodOptSelect'].value = '';
+    return resolveLaunchMethodOpt() === 'chum';
+  })());
+  ok('launch with aggregation keeps sub-option (behavioral)', (() => {
+    els['methodSelect'].value = 'aggregation';
+    els['methodOptSelect'].value = 'boat';
+    return resolveLaunchMethodOpt() === 'boat';
+  })());
+  ok('stored seal plan restores as chum (behavioral)', (() => {
+    return resolveRestoredMethodOpt({ method: 'attract', methodOpt: 'seal' }) === 'chum';
+  })());
+  ok('stored chum plan restores as chum (behavioral)', (() => {
+    return resolveRestoredMethodOpt({ method: 'attract', methodOpt: 'chum' }) === 'chum';
+  })());
 
   // v1.6.10-beta (restored): Sarah throttle state exists
   ok('lastSingleCheerExp in state', 'lastSingleCheerExp' in state);
