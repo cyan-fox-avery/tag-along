@@ -50,16 +50,16 @@ function BG_URL(name) {
   return `assets/backgrounds-webp/${name}.webp`;
 }
 
-/* Preloads both the illustration and silhouette for a species so the
-   tap-to-reveal encounter is instant. Safe to call repeatedly. */
+/* Preloads the illustration for a species so the tap-to-reveal encounter
+   is instant. v1.6.6-beta: silhouettes are no longer separate images — the
+   shadow uses the illustration with a dark CSS overlay. Safe to call
+   repeatedly. */
 const _preloaded = new Set();
 function preloadSharkArt(id) {
   if (_preloaded.has(id)) return;
   _preloaded.add(id);
-  for (const type of ["illustration", "silhouette"]) {
-    const img = new Image();
-    img.src = ART_URL(id, type);
-  }
+  const img = new Image();
+  img.src = ART_URL(id, "illustration");
 }
 
 /* Returns an <img> HTML string for a shark's art, with onerror fallback
