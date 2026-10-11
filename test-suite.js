@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.6.5-beta', VERSION === 'v1.6.5-beta');
+  ok('version v1.6.6-beta', VERSION === 'v1.6.6-beta');
 
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -2041,6 +2041,27 @@ code += `
   ok('pinch-to-zoom removed (no pinch state)', !/pinchStartDist|pinching|pinchMoved/.test(fileCode));
   ok('one-finger pan still wired', /initMapGestures/.test(fileCode) && /mapFocusClear/.test(fileCode));
   ok('no pinch whats-new entry', !/Map pinch-to-zoom/.test(fileCode));
+
+  // v1.6.6-beta: Shadows match their sharks
+  ok('WHATS_NEW has v1.6.6-beta with 1 entry', Array.isArray(WHATS_NEW['v1.6.6-beta']) && WHATS_NEW['v1.6.6-beta'].length === 1);
+  ok('dive encounter shadow uses illustration not silhouette webp', (() => {
+    // Phase 1 must use the illustration (darkened by CSS) so the shadow
+    // always matches the shark — no separate silhouette image.
+    const src = doEncounter.toString();
+    return src.includes('shark-shadow') &&
+           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') &&
+           !src.includes('sharkArtImg(species.id, "silhouette"');
+  })());
+  ok('shark-shadow CSS darkens illustration and SVG fallback', (() => {
+    // The dark overlay must apply to both the WebP img and any SVG
+    // fallback, so a failed image load never reveals the species.
+    return /\\.shark-shadow img,\\s*\\.shark-shadow svg\\s*\\{\\s*filter:\\s*brightness\\(0\\)/.test(cssCode);
+  })());
+  ok('preloadSharkArt only preloads illustrations', (() => {
+    // Silhouettes are no longer separate images; preloading them is wasteful.
+    const src = preloadSharkArt.toString();
+    return src.includes('"illustration"') && !src.includes('"silhouette"');
+  })());
 
   // v1.6.3-beta: Archive search + sort
   ok('WHATS_NEW has v1.6.3-beta with 2 entries', Array.isArray(WHATS_NEW['v1.6.3-beta']) && WHATS_NEW['v1.6.3-beta'].length === 2);
