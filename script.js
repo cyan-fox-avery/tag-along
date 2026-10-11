@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.16-beta";
+const VERSION = "v1.7.17-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.17-beta": [
+"🎁 <strong>Claim your derpy award.</strong> If you've won but the derpy unlock never fired, a claim button now appears in your Collection trophy shelf — one tap grants the award, Sarah's thread, and the derpy mode toggle.",
+  ],
   "v1.7.16-beta": [
 "🦈 <strong>Derpy award gate hardened.</strong> The retroactive derpy unlock now explicitly requires a full 50-shark roster, so only genuine full-roster winners receive Sarah's derpy thread and the Collection toggle.",
   ],
@@ -4277,6 +4280,22 @@ function renderCollection() {
     shelf.appendChild(t);
   }
 
+  /* v1.7.17-beta: manual derpy claim fallback — if the player has won but
+     the automatic unlock never fired, show a one-time claim button. */
+  if (state.won && !state.derpyUnlocked) {
+    const cb = document.createElement("button");
+    cb.type = "button";
+    cb.className = "derpy-claim";
+    cb.setAttribute("aria-label", "Claim your derpy shark award");
+    cb.innerHTML = `\uD83C\uDF81 Claim your derpy award`;
+    cb.addEventListener("click", () => {
+      claimDerpyAward();
+      renderCollection();
+      renderResearch();
+    });
+    shelf.appendChild(cb);
+  }
+
   /* v1.7.0-beta: derpy mode toggle — win-unlocked completion award. */
   if (state.derpyUnlocked) {
     const d = document.createElement("button");
@@ -4760,7 +4779,19 @@ function migrateDerpyUnlock() {
        genuine full-roster winners only. migrateWinV07() already resets
        state.won for partial-roster saves; this check is belt-and-braces
        so the award can never leak to an incomplete win. */
-    const fullRoster = Object.keys(state.tagged).length >= SHARKS.length;
+    const taggedCount = Object.keys(state.tagged).length;
+    const fullRoster = taggedCount >= SHARKS.length;
+    /* v1.7.17-beta: diagnostic logging — Avery's valid 50/50 win wasn't
+       unlocking, so log the gate inputs for debugging. */
+    try {
+      console.log("[derpy-migrate]", JSON.stringify({
+        won: state.won,
+        taggedCount,
+        rosterSize: SHARKS.length,
+        fullRoster,
+        derpyUnlocked: !!state.derpyUnlocked,
+      }));
+    } catch {}
     if (state.won && fullRoster && !state.derpyUnlocked) {
       state.derpyUnlocked = true;
       localStorage.setItem("tyi-derpy-unlocked", "1");
@@ -4773,6 +4804,21 @@ function migrateDerpyUnlock() {
         pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
       }
     }
+  } catch {}
+}
+/* v1.7.17-beta: manual derpy claim — same grant as the automatic migration,
+   callable from the Collection trophy shelf fallback button. */
+function claimDerpyAward() {
+  try {
+    state.derpyUnlocked = true;
+    localStorage.setItem("tyi-derpy-unlocked", "1");
+    const derpyMarker = "derpy mode toggle in your collection book";
+    const alreadyShown = state.messages.some(thread =>
+      (thread.msgs || []).some(m => (m.text || "").includes(derpyMarker)));
+    if (!alreadyShown) {
+      pushThread(DERPY_AWARD_THREAD.map(m => ({ ...m })));
+    }
+    try { console.log("[derpy-claim] manual claim granted"); } catch {}
   } catch {}
 }
 /* v0.22.0 Mira review: capture pre-migration storage state for What's New.
