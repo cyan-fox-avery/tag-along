@@ -191,7 +191,9 @@ const ACHIEVEMENTS = [
     breadcrumb: "name a shark the most popular shark name",
     description: "Named a shark Bruce and discovered how deep the rabbit hole goes.",
     hidden: true,
-    check: (st) => !!st.bruceChainComplete
+    /* v1.7.10-beta: fires as soon as the player names a shark Bruce (the
+       chain has started), not only when the full slow chain completes. */
+    check: (st) => !!(st.bruceChainComplete || st.bruceEgg)
   },
   {
     id: "white-whale",

@@ -38,7 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.9-beta', VERSION === 'v1.7.9-beta');
+  ok('version v1.7.10-beta', VERSION === 'v1.7.10-beta');
+  ok("WHATS_NEW has v1.7.10-beta", !!(WHATS_NEW["v1.7.10-beta"] && WHATS_NEW["v1.7.10-beta"].length));
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -286,6 +287,29 @@ code += `
   checkAchievements();
   ok('endangered tag unlocks Every One Counts', !!state.achievements['every-one-counts']);
   ok('Bruce stays locked without the chain', !state.achievements.bruce);
+  // v1.7.10-beta: "You Named Him WHAT?" fires as soon as the chain starts
+  ok('bruce check passes on egg start', (() => {
+    const b = ACHIEVEMENTS.find(a => a.id === 'bruce');
+    return b.check({ bruceEgg: { stage: 0 }, bruceChainComplete: false }) === true &&
+           b.check({ bruceEgg: null, bruceChainComplete: false }) === false &&
+           b.check({ bruceEgg: null, bruceChainComplete: true }) === true;
+  })());
+  ok('Bruce unlocks when the chain starts (no waiting)', (() => {
+    const saveEgg = state.bruceEgg;
+    const saveDone = state.bruceChainComplete;
+    const saveAch = state.achievements.bruce;
+    state.bruceEgg = { stage: 0, sharkId: 'nurse', playerName: 'Bruce', started: Date.now(), lastAdvance: 0, expeditionsAtStage: 0 };
+    state.bruceChainComplete = false;
+    delete state.achievements.bruce;
+    try {
+      checkAchievements();
+      return !!state.achievements.bruce;
+    } finally {
+      state.bruceEgg = saveEgg;
+      state.bruceChainComplete = saveDone;
+      if (saveAch) state.achievements.bruce = saveAch; else delete state.achievements.bruce;
+    }
+  })());
   ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
 
   // v0.18.0 wave — 7 new species live on the roster with verified archive media
