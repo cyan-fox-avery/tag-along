@@ -2646,18 +2646,28 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
   /* v1.7.19-beta Mira review: Bukangi thread is welfare-first */
   ok('v1.7.19 Bukangi thread has no flippant "vibing" framing',
     !BUKANGI_THREAD.some(function(m){ return /vibing|icon behavior/i.test(m.text); }));
-  ok('v1.7.19 Bukangi thread mentions snout abrasions and not disturbing her',
-    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('abrasions') !== -1; }) &&
+  ok('v1.7.19 Bukangi thread reports scrapes with uncertain cause, not asserted abrasions',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('scrapes') !== -1; }) &&
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('might have hit a wall') !== -1; }) &&
+    !BUKANGI_THREAD.some(function(m){ return m.text.indexOf('abrasions') !== -1; }));
+  ok('v1.7.19 Bukangi thread asks people to stop shining lights and not disturb her',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('stop shining lights') !== -1; }) &&
     BUKANGI_THREAD.some(function(m){ return m.text.indexOf('not to disturb') !== -1; }));
   ok('v1.7.19 Bukangi thread says the canal does not mean she is happy',
     BUKANGI_THREAD.some(function(m){ return m.text.indexOf("doesn't mean she's happy") !== -1; }));
   ok('v1.7.19 WHATS_NEW Bukangi avoids "most famous shark" claim',
     WHATS_NEW['v1.7.19-beta'].some(function(e){ return e.indexOf('captivating Busan') !== -1; }) &&
     !WHATS_NEW['v1.7.19-beta'].some(function(e){ return e.indexOf('most famous shark') !== -1; }));
-  /* v1.7.19-beta Mira review: behavioral Bukangi one-shot tests */
+  /* v1.7.19-beta Mira review: behavioral Bukangi one-shot tests.
+     Fixtures snapshot/restore tyi-messages, tyi-bukangi and state.unread so
+     this block leaves no trace in the harness. */
   (function(){
     var _egg = state.bukangiEgg;
     var _len = state.messages.length;
+    var _unread = state.unread;
+    var _msgsLS = null, _bukLS = null;
+    try { _msgsLS = localStorage.getItem('tyi-messages'); } catch {}
+    try { _bukLS = localStorage.getItem('tyi-bukangi'); } catch {}
     // push failure → flag NOT set, egg not consumed (run first: no thread yet)
     var _push = pushThread;
     state.bukangiEgg = false;
@@ -2669,6 +2679,49 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
     pushThread = _push;
     ok('v1.7.19 Bukangi push failure does not consume the egg',
       _threw === false && r0 === false && state.bukangiEgg === false && state.messages.length === _len);
+    // post-append save failure: storage dies inside pushThread's saveMsgs,
+    // AFTER the in-memory append. The egg must not be consumed on the ghost,
+    // and the in-memory append must be rolled back so the retry can't double-post.
+    (function(){
+      var _egg2 = state.bukangiEgg;
+      var _len2 = state.messages.length;
+      var _unread2 = state.unread;
+      var _msgs2 = null, _buk2 = null;
+      try { _msgs2 = localStorage.getItem('tyi-messages'); } catch {}
+      try { _buk2 = localStorage.getItem('tyi-bukangi'); } catch {}
+      state.bukangiEgg = false;
+      try { localStorage.removeItem('tyi-bukangi'); } catch {}
+      var _setItem = localStorage.setItem;
+      localStorage.setItem = function(k, v) {
+        if (k === 'tyi-messages') throw new Error('simulated post-append storage failure');
+        return _setItem.call(localStorage, k, v);
+      };
+      var r5 = false, _threw5 = false;
+      try { r5 = maybeBukangiEgg({ id: 'dusky' }); } catch (e) { _threw5 = true; }
+      localStorage.setItem = _setItem;
+      ok('v1.7.19 Bukangi post-append save failure leaves no ghost and does not consume the egg',
+        _threw5 === false && r5 === false && state.bukangiEgg === false &&
+        state.messages.length === _len2 && state.unread === _unread2 &&
+        localStorage.getItem('tyi-bukangi') === null);
+      // retry with healthy storage → exactly one durable thread, flag set
+      state.bukangiEgg = false;
+      var r6 = maybeBukangiEgg({ id: 'dusky' });
+      var persisted = [];
+      try { persisted = (JSON.parse(localStorage.getItem('tyi-messages') || '{}').messages) || []; } catch {}
+      var bukCount = persisted.filter(function(t){
+        return (t.msgs || []).some(function(m){ return (m.text || '').indexOf('Bukangi') !== -1; });
+      }).length;
+      ok('v1.7.19 Bukangi retry after save failure delivers exactly one durable thread',
+        r6 === true && state.bukangiEgg === true && bukCount === 1);
+      // restore everything this sub-check touched
+      state.bukangiEgg = _egg2;
+      state.messages.length = _len2;
+      state.unread = _unread2;
+      try {
+        if (_msgs2 === null) localStorage.removeItem('tyi-messages'); else localStorage.setItem('tyi-messages', _msgs2);
+        if (_buk2 === null) localStorage.removeItem('tyi-bukangi'); else localStorage.setItem('tyi-bukangi', _buk2);
+      } catch {}
+    })();
     // first dusky reveal → exactly one thread, flag set
     state.bukangiEgg = false;
     var r1 = maybeBukangiEgg({ id: 'dusky' });
@@ -2688,8 +2741,25 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
     var r4 = maybeBukangiEgg({ id: 'dusky' });
     ok('v1.7.19 Bukangi dedup skips duplicate push but sets flag',
       r4 === true && state.messages.length === _len + 1 && state.bukangiEgg === true);
+    // reset/export/import handling of tyi-bukangi
+    ok('v1.7.19 tyi-bukangi cleared by full reset',
+      (function(){
+        try { localStorage.setItem('tyi-bukangi', '1'); } catch {}
+        RESET_KEYS.forEach(function(k){ try { localStorage.removeItem(k); } catch {} });
+        return localStorage.getItem('tyi-bukangi') === null;
+      })());
+    ok('v1.7.19 tyi-bukangi allowed in save export/import',
+      SAVE_KEY_ALLOWLIST.indexOf('tyi-bukangi') !== -1 &&
+      validateSaveData({ version: 'v1.7.19-beta',
+        keys: { 'tyi-bukangi': '1', 'tyi-collection': '{"nurse":{"researchId":"NS-2026-001"}}' } }).ok === true);
+    // restore fixtures: no trace left in the harness
     state.bukangiEgg = _egg;
     state.messages.length = _len;
+    state.unread = _unread;
+    try {
+      if (_msgsLS === null) localStorage.removeItem('tyi-messages'); else localStorage.setItem('tyi-messages', _msgsLS);
+      if (_bukLS === null) localStorage.removeItem('tyi-bukangi'); else localStorage.setItem('tyi-bukangi', _bukLS);
+    } catch {}
   })();
 
 console.log(out.join('\\n'));

@@ -4219,6 +4219,20 @@ function maybeNameEgg(speciesId, rec) {
   }
 }
 
+/* v1.7.19-beta: Bukangi easter egg — durable-delivery check.
+   The dedup must run against the PERSISTED Phone thread (localStorage), not
+   in-memory state.messages. If a previous attempt appended to memory but
+   localStorage failed, the thread was never durable — retry the push instead
+   of silently consuming the egg on an in-memory ghost. */
+function bukangiThreadPersisted() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("tyi-messages") || "{}");
+    const threads = saved.messages || [];
+    return threads.some(thread =>
+      (thread.msgs || []).some(m => (m.text || "").includes("Bukangi")));
+  } catch { return false; }
+}
+
 /* v1.7.19-beta: Bukangi easter egg — first dusky shark encounter, one-time.
    Extracted as a named helper (like maybeNameEgg) so the one-shot behavior
    is behaviorally testable. Defensive guards: this must never crash the
@@ -4229,22 +4243,29 @@ function maybeBukangiEgg(species) {
     if (state.bukangiEgg) return false;
     if (typeof pushThread !== "function") return false;
     if (typeof BUKANGI_THREAD === "undefined" || !Array.isArray(BUKANGI_THREAD)) return false;
-    /* v1.7.19-beta Mira review: dedup against the saved thread marker. If a
-       previous attempt pushed the thread but crashed before persisting the
-       flag, don't send Sarah's thread a second time — just record the flag. */
-    const bukangiMarker = "Bukangi";
-    let alreadyShown = false;
-    try {
-      alreadyShown = state.messages.some(thread =>
-        (thread.msgs || []).some(m => (m.text || "").includes(bukangiMarker)));
-    } catch {}
-    if (!alreadyShown) {
-      pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
+    if (bukangiThreadPersisted()) {
+      /* v1.7.19-beta Mira review: the thread is durable but the flag was
+         never recorded (interrupted save) — record the flag without sending
+         Sarah's thread a second time. */
+      state.bukangiEgg = true;
+      try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
+      return true;
     }
-    /* v1.7.19-beta Mira review: mark the trigger complete only AFTER delivery
-       was attempted without throwing. If pushThread throws, the flag stays
-       unset so a later dusky encounter retries instead of silently consuming
-       the easter egg. */
+    /* Snapshot in-memory message state so a storage failure mid-push can be
+       rolled back — otherwise the ghost thread would linger in memory and a
+       later retry would double-post. */
+    const _msgLen = state.messages.length;
+    const _unread = state.unread;
+    try {
+      pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
+    } catch (pushErr) {
+      try { state.messages.length = _msgLen; state.unread = _unread; } catch {}
+      throw pushErr;
+    }
+    /* v1.7.19-beta Mira review: mark the trigger complete only AFTER the
+       thread is durable. If the save failed, the flag stays unset so a later
+       dusky encounter retries instead of silently consuming the egg. */
+    if (!bukangiThreadPersisted()) return false;
     state.bukangiEgg = true;
     try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
     return true;
