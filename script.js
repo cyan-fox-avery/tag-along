@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.19-beta";
+const VERSION = "v1.7.20-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.20-beta": [
+"🦈 <strong>Derpy mystery shadows.</strong> In derpy mode, the expedition's mystery silhouette is a darkened derpy shape — same suspense, derpy style. Tap to reveal the full derpy art.",
+  ],
   "v1.7.19-beta": [
 "🏅 <strong>Achievement cards, tidied.</strong> The achievement name now sits above its description instead of beside it — roomier cards, easier scanning.",
 "🏆 <strong>Trophy moved.</strong> Your Master Shark Tagger certificate button now lives in the Achievements tab, where it belongs. The derpy mode toggle stays in your Collection.",
@@ -2110,7 +2113,10 @@ function doEncounter(species, plan) {
        to the full-colour illustration and reveals the name.
        The illustration is preloaded so the reveal is instant.
        v1.6.6-beta: the shadow now uses the shark's actual illustration
-       with a dark CSS overlay, so the silhouette always matches the shark. */
+       with a dark CSS overlay, so the silhouette always matches the shark.
+       v1.7.20-beta: in derpy mode the mystery silhouette is a darkened
+       derpy SVG (same CSS darkening trick) — suspense in derpy style,
+       revealed on tap to the full derpy art. */
     preloadSharkArt(species.id);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     sharkEl.innerHTML =
