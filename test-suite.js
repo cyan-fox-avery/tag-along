@@ -2588,34 +2588,61 @@ ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHA
     })());
 
 
-  // v1.7.20-beta: derpy mode mystery silhouette is a darkened derpy SVG
-  // (CSS .shark-shadow svg { filter: brightness(0); } handles the darkening)
+  // v1.7.20-beta: derpy mystery shadows — documentation + regression tests.
+  // In derpy mode the expedition mystery silhouette is a darkened derpy SVG:
+  // sharkArtImg() returns the derpy SVG, and CSS (.shark-shadow svg)
+  // darkens it with filter: brightness(0) (same trick as v1.6.6).
+  // No behavior change vs v1.7.18; this release locks in the intent.
   ok('sharkArtImg no longer takes skipDerpy', sharkArtImg.length <= 3);
   ok('shadow call site has no skipDerpy arg', fileCode.indexOf('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') !== -1);
   ok('reveal call site keeps derpy behavior', fileCode.indexOf('sharkArtImg(species.id, "illustration", species.name)') !== -1);
-  ok('derpy shadow returns derpy SVG in derpy mode', (function(){
-    var prev = localStorage._s['tyi-derpy-mode'];
-    localStorage._s['tyi-derpy-mode'] = '1';
-    var html = sharkArtImg('nurse', 'illustration', 'Mysterious shark silhouette');
-    if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
-    else { localStorage._s['tyi-derpy-mode'] = prev; }
-    return html === ART['nurse'];
+  ok('CSS darkens svg inside .shark-shadow', (function(){
+    var sel = cssCode.indexOf('.shark-shadow svg');
+    if (sel === -1) return false;
+    var open = cssCode.indexOf('{', sel);
+    var close = cssCode.indexOf('}', open);
+    if (open === -1 || close === -1) return false;
+    return cssCode.slice(open, close).indexOf('brightness(0)') !== -1;
   })());
-  ok('derpy reveal keeps derpy SVG without skipDerpy', (function(){
-    var prev = localStorage._s['tyi-derpy-mode'];
-    localStorage._s['tyi-derpy-mode'] = '1';
+  // run fn with derpy mode forced to a value, restoring the prior value after
+  var withDerpyMode = function(val, fn){
+    var prev = localStorage.getItem('tyi-derpy-mode');
+    try { localStorage.setItem('tyi-derpy-mode', val); return fn(); }
+    finally {
+      if (prev === null) { localStorage.removeItem('tyi-derpy-mode'); }
+      else { localStorage.setItem('tyi-derpy-mode', prev); }
+    }
+  };
+  // the exact shadow markup pattern from the expedition mystery phase
+  var shadowMarkup = function(id){
+    return '<div class="shark-shadow">' + sharkArtImg(id, 'illustration', 'Mysterious shark silhouette') + '</div>';
+  };
+  ok('derpy shadow: derpy SVG inside .shark-shadow (nurse)', withDerpyMode('1', function(){
+    var inner = sharkArtImg('nurse', 'illustration', 'Mysterious shark silhouette');
+    var html = shadowMarkup('nurse');
+    return inner === ART['nurse'] && inner.indexOf('<svg') !== -1 &&
+           html.indexOf('class="shark-shadow"') !== -1;
+  }));
+  ok('derpy shadow: derpy SVG inside .shark-shadow (whale shark)', withDerpyMode('1', function(){
+    var inner = sharkArtImg('whale', 'illustration', 'Mysterious shark silhouette');
+    var html = shadowMarkup('whale');
+    return inner === ART['whale'] && inner.indexOf('<svg') !== -1 &&
+           html.indexOf('class="shark-shadow"') !== -1;
+  }));
+  ok('derpy reveal keeps derpy SVG (nurse)', withDerpyMode('1', function(){
+    return sharkArtImg('nurse', 'illustration', 'Nurse Shark') === ART['nurse'];
+  }));
+  ok('derpy reveal keeps derpy SVG (whale shark)', withDerpyMode('1', function(){
+    return sharkArtImg('whale', 'illustration', 'Whale Shark') === ART['whale'];
+  }));
+  ok('non-derpy mode returns standard img tag (nurse)', withDerpyMode('0', function(){
     var html = sharkArtImg('nurse', 'illustration', 'Nurse Shark');
-    if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
-    else { localStorage._s['tyi-derpy-mode'] = prev; }
-    return html === ART['nurse'];
-  })());
-  ok('non-derpy mode returns standard img tag', (function(){
-    var prev = localStorage._s['tyi-derpy-mode'];
-    if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
-    var html = sharkArtImg('nurse', 'illustration', 'Nurse Shark');
-    if (prev !== undefined) { localStorage._s['tyi-derpy-mode'] = prev; }
     return html.indexOf('<img') === 0 && html.indexOf('data-shark-art="nurse"') !== -1;
-  })());
+  }));
+  ok('non-derpy mode returns standard img tag (whale shark)', withDerpyMode('0', function(){
+    var html = sharkArtImg('whale', 'illustration', 'Whale Shark');
+    return html.indexOf('<img') === 0 && html.indexOf('data-shark-art="whale"') !== -1;
+  }));
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

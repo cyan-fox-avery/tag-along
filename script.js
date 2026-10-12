@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v1.7.20-beta": [
-"🦈 <strong>Derpy mystery shadows.</strong> In derpy mode, the expedition's mystery silhouette is now a darkened derpy shape — same suspense, derpy style. Tap to reveal the full derpy art.",
+"🦈 <strong>Derpy mystery shadows.</strong> In derpy mode, the expedition's mystery silhouette is a darkened derpy shape — same suspense, derpy style. Tap to reveal the full derpy art.",
   ],
   "v1.7.18-beta": [
 "🎁 <strong>Derpy claim button hardened.</strong> The manual derpy award claim button now validates every shark in the roster (not just the count, so stale entries can't pass) and stays hidden while a win ceremony is pending — the ceremony presents Sarah's gift itself. The claim is one-time and can never double-send her thread.",
