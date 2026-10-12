@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.18-beta', VERSION === 'v1.7.18-beta');
+  ok('version v1.7.19-beta', VERSION === 'v1.7.19-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2585,6 +2585,197 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
              badgeText.indexOf('&lt;') !== -1 &&
              badgeText.indexOf('Tom &amp; &quot;Jerry&quot; &lt;3') !== -1;
     })());
+
+  /* v1.7.19-beta: achievement cards stack name above hint */
+  ok('v1.7.19 WHATS_NEW entry present',
+    Array.isArray(WHATS_NEW['v1.7.19-beta']) && WHATS_NEW['v1.7.19-beta'].length === 3);
+  ok('v1.7.19 achievement cards use stacked markup',
+    fileCode.includes('guide-row-head ach-stack') &&
+    fileCode.includes('class="ach-texts"'));
+  ok('v1.7.19 achievement stack CSS present',
+    cssCode.includes('.guide-row-head.ach-stack') &&
+    cssCode.includes('.guide-row-head .ach-texts') &&
+    cssCode.includes('flex-direction: column'));
+  /* v1.7.19-beta: trophy moved to Achievements, derpy stays in Collection */
+  ok('v1.7.19 achieveTrophyShelf div in HTML',
+    htmlCode.includes('id="achieveTrophyShelf"'));
+  ok('v1.7.19 trophy renders in Achievements',
+    fileCode.includes('achieveTrophyShelf') &&
+    fileCode.includes('v1.7.19-beta: the Master Shark Tagger trophy lives here now'));
+  ok('v1.7.19 trophy moved out of Collection render',
+    fileCode.indexOf('v1.7.19-beta: the Master Shark Tagger trophy moved to the Achievements') !== -1 &&
+    fileCode.indexOf('trophy-shelf') > fileCode.indexOf('function renderAchievements()'));
+  ok('v1.7.19 derpy toggle still in Collection',
+    fileCode.includes('derpy-toggle') &&
+    fileCode.indexOf('derpy-toggle') > fileCode.indexOf('function renderCollection()'));
+  /* v1.7.19-beta: Bukangi easter egg */
+  ok('v1.7.19 BUKANGI_THREAD defined with 4 draft messages',
+    typeof BUKANGI_THREAD !== 'undefined' && Array.isArray(BUKANGI_THREAD) &&
+    BUKANGI_THREAD.length === 4 &&
+    BUKANGI_THREAD.every(function(m){ return m.who === 'them'; }));
+  ok('v1.7.19 Bukangi mentions Busan canal facts',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('Busan') !== -1; }) &&
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('ambassador') !== -1; }));
+  ok('v1.7.19 bukangiEgg state flag with tyi-bukangi persistence',
+    fileCode.includes('bukangiEgg') &&
+    fileCode.includes('tyi-bukangi'));
+  ok('v1.7.19 tyi-bukangi in RESET_KEYS',
+    fileCode.includes('"tyi-bukangi"]'));
+  ok('v1.7.19 dusky encounter hook present',
+    fileCode.includes('maybeBukangiEgg(species)') &&
+    fileCode.includes('function maybeBukangiEgg') &&
+    fileCode.includes('BUKANGI_THREAD'));
+  ok('v1.7.19 dusky species exists in roster',
+    SHARKS.some(function(s){ return s.id === 'dusky'; }));
+  /* v1.7.19-beta Mira review: trophy refreshes without a reload */
+  ok('v1.7.19 doWin renders Achievements',
+    (function(){
+      var start = fileCode.indexOf('function doWin()');
+      var end = fileCode.indexOf('function winStep(');
+      return fileCode.slice(start, end).indexOf('renderAchievements()') !== -1;
+    })());
+  ok('v1.7.19 claim button re-renders Achievements on success',
+    fileCode.indexOf('if (claimDerpyAward())') !== -1 &&
+    (function(){
+      var i = fileCode.indexOf('if (claimDerpyAward())');
+      return fileCode.slice(i, i + 120).indexOf('renderAchievements()') !== -1;
+    })());
+  /* v1.7.19-beta Mira review: achievement names wrap in the stack */
+  ok('v1.7.19 achievement names wrap instead of truncating',
+    cssCode.indexOf('.guide-row-head .ach-texts .guide-row-name { flex: none; white-space: normal; overflow: visible; text-overflow: clip; }') !== -1);
+  /* v1.7.19-beta Mira review: Bukangi thread is welfare-first */
+  ok('v1.7.19 Bukangi thread has no flippant "vibing" framing',
+    !BUKANGI_THREAD.some(function(m){ return /vibing|icon behavior/i.test(m.text); }));
+  ok('v1.7.19 Bukangi thread reports scrapes with uncertain cause, not asserted abrasions',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('scrapes') !== -1; }) &&
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('might have hit a wall') !== -1; }) &&
+    !BUKANGI_THREAD.some(function(m){ return m.text.indexOf('abrasions') !== -1; }));
+  ok('v1.7.19 Bukangi thread asks people to stop shining lights and not disturb her',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('stop shining lights') !== -1; }) &&
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf('not to disturb') !== -1; }));
+  ok('v1.7.19 Bukangi thread says the canal does not mean she is happy',
+    BUKANGI_THREAD.some(function(m){ return m.text.indexOf("doesn't mean she's happy") !== -1; }));
+  ok('v1.7.19 WHATS_NEW Bukangi avoids "most famous shark" claim',
+    WHATS_NEW['v1.7.19-beta'].some(function(e){ return e.indexOf('captivating Busan') !== -1; }) &&
+    !WHATS_NEW['v1.7.19-beta'].some(function(e){ return e.indexOf('most famous shark') !== -1; }));
+  /* v1.7.19-beta Mira review: behavioral Bukangi one-shot tests.
+     Fixtures snapshot/restore tyi-messages, tyi-bukangi and state.unread so
+     this block leaves no trace in the harness. */
+  (function(){
+    var _egg = state.bukangiEgg;
+    var _len = state.messages.length;
+    var _unread = state.unread;
+    var _msgsLS = null, _bukLS = null;
+    try { _msgsLS = localStorage.getItem('tyi-messages'); } catch {}
+    try { _bukLS = localStorage.getItem('tyi-bukangi'); } catch {}
+    // push failure → flag NOT set, egg not consumed (run first: no thread yet)
+    var _push = pushThread;
+    state.bukangiEgg = false;
+    var _threw = false;
+    try {
+      pushThread = function(){ throw new Error('simulated push failure'); };
+      var r0 = maybeBukangiEgg({ id: 'dusky' });
+    } catch (e) { _threw = true; }
+    pushThread = _push;
+    ok('v1.7.19 Bukangi push failure does not consume the egg',
+      _threw === false && r0 === false && state.bukangiEgg === false && state.messages.length === _len);
+    // post-append save failure: storage dies inside pushThread's saveMsgs,
+    // AFTER the in-memory append. The egg must not be consumed on the ghost,
+    // and the in-memory append must be rolled back so the retry can't double-post.
+    (function(){
+      var _egg2 = state.bukangiEgg;
+      var _len2 = state.messages.length;
+      var _unread2 = state.unread;
+      var _msgs2 = null, _buk2 = null;
+      try { _msgs2 = localStorage.getItem('tyi-messages'); } catch {}
+      try { _buk2 = localStorage.getItem('tyi-bukangi'); } catch {}
+      state.bukangiEgg = false;
+      try { localStorage.removeItem('tyi-bukangi'); } catch {}
+      var _setItem = localStorage.setItem;
+      localStorage.setItem = function(k, v) {
+        if (k === 'tyi-messages') throw new Error('simulated post-append storage failure');
+        return _setItem.call(localStorage, k, v);
+      };
+      var r5 = false, _threw5 = false;
+      try { r5 = maybeBukangiEgg({ id: 'dusky' }); } catch (e) { _threw5 = true; }
+      localStorage.setItem = _setItem;
+      ok('v1.7.19 Bukangi post-append save failure leaves no ghost and does not consume the egg',
+        _threw5 === false && r5 === false && state.bukangiEgg === false &&
+        state.messages.length === _len2 && state.unread === _unread2 &&
+        localStorage.getItem('tyi-bukangi') === null);
+      // retry with healthy storage → exactly one durable thread, flag set
+      state.bukangiEgg = false;
+      var r6 = maybeBukangiEgg({ id: 'dusky' });
+      var persisted = [];
+      try { persisted = (JSON.parse(localStorage.getItem('tyi-messages') || '{}').messages) || []; } catch {}
+      var bukCount = persisted.filter(function(t){
+        return (t.msgs || []).some(function(m){ return (m.text || '').indexOf('Bukangi') !== -1; });
+      }).length;
+      ok('v1.7.19 Bukangi retry after save failure delivers exactly one durable thread',
+        r6 === true && state.bukangiEgg === true && bukCount === 1);
+      // restore everything this sub-check touched
+      state.bukangiEgg = _egg2;
+      state.messages.length = _len2;
+      state.unread = _unread2;
+      try {
+        if (_msgs2 === null) localStorage.removeItem('tyi-messages'); else localStorage.setItem('tyi-messages', _msgs2);
+        if (_buk2 === null) localStorage.removeItem('tyi-bukangi'); else localStorage.setItem('tyi-bukangi', _buk2);
+      } catch {}
+    })();
+    // first dusky reveal → exactly one thread, flag set
+    state.bukangiEgg = false;
+    var r1 = maybeBukangiEgg({ id: 'dusky' });
+    ok('v1.7.19 Bukangi first dusky reveal pushes exactly one thread',
+      r1 === true && state.messages.length === _len + 1 && state.bukangiEgg === true);
+    // second reveal → none
+    var r2 = maybeBukangiEgg({ id: 'dusky' });
+    ok('v1.7.19 Bukangi second dusky reveal pushes nothing',
+      r2 === false && state.messages.length === _len + 1);
+    // other species → none
+    state.bukangiEgg = false;
+    var r3 = maybeBukangiEgg({ id: 'nurse' });
+    ok('v1.7.19 Bukangi other species pushes nothing',
+      r3 === false && state.messages.length === _len + 1);
+    // dedup: thread present but flag unset (interrupted reload) → no duplicate, flag set
+    state.bukangiEgg = false;
+    var r4 = maybeBukangiEgg({ id: 'dusky' });
+    ok('v1.7.19 Bukangi dedup skips duplicate push but sets flag',
+      r4 === true && state.messages.length === _len + 1 && state.bukangiEgg === true);
+    // reset/export/import handling of tyi-bukangi.
+    // v1.7.19-beta Mira review: this check must NOT be destructive — the old
+    // version wiped every RESET_KEYS entry in the harness without restoring
+    // them. Snapshot all reset keys first, wipe, assert, then restore all.
+    ok('v1.7.19 tyi-bukangi cleared by full reset',
+      (function(){
+        var snap = {};
+        RESET_KEYS.forEach(function(k){
+          try { snap[k] = localStorage.getItem(k); } catch { snap[k] = undefined; }
+        });
+        try { localStorage.setItem('tyi-bukangi', '1'); } catch {}
+        RESET_KEYS.forEach(function(k){ try { localStorage.removeItem(k); } catch {} });
+        var gone = 'unknown';
+        try { gone = localStorage.getItem('tyi-bukangi'); } catch {}
+        RESET_KEYS.forEach(function(k){
+          try {
+            if (snap[k] === null || typeof snap[k] === 'undefined') localStorage.removeItem(k);
+            else localStorage.setItem(k, snap[k]);
+          } catch {}
+        });
+        return gone === null;
+      })());
+    ok('v1.7.19 tyi-bukangi allowed in save export/import',
+      SAVE_KEY_ALLOWLIST.indexOf('tyi-bukangi') !== -1 &&
+      validateSaveData({ version: 'v1.7.19-beta',
+        keys: { 'tyi-bukangi': '1', 'tyi-collection': '{"nurse":{"researchId":"NS-2026-001"}}' } }).ok === true);
+    // restore fixtures: no trace left in the harness
+    state.bukangiEgg = _egg;
+    state.messages.length = _len;
+    state.unread = _unread;
+    try {
+      if (_msgsLS === null) localStorage.removeItem('tyi-messages'); else localStorage.setItem('tyi-messages', _msgsLS);
+      if (_bukLS === null) localStorage.removeItem('tyi-bukangi'); else localStorage.setItem('tyi-bukangi', _bukLS);
+    } catch {}
+  })();
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
