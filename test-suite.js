@@ -2741,12 +2741,27 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
     var r4 = maybeBukangiEgg({ id: 'dusky' });
     ok('v1.7.19 Bukangi dedup skips duplicate push but sets flag',
       r4 === true && state.messages.length === _len + 1 && state.bukangiEgg === true);
-    // reset/export/import handling of tyi-bukangi
+    // reset/export/import handling of tyi-bukangi.
+    // v1.7.19-beta Mira review: this check must NOT be destructive — the old
+    // version wiped every RESET_KEYS entry in the harness without restoring
+    // them. Snapshot all reset keys first, wipe, assert, then restore all.
     ok('v1.7.19 tyi-bukangi cleared by full reset',
       (function(){
+        var snap = {};
+        RESET_KEYS.forEach(function(k){
+          try { snap[k] = localStorage.getItem(k); } catch { snap[k] = undefined; }
+        });
         try { localStorage.setItem('tyi-bukangi', '1'); } catch {}
         RESET_KEYS.forEach(function(k){ try { localStorage.removeItem(k); } catch {} });
-        return localStorage.getItem('tyi-bukangi') === null;
+        var gone = 'unknown';
+        try { gone = localStorage.getItem('tyi-bukangi'); } catch {}
+        RESET_KEYS.forEach(function(k){
+          try {
+            if (snap[k] === null || typeof snap[k] === 'undefined') localStorage.removeItem(k);
+            else localStorage.setItem(k, snap[k]);
+          } catch {}
+        });
+        return gone === null;
       })());
     ok('v1.7.19 tyi-bukangi allowed in save export/import',
       SAVE_KEY_ALLOWLIST.indexOf('tyi-bukangi') !== -1 &&
