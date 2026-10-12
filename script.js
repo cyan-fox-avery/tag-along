@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.20-beta";
+const VERSION = "v1.7.21-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.21-beta": [
+"🦈 <strong>Derpy mystery silhouette fixed.</strong> The darkened derpy shape was collapsing to zero size, leaving the mystery phase empty — it now has explicit dimensions so the silhouette shows properly. Tap to reveal the full derpy art.",
+  ],
   "v1.7.20-beta": [
 "🦈 <strong>Derpy mystery shadows.</strong> In derpy mode, the expedition's mystery silhouette is a darkened derpy shape — same suspense, derpy style. Tap to reveal the full derpy art.",
   ],
@@ -2116,7 +2119,10 @@ function doEncounter(species, plan) {
        with a dark CSS overlay, so the silhouette always matches the shark.
        v1.7.20-beta: in derpy mode the mystery silhouette is a darkened
        derpy SVG (same CSS darkening trick) — suspense in derpy style,
-       revealed on tap to the full derpy art. */
+       revealed on tap to the full derpy art.
+       v1.7.21-beta: the derpy SVG has no width/height attributes, so it
+       collapsed to zero size inside .shark-shadow — CSS now gives it
+       explicit 220x110 dimensions. */
     preloadSharkArt(species.id);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     sharkEl.innerHTML =
