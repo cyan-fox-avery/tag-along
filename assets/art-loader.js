@@ -76,14 +76,15 @@ function derpyUnlocked() {
   try { return localStorage.getItem("tyi-derpy-unlocked") === "1"; } catch { return false; }
 }
 
-function sharkArtImg(id, type, alt, skipDerpy) {
+function sharkArtImg(id, type, alt) {
   /* v1.7.0-beta: derpy mode shows the original derpy SVG art instead of
      the WebP illustration.
-     v1.7.20-beta: skipDerpy opt-out — the expedition mystery silhouette
-     always uses standard art. A darkened derpy cartoon shape would spoil
-     the suspense (the point is you don't know what shark it is until the
-     reveal), so the shadow call site passes skipDerpy=true. */
-  if (!skipDerpy && type === "illustration" && derpyModeOn() && typeof ART !== "undefined" && ART[id]) {
+     v1.7.20-beta: in derpy mode the expedition mystery silhouette is a
+     darkened derpy SVG — the same CSS darkening trick as v1.6.6
+     (.shark-shadow svg { filter: brightness(0); }) — so the mystery
+     stays suspenseful in derpy style, revealed on tap to the full
+     derpy art. */
+  if (type === "illustration" && derpyModeOn() && typeof ART !== "undefined" && ART[id]) {
     return ART[id];
   }
   const url = ART_URL(id, type);

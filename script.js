@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v1.7.20-beta": [
-"🦈 <strong>Mystery shadows stay mysterious in derpy mode.</strong> The expedition's mystery silhouette now always uses the real shark illustration — a darkened derpy cartoon would have spoiled the suspense. The derpy art still appears at the reveal.",
+"🦈 <strong>Derpy mystery shadows.</strong> In derpy mode, the expedition's mystery silhouette is now a darkened derpy shape — same suspense, derpy style. Tap to reveal the full derpy art.",
   ],
   "v1.7.18-beta": [
 "🎁 <strong>Derpy claim button hardened.</strong> The manual derpy award claim button now validates every shark in the roster (not just the count, so stale entries can't pass) and stays hidden while a win ceremony is pending — the ceremony presents Sarah's gift itself. The claim is one-time and can never double-send her thread.",
@@ -2107,14 +2107,15 @@ function doEncounter(species, plan) {
        The illustration is preloaded so the reveal is instant.
        v1.6.6-beta: the shadow now uses the shark's actual illustration
        with a dark CSS overlay, so the silhouette always matches the shark.
-       v1.7.20-beta: the shadow opts out of derpy art (skipDerpy) — a
-       darkened derpy cartoon would spoil the mystery-phase suspense. */
+       v1.7.20-beta: in derpy mode the mystery silhouette is a darkened
+       derpy SVG (same CSS darkening trick) — suspense in derpy style,
+       revealed on tap to the full derpy art. */
     preloadSharkArt(species.id);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     sharkEl.innerHTML =
       `<div class="shark-silhouette" role="button" tabindex="0" ` +
       `aria-label="Something is out there — tap to reveal">` +
-      `<div class="shark-shadow">` + sharkArtImg(species.id, "illustration", "Mysterious shark silhouette", true) + `</div>` +
+      `<div class="shark-shadow">` + sharkArtImg(species.id, "illustration", "Mysterious shark silhouette") + `</div>` +
       `<div class="tap-hint">👆 Tap to reveal</div></div>`;
     sharkEl.classList.remove("hidden");
     logLine(`🦈 <span class="found">Something's out there...</span>`, "found");

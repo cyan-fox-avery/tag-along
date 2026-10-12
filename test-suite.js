@@ -2075,7 +2075,7 @@ code += `
     // always matches the shark — no separate silhouette image.
     const src = doEncounter.toString();
     return src.includes('shark-shadow') &&
-           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette", true)') &&
+           src.includes('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') &&
            !src.includes('sharkArtImg(species.id, "silhouette"');
   })());
   ok('shark-shadow CSS darkens illustration and SVG fallback', (() => {
@@ -2588,17 +2588,18 @@ ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHA
     })());
 
 
-  // v1.7.20-beta: expedition mystery shadow opts out of derpy art
-  ok('sharkArtImg declares skipDerpy 4th param', sharkArtImg.length >= 4);
-  ok('shadow call site passes skipDerpy=true', fileCode.indexOf('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette", true)') !== -1);
-  ok('reveal call site keeps derpy behavior (no skipDerpy)', fileCode.indexOf('sharkArtImg(species.id, "illustration", species.name)') !== -1);
-  ok('derpy shadow opt-out returns standard img tag in derpy mode', (function(){
+  // v1.7.20-beta: derpy mode mystery silhouette is a darkened derpy SVG
+  // (CSS .shark-shadow svg { filter: brightness(0); } handles the darkening)
+  ok('sharkArtImg no longer takes skipDerpy', sharkArtImg.length <= 3);
+  ok('shadow call site has no skipDerpy arg', fileCode.indexOf('sharkArtImg(species.id, "illustration", "Mysterious shark silhouette")') !== -1);
+  ok('reveal call site keeps derpy behavior', fileCode.indexOf('sharkArtImg(species.id, "illustration", species.name)') !== -1);
+  ok('derpy shadow returns derpy SVG in derpy mode', (function(){
     var prev = localStorage._s['tyi-derpy-mode'];
     localStorage._s['tyi-derpy-mode'] = '1';
-    var html = sharkArtImg('nurse', 'illustration', 'Mysterious shark silhouette', true);
+    var html = sharkArtImg('nurse', 'illustration', 'Mysterious shark silhouette');
     if (prev === undefined) { delete localStorage._s['tyi-derpy-mode']; }
     else { localStorage._s['tyi-derpy-mode'] = prev; }
-    return html.indexOf('<img') === 0 && html.indexOf('data-shark-art="nurse"') !== -1;
+    return html === ART['nurse'];
   })());
   ok('derpy reveal keeps derpy SVG without skipDerpy', (function(){
     var prev = localStorage._s['tyi-derpy-mode'];
