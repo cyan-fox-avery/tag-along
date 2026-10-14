@@ -944,12 +944,12 @@ const ARCHIVE_MEDIA = {
   "assets": [
    {
     "type": "photo",
-    "caption": "A megamouth shark — full animal, huge cavernous mouth, one of the rarest sharks ever photographed.",
-    "credit": "OpenCage",
-    "license": "CC BY-SA 2.5",
-    "page": "https://commons.wikimedia.org/wiki/File%3AMegamouth_shark_japan2.jpg",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Megamouth_shark_japan2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Megamouth_shark_japan2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "caption": "A megamouth shark — full animal, showing the huge head and cavernous mouth.",
+    "credit": "Olyngo (via Wikimedia Commons)",
+    "license": "CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Megachasma_pelagios.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Megachasma_pelagios.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Megachasma_pelagios.jpg",
    },
    {
     "type": "photo",
