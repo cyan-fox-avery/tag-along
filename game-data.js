@@ -250,11 +250,11 @@ const PICK_ICONS = {
    The megamouth is famously elusive (unknown to science until 1976, only
    around 300 ever documented). Sarah would absolutely lose her mind. */
 const WHITE_WHALE_THREAD = [
-  { who: "them", text: "STOP. STOP EVERYTHING. Did you just tag a WHALE SHARK?!?" },
+  { who: "them", text: "STOP. STOP EVERYTHING. Did you just tag a MEGAMOUTH?!?" },
   { who: "me", text: "I did! Is that a big deal?" },
-  { who: "them", text: "A BIG deal?? That's the BIGGEST FISH IN THE OCEAN. It just cruises around with its enormous mouth wide open, vacuuming up plankton. And every single one's spot pattern is unique — like a fingerprint!" },
-  { who: "me", text: "That's actually really cool." },
-  { who: "them", text: "It's ENDANGERED and you just put a tag on one. Scientists in the Philippines and Mexico are tracking their migration corridors right now. And now there's one out there with YOUR tag on it. I'm framing this conversation. 🩵" }
+  { who: "them", text: "A BIG deal?? They didn't even KNOW this shark existed until 1976! A Navy anchor snagged one off Hawaii and scientists were like '...what IS that.' Only around 300 have EVER been documented. THREE HUNDRED. Total. Ever." },
+  { who: "me", text: "That puts it in perspective." },
+  { who: "them", text: "It lives in the twilight zone and just... opens this ENORMOUS mouth and filters krill. Like a whale shark's mysterious goth cousin. And now there's one out there with YOUR tag on it. I'm framing this conversation. 🩵" }
 ];
 
 /* v1.7.0-beta: derpy award — Sarah reacts to the win-unlocked derpy art.

@@ -178,6 +178,14 @@ const ACHIEVEMENTS = [
   },
   {
     id: "white-whale",
+    name: "White Whale",
+    icon: "🐋",
+    breadcrumb: "the rarest shark in the sea",
+    description: "Tagged a megamouth shark. Only around 300 have ever been documented. This is the big one.",
+    check: (st) => !!st.tagged.megamouth
+  },
+  {
+    id: "whaaaaale",
     name: "WHAAAAAAALE",
     icon: "🐋",
     breadcrumb: "the biggest fish in the sea",

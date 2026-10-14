@@ -21,8 +21,10 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v1.7.23-beta": [
+"🐋 <strong>WHAAAAAAALE.</strong> New achievement for tagging a whale shark — the biggest fish in the ocean. (White Whale stays with the megamouth, where it belongs.)",
 "🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
 "🧭 <strong>Follow shows insight progress.</strong> The Follow button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — so you know what following will get you.",
+"🦈 <strong>Cookiecutter archive illustration-only.</strong> The cookiecutter's archive entry now shows only the scientific illustration — no more dead specimens.",
   ],
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",

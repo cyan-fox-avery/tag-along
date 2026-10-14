@@ -585,8 +585,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('18 achievements (17 visible + Bruce hidden)', ACHIEVEMENTS.length === 18 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 17);
+  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -1910,9 +1910,12 @@ code += `
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
   // v1.7.23: WHAAAAAAALE achievement (renamed from White Whale) — tag a whale shark
-  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "WHAAAAAAALE"));
-  ok("white-whale checks whale tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { whale: {} } }) === true && a.check({ tagged: {} }) === false; })());
-  ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("whale shark"));
+  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
+  ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
+  // v1.7.23: WHAAAAAAALE achievement — tag a whale shark (separate from White Whale)
+  ok("whaaaaale achievement exists", ACHIEVEMENTS.some(a => a.id === "whaaaaale" && a.name === "WHAAAAAAALE"));
+  ok("whaaaaale checks whale tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "whaaaaale"); return a && a.check({ tagged: { whale: {} } }) === true && a.check({ tagged: {} }) === false; })());
+  ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("megamouth"));
   ok("surface-shimmer oversized past viewport", cssCode.indexOf(".surface-shimmer") !== -1 && cssCode.indexOf("left: -4%") !== -1);
   ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
   // v1.4.2: IUCN abbreviations on field-guide pills
