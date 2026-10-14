@@ -350,6 +350,7 @@ code += `
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
   ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
+  ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',

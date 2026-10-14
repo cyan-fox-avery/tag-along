@@ -379,6 +379,10 @@ body { overflow-x: clip; }
    instead of truncating — the stack has room, so no ellipsis needed here. */
 .guide-row-head .ach-texts .guide-row-name { flex: none; white-space: normal; overflow: visible; text-overflow: clip; }
 .guide-row-head .ach-texts .ach-hint { flex: none; }
+/* v1.7.22-beta: achievement cards are uniform height — the grid stretches cards
+   in each row to match, so unlocked and locked cards are the same size.
+   Overrides the align-items:start on .guide-list at the 768px+ breakpoint. */
+#achieveList { align-items: stretch; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 3px 10px; margin-bottom: 8px;
