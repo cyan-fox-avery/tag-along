@@ -22,6 +22,7 @@ const IUCN_ABBR = {
 const WHATS_NEW = {
   "v1.7.23-beta": [
 "🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
+"🧭 <strong>Follow shows insight progress.</strong> The Follow button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — so you know what following will get you.",
   ],
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
@@ -2302,7 +2303,11 @@ function doEncounter(species, plan) {
       followBtn.type = "button";
       const _followRec = state.tagged[species.id];
       const _followName = (_followRec && _followRec.name) || species.name;
-      followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>`;
+      /* v1.7.23-beta: show insight progress on the Follow button. */
+      const _factTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
+      const _factHave = (state.unlockedFacts[species.id] || []).length;
+      const _factLine = _factTotal ? `<br><small class="dim">(insights: ${_factHave}/${_factTotal})</small>` : "";
+      followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>${_factLine}`;
       followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)`);
       followBtn.addEventListener("click", () => {
         actions.classList.add("hidden");

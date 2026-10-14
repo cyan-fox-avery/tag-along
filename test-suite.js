@@ -412,6 +412,9 @@ code += `
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
   ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
   ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
+  // v1.7.23-beta: Follow button shows insight progress (insights: n/total).
+  ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
+  ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
   // v1.7.23-beta: achievement cards identical height across ALL rows —
   // fixed min-height on every card, not just per-row stretch.
   ok('achievement cards have fixed min-height', cssCode.includes('#achieveList .guide-row') && cssCode.includes('min-height: 140px'));
