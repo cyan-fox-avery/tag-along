@@ -1188,12 +1188,12 @@ const ARCHIVE_MEDIA = {
    },
    {
     "type": "photo",
-    "caption": "Catshark pattern in detail — the small dark spots that give the species its name.",
-    "credit": "Christian Kahle",
-    "license": "CC0",
-    "page": "https://commons.wikimedia.org/wiki/File%3AScyliorhinus_canicula_51703831.jpg",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Scyliorhinus_canicula_51703831.jpg/960px-Scyliorhinus_canicula_51703831.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/2/26/Scyliorhinus_canicula_51703831.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "caption": "A small-spotted catshark — live animal, showing the dark spotted pattern.",
+    "credit": "Ernstla",
+    "license": "CC BY-SA 2.5",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKleingefleckter_Katzenhai.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Kleingefleckter_Katzenhai.jpg/960px-Kleingefleckter_Katzenhai.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Kleingefleckter_Katzenhai.jpg",
    },
   ]
  },
