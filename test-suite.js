@@ -753,12 +753,14 @@ code += `
       a.image.includes('Pristiophorus_cirratus.jpg') &&
       a.license === 'public domain';
   })());
-  // v1.7.22: cookiecutter secondary is the Ifremer whole-specimen photo
-  ok('cookiecutter secondary is the Ifremer specimen', (() => {
-    const a = ARCHIVE_MEDIA.cookiecutter.assets[1];
-    return a.credit.includes('Ifremer') &&
-      a.image.includes('Ifremer_00764-87574') &&
-      a.license === 'CC BY 4.0';
+  // v1.7.23: cookiecutter is illustration-only (no dead-specimen photos)
+  ok('cookiecutter is a single illustration', (() => {
+    const assets = ARCHIVE_MEDIA.cookiecutter.assets;
+    return assets.length === 1 &&
+      assets[0].type === 'illustration' &&
+      assets[0].credit.includes('GrahamBould') &&
+      assets[0].image.includes('Cookiecutter_shark') &&
+      assets[0].license === 'CC BY-SA 1.0';
   })());
   ok('pin switches', (() => {
     togglePin("salmon"); togglePin("dusky");
@@ -1907,10 +1909,10 @@ code += `
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
-  // v1.4.9: White Whale achievement — tag a megamouth
-  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
-  ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
-  ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("megamouth"));
+  // v1.7.23: WHAAAAAAALE achievement (renamed from White Whale) — tag a whale shark
+  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "WHAAAAAAALE"));
+  ok("white-whale checks whale tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { whale: {} } }) === true && a.check({ tagged: {} }) === false; })());
+  ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("whale shark"));
   ok("surface-shimmer oversized past viewport", cssCode.indexOf(".surface-shimmer") !== -1 && cssCode.indexOf("left: -4%") !== -1);
   ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
   // v1.4.2: IUCN abbreviations on field-guide pills
