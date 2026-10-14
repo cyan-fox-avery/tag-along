@@ -234,6 +234,7 @@ code += `
     const origGetById = document.getElementById;
     const origCreate = document.createElement;
     const origTagged = state.tagged;
+    const origRanks = (typeof archiveDateRanks !== "undefined") ? archiveDateRanks : null;
     const list = mockEl();
     document.getElementById = (id) => id === "archiveList" ? list : origGetById(id);
     document.createElement = () => mockEl();
@@ -283,6 +284,7 @@ code += `
       document.getElementById = origGetById;
       document.createElement = origCreate;
       state.tagged = origTagged;
+      if (typeof archiveDateRanks !== "undefined") archiveDateRanks = origRanks;
     }
   })();
   // v1.7.22-beta Mira review: doFollowTagged — fact available AND exhausted.
@@ -296,6 +298,8 @@ code += `
     const origPending = state.pendingTagAlongFact;
     const origSave = factStore.save;
     const origTrip = logTripEncounter;
+    const origDone = state.encounterDone;
+    const origFollowed = state.followedThisTrip;
     renderAll = () => {};
     factStore.save = () => {};
     logTripEncounter = () => {};
@@ -303,6 +307,7 @@ code += `
     logLine = (html) => { logged.push(String(html)); };
     state.tagged = { nurse: { name: "", researchId: "NS-1" } };
     state.encounterDone = null;
+    state.followedThisTrip = false;
     try {
       // Branch 1: fact available -> pendingTagAlongFact set, no insight in log
       state.unlockedFacts = {};
@@ -337,7 +342,8 @@ code += `
       state.tagged = origTagged;
       state.unlockedFacts = origFacts;
       state.pendingTagAlongFact = origPending;
-      state.encounterDone = null;
+      state.encounterDone = origDone;
+      state.followedThisTrip = origFollowed;
     }
   })();
   // v1.7.22-beta: Following a tagged shark records a re-sighting (Pen Pal).
@@ -354,6 +360,8 @@ code += `
     const origCheck = checkAchievements;
     const origRenderColl = renderCollection;
     const origStoreSave = store.save;
+    const origDone = state.encounterDone;
+    const origFollowed = state.followedThisTrip;
     renderAll = () => {};
     logLine = () => {};
     logTripEncounter = () => {};
@@ -367,6 +375,7 @@ code += `
     state.unlockedFacts = { nurse: [0, 1, 2] }; // exhausted, so no fact branch noise
     state.pendingTagAlongFact = null;
     state.encounterDone = null;
+    state.followedThisTrip = false;
     try {
       doFollowTagged("nurse", () => {});
       const res = state.tagged.nurse.resightings || [];
@@ -388,7 +397,8 @@ code += `
       state.currentPlan = origPlan;
       state.unlockedFacts = origFacts;
       state.pendingTagAlongFact = origPending;
-      state.encounterDone = null;
+      state.encounterDone = origDone;
+      state.followedThisTrip = origFollowed;
     }
   })();
   // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
