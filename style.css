@@ -383,6 +383,11 @@ body { overflow-x: clip; }
    in each row to match, so unlocked and locked cards are the same size.
    Overrides the align-items:start on .guide-list at the 768px+ breakpoint. */
 #achieveList { align-items: stretch; }
+/* v1.7.23-beta: achievement cards are identical height across ALL rows, not
+   just within each row — a fixed min-height on every card so short locked
+   cards (e.g. "???") match the tallest unlocked ones. min-height (not height)
+   so extra-long content can still grow instead of clipping. */
+#achieveList .guide-row { min-height: 140px; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 3px 10px; margin-bottom: 8px;

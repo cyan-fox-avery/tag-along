@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.22-beta', VERSION === 'v1.7.22-beta');
+  ok('version v1.7.23-beta', VERSION === 'v1.7.23-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -412,6 +412,9 @@ code += `
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
   ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
   ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
+  // v1.7.23-beta: achievement cards identical height across ALL rows —
+  // fixed min-height on every card, not just per-row stretch.
+  ok('achievement cards have fixed min-height', cssCode.includes('#achieveList .guide-row') && cssCode.includes('min-height: 140px'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',
@@ -2432,6 +2435,7 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
   ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));

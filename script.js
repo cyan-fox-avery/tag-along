@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.22-beta";
+const VERSION = "v1.7.23-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.23-beta": [
+"🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
+  ],
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
 "🧭 <strong>Follow insight cleanup.</strong> Follow now keeps its insights on the Map popup — the tag-along insight (or the graceful \"learned all I can\" line) appears there, not duplicated in the expedition log.",
