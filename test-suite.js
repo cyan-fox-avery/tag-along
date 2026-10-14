@@ -530,13 +530,19 @@ code += `
     togglePin("salmon");
     return on && state.pinned === null && pinStore.load() === null;
   })());
-  // v0.20.0 Mira review: sawshark secondary is a genuine detail crop
-  ok('sawshark secondary is a real detail crop', (() => {
+  // v1.7.22: sawshark secondary is the Gould 1832 illustration, not a duplicate crop
+  ok('sawshark secondary is the Gould illustration', (() => {
     const a = ARCHIVE_MEDIA.sawshark.assets[1];
-    if (a.framing !== 'detail-crop' || !a.detailCrop || !a.trimmed) return false;
-    const html = archiveAssetHtml(a, false);
-    return html.includes('detail-crop-frame') && html.includes('background-position') &&
-      html.includes('trimmed from original');
+    return a.credit.includes('William Buelow Gould') &&
+      a.image.includes('Pristiophorus_cirratus.jpg') &&
+      a.license === 'public domain';
+  })());
+  // v1.7.22: cookiecutter secondary is the Ifremer whole-specimen photo
+  ok('cookiecutter secondary is the Ifremer specimen', (() => {
+    const a = ARCHIVE_MEDIA.cookiecutter.assets[1];
+    return a.credit.includes('Ifremer') &&
+      a.image.includes('Ifremer_00764-87574') &&
+      a.license === 'CC BY 4.0';
   })());
   ok('pin switches', (() => {
     togglePin("salmon"); togglePin("dusky");
