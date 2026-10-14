@@ -699,6 +699,11 @@ select option:disabled { color: #7a8a9e; }
    to both the WebP image and any SVG fallback, so the mystery is never spoiled
    by a failed image load. */
 .shark-shadow img, .shark-shadow svg { filter: brightness(0); }
+/* v1.7.21-beta: derpy SVGs carry a viewBox but no width/height attributes, so
+   inside the plain .shark-shadow block the SVG collapsed to zero size and the
+   mystery phase showed empty water. Give the shadow SVG explicit dimensions
+   matching the 220x110 viewBox. */
+.shark-shadow svg { width: 220px; height: 110px; max-width: 100%; }
 .tap-hint {
   position: absolute; bottom: 2px; left: 0; right: 0;
   text-align: center; font-size: 15px; font-weight: 600;

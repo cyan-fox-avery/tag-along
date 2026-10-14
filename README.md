@@ -1,6 +1,6 @@
 # Tag Along
 
-**v0.22.0** — *a shark research game*
+**v1.7.21-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,99 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v1.7.x changes — derpy sharks 🦈
+
+- **v1.7.0 — Derpy sharks unlocked!** Finish the full roster and Sarah gives you the original derpy art as a completion award — toggle derpy mode in your collection book anytime.
+- **v1.7.1** — Naming a shark Bruce now triggers Sarah's Jaws reaction immediately, even after you've finished the game.
+- **v1.7.3** — The lemon-shark Sarah easter egg spells her name right.
+- **v1.7.4** — Tag-along insights live on the shark's Collection card, not in the expedition log.
+- **v1.7.6** — "Find the aggregation" just works — no more boat/plane/network picker.
+- **v1.7.7** — The Phone tab's notification badge centers its number properly.
+- **v1.7.8** — Learning a new species insight from a wild shark now ends the expedition.
+- **v1.7.9** — Galápagos and South Africa unlock after tagging any 10 sharks.
+- **v1.7.10** — "You Named Him WHAT?" unlocks the moment you name a shark Bruce.
+- **v1.7.11–v1.7.18 — the derpy award, hardened.** Retroactive award for past full-roster winners (v1.7.11), a manual claim button in the Collection (v1.7.17), and a hardened claim that validates the full 50-shark roster and hides during the win ceremony (v1.7.18).
+- **v1.7.12** — IUCN badges no longer clip on iPad.
+- **v1.7.13** — "Bait and Switch" retired; seal scent properly retired (fish-oil chum directly).
+- **v1.7.14** — Encounter badges: NEW SPECIES / YOUR SHARK / ANOTHER, right under the illustration. Plus a UI polish bundle (horizontal desktop cards, green checklist bubbles, one-at-a-time Research accordion, full scientific names).
+- **v1.7.15** — Achievement hints wrap fully — no more "…" cutoffs.
+- **v1.7.19** — Achievement cards tidied (name above description), the Master Shark Tagger trophy moved to the Achievements tab, and the **Bukangi easter egg**: encounter a dusky shark and Sarah tells you about the real dusky captivating Busan.
+- **v1.7.20** — Derpy mystery shadows documented and regression-tested: in derpy mode the mystery silhouette is a darkened derpy shape, revealed on tap.
+- **v1.7.21** — The darkened derpy silhouette gets explicit dimensions so it actually renders (it was collapsing to zero size).
+
+## v1.6.x changes — research and shadows 🔍
+
+- **v1.6.0** — Research accordion (one open at a time), full scientific names on cards, achievement hints get two lines.
+- **v1.6.1** — Bigger logo and tighter header, horizontal collection cards on desktop, checklist-style tag status (a circle that fills green).
+- **v1.6.2** — Generic field sketches removed from cards.
+- **v1.6.3** — Archive search and sort (name, date tagged, IUCN status).
+- **v1.6.4–v1.6.5** — Re-sighting and lemon-naming double-fire fixes.
+- **v1.6.6** — Mystery silhouettes now use each shark's actual illustration with a dark overlay — no more mismatched shapes.
+- **v1.6.7–v1.6.9** — One re-sighting, one Sarah thread; more re-sighting notes; the megamouth's White Whale thread is the celebration.
+- **v1.6.10** — Sarah paces herself: single-shark cheers at most once every 3 expeditions.
+- **v1.6.11** — Trans-Pacific tracks cross the antimeridian properly — no more lines streaking across continents.
+- **v1.6.12** — Simpler attractants: fish-oil chum directly, no dropdown (seal scent retired).
+- **v1.6.13** — A bigger "they're all still out there" follow map.
+
+## v1.5.x changes — the polish wave 📑
+
+A long UI/UX polish train:
+- **Tabs saga (v1.5.6–v1.5.18):** centered tabs, all eight on one iPad row (CSS grid — iPad Safari couldn't be trusted with flex-wrap), tab counts moved to page tops, the Archive tab always visible (greyed until unlocked).
+- **Field guide polish:** the whole header is tappable, an IUCN badge key, color-coded IUCN badges, restacked name headers, overlays instead of pushing content, closable mobile popups.
+- **v1.5.2–v1.5.3:** individual sharks (a 25% chance it's your tagged individual), shark reunions (resident 50% / coastal 25% / migratory 10%), a quieter map, a cleaner logbook, hardened easter eggs.
+- **Bruce & lemon (v1.5.20–v1.5.24, v1.5.32):** Bruce-chain polish — your capitalization, a warmer reaction, the opener on the first catch; naming the lemon shark "Sarah" gets its own reaction thread; six lemon Big Day conversations.
+- **Background (v1.5.25–v1.5.31):** a one-screen ocean gradient, a solid seafloor on true black depths, a thinner seafloor strip, pinning that preserves your scroll.
+- **v1.5.8 safe batch:** "Still to discover" as plain text, reordered matching-yellow release buttons, "Follow" first in encounters, tag IDs for unnamed sharks, no double-tap zoom.
+
+## v1.4.x changes — tag along 🧭
+
+- **v1.4.0** — A third release choice: **tag along** with your shark and end the expedition. Each follow unlocks a secret species fact (1–3 per species) on the Collection card. The pinned shark slot moves above the grid; iPad polish.
+- **v1.4.1–v1.4.8** — The porthole: the idle view becomes an ocean-surface boat window with layered waves, parallax, and spray on the glass. Sun-ray caustics iterate toward a top-left sun fan.
+- **v1.4.9** — New achievement: **White Whale.** Tag the megamouth (~300 ever documented) and Sarah loses her mind.
+- **v1.4.10–v1.4.14** — Porthole cleanup, bubble columns in burst trails, softer diffused sun rays spanning the screen, a calmer porthole with a CSS sky.
+- **v1.4.15** — Underwater vista background, bigger logo, IUCN color coding, smarter pinned hints, time passing across the dive log.
+- **v1.4.16–v1.4.17** — The sun-ray experiment: a true conic-gradient fan (beautiful, but it broke the iPad layout) → emergency rollback to the span-based system.
+- **v1.4.18–v1.4.19** — Tighter wave layers, and **Sarah's Big Day**: tag multiple new species in one trip and get one authored celebration instead of three near-identical texts.
+
+## v1.3.x changes — follow your shark 🦈
+
+- **v1.3.0** — "Just watch" sometimes adds a natural-history observation to a shark's record; logbook date filter; 20 new field observations and 6 new wildlife sightings; save export/import in the footer.
+- **v1.3.1** — **"Tag along."** After tagging, tap 'Tag along with [name] →' to follow your shark on the map.
+- **v1.3.2** — Conservation-note background fixed for readability.
+
+## v1.2.0 changes — failed trips teach 📓
+
+- Unsuccessful expeditions now surface 1–2 field observations — water temp, currents, wildlife.
+- Tag celebrations clearly announce first-of-species vs Nth.
+- The Archive shows locked silhouettes for species you haven't tagged yet.
+- Wider-screen layout refinements.
+
+## v1.1.0-beta changes — tablet and desktop layouts 📱
+
+The game now uses wider screens properly — multi-column research, side-by-side dive views, a proper collection wall.
+
+## v1.0.0-beta — Beta 1.0 🎉
+
+The header eyebrow changes from PROTOTYPE to BETA. The game is officially in beta.
+
+## v0.27.x changes — the reskin that wasn't 🔄
+
+- **v0.27.0** — A marine-terminal UI reskin.
+- **v0.27.1** — Reverted at Avery's request: the classic button-grid UI is restored, with all v0.26.x art integration intact.
+
+## v0.26.x changes — the sharks are here! 🎨
+
+- **v0.26.0** — Every species gets its own illustration (Mira's anatomical audit approved the full set). Encounters open on a mysterious silhouette — tap to reveal. Sea turtles, dolphins, rays, seals, jellyfish, and fish schools drift through your dives. The collection book glows up with full-colour portraits.
+- **v0.26.1** — The dive-scene shark is re-centered ("shark too low"), and background creatures now swim both directions, facing their direction of travel.
+
+## v0.25.0 — the art-pass review thread 🎨
+
+PR #24 served as the art review thread: Mira's anatomical audit of every species illustration, plus the six ambient background-creature shadows. A review thread, not a player release.
+
+## v0.24.0 changes — progressive Wild Archive 🖼️
+
+Your Archive now grows with every tag — Sarah introduces it after your first shark, and each new species adds its real photo quietly.
 
 ## v0.23.0 changes — easter eggs 🥚🦈
 
@@ -472,7 +565,8 @@ Small fixes and polish from Avery's post-release playthrough:
 
 ## Play it
 
-Open `index.html` in a browser, or visit the GitHub Pages site (see below).
+Play it live at https://cyan-fox-avery.github.io/tag-along/ — or open
+`index.html` in a browser.
 
 No build step — just vanilla HTML, CSS, and JavaScript, like nature intended.
 
@@ -495,14 +589,11 @@ tags and gently nudges you if you keep striking out. Messages are optional:
 you'll get a notification badge on the Messages tab, and you can read them
 whenever you like. She's not a hint system — she's family.
 
-## Prototype roster
+## Roster
 
-- Thresher shark *(Alopias vulpinus)*
-- Whale shark *(Rhincodon typus)*
-- Nurse shark *(Ginglymostoma cirratum)*
-- Goblin shark *(Mitsukurina owstoni)*
-- Tiger shark *(Galeocerdo cuvier)*
-- Sand tiger shark *(Carcharias taurus)*
+50 species — the original 6 plus staged waves through v0.21.0, each with a
+research dossier, Sarah chats, tracking envelope, and Wild Archive entry. See
+the in-game field guide for the full list.
 
 Locations, depths, and diets are based on real species data. Ranges are
 approximate — verify against a field guide before finalizing.

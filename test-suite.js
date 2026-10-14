@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.20-beta', VERSION === 'v1.7.20-beta');
+  ok('version v1.7.21-beta', VERSION === 'v1.7.21-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2203,6 +2203,7 @@ ok('WHATS_NEW has v1.7.16-beta', Array.isArray(WHATS_NEW['v1.7.16-beta']) && WHA
 ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHATS_NEW['v1.7.17-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHATS_NEW['v1.7.18-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
   ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));
@@ -2833,6 +2834,19 @@ ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHA
     var html = sharkArtImg('whale', 'illustration', 'Whale Shark');
     return html.indexOf('<img') === 0 && html.indexOf('data-shark-art="whale"') !== -1;
   }));
+
+  // v1.7.21-beta: derpy SVGs have a viewBox but no width/height attributes,
+  // so the SVG collapsed to zero size inside .shark-shadow (empty mystery).
+  // CSS must give .shark-shadow svg explicit dimensions.
+  ok('CSS gives .shark-shadow svg explicit dimensions', (function(){
+    // find the standalone .shark-shadow svg rule (not the combined img+svg filter rule)
+    var re = /\\.shark-shadow\\s+svg\\s*\\{([^}]*)\\}/g, m, found = false;
+    while ((m = re.exec(cssCode)) !== null) {
+      var block = m[1];
+      if (block.indexOf('width') !== -1 && block.indexOf('height') !== -1) { found = true; break; }
+    }
+    return found;
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
