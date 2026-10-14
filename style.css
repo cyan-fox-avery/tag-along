@@ -379,14 +379,14 @@ body { overflow-x: clip; }
    instead of truncating — the stack has room, so no ellipsis needed here. */
 .guide-row-head .ach-texts .guide-row-name { flex: none; white-space: normal; overflow: visible; text-overflow: clip; }
 .guide-row-head .ach-texts .ach-hint { flex: none; }
-/* v1.7.22-beta: achievement cards are uniform height — the grid stretches cards
-   in each row to match, so unlocked and locked cards are the same size.
-   Overrides the align-items:start on .guide-list at the 768px+ breakpoint. */
-#achieveList { align-items: stretch; }
 /* v1.7.23-beta: achievement cards are identical height across ALL rows, not
-   just within each row — a fixed min-height on every card so short locked
-   cards (e.g. "???") match the tallest unlocked ones. min-height (not height)
-   so extra-long content can still grow instead of clipping. */
+   just within each row. The grid tracks themselves are equal:
+   grid-auto-rows: minmax(140px, 1fr) keeps every implicit row at least 140px
+   while wrapping stays automatic; align-items: stretch pulls every card to
+   fill its track (overrides the align-items:start on .guide-list at the
+   768px+ breakpoint from v1.7.22). The per-card min-height is a fallback so
+   a single orphan card still holds the 140px floor. */
+#achieveList { grid-auto-rows: minmax(140px, 1fr); align-items: stretch; }
 #achieveList .guide-row { min-height: 140px; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;

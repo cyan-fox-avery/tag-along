@@ -300,6 +300,7 @@ code += `
     const origTrip = logTripEncounter;
     const origDone = state.encounterDone;
     const origFollowed = state.followedThisTrip;
+    const origPlan2 = state.currentPlan;
     renderAll = () => {};
     factStore.save = () => {};
     logTripEncounter = () => {};
@@ -308,6 +309,10 @@ code += `
     state.tagged = { nurse: { name: "", researchId: "NS-1" } };
     state.encounterDone = null;
     state.followedThisTrip = false;
+    // v1.7.23-beta Mira review: prevent an inherited plan from causing
+    // unintentional re-sightings in the fact-only branches (doFollowTagged
+    // calls recordResighting only when state.currentPlan exists).
+    state.currentPlan = null;
     try {
       // Branch 1: fact available -> pendingTagAlongFact set, no insight in log
       state.unlockedFacts = {};
@@ -344,6 +349,7 @@ code += `
       state.pendingTagAlongFact = origPending;
       state.encounterDone = origDone;
       state.followedThisTrip = origFollowed;
+      state.currentPlan = origPlan2;
     }
   })();
   // v1.7.22-beta: Following a tagged shark records a re-sighting (Pen Pal).
@@ -362,6 +368,10 @@ code += `
     const origStoreSave = store.save;
     const origDone = state.encounterDone;
     const origFollowed = state.followedThisTrip;
+    // v1.7.23-beta Mira review: recordResighting() increments state.stats.resights;
+    // snapshot/restore the exact prior value (including the absent-property case).
+    const hadResights = state.stats && ("resights" in state.stats);
+    const origResights = hadResights ? state.stats.resights : undefined;
     renderAll = () => {};
     logLine = () => {};
     logTripEncounter = () => {};
@@ -399,6 +409,8 @@ code += `
       state.pendingTagAlongFact = origPending;
       state.encounterDone = origDone;
       state.followedThisTrip = origFollowed;
+      if (hadResights) state.stats.resights = origResights;
+      else if (state.stats) delete state.stats.resights;
     }
   })();
   // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
@@ -412,8 +424,10 @@ code += `
   ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
   ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
   // v1.7.23-beta: achievement cards identical height across ALL rows —
-  // fixed min-height on every card, not just per-row stretch.
+  // grid tracks are equal (grid-auto-rows: minmax(140px, 1fr)) plus a
+  // per-card 140px min-height fallback, not just per-row stretch.
   ok('achievement cards have fixed min-height', cssCode.includes('#achieveList .guide-row') && cssCode.includes('min-height: 140px'));
+  ok('achievement grid rows are equal tracks', cssCode.includes('grid-auto-rows: minmax(140px, 1fr)'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',
