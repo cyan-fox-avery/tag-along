@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.21-beta";
+const VERSION = "v1.7.22-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,12 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.22-beta": [
+"📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
+"🧭 <strong>Follow insight cleanup.</strong> Follow now keeps its insights on the Map popup — the tag-along insight (or the graceful \"learned all I can\" line) appears there, not duplicated in the expedition log.",
+"🫧 <strong>Denser bubbles.</strong> The background bubbles are now denser and more organic — 8 staggered columns rising at different speeds and heights, ported from the art-pass reference (rays excluded).",
+"🌊 <strong>Something in the Water retired.</strong> The chum achievement is gone — with only fish-oil chum left as the attract method, there's nothing to earn it with anymore.",
+  ],
   "v1.7.21-beta": [
 "🦈 <strong>Derpy mystery silhouette fixed.</strong> The darkened derpy shape was collapsing to zero size, leaving the mystery phase empty — it now has explicit dimensions so the silhouette shows properly. Tap to reveal the full derpy art.",
   ],
@@ -3753,13 +3759,20 @@ function doFollowTagged(speciesId, doneCb) {
   const rec = state.tagged[speciesId];
   const displayName = (rec && rec.name) || s.name;
   logLine(`🧭 Following ${esc(displayName)} — tag secure, swimming strong.`);
+  /* v1.7.22-beta: Following an already-tagged shark counts as a re-sighting.
+     Feeds the Pen Pal achievement, the track map, and resight stats — just
+     like "📝 Log re-sighting". (Avery: players who always Follow never earned
+     Pen Pal because only the Log button recorded re-sightings.) */
+  if (state.currentPlan) recordResighting(s, state.currentPlan);
   const fact = unlockSecretFact(speciesId);
+  /* v1.7.22-beta: the insight lives on the Map popup only — not in the log.
+     (Matches doTagAlong's v1.5.8-beta behavior.) */
   if (fact) {
-    logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
     /* Stash for the map overlay (readable reward with progression). */
     state.pendingTagAlongFact = { speciesId, fact, exhausted: false };
   } else {
-    logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+    /* v1.7.22-beta Mira review: the exhaustion line lives ONLY in the Map
+       popup (via pendingTagAlongFact) — no duplicate log line. */
     state.pendingTagAlongFact = { speciesId, fact: null, exhausted: true };
   }
   /* v1.4.0-beta Mira review (related polish): log the follow as a trip

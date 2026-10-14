@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.21-beta', VERSION === 'v1.7.21-beta');
+  ok('version v1.7.22-beta', VERSION === 'v1.7.22-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -188,6 +188,230 @@ code += `
     archiveUiCode.includes('toggle("tab-locked"') && !archiveUiCode.includes('toggle("hidden", !state.archiveUnlocked'));
   ok('archive tab has disabled attr support',
     archiveUiCode.includes('btn.disabled'));
+
+  // v1.7.22-beta Mira review: REAL accordion interaction test —
+  // opening entry B closes entry A (body hidden, aria-expanded false,
+  // 'open' class removed); tapping open B closes B.
+  (() => {
+    function mockEl() {
+      const handlers = {};
+      const el = {
+        children: [],
+        _cls: new Set(),
+        _attrs: {},
+        classList: {
+          add(c) { el._cls.add(c); },
+          remove(c) { el._cls.delete(c); },
+          toggle(c, force) {
+            if (force === undefined) {
+              if (el._cls.has(c)) { el._cls.delete(c); return false; }
+              el._cls.add(c); return true;
+            }
+            if (force) { el._cls.add(c); } else { el._cls.delete(c); }
+            return !!force;
+          },
+          contains(c) { return el._cls.has(c); }
+        },
+        style: {},
+        setAttribute(k, v) { el._attrs[k] = String(v); },
+        getAttribute(k) { return (k in el._attrs) ? el._attrs[k] : null; },
+        addEventListener(t, fn) { (handlers[t] = handlers[t] || []).push(fn); },
+        click() { (handlers.click || []).forEach(fn => fn()); },
+        appendChild(c) { el.children.push(c); return el.children[el.children.length - 1]; },
+        _qs: {},
+        querySelector(sel) {
+          if (!el._qs[sel]) el._qs[sel] = mockEl();
+          return el._qs[sel];
+        },
+        querySelectorAll(sel) {
+          if (sel === ".guide-row.open") return el.children.filter(c => c.classList.contains("open"));
+          return [];
+        },
+        innerHTML: ''
+      };
+      return el;
+    }
+    const origGetById = document.getElementById;
+    const origCreate = document.createElement;
+    const origTagged = state.tagged;
+    const origRanks = (typeof archiveDateRanks !== "undefined") ? archiveDateRanks : null;
+    const list = mockEl();
+    document.getElementById = (id) => id === "archiveList" ? list : origGetById(id);
+    document.createElement = () => mockEl();
+    state.tagged = {
+      nurse: { name: "", researchId: "NS-1" },
+      thresher: { name: "", researchId: "TS-1" }
+    };
+    try {
+      renderArchive();
+      const rows = list.children.slice();
+      // Simulate the initial rendered state (innerHTML parsing is mocked out):
+      // bodies hidden, heads collapsed.
+      const heads = rows.map(r => r.querySelector(".guide-row-head"));
+      const bodies = rows.map(r => r.querySelector(".guide-row-body"));
+      bodies.forEach(b => b.classList.add("hidden"));
+      heads.forEach(h => h.setAttribute("aria-expanded", "false"));
+      ok("archive accordion: two rows rendered", rows.length === 2);
+      ok("archive accordion: bodies start hidden",
+        bodies.every(b => b.classList.contains("hidden")));
+      // Click head A -> A opens
+      heads[0].click();
+      ok("archive accordion: clicking A opens A (body visible)",
+        !bodies[0].classList.contains("hidden"));
+      ok("archive accordion: clicking A sets aria-expanded true",
+        heads[0].getAttribute("aria-expanded") === "true");
+      ok("archive accordion: clicking A adds open class",
+        rows[0].classList.contains("open"));
+      // Click head B -> B opens AND A closes
+      heads[1].click();
+      ok("archive accordion: clicking B opens B (body visible)",
+        !bodies[1].classList.contains("hidden"));
+      ok("archive accordion: clicking B closes A (body hidden)",
+        bodies[0].classList.contains("hidden"));
+      ok("archive accordion: clicking B sets A aria-expanded false",
+        heads[0].getAttribute("aria-expanded") === "false");
+      ok("archive accordion: clicking B removes A open class",
+        !rows[0].classList.contains("open"));
+      // Click head B again -> B closes (toggle)
+      heads[1].click();
+      ok("archive accordion: clicking open B closes B (body hidden)",
+        bodies[1].classList.contains("hidden"));
+      ok("archive accordion: clicking open B sets aria-expanded false",
+        heads[1].getAttribute("aria-expanded") === "false");
+    } catch (e) {
+      ok("archive accordion interaction (threw: " + e.message + ")", false);
+    } finally {
+      document.getElementById = origGetById;
+      document.createElement = origCreate;
+      state.tagged = origTagged;
+      if (typeof archiveDateRanks !== "undefined") archiveDateRanks = origRanks;
+    }
+  })();
+  // v1.7.22-beta Mira review: doFollowTagged — fact available AND exhausted.
+  // The insight/exhaustion text must appear ONLY in the Map overlay
+  // (pendingTagAlongFact), never as a log line.
+  (() => {
+    const origRender = renderAll;
+    const origLog = logLine;
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origPending = state.pendingTagAlongFact;
+    const origSave = factStore.save;
+    const origTrip = logTripEncounter;
+    const origDone = state.encounterDone;
+    const origFollowed = state.followedThisTrip;
+    renderAll = () => {};
+    factStore.save = () => {};
+    logTripEncounter = () => {};
+    let logged = [];
+    logLine = (html) => { logged.push(String(html)); };
+    state.tagged = { nurse: { name: "", researchId: "NS-1" } };
+    state.encounterDone = null;
+    state.followedThisTrip = false;
+    try {
+      // Branch 1: fact available -> pendingTagAlongFact set, no insight in log
+      state.unlockedFacts = {};
+      state.pendingTagAlongFact = null;
+      logged = [];
+      doFollowTagged("nurse", () => {});
+      const factPool = SECRET_FACTS.nurse || [];
+      ok("follow: fact branch sets pendingTagAlongFact",
+        !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === false);
+      ok("follow: fact branch stashes one of the pool facts",
+        !!state.pendingTagAlongFact && factPool.includes(state.pendingTagAlongFact.fact));
+      ok("follow: fact text NOT in expedition log",
+        !logged.some(h => state.pendingTagAlongFact && state.pendingTagAlongFact.fact &&
+          h.includes(state.pendingTagAlongFact.fact.slice(0, 40))));
+      // Branch 2: all facts exhausted -> exhausted flag, exhaustion line NOT in log
+      // (it lives only in the Map popup via pendingTagAlongFact)
+      state.unlockedFacts = { nurse: [0, 1, 2] }; // all 3 nurse facts used
+      state.pendingTagAlongFact = null;
+      logged = [];
+      doFollowTagged("nurse", () => {});
+      ok("follow: exhausted branch sets exhausted flag",
+        !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === true);
+      ok("follow: exhaustion line NOT in expedition log",
+        !logged.some(h => h.includes("learned all I can")));
+    } catch (e) {
+      ok("follow branches (threw: " + e.message + ")", false);
+    } finally {
+      renderAll = origRender;
+      logLine = origLog;
+      factStore.save = origSave;
+      logTripEncounter = origTrip;
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+      state.pendingTagAlongFact = origPending;
+      state.encounterDone = origDone;
+      state.followedThisTrip = origFollowed;
+    }
+  })();
+  // v1.7.22-beta: Following a tagged shark records a re-sighting (Pen Pal).
+  // doFollowTagged must call recordResighting like the "Log re-sighting" button.
+  (() => {
+    const origRender = renderAll;
+    const origLog = logLine;
+    const origTrip = logTripEncounter;
+    const origTagged = state.tagged;
+    const origPlan = state.currentPlan;
+    const origFacts = state.unlockedFacts;
+    const origPending = state.pendingTagAlongFact;
+    const origSaveStats = saveStats;
+    const origCheck = checkAchievements;
+    const origRenderColl = renderCollection;
+    const origStoreSave = store.save;
+    const origDone = state.encounterDone;
+    const origFollowed = state.followedThisTrip;
+    renderAll = () => {};
+    logLine = () => {};
+    logTripEncounter = () => {};
+    saveStats = () => {};
+    checkAchievements = () => {};
+    renderCollection = () => {};
+    store.save = () => {};
+    // tagged nurse with zero re-sightings so far
+    state.tagged = { nurse: { name: "", researchId: "NS-1", resightings: [] } };
+    state.currentPlan = { region: "caribbean", depth: "shallow", bait: "chum" };
+    state.unlockedFacts = { nurse: [0, 1, 2] }; // exhausted, so no fact branch noise
+    state.pendingTagAlongFact = null;
+    state.encounterDone = null;
+    state.followedThisTrip = false;
+    try {
+      doFollowTagged("nurse", () => {});
+      const res = state.tagged.nurse.resightings || [];
+      ok("follow records a re-sighting",
+        res.length === 1);
+      ok("follow re-sighting has a location",
+        res.length === 1 && typeof res[0].location === "string" && res[0].location.length > 0);
+    } catch (e) {
+      ok("follow records a re-sighting (threw: " + e.message + ")", false);
+    } finally {
+      renderAll = origRender;
+      logLine = origLog;
+      logTripEncounter = origTrip;
+      saveStats = origSaveStats;
+      checkAchievements = origCheck;
+      renderCollection = origRenderColl;
+      store.save = origStoreSave;
+      state.tagged = origTagged;
+      state.currentPlan = origPlan;
+      state.unlockedFacts = origFacts;
+      state.pendingTagAlongFact = origPending;
+      state.encounterDone = origDone;
+      state.followedThisTrip = origFollowed;
+    }
+  })();
+  // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
+  ok('doFollowTagged does not log the insight', (function(){
+    var m = fileCode.match(/function doFollowTagged[\\s\\S]{0,1500}?renderAll\\(\\);/);
+    return m && m[0].indexOf('Tag-along insight:</strong>') === -1;
+  })());
+  // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
+  ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
+  ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
+  ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
+  ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
+  ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',
@@ -355,8 +579,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
+  ok('18 achievements (17 visible + Bruce hidden)', ACHIEVEMENTS.length === 18 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 17);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -516,13 +740,19 @@ code += `
     togglePin("salmon");
     return on && state.pinned === null && pinStore.load() === null;
   })());
-  // v0.20.0 Mira review: sawshark secondary is a genuine detail crop
-  ok('sawshark secondary is a real detail crop', (() => {
+  // v1.7.22: sawshark secondary is the Gould 1832 illustration, not a duplicate crop
+  ok('sawshark secondary is the Gould illustration', (() => {
     const a = ARCHIVE_MEDIA.sawshark.assets[1];
-    if (a.framing !== 'detail-crop' || !a.detailCrop || !a.trimmed) return false;
-    const html = archiveAssetHtml(a, false);
-    return html.includes('detail-crop-frame') && html.includes('background-position') &&
-      html.includes('trimmed from original');
+    return a.credit.includes('William Buelow Gould') &&
+      a.image.includes('Pristiophorus_cirratus.jpg') &&
+      a.license === 'public domain';
+  })());
+  // v1.7.22: cookiecutter secondary is the Ifremer whole-specimen photo
+  ok('cookiecutter secondary is the Ifremer specimen', (() => {
+    const a = ARCHIVE_MEDIA.cookiecutter.assets[1];
+    return a.credit.includes('Ifremer') &&
+      a.image.includes('Ifremer_00764-87574') &&
+      a.license === 'CC BY 4.0';
   })());
   ok('pin switches', (() => {
     togglePin("salmon"); togglePin("dusky");
@@ -1629,12 +1859,11 @@ code += `
   ok('time progression', /The afternoon stretches out/.test(fileCode) && /Evening approaches/.test(fileCode));
   // v1.4.15-beta: subtle diet phrases (not bait answers)
   ok('diet phrases', /they eat plankton/.test(fileCode) && /DIET_PHRASE/.test(fileCode));
-  // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
+  // v1.7.22-beta: PR47 bubbles — 8 staggered columns, 26 spans, bubble-rise keyframes
   (() => {
-    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
-    ok("bubble columns share a 24s cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+24s/.test(cssCode));
+    ok("bubbles use column keyframes", /@keyframes\\s+bubble-rise/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
-    ok("bubbles number 16 (4 lanes x 4)", bubbleCount === 16);
+    ok("bubbles number 26 (8 staggered columns)", bubbleCount === 26);
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1707,9 +1936,7 @@ code += `
   ok('porthole orbit has depth gradient', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*38s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
-  ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
-  // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
-  ok('bubble columns overlap in pairs', /columns A.B fire together/.test(cssCode) && /columns C.D fire together/.test(cssCode));
+  ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
   ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
@@ -2204,6 +2431,7 @@ ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHA
 ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHATS_NEW['v1.7.18-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
   ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));
@@ -2349,6 +2577,9 @@ ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHA
 
   // v1.7.13-beta: Bait and Switch retired
   ok('bait-switch achievement removed', !ACHIEVEMENTS.some(a => a.id === 'bait-switch'));
+
+  // v1.7.22-beta: Something in the Water retired (only chum remains)
+  ok('something-water achievement removed', !ACHIEVEMENTS.some(a => a.id === 'something-water'));
 
   // v1.7.13-beta Mira review fixes: research copy + logbook legacy labels + behavioral tests
   ok('great white research recommends fish-oil chum, not seal scent', (() => {

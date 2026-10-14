@@ -188,6 +188,15 @@ function renderArchive() {
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
     head.addEventListener("click", () => {
+      /* v1.7.22-beta: accordion — opening one entry closes any other open
+         entry (shared collapseGuideRow helper from script.js). Only one
+         archive entry is expanded at a time. */
+      const wasHidden = body.classList.contains("hidden");
+      if (wasHidden && typeof collapseGuideRow === "function") {
+        list.querySelectorAll(".guide-row.open").forEach(other => {
+          if (other !== row) collapseGuideRow(other, false);
+        });
+      }
       const isHidden = body.classList.toggle("hidden");
       head.setAttribute("aria-expanded", String(!isHidden));
       /* v1.5.22-beta: match the Research tab — toggling "open" makes the

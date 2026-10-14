@@ -59,14 +59,6 @@ const ACHIEVEMENTS = [
     }
   },
   {
-    id: "something-water",
-    name: "Something in the Water",
-    icon: "🌊",
-    breadcrumb: "something in the water...",
-    description: "Tagged a shark with the right scent in the water. Chum works.",
-    check: (st) => !!(st.stats.chumTags > 0)
-  },
-  {
     id: "best-cousin",
     name: "Best Cousin Ever",
     icon: "💙",
