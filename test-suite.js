@@ -541,6 +541,14 @@ code += `
   })());
   ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
 
+  // v1.7.23-beta: cookiecutter archive is illustration-only (Avery's call — no dead specimens)
+  (function () {
+    const assets = ARCHIVE_MEDIA.cookiecutter.assets;
+    ok('cookiecutter is a single illustration',
+      assets.length === 1 && assets[0].type === 'illustration' &&
+      /GrahamBould/.test(assets[0].credit) && assets[0].license === 'CC BY-SA 1.0');
+  })();
+
   // v0.18.0 wave — 7 new species live on the roster with verified archive media
   const wave7 = ['scalloped','smooth','bonnethead','bull','greyreef','caribbean','sandbar'];
   ok('7 wave species on roster', wave7.every(id => SHARKS.some(s => s.id === id)));
