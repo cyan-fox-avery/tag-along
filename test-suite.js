@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.21-beta', VERSION === 'v1.7.21-beta');
+  ok('version v1.7.22-beta', VERSION === 'v1.7.22-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -188,6 +188,20 @@ code += `
     archiveUiCode.includes('toggle("tab-locked"') && !archiveUiCode.includes('toggle("hidden", !state.archiveUnlocked'));
   ok('archive tab has disabled attr support',
     archiveUiCode.includes('btn.disabled'));
+
+  // v1.7.22-beta: Archive accordion — opening one entry closes others
+  ok('archive accordion closes other entries',
+    archiveUiCode.includes('collapseGuideRow(other, false)'));
+  // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
+  ok('doFollowTagged does not log the insight', (function(){
+    var m = fileCode.match(/function doFollowTagged[\\s\\S]{0,1500}?renderAll\\(\\);/);
+    return m && m[0].indexOf('Tag-along insight:</strong>') === -1;
+  })());
+  // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
+  ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
+  ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
+  ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
+  ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',
@@ -1629,12 +1643,11 @@ code += `
   ok('time progression', /The afternoon stretches out/.test(fileCode) && /Evening approaches/.test(fileCode));
   // v1.4.15-beta: subtle diet phrases (not bait answers)
   ok('diet phrases', /they eat plankton/.test(fileCode) && /DIET_PHRASE/.test(fileCode));
-  // v1.4.14: MORE bubbles in overlapping burst columns on a shorter shared cycle
+  // v1.7.22-beta: PR47 bubbles — 8 staggered columns, 26 spans, bubble-rise keyframes
   (() => {
-    ok("bubbles use column keyframes", /@keyframes\\s+bubble-column/.test(cssCode));
-    ok("bubble columns share a 24s cycle", /\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*bubble-column\\s+24s/.test(cssCode));
+    ok("bubbles use column keyframes", /@keyframes\\s+bubble-rise/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
-    ok("bubbles number 16 (4 lanes x 4)", bubbleCount === 16);
+    ok("bubbles number 26 (8 staggered columns)", bubbleCount === 26);
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1707,9 +1720,7 @@ code += `
   ok('porthole orbit has depth gradient', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*38s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
-  ok('bubbles rise in burst columns', /columns fire in OVERLAPPING pairs/i.test(cssCode));
-  // v1.4.16: porthole refinements — overlapping bubble columns, bigger wave layout, snappy splash
-  ok('bubble columns overlap in pairs', /columns A.B fire together/.test(cssCode) && /columns C.D fire together/.test(cssCode));
+  ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
   ok('splash slides fast and fades quick', /@keyframes\\s+pw-spray-1[\\s\\S]*?translateY\\(140px\\)/.test(cssCode));
@@ -2204,6 +2215,7 @@ ok('WHATS_NEW has v1.7.17-beta', Array.isArray(WHATS_NEW['v1.7.17-beta']) && WHA
 ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHATS_NEW['v1.7.18-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
   ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));

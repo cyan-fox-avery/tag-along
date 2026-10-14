@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.21-beta";
+const VERSION = "v1.7.22-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,11 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.22-beta": [
+"📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
+"🧭 <strong>Follow takes you to the Map.</strong> Ending an expedition early to follow a shark always returns you to the Map tab, where the tag-along insight popup appears. The insight no longer also lands in the expedition log.",
+"🫧 <strong>Denser bubbles.</strong> The background bubbles are now denser and more organic — 8 staggered columns rising at different speeds and heights, ported from the art-pass reference (rays excluded).",
+  ],
   "v1.7.21-beta": [
 "🦈 <strong>Derpy mystery silhouette fixed.</strong> The darkened derpy shape was collapsing to zero size, leaving the mystery phase empty — it now has explicit dimensions so the silhouette shows properly. Tap to reveal the full derpy art.",
   ],
@@ -3754,8 +3759,9 @@ function doFollowTagged(speciesId, doneCb) {
   const displayName = (rec && rec.name) || s.name;
   logLine(`🧭 Following ${esc(displayName)} — tag secure, swimming strong.`);
   const fact = unlockSecretFact(speciesId);
+  /* v1.7.22-beta: the insight lives on the Map popup only — not in the log.
+     (Matches doTagAlong's v1.5.8-beta behavior.) */
   if (fact) {
-    logLine(`🔬 <strong>Tag-along insight:</strong> ${esc(fact)}`);
     /* Stash for the map overlay (readable reward with progression). */
     state.pendingTagAlongFact = { speciesId, fact, exhausted: false };
   } else {
