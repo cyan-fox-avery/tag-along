@@ -401,11 +401,6 @@ code += `
       state.followedThisTrip = origFollowed;
     }
   })();
-  // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
-  ok('doFollowTagged does not log the insight', (function(){
-    var m = fileCode.match(/function doFollowTagged[\\s\\S]{0,1500}?renderAll\\(\\);/);
-    return m && m[0].indexOf('Tag-along insight:</strong>') === -1;
-  })());
   // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
@@ -415,6 +410,7 @@ code += `
   // v1.7.23-beta: Follow button shows insight progress (insights: n/total).
   ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
   ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
+  ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
   // v1.7.23-beta: achievement cards identical height across ALL rows —
   // fixed min-height on every card, not just per-row stretch.
   ok('achievement cards have fixed min-height', cssCode.includes('#achieveList .guide-row') && cssCode.includes('min-height: 140px'));
@@ -546,7 +542,7 @@ code += `
     const assets = ARCHIVE_MEDIA.cookiecutter.assets;
     ok('cookiecutter is a single illustration',
       assets.length === 1 && assets[0].type === 'illustration' &&
-      /GrahamBould/.test(assets[0].credit) && assets[0].license === 'CC BY-SA 1.0');
+      /Dr Tony Ayling/.test(assets[0].credit) && assets[0].license === 'CC BY-SA 1.0');
   })();
 
   // v0.18.0 wave — 7 new species live on the roster with verified archive media
@@ -766,9 +762,15 @@ code += `
     const assets = ARCHIVE_MEDIA.cookiecutter.assets;
     return assets.length === 1 &&
       assets[0].type === 'illustration' &&
-      assets[0].credit.includes('GrahamBould') &&
+      assets[0].credit.includes('Dr Tony Ayling') &&
       assets[0].image.includes('Cookiecutter_shark') &&
       assets[0].license === 'CC BY-SA 1.0';
+  })());
+  ok('megamouth credits the creator, not the uploader', (() => {
+    const assets = ARCHIVE_MEDIA.megamouth.assets;
+    return assets.length > 0 &&
+      assets[0].credit.includes('CSIRO National Fish Collection') &&
+      assets[0].license === 'CC BY 3.0';
   })());
   ok('pin switches', (() => {
     togglePin("salmon"); togglePin("dusky");

@@ -2310,7 +2310,8 @@ function doEncounter(species, plan) {
       const _factHave = (state.unlockedFacts[species.id] || []).length;
       const _factLine = _factTotal ? `<br><small class="dim">(insights: ${_factHave}/${_factTotal})</small>` : "";
       followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>${_factLine}`;
-      followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)`);
+      const _factLabel = _factTotal ? ` (${_factHave} of ${_factTotal} insights learned)` : "";
+      followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)${_factLabel}`);
       followBtn.addEventListener("click", () => {
         actions.classList.add("hidden");
         actions.innerHTML = "";

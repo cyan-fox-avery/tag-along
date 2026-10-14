@@ -945,7 +945,7 @@ const ARCHIVE_MEDIA = {
    {
     "type": "photo",
     "caption": "A megamouth shark — full animal, showing the huge head and cavernous mouth.",
-    "credit": "Olyngo (via Wikimedia Commons)",
+    "credit": "CSIRO National Fish Collection (via Wikimedia Commons)",
     "license": "CC BY 3.0",
     "page": "https://commons.wikimedia.org/wiki/File:Megachasma_pelagios.jpg",
     "image": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Megachasma_pelagios.jpg",
@@ -1017,7 +1017,7 @@ const ARCHIVE_MEDIA = {
    {
     "type": "illustration",
     "caption": "A cookiecutter shark — scientific illustration showing the small streamlined body.",
-    "credit": "GrahamBould (via Wikimedia Commons)",
+    "credit": "Dr Tony Ayling (via Wikimedia Commons; uploaded by GrahamBould)",
     "license": "CC BY-SA 1.0",
     "page": "https://commons.wikimedia.org/wiki/File:Isistius_brasiliensis_(Cookiecutter_shark).gif",
     "image": "https://upload.wikimedia.org/wikipedia/commons/7/72/Isistius_brasiliensis_%28Cookiecutter_shark%29.gif?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
