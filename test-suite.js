@@ -579,8 +579,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
+  ok('18 achievements (17 visible + Bruce hidden)', ACHIEVEMENTS.length === 18 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 17);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -2577,6 +2577,9 @@ ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHA
 
   // v1.7.13-beta: Bait and Switch retired
   ok('bait-switch achievement removed', !ACHIEVEMENTS.some(a => a.id === 'bait-switch'));
+
+  // v1.7.22-beta: Something in the Water retired (only chum remains)
+  ok('something-water achievement removed', !ACHIEVEMENTS.some(a => a.id === 'something-water'));
 
   // v1.7.13-beta Mira review fixes: research copy + logbook legacy labels + behavioral tests
   ok('great white research recommends fish-oil chum, not seal scent', (() => {
