@@ -189,9 +189,157 @@ code += `
   ok('archive tab has disabled attr support',
     archiveUiCode.includes('btn.disabled'));
 
-  // v1.7.22-beta: Archive accordion — opening one entry closes others
-  ok('archive accordion closes other entries',
-    archiveUiCode.includes('collapseGuideRow(other, false)'));
+  // v1.7.22-beta Mira review: REAL accordion interaction test —
+  // opening entry B closes entry A (body hidden, aria-expanded false,
+  // 'open' class removed); tapping open B closes B.
+  (() => {
+    function mockEl() {
+      const handlers = {};
+      const el = {
+        children: [],
+        _cls: new Set(),
+        _attrs: {},
+        classList: {
+          add(c) { el._cls.add(c); },
+          remove(c) { el._cls.delete(c); },
+          toggle(c, force) {
+            if (force === undefined) {
+              if (el._cls.has(c)) { el._cls.delete(c); return false; }
+              el._cls.add(c); return true;
+            }
+            if (force) { el._cls.add(c); } else { el._cls.delete(c); }
+            return !!force;
+          },
+          contains(c) { return el._cls.has(c); }
+        },
+        style: {},
+        setAttribute(k, v) { el._attrs[k] = String(v); },
+        getAttribute(k) { return (k in el._attrs) ? el._attrs[k] : null; },
+        addEventListener(t, fn) { (handlers[t] = handlers[t] || []).push(fn); },
+        click() { (handlers.click || []).forEach(fn => fn()); },
+        appendChild(c) { el.children.push(c); return el.children[el.children.length - 1]; },
+        _qs: {},
+        querySelector(sel) {
+          if (!el._qs[sel]) el._qs[sel] = mockEl();
+          return el._qs[sel];
+        },
+        querySelectorAll(sel) {
+          if (sel === ".guide-row.open") return el.children.filter(c => c.classList.contains("open"));
+          return [];
+        },
+        innerHTML: ''
+      };
+      return el;
+    }
+    const origGetById = document.getElementById;
+    const origCreate = document.createElement;
+    const origTagged = state.tagged;
+    const list = mockEl();
+    document.getElementById = (id) => id === "archiveList" ? list : origGetById(id);
+    document.createElement = () => mockEl();
+    state.tagged = {
+      nurse: { name: "", researchId: "NS-1" },
+      thresher: { name: "", researchId: "TS-1" }
+    };
+    try {
+      renderArchive();
+      const rows = list.children.slice();
+      // Simulate the initial rendered state (innerHTML parsing is mocked out):
+      // bodies hidden, heads collapsed.
+      const heads = rows.map(r => r.querySelector(".guide-row-head"));
+      const bodies = rows.map(r => r.querySelector(".guide-row-body"));
+      bodies.forEach(b => b.classList.add("hidden"));
+      heads.forEach(h => h.setAttribute("aria-expanded", "false"));
+      ok("archive accordion: two rows rendered", rows.length === 2);
+      ok("archive accordion: bodies start hidden",
+        bodies.every(b => b.classList.contains("hidden")));
+      // Click head A -> A opens
+      heads[0].click();
+      ok("archive accordion: clicking A opens A (body visible)",
+        !bodies[0].classList.contains("hidden"));
+      ok("archive accordion: clicking A sets aria-expanded true",
+        heads[0].getAttribute("aria-expanded") === "true");
+      ok("archive accordion: clicking A adds open class",
+        rows[0].classList.contains("open"));
+      // Click head B -> B opens AND A closes
+      heads[1].click();
+      ok("archive accordion: clicking B opens B (body visible)",
+        !bodies[1].classList.contains("hidden"));
+      ok("archive accordion: clicking B closes A (body hidden)",
+        bodies[0].classList.contains("hidden"));
+      ok("archive accordion: clicking B sets A aria-expanded false",
+        heads[0].getAttribute("aria-expanded") === "false");
+      ok("archive accordion: clicking B removes A open class",
+        !rows[0].classList.contains("open"));
+      // Click head B again -> B closes (toggle)
+      heads[1].click();
+      ok("archive accordion: clicking open B closes B (body hidden)",
+        bodies[1].classList.contains("hidden"));
+      ok("archive accordion: clicking open B sets aria-expanded false",
+        heads[1].getAttribute("aria-expanded") === "false");
+    } catch (e) {
+      ok("archive accordion interaction (threw: " + e.message + ")", false);
+    } finally {
+      document.getElementById = origGetById;
+      document.createElement = origCreate;
+      state.tagged = origTagged;
+    }
+  })();
+  // v1.7.22-beta Mira review: doFollowTagged — fact available AND exhausted.
+  // The insight/exhaustion text must appear ONLY in the Map overlay
+  // (pendingTagAlongFact), never as a log line.
+  (() => {
+    const origRender = renderAll;
+    const origLog = logLine;
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origPending = state.pendingTagAlongFact;
+    const origSave = factStore.save;
+    const origTrip = logTripEncounter;
+    renderAll = () => {};
+    factStore.save = () => {};
+    logTripEncounter = () => {};
+    let logged = [];
+    logLine = (html) => { logged.push(String(html)); };
+    state.tagged = { nurse: { name: "", researchId: "NS-1" } };
+    state.encounterDone = null;
+    try {
+      // Branch 1: fact available -> pendingTagAlongFact set, no insight in log
+      state.unlockedFacts = {};
+      state.pendingTagAlongFact = null;
+      logged = [];
+      doFollowTagged("nurse", () => {});
+      const factPool = SECRET_FACTS.nurse || [];
+      ok("follow: fact branch sets pendingTagAlongFact",
+        !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === false);
+      ok("follow: fact branch stashes one of the pool facts",
+        !!state.pendingTagAlongFact && factPool.includes(state.pendingTagAlongFact.fact));
+      ok("follow: fact text NOT in expedition log",
+        !logged.some(h => state.pendingTagAlongFact && state.pendingTagAlongFact.fact &&
+          h.includes(state.pendingTagAlongFact.fact.slice(0, 40))));
+      // Branch 2: all facts exhausted -> exhausted flag, exhaustion line NOT in log
+      // (it lives only in the Map popup via pendingTagAlongFact)
+      state.unlockedFacts = { nurse: [0, 1, 2] }; // all 3 nurse facts used
+      state.pendingTagAlongFact = null;
+      logged = [];
+      doFollowTagged("nurse", () => {});
+      ok("follow: exhausted branch sets exhausted flag",
+        !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === true);
+      ok("follow: exhaustion line NOT in expedition log",
+        !logged.some(h => h.includes("learned all I can")));
+    } catch (e) {
+      ok("follow branches (threw: " + e.message + ")", false);
+    } finally {
+      renderAll = origRender;
+      logLine = origLog;
+      factStore.save = origSave;
+      logTripEncounter = origTrip;
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+      state.pendingTagAlongFact = origPending;
+      state.encounterDone = null;
+    }
+  })();
   // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
   ok('doFollowTagged does not log the insight', (function(){
     var m = fileCode.match(/function doFollowTagged[\\s\\S]{0,1500}?renderAll\\(\\);/);

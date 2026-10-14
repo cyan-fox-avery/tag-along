@@ -22,7 +22,7 @@ const IUCN_ABBR = {
 const WHATS_NEW = {
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
-"🧭 <strong>Follow takes you to the Map.</strong> Ending an expedition early to follow a shark always returns you to the Map tab, where the tag-along insight popup appears. The insight no longer also lands in the expedition log.",
+"🧭 <strong>Follow insight cleanup.</strong> Follow now keeps its insights on the Map popup — the tag-along insight (or the graceful \"learned all I can\" line) appears there, not duplicated in the expedition log.",
 "🫧 <strong>Denser bubbles.</strong> The background bubbles are now denser and more organic — 8 staggered columns rising at different speeds and heights, ported from the art-pass reference (rays excluded).",
   ],
   "v1.7.21-beta": [
@@ -3765,7 +3765,8 @@ function doFollowTagged(speciesId, doneCb) {
     /* Stash for the map overlay (readable reward with progression). */
     state.pendingTagAlongFact = { speciesId, fact, exhausted: false };
   } else {
-    logLine(`🔬 <em>I've learned all I can — the rest is in the specialists' hands now.</em>`);
+    /* v1.7.22-beta Mira review: the exhaustion line lives ONLY in the Map
+       popup (via pendingTagAlongFact) — no duplicate log line. */
     state.pendingTagAlongFact = { speciesId, fact: null, exhausted: true };
   }
   /* v1.4.0-beta Mira review (related polish): log the follow as a trip
