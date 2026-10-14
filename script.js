@@ -3758,6 +3758,11 @@ function doFollowTagged(speciesId, doneCb) {
   const rec = state.tagged[speciesId];
   const displayName = (rec && rec.name) || s.name;
   logLine(`🧭 Following ${esc(displayName)} — tag secure, swimming strong.`);
+  /* v1.7.22-beta: Following an already-tagged shark counts as a re-sighting.
+     Feeds the Pen Pal achievement, the track map, and resight stats — just
+     like "📝 Log re-sighting". (Avery: players who always Follow never earned
+     Pen Pal because only the Log button recorded re-sightings.) */
+  if (state.currentPlan) recordResighting(s, state.currentPlan);
   const fact = unlockSecretFact(speciesId);
   /* v1.7.22-beta: the insight lives on the Map popup only — not in the log.
      (Matches doTagAlong's v1.5.8-beta behavior.) */
