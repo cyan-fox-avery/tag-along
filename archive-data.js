@@ -1115,12 +1115,12 @@ const ARCHIVE_MEDIA = {
   "assets": [
    {
     "type": "photo",
-    "caption": "A kitefin shark — deep-water, heavy-bodied, rarely photographed.",
-    "credit": "Simon Tonge",
-    "license": "CC0",
-    "page": "https://commons.wikimedia.org/wiki/File%3ADalatias_licha_22073024.jpg",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Dalatias_licha_22073024.jpg/960px-Dalatias_licha_22073024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Dalatias_licha_22073024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "caption": "A kitefin shark — scientific illustration by Paul Gervais, showing the heavy deep-water body.",
+    "credit": "Paul Gervais (via Wikimedia Commons)",
+    "license": "public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Dalatias_licha_Gervais.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Dalatias_licha_Gervais.jpg/960px-Dalatias_licha_Gervais.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Dalatias_licha_Gervais.jpg",
    },
   ]
  },
