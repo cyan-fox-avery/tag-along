@@ -340,6 +340,57 @@ code += `
       state.encounterDone = null;
     }
   })();
+  // v1.7.22-beta: Following a tagged shark records a re-sighting (Pen Pal).
+  // doFollowTagged must call recordResighting like the "Log re-sighting" button.
+  (() => {
+    const origRender = renderAll;
+    const origLog = logLine;
+    const origTrip = logTripEncounter;
+    const origTagged = state.tagged;
+    const origPlan = state.currentPlan;
+    const origFacts = state.unlockedFacts;
+    const origPending = state.pendingTagAlongFact;
+    const origSaveStats = saveStats;
+    const origCheck = checkAchievements;
+    const origRenderColl = renderCollection;
+    const origStoreSave = store.save;
+    renderAll = () => {};
+    logLine = () => {};
+    logTripEncounter = () => {};
+    saveStats = () => {};
+    checkAchievements = () => {};
+    renderCollection = () => {};
+    store.save = () => {};
+    // tagged nurse with zero re-sightings so far
+    state.tagged = { nurse: { name: "", researchId: "NS-1", resightings: [] } };
+    state.currentPlan = { region: "caribbean", depth: "shallow", bait: "chum" };
+    state.unlockedFacts = { nurse: [0, 1, 2] }; // exhausted, so no fact branch noise
+    state.pendingTagAlongFact = null;
+    state.encounterDone = null;
+    try {
+      doFollowTagged("nurse", () => {});
+      const res = state.tagged.nurse.resightings || [];
+      ok("follow records a re-sighting",
+        res.length === 1);
+      ok("follow re-sighting has a location",
+        res.length === 1 && typeof res[0].location === "string" && res[0].location.length > 0);
+    } catch (e) {
+      ok("follow records a re-sighting (threw: " + e.message + ")", false);
+    } finally {
+      renderAll = origRender;
+      logLine = origLog;
+      logTripEncounter = origTrip;
+      saveStats = origSaveStats;
+      checkAchievements = origCheck;
+      renderCollection = origRenderColl;
+      store.save = origStoreSave;
+      state.tagged = origTagged;
+      state.currentPlan = origPlan;
+      state.unlockedFacts = origFacts;
+      state.pendingTagAlongFact = origPending;
+      state.encounterDone = null;
+    }
+  })();
   // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
   ok('doFollowTagged does not log the insight', (function(){
     var m = fileCode.match(/function doFollowTagged[\\s\\S]{0,1500}?renderAll\\(\\);/);
