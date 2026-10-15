@@ -2706,15 +2706,43 @@ const RESIGHT_NOTES = [
   "Back again! At this point I'm starting to think it likes us."
 ];
 
+/* v1.7.24-beta: tiered re-sighting notes — Sarah gets more excited
+   as she sees the same shark again. 2nd sighting: warm recognition.
+   3rd+: full best-friend energy. */
+const RESIGHT_NOTES_2ND = [
+  "It's back! I was hoping we'd see this one again.",
+  "Second sighting! Okay, I'm officially keeping an eye on this one.",
+  "Hey, it's our shark again! Starting to recognize this one.",
+  "Back for round two! This shark is becoming a regular.",
+  "Twice now! Either it likes this spot or it likes us. Probably both."
+];
+
+const RESIGHT_NOTES_EXCITED = [
+  "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
+  "Okay, this is officially a friendship. Three sightings means it knows us. It KNOWS us!",
+  "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
+  "Three sightings of the same shark! Do you realize how special that is?? This one chose us!",
+  "It's back AGAIN! I think this shark has adopted us. We're its humans now."
+];
+
+/* Pick the re-sighting note pool by which re-sighting this is
+   (1-based ordinal for this individual). */
+function resightNoteFor(ordinal) {
+  if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
+  if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
+  return pick(RESIGHT_NOTES);
+}
+
 function recordResighting(species, plan) {
   const t = state.tagged[species.id];
+  t.resightings = t.resightings || [];
+  const ordinal = t.resightings.length + 1;
   const entry = {
     date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
     location: REGIONS[plan.region].name,
-    note: pick(RESIGHT_NOTES),
+    note: resightNoteFor(ordinal),
     ts: Date.now()
   };
-  t.resightings = t.resightings || [];
   t.resightings.push(entry);
   /* The tracking story grows: a new ping on the map. v0.9.0: the hop
      distance and ping interval come from the species' real envelope,

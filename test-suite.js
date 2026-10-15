@@ -413,6 +413,64 @@ code += `
       else if (state.stats) delete state.stats.resights;
     }
   })();
+  // v1.7.24-beta: tiered re-sighting notes — 1st uses RESIGHT_NOTES,
+  // 2nd uses the middle pool, 3rd+ uses the excited pool.
+  (function () {
+    const n1 = resightNoteFor(1);
+    const n2 = resightNoteFor(2);
+    const n3 = resightNoteFor(3);
+    const n5 = resightNoteFor(5);
+    ok('resightNoteFor(1) uses regular pool',
+      RESIGHT_NOTES.includes(n1) && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
+    ok('resightNoteFor(2) uses middle pool',
+      RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_NOTES.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
+    ok('resightNoteFor(3) uses excited pool',
+      RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_NOTES.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
+    ok('resightNoteFor(5) still uses excited pool',
+      RESIGHT_NOTES_EXCITED.includes(n5));
+  })();
+  ok('excited pool has all five Avery picks',
+    RESIGHT_NOTES_EXCITED.length === 5 &&
+    RESIGHT_NOTES_EXCITED.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+    RESIGHT_NOTES_EXCITED.includes("It's back AGAIN! I think this shark has adopted us. We're its humans now."));
+  ok('middle pool has all five Avery picks',
+    RESIGHT_NOTES_2ND.length === 5 &&
+    RESIGHT_NOTES_2ND.includes("It's back! I was hoping we'd see this one again.") &&
+    RESIGHT_NOTES_2ND.includes("Twice now! Either it likes this spot or it likes us. Probably both."));
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const origTagged = state.tagged;
+    const origSaveStats = saveStats;
+    const origCheck = checkAchievements;
+    const origRenderColl = renderCollection;
+    const origStoreSave = store.save;
+    saveStats = () => {};
+    checkAchievements = () => {};
+    renderCollection = () => {};
+    store.save = () => {};
+    const plan = { region: 'caribbean', depth: 'shallow', bait: 'chum' };
+    function noteAfter(priorCount) {
+      const prior = [];
+      for (let i = 0; i < priorCount; i++) prior.push({ date: 'Jan 1, 2026', location: 'Caribbean Sea', note: 'old', ts: 1 });
+      state.tagged = { nurse: { name: '', researchId: 'NS-1', resightings: prior } };
+      const entry = recordResighting(nurse, plan);
+      return entry.note;
+    }
+    try {
+      ok('recordResighting 1st uses regular pool', RESIGHT_NOTES.includes(noteAfter(0)));
+      ok('recordResighting 2nd uses middle pool', RESIGHT_NOTES_2ND.includes(noteAfter(1)));
+      ok('recordResighting 3rd uses excited pool', RESIGHT_NOTES_EXCITED.includes(noteAfter(2)));
+      ok('recordResighting 4th still uses excited pool', RESIGHT_NOTES_EXCITED.includes(noteAfter(3)));
+    } catch (e) {
+      ok('recordResighting tiered notes (threw: ' + e.message + ')', false);
+    } finally {
+      saveStats = origSaveStats;
+      checkAchievements = origCheck;
+      renderCollection = origRenderColl;
+      store.save = origStoreSave;
+      state.tagged = origTagged;
+    }
+  })();
   // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
