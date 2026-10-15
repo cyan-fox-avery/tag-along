@@ -1913,6 +1913,13 @@ code += `
     ok("bubbles use column keyframes", /@keyframes\\s+bubble-rise/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
     ok("bubbles number 26 (8 staggered columns)", bubbleCount === 26);
+    // v1.7.23-beta: frozen-bubble fix — every bubble-rise keyframe must state
+    // its transform explicitly (WebKit stalled when 8%/85% omitted it), and
+    // bubbles must be composited so the initial renderAll() can't stall them.
+    const riseBlock = (cssCode.match(/@keyframes\\s+bubble-rise\\s*\\{[\\s\\S]*?\\n\\}/) || [""])[0];
+    const riseStops = (riseBlock.match(/^\\s*\\d+%\\s*\\{[^}]*\\}/gm) || []);
+    ok("bubble-rise keyframes all state transform", riseStops.length >= 4 && riseStops.every(s => /transform:/.test(s)));
+    ok("bubbles use will-change for compositor animation", /\\.bubbles\\s+span\\s*\\{[^}]*will-change:\\s*transform/.test(cssCode));
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
