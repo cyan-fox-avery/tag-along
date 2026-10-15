@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.26-beta', VERSION === 'v1.7.26-beta');
+  ok('version v1.7.27-beta', VERSION === 'v1.7.27-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2303,6 +2303,13 @@ code += `
   ok('porthole orbit has depth gradient', /\\.pw-far\\s+\\.pw-orbit\\s*\\{[^}]*38s/.test(cssCode));
   ok('splash pops without sliding', !/5\\dpx/.test(cssCode.match(/@keyframes pw-spray-1[\\s\\S]*?\\n\\}/)[0]));
   ok('porthole respects reduced motion', /prefers-reduced-motion[\\s\\S]*?pw-orbit/.test(cssCode));
+  // v1.7.27-beta: wide-screen layouts — two-column detail modal + 2-col Research grid
+  ok('wide detail modal splits into two columns', /#detailOverlay\\s+#detailContent\\s*\\{[^}]*display:\\s*grid[^}]*grid-template-columns:\\s*1fr\\s+1\\.15fr/.test(cssCode));
+  ok('wide detail modal widens past phone width', /#detailOverlay\\s+\\.detail-modal\\s*\\{[^}]*max-width:\\s*820px/.test(cssCode));
+  ok('detail modal HTML carries detail-modal class', /id=\"detailOverlay\"[\\s\\S]*?class=\"phone detail-modal\"/.test(htmlCode));
+  ok('wide Research grid is 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
+  ok('detail left column holds identity', /#detailOverlay[\\s\\S]*?\\.shark-art[\\s\\S]*?grid-column:\\s*1/.test(cssCode));
+  ok('detail right column holds stats and notes', /#detailOverlay[\\s\\S]*?\\.book-stats[\\s\\S]*?grid-column:\\s*2/.test(cssCode));
   ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));
@@ -2839,6 +2846,7 @@ ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHA
 ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHATS_NEW['v1.7.24-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 

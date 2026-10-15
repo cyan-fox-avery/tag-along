@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.26-beta";
+const VERSION = "v1.7.27-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.27-beta": [
+"🖥️ <strong>Wider layouts on big screens.</strong> The Collection detail card now splits into two columns on wide screens (art + identity on the left, stats / notes / insights on the right) instead of one tall narrow strip — and the Research tab uses 2 wider columns instead of 3 narrow ones, so expanded entries are shorter. Phone / narrow layouts are unchanged.",
+  ],
   "v1.7.26-beta": [
 "🦈 <strong>Thresher hook reworded.</strong> The Collection hook now reads “It looks perpetually nervous, but that tail is actually a sword.” — “perpetually nervous” describes the whole shark, not just its tail.",
   ],
