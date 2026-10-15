@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.26-beta";
+const VERSION = "v1.7.27-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.27-beta": [
+"🖥️ <strong>Wider layouts on big screens.</strong> The Collection detail card now splits into two columns on wide screens (art + identity on the left, stats / notes / insights on the right) instead of one tall narrow strip — and the Research tab uses 2 wider columns instead of 3 narrow ones, so expanded entries are shorter. Phone / narrow layouts are unchanged.",
+  ],
   "v1.7.26-beta": [
 "🦈 <strong>Thresher hook reworded.</strong> The Collection hook now reads “It looks perpetually nervous, but that tail is actually a sword.” — “perpetually nervous” describes the whole shark, not just its tail.",
   ],
@@ -4674,6 +4677,7 @@ function openDetail(id) {
   const t = state.tagged[id];
   const c = $("detailContent");
   c.innerHTML = `
+    <div class="detail-identity">
     <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
     ${t.name ? `<div class="given-name">“${esc(t.name)}”</div>` : ""}
     <div class="detail-name-row">
@@ -4690,6 +4694,8 @@ function openDetail(id) {
     <h3 style="margin:6px 0 0">${s.name}</h3>
     <p class="latin detail-scientific">${s.latin}</p>
     <span class="status-pill">IUCN: ${s.status}</span>
+    </div>
+    <div class="detail-record">
     <p class="book-stats">
       📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
       📍 Tagged at ${esc(t.location)}<br>
@@ -4736,6 +4742,7 @@ function openDetail(id) {
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
     ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
+    </div>
   `;
   $("detailOverlay").classList.remove("hidden");
   $("trackBtn").addEventListener("click", () => openTrack(id));
