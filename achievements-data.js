@@ -192,6 +192,54 @@ const ACHIEVEMENTS = [
     description: "Tagged a whale shark. The biggest fish in the ocean — and every spot pattern is unique, like a fingerprint.",
     check: (st) => !!st.tagged.whale
   },
+  {
+    id: "dedicated",
+    name: "Dedicated",
+    icon: "🔬",
+    breadcrumb: "learn everything there is to learn",
+    description: "Unlocked every extra fact obtainable by following sharks. You didn't just tag them — you got to know them.",
+    check: (st) => {
+      /* v1.7.28-beta: every SECRET_FACTS entry across all species learned
+         via Follow/Observe. Pools are never empty (50 species, 101 facts),
+         and unlockedFacts only grows via unlockSecretFact. */
+      if (typeof SECRET_FACTS === "undefined") return false;
+      const ids = Object.keys(SECRET_FACTS);
+      return ids.length > 0 && ids.every(id => {
+        const pool = SECRET_FACTS[id] || [];
+        const unlocked = (st.unlockedFacts && st.unlockedFacts[id]) || [];
+        return pool.length > 0 && pool.every((_, i) => unlocked.includes(i));
+      });
+    }
+  },
+  {
+    id: "certified-nerd",
+    name: "Certified Shark Nerd",
+    icon: "🤓",
+    breadcrumb: "finish everything else first",
+    description: "Completed every other visible achievement. Officially a certified shark nerd — wear it proudly.",
+    check: (st) => {
+      /* v1.7.28-beta: meta-achievement — every other VISIBLE achievement
+         complete. Excludes the hidden Bruce chain (Avery: visible only)
+         and itself. Re-evaluates the other checks directly instead of
+         trusting state.achievements, so it fires in the same
+         checkAchievements() pass that unlocks the last one, regardless
+         of array order. The other checks are pure predicates on state,
+         so no recursion: none of them calls back into this check.
+         v1.7.28-beta Mira review: several achievements are historical
+         milestones, not invariant current-state conditions — best-cousin
+         (rename the Sarah shark and check() goes false) and first-name
+         (clear a nickname and check() goes false) — but the earned flag
+         persists in state.achievements. So count a persisted earned flag
+         OR a currently passing check. The OR preserves same-pass
+         behavior: an achievement unlocked earlier in this pass already
+         has its flag set, and one whose check() passes now is caught by
+         the predicate. */
+      if (typeof ACHIEVEMENTS === "undefined") return false;
+      return ACHIEVEMENTS.filter(a => !a.hidden && a.id !== "certified-nerd").every(a => {
+        try { return !!st.achievements?.[a.id] || (typeof a.check === "function" && !!a.check(st)); } catch { return false; }
+      });
+    }
+  },
 ];
 
 /* v0.18.0 review: the Bruce chain isn't built yet, so this stays out of the
