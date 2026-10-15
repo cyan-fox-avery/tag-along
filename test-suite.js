@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.23-beta', VERSION === 'v1.7.23-beta');
+  ok('version v1.7.24-beta', VERSION === 'v1.7.24-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -423,6 +423,11 @@ code += `
   ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
   ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
   ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
+  // v1.7.24-beta: Observe species button shows insight progress too
+  // (insights: n/total), same pattern as Follow — wild-shark encounters.
+  ok('observe button shows insight count', fileCode.includes('_obsFactHave') && fileCode.includes('_obsFactTotal') && fileCode.includes('insights: '));
+  ok('observe button computes fact totals from SECRET_FACTS', fileCode.includes('_obsFactTotal = (typeof SECRET_FACTS'));
+  ok('observe button aria-label includes insight progress', fileCode.includes('_obsFactLabel'));
   // v1.7.23-beta: achievement cards identical height across ALL rows —
   // grid tracks are equal (grid-auto-rows: minmax(140px, 1fr)) plus a
   // per-card 140px min-height fallback, not just per-row stretch.
@@ -2529,6 +2534,7 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHATS_NEW['v1.7.24-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.23-beta";
+const VERSION = "v1.7.24-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.24-beta": [
+"🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
+  ],
   "v1.7.23-beta": [
 "🐋 <strong>WHAAAAAAALE.</strong> New achievement for tagging a whale shark — the biggest fish in the ocean. (White Whale stays with the megamouth, where it belongs.)",
 "🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
@@ -2368,8 +2371,15 @@ function doEncounter(species, plan) {
       const observeBtn = document.createElement("button");
       observeBtn.className = "secondary-button";
       observeBtn.type = "button";
-      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)</small>`;
-      observeBtn.setAttribute("aria-label", `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)`);
+      /* v1.7.24-beta: show insight progress on the Observe button, same as
+         Follow (v1.7.23-beta) — the player should know what observing this
+         wild shark will get them before committing the expedition. */
+      const _obsFactTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
+      const _obsFactHave = (state.unlockedFacts[species.id] || []).length;
+      const _obsFactLine = _obsFactTotal ? `<br><small class="dim">(insights: ${_obsFactHave}/${_obsFactTotal})</small>` : "";
+      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)</small>${_obsFactLine}`;
+      const _obsFactLabel = _obsFactTotal ? ` (${_obsFactHave} of ${_obsFactTotal} insights learned)` : "";
+      observeBtn.setAttribute("aria-label", `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)${_obsFactLabel}`);
       observeBtn.addEventListener("click", () => {
         const fact = unlockSecretFact(species.id);
         logTripEncounter(species, "observed");
