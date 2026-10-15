@@ -22,6 +22,7 @@ const IUCN_ABBR = {
 const WHATS_NEW = {
   "v1.7.25-beta": [
 "🔬 <strong>Exhausted Observe ends the expedition.</strong> Observing a species with no insights left now ends the expedition and shows the “learned all I can” Map popup — before this fix it just offered Keep diving / Head back and showed nothing.",
+"🫧 <strong>Bubbles no longer freeze at the bottom.</strong> The rising bubbles are now driven by a small time-based JS loop instead of CSS keyframe animations — iOS WKWebView didn't reliably tick compositor animations for bubbles that launch from below the viewport, so they could stick at the bottom. The loop recomputes each bubble from wall-clock time every frame, so it can pause under load but never gets permanently stuck. Same 26 bubbles, same motion.",
   ],
   "v1.7.24-beta": [
 "🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
@@ -5502,6 +5503,78 @@ setInterval(tickPhoneClock, 30000);
         (parseFloat(sp.dataset.homeAngle) + jitter).toFixed(1) + 'deg');
     });
   });
+})();
+/* v1.7.25-beta: bubbles driven by a time-based JS loop (see the style.css
+   comment for the full why — iOS WKWebView froze the CSS compositor
+   animations for bubbles launching from below the viewport). The helpers
+   are pure and unit-tested in test-suite.js; the IIFE wires them to the
+   26 spans, reading per-bubble config (--bubble-rise / --bubble-duration /
+   --bubble-delay) from CSS so style.css stays the single source of truth.
+   Position is recomputed from wall-clock time every frame, so the loop
+   can pause while the main thread is busy or the tab is hidden and
+   resume at the correct position — a bubble can never get permanently
+   stuck at a wrong position. */
+/* Piecewise-linear stops of the old bubble-rise keyframes:
+   [progress, driftX px, opacity]. Rise (translateY) is exactly linear:
+   y = rise * progress. */
+const BUBBLE_STOPS = [[0, 0, 0], [0.08, 2, 0.85], [0.85, 20, 0.45], [1, 24, 0]];
+/* Interpolate drift + opacity at progress p (0..1, clamped). */
+function bubbleFrameAt(p) {
+  const q = Math.min(1, Math.max(0, p));
+  for (let i = 1; i < BUBBLE_STOPS.length; i++) {
+    const s0 = BUBBLE_STOPS[i - 1];
+    const s1 = BUBBLE_STOPS[i];
+    if (q <= s1[0]) {
+      const t = s1[0] === s0[0] ? 0 : (q - s0[0]) / (s1[0] - s0[0]);
+      return { x: s0[1] + (s1[1] - s0[1]) * t, opacity: s0[2] + (s1[2] - s0[2]) * t };
+    }
+  }
+  return { x: 24, opacity: 0 };
+}
+/* Progress through one rise, 0..1. delayMs is negative (bubble starts
+   partway up: local time = now - delay); wraps cleanly at the loop point. */
+function bubbleProgressAt(nowMs, delayMs, durationMs) {
+  const dur = durationMs > 0 ? durationMs : 20000;
+  const t = (((nowMs - delayMs) % dur) + dur) % dur;
+  return t / dur;
+}
+/* Convert a CSS length ("-105vh", "20px") to px. vh tracks the live
+   viewport height, so bubbles adapt if the iOS URL bar shows/hides. */
+function bubbleLengthToPx(value, viewportPx) {
+  const m = /^(-?\d+(?:\.\d+)?)(vh|px)$/.exec(String(value).trim());
+  if (!m) return 0;
+  return m[2] === "vh" ? parseFloat(m[1]) * viewportPx / 100 : parseFloat(m[1]);
+}
+(function initBubbles() {
+  if (typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (typeof document.querySelectorAll !== "function" ||
+      typeof requestAnimationFrame !== "function" ||
+      typeof getComputedStyle !== "function") return;
+  const spans = document.querySelectorAll(".bubbles span");
+  if (!spans.length) return;
+  const cfgs = [];
+  spans.forEach(sp => {
+    const cs = getComputedStyle(sp);
+    cfgs.push({
+      el: sp,
+      rise: cs.getPropertyValue("--bubble-rise").trim(),
+      duration: (parseFloat(cs.getPropertyValue("--bubble-duration")) || 20) * 1000,
+      delay: (parseFloat(cs.getPropertyValue("--bubble-delay")) || 0) * 1000,
+    });
+  });
+  const tick = (now) => {
+    const viewportPx = window.innerHeight;
+    for (const c of cfgs) {
+      const p = bubbleProgressAt(now, c.delay, c.duration);
+      const f = bubbleFrameAt(p);
+      const y = bubbleLengthToPx(c.rise, viewportPx) * p;
+      c.el.style.transform = "translate3d(" + f.x.toFixed(1) + "px, " + y.toFixed(1) + "px, 0)";
+      c.el.style.opacity = f.opacity.toFixed(3);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 })();
 /* v0.19.0: field-guide database controls. */
 (function initGuideTools() {

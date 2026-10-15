@@ -625,7 +625,7 @@ code += `
     fileCode.includes('pendingTagAlongFact = { speciesId: species.id, fact: null, exhausted: true, mode: "observe" }') &&
     fileCode.includes('resolve({ tagAlong: species.id })'));
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
-  ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
+  ok('bubbles are JS-driven, no CSS keyframe animation', !cssCode.includes('@keyframes bubble-rise') && fileCode.includes('initBubbles') && fileCode.includes('requestAnimationFrame(tick)'));
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
   ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
   ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
@@ -2194,18 +2194,40 @@ code += `
   ok('time progression', /The afternoon stretches out/.test(fileCode) && /Evening approaches/.test(fileCode));
   // v1.4.15-beta: subtle diet phrases (not bait answers)
   ok('diet phrases', /they eat plankton/.test(fileCode) && /DIET_PHRASE/.test(fileCode));
-  // v1.7.22-beta: PR47 bubbles — 8 staggered columns, 26 spans, bubble-rise keyframes
+  // v1.7.22-beta: PR47 bubbles — 8 staggered columns, 26 spans.
+  // v1.7.25-beta: bubbles are driven by a time-based JS loop (initBubbles),
+  // not CSS keyframes — iOS WKWebView froze the CSS compositor animations
+  // for bubbles launching from below the viewport. The JS loop recomputes
+  // each bubble from wall-clock time, so it can pause but never sticks.
   (() => {
-    ok("bubbles use column keyframes", /@keyframes\\s+bubble-rise/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
     ok("bubbles number 26 (8 staggered columns)", bubbleCount === 26);
-    // v1.7.23-beta: frozen-bubble fix — every bubble-rise keyframe must state
-    // its transform explicitly (WebKit stalled when 8%/85% omitted it), and
-    // bubbles must be composited so the initial renderAll() can't stall them.
-    const riseBlock = (cssCode.match(/@keyframes\\s+bubble-rise\\s*\\{[\\s\\S]*?\\n\\}/) || [""])[0];
-    const riseStops = (riseBlock.match(/^\\s*\\d+%\\s*\\{[^}]*\\}/gm) || []);
-    ok("bubble-rise keyframes all state transform", riseStops.length >= 4 && riseStops.every(s => /transform:/.test(s)));
-    ok("bubbles use will-change for compositor animation", /\\.bubbles\\s+span\\s*\\{[^}]*will-change:\\s*transform/.test(cssCode));
+    // Every bubble rule carries its own JS-loop config as custom properties.
+    const bubbleRules = cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*\\}/g) || [];
+    ok("every bubble rule has JS-loop config", bubbleRules.length === 26 && bubbleRules.every(r => /--bubble-rise:/.test(r) && /--bubble-duration:/.test(r) && /--bubble-delay:/.test(r)));
+    ok("bubbles have no CSS keyframe animation", !/@keyframes\\s+bubble-rise/.test(cssCode) && !/\\.bubbles\\s+span\\s*\\{[^}]*animation-name/.test(cssCode));
+    // The loop wires itself to the spans and honours reduced motion.
+    ok("bubble loop reads config + respects reduced motion",
+      /function initBubbles/.test(fileCode) &&
+      /prefers-reduced-motion: reduce/.test(fileCode) &&
+      /--bubble-rise/.test(fileCode) &&
+      fileCode.includes("requestAnimationFrame(tick)"));
+    // Pure math: interpolation matches the old keyframe envelope.
+    const f0 = bubbleFrameAt(0);
+    ok("bubbleFrameAt(0) is invisible at origin", f0.x === 0 && f0.opacity === 0);
+    const f8 = bubbleFrameAt(0.08);
+    ok("bubbleFrameAt(0.08) matches old 8% stop", Math.abs(f8.x - 2) < 1e-9 && Math.abs(f8.opacity - 0.85) < 1e-9);
+    const f50 = bubbleFrameAt(0.5);
+    ok("bubbleFrameAt(0.5) interpolates the mid segment", Math.abs(f50.x - 11.8) < 0.05 && Math.abs(f50.opacity - 0.632) < 0.005);
+    const f100 = bubbleFrameAt(1);
+    ok("bubbleFrameAt(1) is invisible at full drift", f100.x === 24 && f100.opacity === 0);
+    ok("bubbleFrameAt clamps out-of-range progress", bubbleFrameAt(-0.5).opacity === 0 && bubbleFrameAt(1.5).opacity === 0);
+    // Progress: negative delay means "already partway up"; wraps at loop end.
+    ok("bubbleProgressAt honours negative delay", Math.abs(bubbleProgressAt(0, -1000, 18000) - 1 / 18) < 1e-9);
+    ok("bubbleProgressAt wraps at the loop point", Math.abs(bubbleProgressAt(19000, -1000, 18000) - 2000 / 18000) < 1e-9);
+    ok("bubbleProgressAt starts at 0 with no delay", bubbleProgressAt(0, 0, 18000) === 0);
+    // Length parsing: vh tracks the live viewport; px passes through.
+    ok("bubbleLengthToPx converts vh and px", bubbleLengthToPx("-105vh", 800) === -840 && bubbleLengthToPx("20px", 800) === 20 && bubbleLengthToPx("bogus", 800) === 0);
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
