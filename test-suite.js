@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.31-beta', VERSION === 'v1.7.31-beta');
+  ok('version v1.7.32-beta', VERSION === 'v1.7.32-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -566,16 +566,16 @@ code += `
   (function () {
     try {
       // Likes-us closer (female): 4 messages, food reply with she-pronoun.
-      const tLike = reunionReactionThread('“Bubbles”', RESIGHT_LIKES_US_LINE, { sex: 'female' });
+      const tLike = reunionReactionThread('Bubbles', RESIGHT_LIKES_US_LINE, { sex: 'female' });
       ok('reunion thread appends food reply after likes-us closer',
         tLike.length === 4 && tLike[2].who === 'them' && tLike[2].text === RESIGHT_LIKES_US_LINE &&
         tLike[3].who === 'me' && tLike[3].text === 'Maybe. Or maybe she just knows where the food is.');
       // Original closer: 3 messages, no food reply.
-      const tOrig = reunionReactionThread('“Bubbles”', RESIGHT_REUNION_CLOSERS[0], { sex: 'male' });
+      const tOrig = reunionReactionThread('Bubbles', RESIGHT_REUNION_CLOSERS[0], { sex: 'male' });
       ok('reunion thread has no food reply after original closer',
         tOrig.length === 3 && tOrig[2].text === RESIGHT_REUNION_CLOSERS[0]);
       // Another variant closer: 3 messages, no food reply.
-      const tVar = reunionReactionThread('“Bubbles”', RESIGHT_REUNION_CLOSERS[1], { sex: 'male' });
+      const tVar = reunionReactionThread('Bubbles', RESIGHT_REUNION_CLOSERS[1], { sex: 'male' });
       ok('reunion thread has no food reply after other variant closers',
         tVar.length === 3 && tVar[2].text === RESIGHT_REUNION_CLOSERS[1]);
       // Opener + confirm structure is preserved for every closer.
@@ -649,6 +649,58 @@ code += `
       return false;
     }
   })());
+  // v1.7.32-beta: Sarah's dialogue names sharks WITHOUT quotes —
+  // "You saw Helen again?" not "You saw "Helen" again?". Covers
+  // both quoting sites: resightThread's opener and the reunion
+  // reaction's WAIT opener (via maybeReunionReaction).
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const rs = [{ date: 'Jan 1, 2026', location: 'Caribbean Sea', note: 'Looking healthy and unhurried.', ts: 1 }];
+    const rec = { name: 'Helen', researchId: 'NS-1', sex: 'female', resightings: rs };
+    try {
+      const t = resightThread(nurse, rec);
+      ok('Sarah resight opener names the shark without quotes',
+        t[0].who === 'them' && t[0].text === 'You saw Helen again? The nurse shark?' &&
+        !t[0].text.includes('“') && !t[0].text.includes('"'));
+    } catch (e) {
+      ok('Sarah resight opener quotes (threw: ' + e.message + ')', false);
+    }
+    const savedReacted = state.reunionReacted;
+    const savedMsgCount = state.messages.length;
+    const savedUnread = state.unread;
+    state.reunionReacted = {};
+    try {
+      const fired = maybeReunionReaction(nurse, { name: 'Helen', researchId: 'NS-1', sex: 'female', resightings: [] });
+      const thread = state.messages[state.messages.length - 1].msgs;
+      ok('Sarah reunion opener names the shark without quotes',
+        fired === true && thread[0].who === 'them' &&
+        thread[0].text.includes('Helen') &&
+        !thread[0].text.includes('“') && !thread[0].text.includes('"'));
+    } catch (e) {
+      ok('Sarah reunion opener quotes (threw: ' + e.message + ')', false);
+    } finally {
+      state.messages.length = savedMsgCount;
+      state.reunionReacted = savedReacted;
+      state.unread = savedUnread;
+      saveMsgs();
+      updateMsgBadge();
+      try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
+    }
+  })();
+  // v1.7.32-beta: no ✅ emoji on the Tagged filter chip — the chip's
+  // selected-state styling already shows it's active.
+  ok('no Tagged checkmark emoji in filter chips', !fileCode.includes('Tagged ✅'));
+  // v1.7.32-beta: the Expedition Method dropdown's first option is
+  // "No extra method" — no method is a valid choice, and "Choose a
+  // method…" implied one was required.
+  ok('method dropdown first option is No extra method',
+    fileCode.includes('ph.textContent = "No extra method"') &&
+    !fileCode.includes('textContent = "Choose a method'));
+  // v1.7.32-beta: the Research method filter chips are built from the
+  // top-level METHODS entries (the same two options as the Expedition
+  // dropdown), not from the sub-opts.
+  ok('Research method chips come from top-level METHODS',
+    fileCode.includes('mk("filterMethod", Object.entries(METHODS)'));
   // v1.7.25-beta: exhausted Observe (all insights learned) still ends
   // the expedition and shows the popup — same as Follow's exhausted
   // flow. Before this fix the branch called finish() (Keep diving /
@@ -1043,7 +1095,7 @@ code += `
 
   // v0.19.0: field-guide database
   const resetGF = () => { guideFilters.q = ""; guideFilters.region.clear();
-    guideFilters.depth.clear(); guideFilters.methodOpt.clear();
+    guideFilters.depth.clear(); guideFilters.method.clear();
     guideFilters.bait.clear(); guideFilters.tagged = "all"; };
   resetGF();
   ok('no filters matches all', SHARKS.filter(guideMatches).length === SHARKS.length);
@@ -1067,10 +1119,24 @@ code += `
   guideFilters.tagged = "untagged";
   ok('untagged filter', SHARKS.filter(guideMatches).length === SHARKS.length - 1);
   resetGF();
-  guideFilters.methodOpt.add("chum");
-  const chummers = SHARKS.filter(guideMatches);
-  ok('method filter uses exact planner vocabulary',
-    chummers.length > 0 && chummers.every(s => methodOpts(s).includes("chum")));
+  // v1.7.32-beta: the Research method filter offers exactly the two
+  // top-level planner methods — the same options as the Expedition
+  // Method dropdown. No sub-opts (chum / boat / plane / network).
+  guideFilters.method.add("attract");
+  const attractors = SHARKS.filter(guideMatches);
+  ok('method filter matches attract species',
+    attractors.length > 0 && attractors.every(s => (s.methods || {}).attract));
+  guideFilters.method.clear(); guideFilters.method.add("aggregation");
+  const aggregators = SHARKS.filter(guideMatches);
+  ok('method filter matches aggregation species',
+    aggregators.length > 0 && aggregators.every(s => (s.methods || {}).aggregation));
+  ok('method filters partition species with methods',
+    attractors.length + aggregators.length ===
+    SHARKS.filter(s => Object.keys(s.methods || {}).length).length);
+  ok('method filter offers exactly the two planner methods',
+    Object.keys(METHODS).length === 2 &&
+    METHODS.attract.name === 'Attract — scent in the water' &&
+    METHODS.aggregation.name === 'Find the aggregation');
   ok('filter count tracks active filters', (() => {
     resetGF(); guideFilters.q = "x"; guideFilters.region.add("caribbean");
     return activeFilterCount() === 2;
@@ -1088,11 +1154,11 @@ code += `
   })());
   ok('clear resets everything', (() => {
     guideFilters.q = "shark"; guideFilters.region.add("caribbean");
-    guideFilters.depth.add("reef"); guideFilters.methodOpt.add("chum");
+    guideFilters.depth.add("reef"); guideFilters.method.add("attract");
     guideFilters.bait.add("tuna"); guideFilters.tagged = "tagged";
     clearGuideFilters();
     return guideFilters.q === "" && guideFilters.region.size === 0 &&
-      guideFilters.depth.size === 0 && guideFilters.methodOpt.size === 0 &&
+      guideFilters.depth.size === 0 && guideFilters.method.size === 0 &&
       guideFilters.bait.size === 0 && guideFilters.tagged === "all" &&
       SHARKS.filter(guideMatches).length === SHARKS.length;
   })());
@@ -3064,7 +3130,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
-ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.30-beta', Array.isArray(WHATS_NEW['v1.7.30-beta']) && WHATS_NEW['v1.7.30-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.29-beta', Array.isArray(WHATS_NEW['v1.7.29-beta']) && WHATS_NEW['v1.7.29-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.28-beta', Array.isArray(WHATS_NEW['v1.7.28-beta']) && WHATS_NEW['v1.7.28-beta'].length >= 1);

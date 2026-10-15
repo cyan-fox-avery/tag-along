@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.31-beta";
+const VERSION = "v1.7.32-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,12 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.32-beta": [
+"🧹 <strong>Method filters match the Expedition planner.</strong> The Research tab's Method filter now offers exactly the two methods the Expedition dropdown has — Attract — scent in the water, and Find the aggregation. The stale sub-options (Boat survey, Spotter-plane survey, Local sightings network, Fish-oil chum) are gone from the filter; they still label old logbook entries.",
+"📋 <strong>Method dropdown: “No extra method.”</strong> The Expedition Method dropdown's first option now says “No extra method” instead of “Choose a method…” — picking no method is a valid choice, not a missing one.",
+"🏷️ <strong>Tagged chip loses the ✅.</strong> The Research “Tagged” filter chip no longer carries a checkmark emoji — its selected-state styling already shows it's active.",
+"💬 <strong>Sarah names sharks without quotes.</strong> In Sarah's messages, a shark's nickname appears bare — “You saw Helen again?” — instead of wrapped in quotes.",
+  ],
   "v1.7.31-beta": [
 "🖼️ <strong>Collection detail: big art on top, info in two columns.</strong> The shark illustration now spans the full modal width above the info, and the details sit in two columns below it (identity + stats on the left, sightings / notes / insights on the right) — no more empty gap beside long entries. Phone / narrow layouts are unchanged.",
   ],
@@ -1418,17 +1424,18 @@ const guideFilters = {
   q: "",
   region: new Set(),
   depth: new Set(),
-  methodOpt: new Set(),
+  method: new Set(),
   bait: new Set(),
   tagged: "all" // "all" | "tagged" | "untagged"
 };
 function baitList(s) {
   return Array.isArray(s.combo.bait) ? s.combo.bait : [s.combo.bait];
 }
-function methodOpts(s) {
-  const m = s.methods || {};
-  return [...(m.attract || []), ...(m.aggregation || [])];
-}
+/* v1.7.32-beta: the Research method filter works at the top-level
+   method (attract / aggregation) — the same two options the Expedition
+   Method dropdown offers. Sub-opts (chum / boat / plane / network)
+   stay in METHODS + species data for expedition boost + logbook
+   rendering, but the Research filter no longer lists them. */
 function guideMatches(s) {
   const f = guideFilters;
   if (f.q) {
@@ -1437,7 +1444,7 @@ function guideMatches(s) {
   }
   if (f.region.size && !f.region.has(s.combo.region)) return false;
   if (f.depth.size && !(s.depths || []).some(d => f.depth.has(d))) return false;
-  if (f.methodOpt.size && !methodOpts(s).some(m => f.methodOpt.has(m))) return false;
+  if (f.method.size && !Object.keys(s.methods || {}).some(m => f.method.has(m))) return false;
   if (f.bait.size && !baitList(s).some(b => f.bait.has(b))) return false;
   if (f.tagged === "tagged" && !state.tagged[s.id]) return false;
   if (f.tagged === "untagged" && state.tagged[s.id]) return false;
@@ -1445,7 +1452,7 @@ function guideMatches(s) {
 }
 function activeFilterCount() {
   const f = guideFilters;
-  return f.region.size + f.depth.size + f.methodOpt.size + f.bait.size +
+  return f.region.size + f.depth.size + f.method.size + f.bait.size +
     (f.tagged !== "all" ? 1 : 0) + (f.q ? 1 : 0);
 }
 function buildFilterChips() {
@@ -1469,17 +1476,15 @@ function buildFilterChips() {
   mk("filterRegion", Object.entries(REGIONS).map(([id, r]) =>
     [id, r.locked ? `🔒 ${r.name}` : r.name]), guideFilters.region);
   mk("filterDepth", Object.entries(DEPTHS).map(([id, d]) => [id, d.name]), guideFilters.depth);
-  const mOpts = [];
-  Object.values(METHODS).forEach(m => Object.entries(m.opts).forEach(([id, label]) => {
-    if (id !== "none") mOpts.push([id, label]);
-  }));
-  mk("filterMethod", mOpts, guideFilters.methodOpt);
+  /* v1.7.32-beta: method chips are the two top-level METHODS — the
+     same options the Expedition Method dropdown offers. */
+  mk("filterMethod", Object.entries(METHODS).map(([id, m]) => [id, m.name]), guideFilters.method);
   mk("filterBait", Object.entries(BAITS).map(([id, label]) => [id, label]), guideFilters.bait);
   // tagged status: single-select chips
   const tRow = $("filterTagged");
   if (tRow) {
     tRow.innerHTML = "";
-    [["all", "All"], ["tagged", "Tagged ✅"], ["untagged", "Untagged"]].forEach(([id, label]) => {
+    [["all", "All"], ["tagged", "Tagged"], ["untagged", "Untagged"]].forEach(([id, label]) => {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "chip";
@@ -1511,20 +1516,18 @@ function renderActiveChips() {
   if (f.q) addChip(`“${f.q}”`, () => { f.q = ""; const s = $("guideSearch"); if (s) s.value = ""; });
   f.region.forEach(id => addChip(REGIONS[id] ? REGIONS[id].name : id, () => f.region.delete(id)));
   f.depth.forEach(id => addChip(DEPTHS[id] ? DEPTHS[id].name : id, () => f.depth.delete(id)));
-  f.methodOpt.forEach(id => {
-    let label = id;
-    Object.values(METHODS).forEach(m => { if (m.opts[id]) label = m.opts[id]; });
-    addChip(label, () => f.methodOpt.delete(id));
+  f.method.forEach(id => {
+    addChip(METHODS[id] ? METHODS[id].name : id, () => f.method.delete(id));
   });
   f.bait.forEach(id => addChip(BAITS[id] || id, () => f.bait.delete(id)));
-  if (f.tagged !== "all") addChip(f.tagged === "tagged" ? "Tagged ✅" : "Untagged",
+  if (f.tagged !== "all") addChip(f.tagged === "tagged" ? "Tagged" : "Untagged",
     () => { f.tagged = "all"; });
 }
 function clearGuideFilters() {
   guideFilters.q = "";
   guideFilters.region.clear();
   guideFilters.depth.clear();
-  guideFilters.methodOpt.clear();
+  guideFilters.method.clear();
   guideFilters.bait.clear();
   guideFilters.tagged = "all";
   const s = $("guideSearch");
@@ -2876,7 +2879,7 @@ function recordResighting(species, plan) {
 /* A re-sighting gets its own little celebration — species-relevant,
    like every other Sarah moment after a tag. */
 function resightThread(species, rec) {
-  const label = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
+  const label = rec.name ? rec.name : rec.researchId;
   const last = rec.resightings[rec.resightings.length - 1];
   const ordinal = rec.resightings.length;
   const thread = [
@@ -2931,7 +2934,7 @@ function maybeReunionReaction(species, rec) {
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
-  const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : (rec.researchId || species.name);
+  const name = rec.name ? esc(rec.name) : (rec.researchId || species.name);
   pushThread(reunionReactionThread(name, pick(RESIGHT_REUNION_CLOSERS), rec));
   return true;
 }
@@ -5256,7 +5259,10 @@ function updateAllVisuals() {
   const mSel = $("methodSelect"), oSel = $("methodOptSelect"), field = $("methodOptField");
   mSel.innerHTML = "";
   const ph = document.createElement("option");
-  ph.value = ""; ph.textContent = "Choose a method…";
+  /* v1.7.32-beta: the first option reads "No extra method" — picking
+     no method is a valid choice, and the old placeholder implied a
+     method was required. */
+  ph.value = ""; ph.textContent = "No extra method";
   mSel.appendChild(ph);
   Object.entries(METHODS).forEach(([id, m]) => {
     const o = document.createElement("option");
