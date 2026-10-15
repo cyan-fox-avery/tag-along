@@ -2308,8 +2308,58 @@ code += `
   ok('wide detail modal widens past phone width', /#detailOverlay\\s+\\.detail-modal\\s*\\{[^}]*max-width:\\s*820px/.test(cssCode));
   ok('detail modal HTML carries detail-modal class', /id=\"detailOverlay\"[\\s\\S]*?class=\"phone detail-modal\"/.test(htmlCode));
   ok('wide Research grid is 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
-  ok('detail left column holds identity', /#detailOverlay[\\s\\S]*?\\.shark-art[\\s\\S]*?grid-column:\\s*1/.test(cssCode));
-  ok('detail right column holds stats and notes', /#detailOverlay[\\s\\S]*?\\.book-stats[\\s\\S]*?grid-column:\\s*2/.test(cssCode));
+  ok('detail columns are two wrappers', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-identity\\s*\{[^}]*grid-column:\\s*1/.test(cssCode) && /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-record\\s*\{[^}]*grid-column:\\s*2/.test(cssCode));
+  ok('detail grid does not place individual blocks', !/#detailOverlay\\s+#detailContent\\s*>\\s*\.(shark-art|book-stats|resight-block|hook)/.test(cssCode));
+  // v1.7.27-beta Mira fix: two independent column wrappers — identity first,
+  // record second; each column flows its own block content from the top.
+  // The mocked DOM has no layout engine, so these assert the DOM structure
+  // the CSS relies on (a real-browser rect check runs separately).
+  ok('detail modal wraps identity and record columns in order', (() => {
+    const savedTagged = state.tagged;
+    const savedFacts = state.unlockedFacts;
+    state.tagged = { nurse: { name: 'Testy', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [
+      { date: 'Oct 10, 2026', location: 'Caribbean Sea', note: 'r1' },
+      { date: 'Oct 11, 2026', location: 'Caribbean Sea', note: 'r2' },
+      { date: 'Oct 12, 2026', location: 'Caribbean Sea', note: 'r3' },
+      { date: 'Oct 13, 2026', location: 'Caribbean Sea', note: 'r4' },
+    ], notes: ['watched-note-1', 'watched-note-2'] } };
+    state.unlockedFacts = { nurse: [0] };
+    try { openDetail('nurse'); } catch (e) { state.tagged = savedTagged; state.unlockedFacts = savedFacts; return false; }
+    const html = document.getElementById('detailContent').innerHTML;
+    state.tagged = savedTagged;
+    state.unlockedFacts = savedFacts;
+    const idIdx = html.indexOf('detail-identity');
+    const recIdx = html.indexOf('detail-record');
+    if (idIdx === -1 || recIdx === -1 || idIdx > recIdx) return false;
+    const idHtml = html.slice(idIdx, recIdx);
+    const recHtml = html.slice(recIdx);
+    const inId = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"'].every(c => idHtml.includes(c));
+    const notInId = ['class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
+    const inRec = ['class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
+    const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"'].every(c => !recHtml.includes(c));
+    return inId && notInId && inRec && notInRec;
+  })());
+  ok('detail modal keeps conditional blocks out when empty', (() => {
+    const savedTagged = state.tagged;
+    const savedFacts = state.unlockedFacts;
+    state.tagged = { nurse: { name: '', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [], notes: [] } };
+    state.unlockedFacts = { nurse: [] };
+    try { openDetail('nurse'); } catch (e) { state.tagged = savedTagged; state.unlockedFacts = savedFacts; return false; }
+    const html = document.getElementById('detailContent').innerHTML;
+    state.tagged = savedTagged;
+    state.unlockedFacts = savedFacts;
+    const idIdx = html.indexOf('detail-identity');
+    const recIdx = html.indexOf('detail-record');
+    if (idIdx === -1 || recIdx === -1 || idIdx > recIdx) return false;
+    const idHtml = html.slice(idIdx, recIdx);
+    const recHtml = html.slice(recIdx);
+    // nickname, re-sightings, field notes, insights all absent — but the
+    // wrappers, the rename form, and the always-present blocks remain
+    return !idHtml.includes('class="given-name"') && idHtml.includes('id="renameForm"')
+      && !recHtml.includes('class="resight-block"') && !recHtml.includes('class="watch-notes-block"')
+      && !recHtml.includes('class="secret-facts-block"')
+      && recHtml.includes('class="book-stats"') && recHtml.includes('class="hook"');
+  })());
   ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
   ok('far wave sits lower', /\\.pw-far\\s*\\{[^}]*top:\\s*14%/.test(cssCode));

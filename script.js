@@ -4677,6 +4677,7 @@ function openDetail(id) {
   const t = state.tagged[id];
   const c = $("detailContent");
   c.innerHTML = `
+    <div class="detail-identity">
     <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
     ${t.name ? `<div class="given-name">“${esc(t.name)}”</div>` : ""}
     <div class="detail-name-row">
@@ -4693,6 +4694,8 @@ function openDetail(id) {
     <h3 style="margin:6px 0 0">${s.name}</h3>
     <p class="latin detail-scientific">${s.latin}</p>
     <span class="status-pill">IUCN: ${s.status}</span>
+    </div>
+    <div class="detail-record">
     <p class="book-stats">
       📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
       📍 Tagged at ${esc(t.location)}<br>
@@ -4739,6 +4742,7 @@ function openDetail(id) {
     <p class="hook">💡 ${s.hook}</p>
     <p class="bonus-fact">✨ ${s.bonus}</p>
     ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
+    </div>
   `;
   $("detailOverlay").classList.remove("hidden");
   $("trackBtn").addEventListener("click", () => openTrack(id));
