@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.32-beta";
+const VERSION = "v1.7.33-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.33-beta": [
+"🖼️ <strong>Collection detail: tighter art, re-sightings on the left.</strong> The shark illustration sits tighter in the modal — less empty blue above and below it — and the Re-sightings block moved from the right column to the left, under the stats and Track button, so the columns balance better on long entries.",
+  ],
   "v1.7.32-beta": [
 "🧹 <strong>Method filters match the Expedition planner.</strong> The Research tab's Method filter now offers exactly the two methods the Expedition dropdown has — Attract — scent in the water, and Find the aggregation. The stale sub-options (Boat survey, Spotter-plane survey, Local sightings network, Fish-oil chum) are gone from the filter; they still label old logbook entries.",
 "📋 <strong>Method dropdown: “No extra method.”</strong> The Expedition Method dropdown's first option now says “No extra method” instead of “Choose a method…” — picking no method is a valid choice, not a missing one.",
@@ -4722,12 +4725,12 @@ function openDetail(id) {
       📅 ${esc(t.date)}
     </p>
     <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px">📍 Track this shark</button>
-    </div>
-    <div class="detail-record">
     ${(() => {
       /* v1.7.23-beta: show only the most recent 3 re-sightings; older ones
          hide behind a "Show all" toggle. Re-sightings are stored
-         oldest-first, so the visible slice is the tail of the list. */
+         oldest-first, so the visible slice is the tail of the list.
+         v1.7.33-beta: the block lives in the left (identity) column,
+         under stats + Track, so the columns balance on long entries. */
       if (!t.resightings || !t.resightings.length) return "";
       const total = t.resightings.length;
       const VISIBLE = 3;
@@ -4741,6 +4744,8 @@ function openDetail(id) {
       ${older.length ? `<button id="resightMore" class="mini-button" type="button" aria-expanded="false">Show all (${total})</button>` : ""}
     </div>`;
     })()}
+    </div>
+    <div class="detail-record">
     ${t.notes && t.notes.length ? `
     <div class="watch-notes-block">
       <h4>📓 Field notes from watching (${t.notes.length})</h4>
