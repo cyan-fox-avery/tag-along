@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.24-beta";
+const VERSION = "v1.7.25-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.25-beta": [
+"🔬 <strong>Exhausted Observe ends the expedition.</strong> Observing a species with no insights left now ends the expedition and shows the “learned all I can” Map popup — before this fix it just offered Keep diving / Head back and showed nothing.",
+  ],
   "v1.7.24-beta": [
 "🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
 "🔬 <strong>Observe insight popup fixed.</strong> Observing a wild, untagged shark now shows the unlocked insight in the Map popup when the expedition ends — before this fix the fact only lived in the dive log and the popup never appeared. (Same as Follow's v1.7.22 fix.)",
@@ -2379,17 +2382,18 @@ function doEncounter(species, plan) {
       const _obsFactTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
       const _obsFactHave = (state.unlockedFacts[species.id] || []).length;
       const _obsFactLine = _obsFactTotal ? `<br><small class="dim">(insights: ${_obsFactHave}/${_obsFactTotal})</small>` : "";
-      /* v1.7.24-beta Mira review: when all insights are learned, the
-         exhausted branch calls finish() — it does NOT end the expedition
-         and reveals no new fact — so the copy must not promise either. */
+      /* v1.7.25-beta: when all insights are learned, the exhausted
+         branch still ends the expedition and shows the "learned all I
+         can" popup (same as Follow's exhausted flow) — it reveals no
+         new fact, so the copy must not promise one. */
       const _obsExhausted = _obsFactTotal > 0 && _obsFactHave >= _obsFactTotal;
       const _obsSub = _obsExhausted
-        ? `study this ${esc(species.name)} — all insights learned, just enjoy watching`
+        ? `study this ${esc(species.name)} — all insights learned (ends the expedition)`
         : `study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)`;
       observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">${_obsSub}</small>${_obsFactLine}`;
       const _obsFactLabel = _obsFactTotal ? ` (${_obsFactHave} of ${_obsFactTotal} insights learned)` : "";
       observeBtn.setAttribute("aria-label", _obsExhausted
-        ? `Observe this ${species.name} (species study, not your tagged shark; all insights already learned)${_obsFactLabel}`
+        ? `Observe this ${species.name} (species study, not your tagged shark; all insights already learned; ends the expedition)${_obsFactLabel}`
         : `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)${_obsFactLabel}`);
       observeBtn.addEventListener("click", () => {
         const fact = unlockSecretFact(species.id);
@@ -2413,8 +2417,20 @@ function doEncounter(species, plan) {
           renderAll();
           resolve({ tagAlong: species.id });
         } else {
-          logLine(`🔬 <em>You watch carefully, but learn nothing new about the ${esc(species.name)} today.</em>`);
-          finish();
+          /* v1.7.25-beta: exhausted Observe — no facts left, but the
+             expedition still ends and the popup still shows, mirroring
+             the non-exhausted Observe flow and Follow's exhausted flow.
+             Before this fix the branch called finish() (Keep diving /
+             Head back) and showed no popup, so Avery never saw the
+             "learned all I can" message for a fully-learned species.
+             The popup copy (showTagAlongFact) already handles
+             exhausted + observe — no new fact is promised. */
+          state.pendingTagAlongFact = { speciesId: species.id, fact: null, exhausted: true, mode: "observe" };
+          logLine(`🧭 The study is complete — heading back to the ship to log it properly.`);
+          actions.classList.add("hidden");
+          actions.innerHTML = "";
+          renderAll();
+          resolve({ tagAlong: species.id });
         }
       });
       actions.appendChild(observeBtn);

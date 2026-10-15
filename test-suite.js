@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.24-beta', VERSION === 'v1.7.24-beta');
+  ok('version v1.7.25-beta', VERSION === 'v1.7.25-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -611,12 +611,19 @@ code += `
       try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
     }
   })();
-  // v1.7.24-beta Mira review: exhausted Observe (3/3) must not promise a
-  // secret fact or claim the expedition ends — finish() keeps diving.
+  // v1.7.25-beta: exhausted Observe (all insights learned) still ends
+  // the expedition and shows the popup — same as Follow's exhausted
+  // flow. Before this fix the branch called finish() (Keep diving /
+  // Head back) and showed no popup. The copy must not promise a new
+  // fact, but must say the expedition ends.
   ok('observe exhausted copy is accurate',
-    fileCode.includes('all insights learned, just enjoy watching') &&
+    fileCode.includes('all insights learned (ends the expedition)') &&
     fileCode.includes('_obsExhausted') &&
-    fileCode.includes('all insights already learned'));
+    fileCode.includes('all insights already learned') &&
+    !fileCode.includes('all insights learned, just enjoy watching'));
+  ok('observe exhausted ends expedition with popup',
+    fileCode.includes('pendingTagAlongFact = { speciesId: species.id, fact: null, exhausted: true, mode: "observe" }') &&
+    fileCode.includes('resolve({ tagAlong: species.id })'));
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
@@ -2809,6 +2816,7 @@ ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHA
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHATS_NEW['v1.7.24-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
