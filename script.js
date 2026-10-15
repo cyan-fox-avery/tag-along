@@ -2933,8 +2933,12 @@ function maybeReunionReaction(species, rec) {
   if (state.reunionReacted[species.id]) return false;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
-  /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
-  const name = rec.name ? esc(rec.name) : (rec.researchId || species.name);
+  /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name.
+     v1.7.32-beta Mira fix: pass the RAW nickname — renderMessages()
+     escapes once at the render boundary. Escaping here would double-
+     escape (e.g. "Fin & Tonic" stored as "Fin &amp; Tonic", rendered
+     as "Fin &amp;amp; Tonic"). */
+  const name = rec.name ? rec.name : (rec.researchId || species.name);
   pushThread(reunionReactionThread(name, pick(RESIGHT_REUNION_CLOSERS), rec));
   return true;
 }

@@ -687,6 +687,40 @@ code += `
       try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
     }
   })();
+  // v1.7.32-beta Mira fix: reunion nicknames must be stored RAW and
+  // escaped ONCE at render. Previously maybeReunionReaction() escaped
+  // the name before pushThread(), and renderMessages() escaped again,
+  // so "Fin & Tonic" displayed as literal "Fin &amp; Tonic". Covers
+  // both "&" (double-escape) and "<" (must stay safely escaped).
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const savedReacted = state.reunionReacted;
+    const savedMsgCount = state.messages.length;
+    const savedUnread = state.unread;
+    state.reunionReacted = {};
+    try {
+      const fired = maybeReunionReaction(nurse, { name: 'Fin & <Tonic>', researchId: 'NS-1', sex: 'female', resightings: [] });
+      const thread = state.messages[state.messages.length - 1].msgs;
+      ok('reunion nickname stored raw, not pre-escaped',
+        fired === true && thread[0].text === 'WAIT. You saw Fin & <Tonic> again?!?' &&
+        !thread[0].text.includes('&amp;'));
+      renderMessages();
+      const html = $("messagesList").innerHTML;
+      ok('reunion nickname escaped exactly once at render',
+        html.includes('Fin &amp; &lt;Tonic&gt;') &&
+        !html.includes('&amp;amp;') && !html.includes('Fin & <Tonic>'));
+    } catch (e) {
+      ok('reunion nickname escaping (threw: ' + e.message + ')', false);
+    } finally {
+      state.messages.length = savedMsgCount;
+      state.reunionReacted = savedReacted;
+      state.unread = savedUnread;
+      saveMsgs();
+      updateMsgBadge();
+      renderMessages();
+      try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
+    }
+  })();
   // v1.7.32-beta: no ✅ emoji on the Tagged filter chip — the chip's
   // selected-state styling already shows it's active.
   ok('no Tagged checkmark emoji in filter chips', !fileCode.includes('Tagged ✅'));
@@ -3131,6 +3165,7 @@ ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHA
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.30-beta', Array.isArray(WHATS_NEW['v1.7.30-beta']) && WHATS_NEW['v1.7.30-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.29-beta', Array.isArray(WHATS_NEW['v1.7.29-beta']) && WHATS_NEW['v1.7.29-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.28-beta', Array.isArray(WHATS_NEW['v1.7.28-beta']) && WHATS_NEW['v1.7.28-beta'].length >= 1);
