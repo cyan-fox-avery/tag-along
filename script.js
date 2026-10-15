@@ -22,6 +22,7 @@ const IUCN_ABBR = {
 const WHATS_NEW = {
   "v1.7.24-beta": [
 "🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
+"🔁 <strong>Tiered re-sighting reactions.</strong> Sarah gets more excited each time you re-sight the same shark — warm recognition on the 2nd re-sighting, full best-friend energy from the 3rd on. Her reactions now live in her own chat bubble, and your field notes stay observational.",
   ],
   "v1.7.23-beta": [
 "🐋 <strong>WHAAAAAAALE.</strong> New achievement for tagging a whale shark — the biggest fish in the ocean. (White Whale stays with the megamouth, where it belongs.)",
@@ -2377,9 +2378,18 @@ function doEncounter(species, plan) {
       const _obsFactTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
       const _obsFactHave = (state.unlockedFacts[species.id] || []).length;
       const _obsFactLine = _obsFactTotal ? `<br><small class="dim">(insights: ${_obsFactHave}/${_obsFactTotal})</small>` : "";
-      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)</small>${_obsFactLine}`;
+      /* v1.7.24-beta Mira review: when all insights are learned, the
+         exhausted branch calls finish() — it does NOT end the expedition
+         and reveals no new fact — so the copy must not promise either. */
+      const _obsExhausted = _obsFactTotal > 0 && _obsFactHave >= _obsFactTotal;
+      const _obsSub = _obsExhausted
+        ? `study this ${esc(species.name)} — all insights learned, just enjoy watching`
+        : `study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)`;
+      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">${_obsSub}</small>${_obsFactLine}`;
       const _obsFactLabel = _obsFactTotal ? ` (${_obsFactHave} of ${_obsFactTotal} insights learned)` : "";
-      observeBtn.setAttribute("aria-label", `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)${_obsFactLabel}`);
+      observeBtn.setAttribute("aria-label", _obsExhausted
+        ? `Observe this ${species.name} (species study, not your tagged shark; all insights already learned)${_obsFactLabel}`
+        : `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)${_obsFactLabel}`);
       observeBtn.addEventListener("click", () => {
         const fact = unlockSecretFact(species.id);
         logTripEncounter(species, "observed");
@@ -2706,12 +2716,13 @@ const RESIGHT_NOTES = [
   "Back again! At this point I'm starting to think it likes us."
 ];
 
-/* v1.7.24-beta: tiered re-sighting notes — Sarah gets more excited
-   as she sees the same shark again. 2nd sighting: warm recognition.
-   3rd+: full best-friend energy. */
+/* v1.7.24-beta: tiered re-sighting reactions — Sarah gets more excited
+   as she sees the same shark again. 2nd re-sighting: warm recognition.
+   3rd+: full best-friend energy. Tiers count RE-sightings
+   (ordinal = resightings.length + 1). */
 const RESIGHT_NOTES_2ND = [
   "It's back! I was hoping we'd see this one again.",
-  "Second sighting! Okay, I'm officially keeping an eye on this one.",
+  "Second re-sighting! Okay, this one keeps showing up.",
   "Hey, it's our shark again! Starting to recognize this one.",
   "Back for round two! This shark is becoming a regular.",
   "Twice now! Either it likes this spot or it likes us. Probably both."
@@ -2721,13 +2732,15 @@ const RESIGHT_NOTES_EXCITED = [
   "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
   "Okay, this is officially a friendship. Three sightings means it knows us. It KNOWS us!",
   "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
-  "Three sightings of the same shark! Do you realize how special that is?? This one chose us!",
+  "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
   "It's back AGAIN! I think this shark has adopted us. We're its humans now."
 ];
 
-/* Pick the re-sighting note pool by which re-sighting this is
-   (1-based ordinal for this individual). */
-function resightNoteFor(ordinal) {
+/* Pick Sarah's tiered re-sighting reaction by which re-sighting this is
+   (1-based re-sighting ordinal for this individual). Used ONLY in
+   Sarah's chat bubble (resightThread) — never in the persisted
+   field note, so the player never speaks Sarah's lines. */
+function resightSarahReactionFor(ordinal) {
   if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
   if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
   return pick(RESIGHT_NOTES);
@@ -2736,11 +2749,14 @@ function resightNoteFor(ordinal) {
 function recordResighting(species, plan) {
   const t = state.tagged[species.id];
   t.resightings = t.resightings || [];
-  const ordinal = t.resightings.length + 1;
+  /* v1.7.24-beta Mira review: entry.note is the player's field note —
+     always from the 1st-pool lines. Sarah's tiered reactions live in
+     her own chat bubble (resightThread), never in the persisted
+     record, so the player never speaks Sarah's lines. */
   const entry = {
     date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
     location: REGIONS[plan.region].name,
-    note: resightNoteFor(ordinal),
+    note: pick(RESIGHT_NOTES),
     ts: Date.now()
   };
   t.resightings.push(entry);
@@ -2780,11 +2796,30 @@ function recordResighting(species, plan) {
 function resightThread(species, rec) {
   const label = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
   const last = rec.resightings[rec.resightings.length - 1];
-  return [
+  const ordinal = rec.resightings.length;
+  const thread = [
     { who: "them", text: `You saw ${label} again? The ${species.name.toLowerCase()}?` },
+    /* The player's bubble reports the field note only — never Sarah's lines. */
     { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
-    { who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" }
   ];
+  /* v1.7.24-beta Mira review: Sarah's tiered reaction goes in HER bubble.
+     1st re-sighting keeps the original generic closer. From the 2nd
+     re-sighting on, Sarah reacts from her tiered pool and the player
+     answers with a grounded reply. */
+  if (ordinal >= 2) {
+    thread.push({ who: "them", text: resightSarahReactionFor(ordinal) });
+    thread.push({ who: "me", text: resightPlayerReply(rec) });
+  } else {
+    thread.push({ who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" });
+  }
+  return thread;
+}
+
+/* Player's grounded reply after Sarah's affectionate 2nd/3rd+ reactions
+   (Avery). Pronoun matches the shark's recorded sex; "it" when unknown. */
+function resightPlayerReply(rec) {
+  const pron = rec && rec.sex === "female" ? "she" : rec && rec.sex === "male" ? "he" : "it";
+  return `Maybe. Or maybe ${pron} just knows where the food is.`;
 }
 /* v1.5.3-beta: one-time Sarah reaction to first reunion per species.
    Warm, not spammy — only fires once per species, ever. */

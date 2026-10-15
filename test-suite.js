@@ -413,20 +413,21 @@ code += `
       else if (state.stats) delete state.stats.resights;
     }
   })();
-  // v1.7.24-beta: tiered re-sighting notes — 1st uses RESIGHT_NOTES,
-  // 2nd uses the middle pool, 3rd+ uses the excited pool.
+  // v1.7.24-beta: tiered SARAH reactions — 1st falls back to the regular
+  // pool, 2nd uses the middle pool, 3rd+ uses the excited pool. These
+  // lines live in Sarah's chat bubble only, never in the field note.
   (function () {
-    const n1 = resightNoteFor(1);
-    const n2 = resightNoteFor(2);
-    const n3 = resightNoteFor(3);
-    const n5 = resightNoteFor(5);
-    ok('resightNoteFor(1) uses regular pool',
+    const n1 = resightSarahReactionFor(1);
+    const n2 = resightSarahReactionFor(2);
+    const n3 = resightSarahReactionFor(3);
+    const n5 = resightSarahReactionFor(5);
+    ok('resightSarahReactionFor(1) falls back to regular pool',
       RESIGHT_NOTES.includes(n1) && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
-    ok('resightNoteFor(2) uses middle pool',
+    ok('resightSarahReactionFor(2) uses middle pool',
       RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_NOTES.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
-    ok('resightNoteFor(3) uses excited pool',
+    ok('resightSarahReactionFor(3) uses excited pool',
       RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_NOTES.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
-    ok('resightNoteFor(5) still uses excited pool',
+    ok('resightSarahReactionFor(5) still uses excited pool',
       RESIGHT_NOTES_EXCITED.includes(n5));
   })();
   ok('excited pool has all five Avery picks',
@@ -437,6 +438,14 @@ code += `
     RESIGHT_NOTES_2ND.length === 5 &&
     RESIGHT_NOTES_2ND.includes("It's back! I was hoping we'd see this one again.") &&
     RESIGHT_NOTES_2ND.includes("Twice now! Either it likes this spot or it likes us. Probably both."));
+  // v1.7.24-beta: tiers count RE-sightings — the numbered lines say so,
+  // with no forward-looking "more sightings coming" language.
+  ok('2nd pool line says re-sighting, no future-sightings implication',
+    RESIGHT_NOTES_2ND.includes("Second re-sighting! Okay, this one keeps showing up.") &&
+    !RESIGHT_NOTES_2ND.some(l => l.includes("Second sighting!") || l.includes("keeping an eye on")));
+  ok('3rd+ pool line says re-sightings',
+    RESIGHT_NOTES_EXCITED.includes("Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!") &&
+    !RESIGHT_NOTES_EXCITED.some(l => l.includes("Three sightings of the same shark!")));
   (function () {
     const nurse = SHARKS.find(s => s.id === 'nurse');
     const origTagged = state.tagged;
@@ -444,6 +453,10 @@ code += `
     const origCheck = checkAchievements;
     const origRenderColl = renderCollection;
     const origStoreSave = store.save;
+    // v1.7.24-beta Mira review: recordResighting() increments
+    // state.stats.resights; snapshot/restore it (incl. absent case).
+    const hadResights = state.stats && ("resights" in state.stats);
+    const origResights = hadResights ? state.stats.resights : undefined;
     saveStats = () => {};
     checkAchievements = () => {};
     renderCollection = () => {};
@@ -457,21 +470,71 @@ code += `
       return entry.note;
     }
     try {
-      ok('recordResighting 1st uses regular pool', RESIGHT_NOTES.includes(noteAfter(0)));
-      ok('recordResighting 2nd uses middle pool', RESIGHT_NOTES_2ND.includes(noteAfter(1)));
-      ok('recordResighting 3rd uses excited pool', RESIGHT_NOTES_EXCITED.includes(noteAfter(2)));
-      ok('recordResighting 4th still uses excited pool', RESIGHT_NOTES_EXCITED.includes(noteAfter(3)));
+      // v1.7.24-beta Mira review: the persisted field note is ALWAYS from
+      // the regular pool — the tiered Sarah reactions live in her bubble.
+      ok('recordResighting note stays observational (1st)', RESIGHT_NOTES.includes(noteAfter(0)));
+      ok('recordResighting note stays observational (2nd)', RESIGHT_NOTES.includes(noteAfter(1)));
+      ok('recordResighting note stays observational (3rd)', RESIGHT_NOTES.includes(noteAfter(2)));
+      ok('recordResighting note stays observational (4th)', RESIGHT_NOTES.includes(noteAfter(3)));
     } catch (e) {
-      ok('recordResighting tiered notes (threw: ' + e.message + ')', false);
+      ok('recordResighting field notes (threw: ' + e.message + ')', false);
     } finally {
       saveStats = origSaveStats;
       checkAchievements = origCheck;
       renderCollection = origRenderColl;
       store.save = origStoreSave;
       state.tagged = origTagged;
+      if (hadResights) state.stats.resights = origResights;
+      else if (state.stats) delete state.stats.resights;
     }
   })();
-  // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
+  // v1.7.24-beta Mira review: WHO says the dialogue — Sarah's tiered
+  // reactions live in HER bubble; the player's bubble reports the field
+  // note only. Regression: the player must never speak Sarah's lines.
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    function threadWith(count, sex) {
+      const rs = [];
+      for (let i = 0; i < count; i++) rs.push({ date: 'Jan 1, 2026', location: 'Caribbean Sea', note: 'Looking healthy and unhurried.', ts: 1 });
+      const rec = { name: '', researchId: 'NS-1', sex, resightings: rs };
+      return resightThread(nurse, rec);
+    }
+    try {
+      // 1st re-sighting: opener + player field note + generic closer; no food reply.
+      const t1 = threadWith(1, 'female');
+      ok('1st resightThread keeps generic closer, no food reply',
+        t1.length === 3 && t1[2].who === 'them' && t1[2].text.includes('best part of tagging') &&
+        !t1.some(m => m.text.includes('just knows where the food is')));
+      ok('1st resightThread player bubble reports field note only',
+        t1[1].who === 'me' && t1[1].text.includes('Looking healthy and unhurried.'));
+      // 2nd re-sighting (female): Sarah middle-pool line + she-pronoun reply.
+      const t2 = threadWith(2, 'female');
+      ok('2nd resightThread Sarah bubble uses middle pool',
+        t2.length === 4 && t2[2].who === 'them' && RESIGHT_NOTES_2ND.includes(t2[2].text));
+      ok('2nd resightThread player reply uses she pronoun',
+        t2[3].who === 'me' && t2[3].text === 'Maybe. Or maybe she just knows where the food is.');
+      ok('2nd resightThread player bubble never speaks Sarah lines',
+        !RESIGHT_NOTES_2ND.some(l => t2[1].text.includes(l)) && !RESIGHT_NOTES_EXCITED.some(l => t2[1].text.includes(l)));
+      // 3rd re-sighting (male): Sarah excited-pool line + he-pronoun reply.
+      const t3 = threadWith(3, 'male');
+      ok('3rd resightThread Sarah bubble uses excited pool',
+        t3.length === 4 && t3[2].who === 'them' && RESIGHT_NOTES_EXCITED.includes(t3[2].text));
+      ok('3rd resightThread player reply uses he pronoun',
+        t3[3].who === 'me' && t3[3].text === 'Maybe. Or maybe he just knows where the food is.');
+      // Unknown sex: it-pronoun fallback.
+      const tU = threadWith(2, undefined);
+      ok('resightThread player reply falls back to it pronoun',
+        tU[3].text === 'Maybe. Or maybe it just knows where the food is.');
+    } catch (e) {
+      ok('resightThread voice regression (threw: ' + e.message + ')', false);
+    }
+  })();
+  // v1.7.24-beta Mira review: exhausted Observe (3/3) must not promise a
+  // secret fact or claim the expedition ends — finish() keeps diving.
+  ok('observe exhausted copy is accurate',
+    fileCode.includes('all insights learned, just enjoy watching') &&
+    fileCode.includes('_obsExhausted') &&
+    fileCode.includes('all insights already learned'));
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
