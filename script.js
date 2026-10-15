@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.25-beta";
+const VERSION = "v1.7.26-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.26-beta": [
+"🦈 <strong>Thresher hook reworded.</strong> The Collection hook now reads “It looks perpetually nervous, but that tail is actually a sword.” — “perpetually nervous” describes the whole shark, not just its tail.",
+  ],
   "v1.7.25-beta": [
 "🔬 <strong>Exhausted Observe ends the expedition.</strong> Observing a species with no insights left now ends the expedition and shows the “learned all I can” Map popup — before this fix it just offered Keep diving / Head back and showed nothing.",
 "🫧 <strong>Bubbles no longer freeze at the bottom.</strong> The rising bubbles are now driven by a small time-based JS loop instead of CSS keyframe animations — iOS WKWebView didn't reliably tick compositor animations for bubbles that launch from below the viewport, so they could stick at the bottom. The loop recomputes each bubble from wall-clock time every frame, so it can pause under load but never gets permanently stuck. Same 26 bubbles, same motion.",

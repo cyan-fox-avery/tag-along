@@ -36,7 +36,7 @@ const SHARKS = [
     methods: { attract: ["chum"] },
     sizeRange: [3.0, 4.6],
     research: "Thresher sharks follow warm water through tropical and temperate oceans, often far from shore in the open Atlantic. They spend the daylight hours deep below the sunlit layer and rise toward the surface after dark. Out in the mid-water they herd schools of anchovies, herring and mackerel — squid too, when they cross paths — then stun them with a whip of the enormous tail that makes up half their body length. Most of their lives happen somewhere between 30 and 550 metres down. A chum slick is the classic way to draw one within tagging range — out here, scent travels farther than any bait.",
-    hook: "That tail looks perpetually nervous, but it's actually a sword. Threshers hunt by tail-whipping.",
+    hook: "It looks perpetually nervous, but that tail is actually a sword. Threshers hunt by tail-whipping.",
     bonus: "Multiple threshers have been seen around the same bait ball, though coordinated pair hunting isn't established — the observations remain anecdotal. The tail-slap strike itself is well documented.",
     conservation: "Listed as Vulnerable — prized for fins and meat, with longlines taking a heavy toll; several regions now ban retention, and their spectacular tail-hunting makes them a flagship for pelagic protection.",
     cheer: "Threshers hunt by whipping their tails — half their body length, fast enough to stun fish. Coolest hunting method in the ocean, no contest.",
