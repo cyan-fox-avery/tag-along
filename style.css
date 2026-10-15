@@ -1524,12 +1524,39 @@ video.archive-media { max-height: 420px; }
   .tab { font-size: 14px; }
   .dive-scene { top: 106px; }
 
-  /* Research: 2 columns. v1.4.0-beta: open entries stay in their column;
+  /* Research: 3 columns. v1.4.0-beta: open entries stay in their column;
      body stacks vertically within the cell.
-     v1.7.27-beta: was 3 columns — the narrow columns made expanded
+     v1.7.27-beta: tried 2 columns — the narrow columns made expanded
      entries very long single-column strips. 2 wider columns keep the
-     same entries but shorter. */
+     same entries but shorter.
+     v1.7.30-beta: back to 3 columns per Avery (iPad acceptance on
+     v1.7.29) — the 2-column grid wasn't the right fix. Instead the
+     expanded dropdown below widens to span two columns, so expanded
+     content gets room without the grid itself losing a column.
+     Scoped to #researchList: Archive and Achievements keep the
+     2-column .guide-list rule (v1.7.27 state, no complaint). */
   .guide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #researchList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* v1.7.30-beta: expanded Research entries widen to span two columns
+     (2 columns + the 12px gap between them) instead of squeezing into
+     one ~300px column. The body is position:absolute, so it overlays
+     neighbors without pushing the grid around. The base rule caps
+     max-width at 100% — overridden here, or the widening would be
+     clipped back to one column.
+     Last-column entries anchor right (left:auto; right:0) so the
+     dropdown extends left into column 2 instead of overflowing the
+     app container off the right edge of the screen. The :nth-child(3n)
+     count holds because #researchList holds only .guide-row children —
+     the pinned card lives in the separate #pinnedSlot above the grid —
+     so children 3, 6, 9, … land in column 3. Scoped to
+     #researchList so Archive/Achievements dropdowns are untouched. */
+  #researchList .guide-row.open .guide-row-body {
+    width: calc(200% + 12px); max-width: none;
+  }
+  #researchList .guide-row:nth-child(3n).open .guide-row-body {
+    left: auto; right: 0;
+  }
 
   /* Expedition: side-by-side dive */
   .dive-view { display: grid; grid-template-columns: 1.2fr 1fr; grid-template-rows: auto auto; gap: 16px; align-items: start; }

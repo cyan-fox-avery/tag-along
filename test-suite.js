@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.29-beta', VERSION === 'v1.7.29-beta');
+  ok('version v1.7.30-beta', VERSION === 'v1.7.30-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2448,7 +2448,16 @@ code += `
   ok('wide detail modal splits into two columns', /#detailOverlay\\s+#detailContent\\s*\\{[^}]*display:\\s*grid[^}]*grid-template-columns:\\s*1fr\\s+1\\.15fr/.test(cssCode));
   ok('wide detail modal widens past phone width', /#detailOverlay\\s+\\.detail-modal\\s*\\{[^}]*max-width:\\s*820px/.test(cssCode));
   ok('detail modal HTML carries detail-modal class', /id=\"detailOverlay\"[\\s\\S]*?class=\"phone detail-modal\"/.test(htmlCode));
-  ok('wide Research grid is 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
+  // v1.7.30-beta: Research back to 3 columns at >=1024px (v1.7.27's
+  // 2-column grid was wrong per Avery's iPad acceptance); Archive and
+  // Achievements stay on the shared 2-column .guide-list rule.
+  // Expanded Research dropdowns span two columns; last-column ones
+  // anchor right so they don't overflow the app container.
+  ok('wide Research grid is 3 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?#researchList\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3/.test(cssCode));
+  ok('wide Archive/Achievements grids stay 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
+  ok('wide Research dropdown spans two columns', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*width:\\s*calc\\(200% \\+ 12px\\)/.test(cssCode));
+  ok('wide Research dropdown overrides base max-width', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*none/.test(cssCode));
+  ok('wide Research last-column dropdown anchors right', /#researchList\\s+\\.guide-row:nth-child\\(3n\\)\\.open\\s+\\.guide-row-body\\s*\\{[^}]*right:\\s*0/.test(cssCode));
   ok('detail columns are two wrappers', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-identity\\s*\{[^}]*grid-column:\\s*1/.test(cssCode) && /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-record\\s*\{[^}]*grid-column:\\s*2/.test(cssCode));
   ok('detail grid does not place individual blocks', !/#detailOverlay\\s+#detailContent\\s*>\\s*\.(shark-art|book-stats|resight-block|hook)/.test(cssCode));
   // v1.7.27-beta Mira fix: two independent column wrappers — identity first,
@@ -3041,6 +3050,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.30-beta', Array.isArray(WHATS_NEW['v1.7.30-beta']) && WHATS_NEW['v1.7.30-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.29-beta', Array.isArray(WHATS_NEW['v1.7.29-beta']) && WHATS_NEW['v1.7.29-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.28-beta', Array.isArray(WHATS_NEW['v1.7.28-beta']) && WHATS_NEW['v1.7.28-beta'].length >= 1);
 ok('no wall-clock claim remains (rAF timestamp)', !/wall-clock/.test(fileCode + cssCode) && /rAF timestamp/.test(fileCode));
