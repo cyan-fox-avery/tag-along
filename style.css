@@ -1592,11 +1592,23 @@ video.archive-media { max-height: 420px; }
      record in two columns below it. The old left column ended at the
      IUCN pill and left a big empty gap beside long record entries;
      the art row + stats-in-identity balance the columns instead. */
-  #detailOverlay .detail-modal { max-width: 820px; }
+  #detailOverlay .detail-modal { max-width: 820px; padding-top: 8px; padding-bottom: 8px; }
   #detailOverlay #detailContent {
-    display: grid; grid-template-columns: 1fr 1.15fr; gap: 4px 20px; align-items: start;
+    display: grid; grid-template-columns: 1fr 1.15fr; gap: 0 20px; align-items: start;
   }
   #detailOverlay #detailContent > .detail-art { grid-column: 1 / -1; min-width: 0; }
+  /* v1.7.33-beta: trim the vertical space around the art — the modal's
+     own top/bottom padding drops 16px -> 8px and the art's own margins
+     go to zero (base .shark-art is 4px top / 8px bottom). The grid row
+     gap also goes to zero; the column gap stays 20px.
+     NOTE: most of the visible blue above/below the shark is transparent
+     padding baked into the illustration WebPs themselves (nurse: ~34%
+     top / ~32% bottom; varies 0-44% across species, ~10 species at ~0%).
+     CSS alone can't remove that — and a uniform negative-margin / crop
+     would overlap the actual shark on the ~0%-padding species. This
+     trim takes only the real CSS spacing; trimming the asset files is
+     a separate, game-wide decision, not a modal tweak. */
+  #detailOverlay #detailContent > .detail-art .shark-art { margin: 0; }
   /* Large art across the top: scoped to the detail modal so the
      Collection grid cells (140px art) and other .shark-art uses are
      untouched. height:auto keeps the illustration's aspect ratio. */

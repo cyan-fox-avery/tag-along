@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.32-beta', VERSION === 'v1.7.32-beta');
+  ok('version v1.7.33-beta', VERSION === 'v1.7.33-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2563,11 +2563,18 @@ code += `
   // identity + record in two columns below it. Art is large on wide screens.
   ok('detail art spans both columns on top', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-art\\s*\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
   ok('detail art is large on wide screens', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-art\\s+\.shark-art[^{]*\{[^}]*max-width:\\s*600px/.test(cssCode));
+  // v1.7.33-beta: trim the vertical space around the art — the modal's
+  // own top/bottom padding drops to 8px, the art's own margins go to
+  // zero, and the grid row gap goes to zero (column gap stays 20px).
+  ok('detail art has no vertical margins', /#detailOverlay\\s+#detailContent\\s*>\\s*\\.detail-art\\s+\\.shark-art\\s*\\{[^}]*margin:\\s*0/.test(cssCode));
+  ok('detail modal trims top/bottom padding', /#detailOverlay\\s+\\.detail-modal\\s*\\{[^}]*padding-top:\\s*8px[^}]*padding-bottom:\\s*8px/.test(cssCode));
+  ok('detail grid has no row gap', /#detailOverlay\\s+#detailContent\\s*\\{[^}]*gap:\\s*0\\s+20px/.test(cssCode));
   ok('detail grid does not place individual blocks', !/#detailOverlay\\s+#detailContent\\s*>\\s*\.(shark-art|book-stats|resight-block|hook)/.test(cssCode));
   // v1.7.27-beta Mira fix: independent wrappers — art row first, then
   // identity and record columns; each flows its own block content from
   // the top. v1.7.31-beta: stats + Track moved into identity; art is
-  // its own full-width row above the columns.
+  // its own full-width row above the columns. v1.7.33-beta: Re-sightings
+  // also moves into identity, under stats + Track.
   // The mocked DOM has no layout engine, so these assert the DOM structure
   // the CSS relies on (a real-browser rect check runs separately).
   ok('detail modal wraps identity and record columns in order', (() => {
@@ -2593,10 +2600,10 @@ code += `
     const recHtml = html.slice(recIdx);
     const inArt = ['class="shark-art"'].every(c => artHtml.includes(c));
     const notInArt = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !artHtml.includes(c));
-    const inId = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"'].every(c => idHtml.includes(c));
-    const notInId = ['class="shark-art"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
-    const inRec = ['class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
-    const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"'].every(c => !recHtml.includes(c));
+    const inId = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'id="resightMore"'].every(c => idHtml.includes(c));
+    const notInId = ['class="shark-art"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
+    const inRec = ['class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
+    const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"'].every(c => !recHtml.includes(c));
     return inArt && notInArt && inId && notInId && inRec && notInRec;
   })());
   ok('detail modal keeps conditional blocks out when empty', (() => {
@@ -2620,7 +2627,7 @@ code += `
     return artHtml.includes('class="shark-art"')
       && !idHtml.includes('class="given-name"') && idHtml.includes('id="renameForm"')
       && idHtml.includes('class="book-stats"') && idHtml.includes('id="trackBtn"')
-      && !recHtml.includes('class="resight-block"') && !recHtml.includes('class="watch-notes-block"')
+      && !idHtml.includes('class="resight-block"') && !recHtml.includes('class="resight-block"') && !recHtml.includes('class="watch-notes-block"')
       && !recHtml.includes('class="secret-facts-block"')
       && recHtml.includes('class="hook"');
   })());
@@ -3164,6 +3171,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.30-beta', Array.isArray(WHATS_NEW['v1.7.30-beta']) && WHATS_NEW['v1.7.30-beta'].length >= 1);
