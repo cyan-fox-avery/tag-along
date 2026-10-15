@@ -2711,7 +2711,11 @@ function renderSightings() {
    waters. Logging the re-sighting adds a field entry to the shark's
    collection card and extends its tracking story — warm, not a
    progression track. */
-const RESIGHT_NOTES = [
+/* v1.7.24-beta Mira review: the persisted field note comes ONLY from
+   FIELD_RESIGHT_NOTES — genuinely observational entries, no Sarah
+   voice. Sarah's lines live in their own reaction pools and reach the
+   player only through her chat bubble. */
+const FIELD_RESIGHT_NOTES = [
   "Looking healthy and unhurried.",
   "A fresh scar on the dorsal fin — a story there.",
   "A little bigger than at tagging, if the eye can be trusted.",
@@ -2719,12 +2723,27 @@ const RESIGHT_NOTES = [
   "Same calm circuit as ever — this one knows these waters.",
   "Bold as brass, came in close to look at the boat.",
   "Feeding well; good body condition.",
-  "The tag is still seated perfectly. Good work, past us.",
+  "The tag is still seated perfectly. Good work, past us."
+];
+
+/* v1.7.24-beta: Sarah's first-reunion closer variants (Avery's picks).
+   These are Sarah's voice — conversational, affectionate — and are
+   NEVER stored as the field note. They are alternatives within the
+   existing first-reunion resightThread (ordinal 1), alongside the
+   generic closer below. One thread per encounter; resightThread is
+   skipped when maybeReunionReaction already spoke this encounter. */
+const RESIGHT_NOTES_1ST = [
   "Oh wow, it's back! I was literally just thinking about this one.",
   "Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.",
   "The tag's holding up great. This shark is basically wearing a Fitbit and thriving.",
   "Back again! At this point I'm starting to think it likes us."
 ];
+
+/* The original first-reunion closer, kept as one of the ordinal-1 variants. */
+const RESIGHT_GENERIC_CLOSER = "That's the best part of tagging — you get to know it's them. Do you think it recognized you?";
+
+/* The one Sarah line that earns the player's food reply (Avery). */
+const RESIGHT_LIKES_US_LINE = "Back again! At this point I'm starting to think it likes us.";
 
 /* v1.7.24-beta: tiered re-sighting reactions — Sarah gets more excited
    as she sees the same shark again. 2nd re-sighting: warm recognition.
@@ -2746,27 +2765,28 @@ const RESIGHT_NOTES_EXCITED = [
   "It's back AGAIN! I think this shark has adopted us. We're its humans now."
 ];
 
-/* Pick Sarah's tiered re-sighting reaction by which re-sighting this is
+/* Pick Sarah's re-sighting reaction by which re-sighting this is
    (1-based re-sighting ordinal for this individual). Used ONLY in
    Sarah's chat bubble (resightThread) — never in the persisted
-   field note, so the player never speaks Sarah's lines. */
+   field note, so the player never speaks Sarah's lines.
+   1st: first-reunion closer variants (generic closer + 1ST pool). */
 function resightSarahReactionFor(ordinal) {
   if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
   if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
-  return pick(RESIGHT_NOTES);
+  return pick([RESIGHT_GENERIC_CLOSER, ...RESIGHT_NOTES_1ST]);
 }
 
 function recordResighting(species, plan) {
   const t = state.tagged[species.id];
   t.resightings = t.resightings || [];
   /* v1.7.24-beta Mira review: entry.note is the player's field note —
-     always from the 1st-pool lines. Sarah's tiered reactions live in
-     her own chat bubble (resightThread), never in the persisted
-     record, so the player never speaks Sarah's lines. */
+     always from FIELD_RESIGHT_NOTES (observational only). Sarah's
+     reactions live in her own chat bubble (resightThread), never in
+     the persisted record, so the player never speaks Sarah's lines. */
   const entry = {
     date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
     location: REGIONS[plan.region].name,
-    note: pick(RESIGHT_NOTES),
+    note: pick(FIELD_RESIGHT_NOTES),
     ts: Date.now()
   };
   t.resightings.push(entry);
@@ -2812,22 +2832,23 @@ function resightThread(species, rec) {
     /* The player's bubble reports the field note only — never Sarah's lines. */
     { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
   ];
-  /* v1.7.24-beta Mira review: Sarah's tiered reaction goes in HER bubble.
-     1st re-sighting keeps the original generic closer. From the 2nd
-     re-sighting on, Sarah reacts from her tiered pool and the player
-     answers with a grounded reply. */
-  if (ordinal >= 2) {
-    thread.push({ who: "them", text: resightSarahReactionFor(ordinal) });
-    thread.push({ who: "me", text: resightPlayerReply(rec) });
-  } else {
-    thread.push({ who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" });
-  }
+  /* v1.7.24-beta Mira review: Sarah's reaction goes in HER bubble.
+     1st re-sighting picks from the first-reunion closer variants;
+     2nd+ from the tiered pools. The player's food reply follows ONLY
+     the "I think it likes us" line — never after other lines. */
+  const sarahLine = resightSarahReactionFor(ordinal);
+  thread.push({ who: "them", text: sarahLine });
+  const foodReply = resightFoodReplyFor(sarahLine, rec);
+  if (foodReply) thread.push({ who: "me", text: foodReply });
   return thread;
 }
 
-/* Player's grounded reply after Sarah's affectionate 2nd/3rd+ reactions
-   (Avery). Pronoun matches the shark's recorded sex; "it" when unknown. */
-function resightPlayerReply(rec) {
+/* The player's food reply follows ONLY Sarah's "I think it likes us"
+   line (Avery) — it answers that specific claim, so it would be a
+   non sequitur after any other reaction. Returns null otherwise.
+   Pronoun matches the shark's recorded sex; "it" when unknown. */
+function resightFoodReplyFor(sarahLine, rec) {
+  if (sarahLine !== RESIGHT_LIKES_US_LINE) return null;
   const pron = rec && rec.sex === "female" ? "she" : rec && rec.sex === "male" ? "he" : "it";
   return `Maybe. Or maybe ${pron} just knows where the food is.`;
 }
@@ -3866,7 +3887,10 @@ function doFollowTagged(speciesId, doneCb) {
   /* v1.7.22-beta: Following an already-tagged shark counts as a re-sighting.
      Feeds the Pen Pal achievement, the track map, and resight stats — just
      like "📝 Log re-sighting". (Avery: players who always Follow never earned
-     Pen Pal because only the Log button recorded re-sightings.) */
+     Pen Pal because only the Log button recorded re-sightings.)
+     v1.7.24-beta: Follow records the re-sighting but pushes no
+     resightThread — Sarah's tiered reactions are for 📝 Log re-sighting
+     only. No extra Phone spam. */
   if (state.currentPlan) recordResighting(s, state.currentPlan);
   const fact = unlockSecretFact(speciesId);
   /* v1.7.22-beta: the insight lives on the Map popup only — not in the log.
