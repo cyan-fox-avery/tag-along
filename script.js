@@ -2730,7 +2730,7 @@ const RESIGHT_NOTES_2ND = [
 
 const RESIGHT_NOTES_EXCITED = [
   "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
-  "Okay, this is officially a friendship. Three sightings means it knows us. It KNOWS us!",
+  "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
   "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
   "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
   "It's back AGAIN! I think this shark has adopted us. We're its humans now."
