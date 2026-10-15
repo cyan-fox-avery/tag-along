@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.28-beta', VERSION === 'v1.7.28-beta');
+  ok('version v1.7.29-beta', VERSION === 'v1.7.29-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2593,10 +2593,12 @@ code += `
   ok('html background is pure black', cssCode.indexOf('html { background: #000; }') !== -1);
   // v1.5.27: body::after overlay removed; seafloor SVG itself is taller
   ok('no body::after overlay', !/body::after/.test(cssCode));
-  ok('seafloor is a thin 5vh strip', /\.seafloor\\s*\{[^}]*height:\\s*5vh/.test(cssCode));
-  // v1.5.30: seafloor is viewport-fixed so the bottom stays on the bottom
-  ok('seafloor is viewport-fixed', /\.seafloor\\s*\{[^}]*position:\\s*fixed/.test(cssCode));
-  ok('seafloor is bottom-anchored', /\.seafloor\\s*\{[^}]*bottom:\\s*0/.test(cssCode));
+  // v1.7.29: seafloor SVG removed entirely — its kelp strands rendered
+  // oversized on iPad as mysterious blue squiggles. The background
+  // gradient (light blue -> black) carries the bottom now.
+  ok('seafloor SVG removed from markup', !/class="seafloor"/.test(htmlCode));
+  ok('no seafloor CSS rules', !/\.seafloor/.test(cssCode));
+  ok('no kelp paths in markup', !/class="kelp/.test(htmlCode));
   // v1.5.32: Bruce opener fires immediately — timing gate only applies between stages
   ok('bruce stage 0 skips timing gate', /if\\s*\\(stage\\s*>\\s*0\\)/.test(code));
   ok('body uses dynamic viewport height', /min-height:\\s*100dvh/.test(cssCode));
@@ -3039,6 +3041,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.29-beta', Array.isArray(WHATS_NEW['v1.7.29-beta']) && WHATS_NEW['v1.7.29-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.28-beta', Array.isArray(WHATS_NEW['v1.7.28-beta']) && WHATS_NEW['v1.7.28-beta'].length >= 1);
 ok('no wall-clock claim remains (rAF timestamp)', !/wall-clock/.test(fileCode + cssCode) && /rAF timestamp/.test(fileCode));
 ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.28-beta";
+const VERSION = "v1.7.29-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.29-beta": [
+"🌊 <strong>Seafloor removed.</strong> The seafloor silhouette (sediment + kelp) at the bottom of the screen is gone — its kelp strands were rendering oversized on iPad as mysterious blue squiggles. The background gradient still fades from light blue to pure black, so the ocean just has no floor now.",
+  ],
   "v1.7.28-beta": [
 "🏅 <strong>Two new achievements.</strong> <strong>Dedicated</strong> — unlock every extra fact obtainable by following sharks. <strong>Certified Shark Nerd</strong> — complete every other visible achievement (the hidden Bruce one doesn't count).",
 "🧹 <strong>Test hygiene.</strong> The reunion-reaction fixtures now restore the unread count and saved messages too, so no test inherits synthetic Phone notifications.",
