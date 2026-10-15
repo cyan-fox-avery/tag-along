@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.30-beta";
+const VERSION = "v1.7.31-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.31-beta": [
+"🖼️ <strong>Collection detail: big art on top, info in two columns.</strong> The shark illustration now spans the full modal width above the info, and the details sit in two columns below it (identity + stats on the left, sightings / notes / insights on the right) — no more empty gap beside long entries. Phone / narrow layouts are unchanged.",
+  ],
   "v1.7.30-beta": [
 "📖 <strong>Research tab back to 3 columns.</strong> The 2-column grid from v1.7.27 wasn't right — the field guide is 3 columns again on wide screens. Instead, an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column.",
   ],
@@ -4687,8 +4690,10 @@ function openDetail(id) {
   const t = state.tagged[id];
   const c = $("detailContent");
   c.innerHTML = `
-    <div class="detail-identity">
+    <div class="detail-art">
     <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
+    </div>
+    <div class="detail-identity">
     ${t.name ? `<div class="given-name">“${esc(t.name)}”</div>` : ""}
     <div class="detail-name-row">
       ${idLine(t)}
@@ -4704,14 +4709,14 @@ function openDetail(id) {
     <h3 style="margin:6px 0 0">${s.name}</h3>
     <p class="latin detail-scientific">${s.latin}</p>
     <span class="status-pill">IUCN: ${s.status}</span>
-    </div>
-    <div class="detail-record">
     <p class="book-stats">
       📏 ${t.length} m · ${t.sex === "female" ? "♀ female" : "♂ male"}<br>
       📍 Tagged at ${esc(t.location)}<br>
       📅 ${esc(t.date)}
     </p>
     <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px">📍 Track this shark</button>
+    </div>
+    <div class="detail-record">
     ${(() => {
       /* v1.7.23-beta: show only the most recent 3 re-sightings; older ones
          hide behind a "Show all" toggle. Re-sightings are stored
