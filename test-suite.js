@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.33-beta', VERSION === 'v1.7.33-beta');
+  ok('version v1.7.34-beta', VERSION === 'v1.7.34-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -1889,6 +1889,42 @@ code += `
       fs.existsSync(path.join(DIR, ART_URL(s.id, 'silhouette')))
     );
   })());
+  // v1.7.34-beta: illustration WebPs are trimmed — transparent borders cut,
+  // shark pixels untouched. All files are lossless VP8L (the trim re-encoded
+  // them losslessly, so a pixel-exact round-trip holds). Spot-check the three
+  // heaviest trims, and guard the total area so a future untrimmed re-export
+  // (original total ≈ 29.8M px) fails loudly. Sevengill is the one file whose
+  // art already touched all four edges, so it is unchanged at 900x669.
+  ok('v1.7.34-beta: illustration WebPs are trimmed of transparent borders', (() => {
+    function webpLosslessDims(buf) {
+      // VP8L chunk: "RIFF" + size + "WEBP" + "VP8L" + chunk-size (4 bytes)
+      // + 0x2F signature, then a 4-byte LE word: 14 bits (width-1),
+      // 14 bits (height-1).
+      if (!buf || buf.length < 25) return null;
+      if (buf.toString('ascii', 0, 4) !== 'RIFF') return null;
+      if (buf.toString('ascii', 8, 12) !== 'WEBP') return null;
+      if (buf.toString('ascii', 12, 16) !== 'VP8L') return null;
+      const v = buf.readUInt32LE(21);
+      return { w: (v & 0x3FFF) + 1, h: ((v >> 14) & 0x3FFF) + 1 };
+    }
+    let totalArea = 0;
+    const dims = {};
+    for (const s of SHARKS) {
+      const buf = fs.readFileSync(path.join(DIR, ART_URL(s.id, 'illustration')));
+      const d = webpLosslessDims(buf);
+      if (!d) return false;
+      if (d.w > 900 || d.h > 669) return false;
+      dims[s.id] = d;
+      totalArea += d.w * d.h;
+    }
+    const nurse = dims['nurse'];
+    const sawshark = dims['sawshark'];
+    const catshark = dims['catshark'];
+    return nurse && nurse.w === 871 && nurse.h === 229 &&
+           sawshark && sawshark.w === 884 && sawshark.h === 160 &&
+           catshark && catshark.w === 869 && catshark.h === 219 &&
+           totalArea < 21200000;
+  })());
   ok('v0.26.0: background creature sprites exist on disk', (() => {
     return ['bg-sea-turtle', 'bg-dolphin', 'bg-fish-school',
             'bg-ray', 'bg-seal', 'bg-jellyfish']
@@ -3171,6 +3207,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
