@@ -74,7 +74,7 @@ OUT_DIR = REPO / "qa/trim-v1.7.36"
 BASELINE_SHA = "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2"
 # Branch head at push time (filled in after the first push; the numeric
 # record is identical regardless — only this provenance string changes).
-AFTER_SHA = "TBD (filled after push)"
+AFTER_SHA = "99580c7237593154a2fcc844c60fdb0940155fec (v1.7.36-component-crop head)"
 
 MARGIN = 3
 STRUCT = np.ones((3, 3), dtype=int)  # 8-connectivity

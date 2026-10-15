@@ -5,7 +5,7 @@
   "commits": {
     "before_originals": "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2 (main, PR #99 merge)",
     "before_v1_7_35_files": "34b5556c13496cc75778fa8c2c6a73a6bc3502a4 (main, PR #102 merge)",
-    "after_component_cropped": "TBD (filled after push)"
+    "after_component_cropped": "99580c7237593154a2fcc844c60fdb0940155fec (v1.7.36-component-crop head)"
   },
   "totals": {
     "species": 50,
