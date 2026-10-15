@@ -88,6 +88,7 @@ const LICENSE_URLS = {
   "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
   "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
   "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "CC BY-SA 1.0": "https://creativecommons.org/licenses/by-sa/1.0/",
   "CC0": "https://creativecommons.org/publicdomain/zero/1.0/",
   /* v0.20.0: NC licenses allowed for exceptional images (project policy:
      Tag Along is free and non-commercial; NC assets carry a licenseNote and

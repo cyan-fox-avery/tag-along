@@ -944,12 +944,12 @@ const ARCHIVE_MEDIA = {
   "assets": [
    {
     "type": "photo",
-    "caption": "A megamouth shark — full animal, huge cavernous mouth, one of the rarest sharks ever photographed.",
-    "credit": "OpenCage",
-    "license": "CC BY-SA 2.5",
-    "page": "https://commons.wikimedia.org/wiki/File%3AMegamouth_shark_japan2.jpg",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Megamouth_shark_japan2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Megamouth_shark_japan2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "caption": "A megamouth shark — full animal, showing the huge head and cavernous mouth.",
+    "credit": "CSIRO National Fish Collection (via Wikimedia Commons)",
+    "license": "CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Megachasma_pelagios.jpg",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Megachasma_pelagios.jpg",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Megachasma_pelagios.jpg",
    },
    {
     "type": "photo",
@@ -1015,22 +1015,13 @@ const ARCHIVE_MEDIA = {
   "future": false,
   "assets": [
    {
-    "type": "photo",
-    "caption": "A cookiecutter shark — the whole tiny animal, small enough to hold.",
-    "credit": "NOAA Observer Project",
-    "license": "public domain (NOAA)",
-    "page": "https://commons.wikimedia.org/wiki/File%3AIsistius_brasiliensis.jpg",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Isistius_brasiliensis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Isistius_brasiliensis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-   },
-   {
-    "type": "photo",
-    "caption": "A cookiecutter shark — whole specimen, showing the small streamlined body. Ifremer.",
-    "credit": "Ifremer (via Wikimedia Commons)",
-    "license": "CC BY 4.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Squalelet_f%C3%A9roce_(Isistius_brasiliensis)_(Ifremer_00764-87574).jpg",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Squalelet_f%C3%A9roce_%28Isistius_brasiliensis%29_%28Ifremer_00764-87574%29.jpg/960px-Squalelet_f%C3%A9roce_%28Isistius_brasiliensis%29_%28Ifremer_00764-87574%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Squalelet_f%C3%A9roce_%28Isistius_brasiliensis%29_%28Ifremer_00764-87574%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "type": "illustration",
+    "caption": "A cookiecutter shark — scientific illustration showing the small streamlined body.",
+    "credit": "Dr Tony Ayling (via Wikimedia Commons; uploaded by GrahamBould)",
+    "license": "CC BY-SA 1.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Isistius_brasiliensis_(Cookiecutter_shark).gif",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/7/72/Isistius_brasiliensis_%28Cookiecutter_shark%29.gif?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "full": "https://upload.wikimedia.org/wikipedia/commons/7/72/Isistius_brasiliensis_%28Cookiecutter_shark%29.gif?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
    },
   ]
  },

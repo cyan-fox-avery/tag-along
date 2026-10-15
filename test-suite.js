@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.22-beta', VERSION === 'v1.7.22-beta');
+  ok('version v1.7.23-beta', VERSION === 'v1.7.23-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -300,6 +300,7 @@ code += `
     const origTrip = logTripEncounter;
     const origDone = state.encounterDone;
     const origFollowed = state.followedThisTrip;
+    const origPlan2 = state.currentPlan;
     renderAll = () => {};
     factStore.save = () => {};
     logTripEncounter = () => {};
@@ -308,6 +309,10 @@ code += `
     state.tagged = { nurse: { name: "", researchId: "NS-1" } };
     state.encounterDone = null;
     state.followedThisTrip = false;
+    // v1.7.23-beta Mira review: prevent an inherited plan from causing
+    // unintentional re-sightings in the fact-only branches (doFollowTagged
+    // calls recordResighting only when state.currentPlan exists).
+    state.currentPlan = null;
     try {
       // Branch 1: fact available -> pendingTagAlongFact set, no insight in log
       state.unlockedFacts = {};
@@ -344,6 +349,7 @@ code += `
       state.pendingTagAlongFact = origPending;
       state.encounterDone = origDone;
       state.followedThisTrip = origFollowed;
+      state.currentPlan = origPlan2;
     }
   })();
   // v1.7.22-beta: Following a tagged shark records a re-sighting (Pen Pal).
@@ -362,6 +368,10 @@ code += `
     const origStoreSave = store.save;
     const origDone = state.encounterDone;
     const origFollowed = state.followedThisTrip;
+    // v1.7.23-beta Mira review: recordResighting() increments state.stats.resights;
+    // snapshot/restore the exact prior value (including the absent-property case).
+    const hadResights = state.stats && ("resights" in state.stats);
+    const origResights = hadResights ? state.stats.resights : undefined;
     renderAll = () => {};
     logLine = () => {};
     logTripEncounter = () => {};
@@ -399,19 +409,42 @@ code += `
       state.pendingTagAlongFact = origPending;
       state.encounterDone = origDone;
       state.followedThisTrip = origFollowed;
+      if (hadResights) state.stats.resights = origResights;
+      else if (state.stats) delete state.stats.resights;
     }
   })();
-  // v1.7.22-beta: Follow insight lives on the Map popup only, not in the log
-  ok('doFollowTagged does not log the insight', (function(){
-    var m = fileCode.match(/function doFollowTagged[\\s\\S]{0,1500}?renderAll\\(\\);/);
-    return m && m[0].indexOf('Tag-along insight:</strong>') === -1;
-  })());
   // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
   ok('PR47 fan rays not ported', !cssCode.includes('.caustics .fan'));
   ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
+  // v1.7.23-beta: Follow button shows insight progress (insights: n/total).
+  ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
+  ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
+  ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
+  // v1.7.23-beta: achievement cards identical height across ALL rows —
+  // grid tracks are equal (grid-auto-rows: minmax(140px, 1fr)) plus a
+  // per-card 140px min-height fallback, not just per-row stretch.
+  ok('achievement cards have fixed min-height', cssCode.includes('#achieveList .guide-row') && cssCode.includes('min-height: 140px'));
+  ok('achievement grid rows are equal tracks', cssCode.includes('grid-auto-rows: minmax(140px, 1fr)'));
+  // v1.7.23-beta: Collection detail had no visible exit on mobile — the
+  // Close button sat below the fold. Top-right ✕ on the long-content
+  // modals (detail, tracking, what's-new), 44×44px touch target.
+  ok('detail modal has top-right close button',
+    htmlCode.includes('id="detailCloseTop"') && htmlCode.includes('aria-label="Close details"'));
+  ok('track modal has top-right close button',
+    htmlCode.includes('id="trackCloseTop"') && htmlCode.includes('aria-label="Close tracking"'));
+  ok('whats-new modal has top-right close button',
+    htmlCode.includes('id="whatsNewCloseTop"') && htmlCode.includes('aria-label="Close what\\'s new"'));
+  ok('modal-close is a 44px touch target',
+    cssCode.includes('.modal-close') && cssCode.includes('width: 44px') && cssCode.includes('height: 44px'));
+  ok('modal-close is positioned top-right of the card',
+    cssCode.includes('.modal-close') && cssCode.includes('position: absolute') && cssCode.includes('top: 8px') && cssCode.includes('right: 8px'));
+  ok('top close buttons delegate to the bottom Close buttons',
+    fileCode.includes('$("detailCloseTop").addEventListener("click", () => $("detailClose").click())') &&
+    fileCode.includes('$("trackCloseTop").addEventListener("click", () => $("trackClose").click())') &&
+    fileCode.includes('$("whatsNewCloseTop").addEventListener("click", () => $("whatsNewClose").click())'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',
@@ -535,6 +568,14 @@ code += `
   })());
   ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
 
+  // v1.7.23-beta: cookiecutter archive is illustration-only (Avery's call — no dead specimens)
+  (function () {
+    const assets = ARCHIVE_MEDIA.cookiecutter.assets;
+    ok('cookiecutter is a single illustration',
+      assets.length === 1 && assets[0].type === 'illustration' &&
+      /Dr Tony Ayling/.test(assets[0].credit) && assets[0].license === 'CC BY-SA 1.0');
+  })();
+
   // v0.18.0 wave — 7 new species live on the roster with verified archive media
   const wave7 = ['scalloped','smooth','bonnethead','bull','greyreef','caribbean','sandbar'];
   ok('7 wave species on roster', wave7.every(id => SHARKS.some(s => s.id === id)));
@@ -579,8 +620,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('18 achievements (17 visible + Bruce hidden)', ACHIEVEMENTS.length === 18 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 17);
+  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -747,12 +788,20 @@ code += `
       a.image.includes('Pristiophorus_cirratus.jpg') &&
       a.license === 'public domain';
   })());
-  // v1.7.22: cookiecutter secondary is the Ifremer whole-specimen photo
-  ok('cookiecutter secondary is the Ifremer specimen', (() => {
-    const a = ARCHIVE_MEDIA.cookiecutter.assets[1];
-    return a.credit.includes('Ifremer') &&
-      a.image.includes('Ifremer_00764-87574') &&
-      a.license === 'CC BY 4.0';
+  // v1.7.23: cookiecutter is illustration-only (no dead-specimen photos)
+  ok('cookiecutter is a single illustration', (() => {
+    const assets = ARCHIVE_MEDIA.cookiecutter.assets;
+    return assets.length === 1 &&
+      assets[0].type === 'illustration' &&
+      assets[0].credit.includes('Dr Tony Ayling') &&
+      assets[0].image.includes('Cookiecutter_shark') &&
+      assets[0].license === 'CC BY-SA 1.0';
+  })());
+  ok('megamouth credits the creator, not the uploader', (() => {
+    const assets = ARCHIVE_MEDIA.megamouth.assets;
+    return assets.length > 0 &&
+      assets[0].credit.includes('CSIRO National Fish Collection') &&
+      assets[0].license === 'CC BY 3.0';
   })());
   ok('pin switches', (() => {
     togglePin("salmon"); togglePin("dusky");
@@ -1864,6 +1913,13 @@ code += `
     ok("bubbles use column keyframes", /@keyframes\\s+bubble-rise/.test(cssCode));
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
     ok("bubbles number 26 (8 staggered columns)", bubbleCount === 26);
+    // v1.7.23-beta: frozen-bubble fix — every bubble-rise keyframe must state
+    // its transform explicitly (WebKit stalled when 8%/85% omitted it), and
+    // bubbles must be composited so the initial renderAll() can't stall them.
+    const riseBlock = (cssCode.match(/@keyframes\\s+bubble-rise\\s*\\{[\\s\\S]*?\\n\\}/) || [""])[0];
+    const riseStops = (riseBlock.match(/^\\s*\\d+%\\s*\\{[^}]*\\}/gm) || []);
+    ok("bubble-rise keyframes all state transform", riseStops.length >= 4 && riseStops.every(s => /transform:/.test(s)));
+    ok("bubbles use will-change for compositor animation", /\\.bubbles\\s+span\\s*\\{[^}]*will-change:\\s*transform/.test(cssCode));
   })();
   // v1.4.0-beta: expanded guide entries overlay the grid instead of pushing it
   (() => {
@@ -1901,9 +1957,12 @@ code += `
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
-  // v1.4.9: White Whale achievement — tag a megamouth
+  // v1.7.23: WHAAAAAAALE achievement (renamed from White Whale) — tag a whale shark
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
+  // v1.7.23: WHAAAAAAALE achievement — tag a whale shark (separate from White Whale)
+  ok("whaaaaale achievement exists", ACHIEVEMENTS.some(a => a.id === "whaaaaale" && a.name === "WHAAAAAAALE"));
+  ok("whaaaaale checks whale tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "whaaaaale"); return a && a.check({ tagged: { whale: {} } }) === true && a.check({ tagged: {} }) === false; })());
   ok("WHITE_WHALE_THREAD exists with Sarah's reaction", typeof WHITE_WHALE_THREAD !== "undefined" && WHITE_WHALE_THREAD.length >= 4 && WHITE_WHALE_THREAD[0].text.toLowerCase().includes("megamouth"));
   ok("surface-shimmer oversized past viewport", cssCode.indexOf(".surface-shimmer") !== -1 && cssCode.indexOf("left: -4%") !== -1);
   ok("collection empty-note spans grid", /\\.collection-grid\\s+\\.empty-note\\s*\\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
@@ -2233,7 +2292,45 @@ code += `
   })());
   ok('REUNION_ODDS has three tiers', (() => {
     if (typeof REUNION_ODDS === 'undefined') return false;
-    return REUNION_ODDS.resident === 0.50 && REUNION_ODDS.coastal === 0.25 && REUNION_ODDS.migratory === 0.10;
+    return REUNION_ODDS.resident === 0.25 && REUNION_ODDS.coastal === 0.125 && REUNION_ODDS.migratory === 0.05;
+  })());
+  // v1.7.23-beta: re-sighting tuning — halved odds, no time gating (Avery:
+  // "we're not time gating the game" — the 24h cooldown was removed).
+  // The reunion roll is a pure odds roll on every encounter.
+  ok('reunion roll has no time gating', /isReunion = Math\\.random\\(\\) < odds;/.test(fileCode)
+    && !/recentlyResighted/.test(fileCode) && !/RESIGHT_COOLDOWN/.test(fileCode));
+  ok('re-sightings list collapses to 3 with Show all', (() => {
+    const savedTagged = state.tagged;
+    state.tagged = { nurse: { name: '', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [
+      { date: 'Oct 10, 2026', location: 'Caribbean Sea', note: 'n1-oldest' },
+      { date: 'Oct 11, 2026', location: 'Caribbean Sea', note: 'n2-older' },
+      { date: 'Oct 12, 2026', location: 'Caribbean Sea', note: 'n3' },
+      { date: 'Oct 13, 2026', location: 'Caribbean Sea', note: 'n4' },
+      { date: 'Oct 14, 2026', location: 'Caribbean Sea', note: 'n5-newest' },
+    ] } };
+    try { openDetail('nurse'); } catch (e) { state.tagged = savedTagged; return false; }
+    const html = document.getElementById('detailContent').innerHTML;
+    state.tagged = savedTagged;
+    // header keeps the total; older entries live inside the hidden block
+    // (between resightOlder and its closing </ul>); newest entries render after it
+    const olderStart = html.indexOf('resightOlder');
+    const olderEnd = html.indexOf('</ul>', olderStart);
+    const n1Idx = html.indexOf('n1-oldest');
+    const n5Idx = html.indexOf('n5-newest');
+    return html.includes('Re-sightings (5)') && html.includes('Show all (5)')
+      && olderStart !== -1 && olderEnd !== -1
+      && n1Idx > olderStart && n1Idx < olderEnd
+      && n5Idx > olderEnd;
+  })());
+  ok('re-sightings list with 3 or fewer has no Show all button', (() => {
+    const savedTagged = state.tagged;
+    state.tagged = { nurse: { name: '', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [
+      { date: 'Oct 10, 2026', location: 'Caribbean Sea', note: 'only-one' },
+    ] } };
+    try { openDetail('nurse'); } catch (e) { state.tagged = savedTagged; return false; }
+    const html = document.getElementById('detailContent').innerHTML;
+    state.tagged = savedTagged;
+    return html.includes('Re-sightings (1)') && !html.includes('resightMore') && html.includes('only-one');
   })());
   ok('maybeReunionReaction defined', /function maybeReunionReaction/.test(code));
   ok('reunion reaction is one-time per species', /state\\.reunionReacted\\[species\\.id\\]/.test(code));
@@ -2432,6 +2529,7 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
   ok('migrateDerpyUnlock gates on full roster in source', /function migrateDerpyUnlock\\(\\)[\\s\\S]{0,900}?hasFullRoster\\(\\)/.test(fileCode));

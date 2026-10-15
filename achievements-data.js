@@ -184,6 +184,14 @@ const ACHIEVEMENTS = [
     description: "Tagged a megamouth shark. Only around 300 have ever been documented. This is the big one.",
     check: (st) => !!st.tagged.megamouth
   },
+  {
+    id: "whaaaaale",
+    name: "WHAAAAAAALE",
+    icon: "🐋",
+    breadcrumb: "the biggest fish in the sea",
+    description: "Tagged a whale shark. The biggest fish in the ocean — and every spot pattern is unique, like a fingerprint.",
+    check: (st) => !!st.tagged.whale
+  },
 ];
 
 /* v0.18.0 review: the Bruce chain isn't built yet, so this stays out of the

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.22-beta";
+const VERSION = "v1.7.23-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,14 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.23-beta": [
+"🐋 <strong>WHAAAAAAALE.</strong> New achievement for tagging a whale shark — the biggest fish in the ocean. (White Whale stays with the megamouth, where it belongs.)",
+"🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
+"🧭 <strong>Follow shows insight progress.</strong> The Follow button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — so you know what following will get you.",
+"🦈 <strong>Cookiecutter archive illustration-only.</strong> The cookiecutter's archive entry now shows only the scientific illustration — no more dead specimens.",
+"✕ <strong>Close button on modals.</strong> Collection detail, Tracking, and What's New now have a ✕ in the top-right corner — the old Close button sat below the fold on mobile, leaving no visible way out.",
+"🔁 <strong>Re-sightings, less spammy.</strong> Reunion odds are halved (resident 25%, coastal 12.5%, migratory 5%) — same chance on every encounter, no time gating. The detail card shows only the 3 most recent re-sightings, with a Show all button for the rest.",
+  ],
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
 "🧭 <strong>Follow insight cleanup.</strong> Follow now keeps its insights on the Map popup — the tag-along insight (or the graceful \"learned all I can\" line) appears there, not duplicated in the expedition log.",
@@ -1296,8 +1304,11 @@ const esc = (str) => String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").re
 const sharkById = (id) => SHARKS.find(s => s.id === id);
 /* v1.5.3-beta: reunion odds by species ecology. These are game-balance numbers,
    NOT scientific re-sighting probabilities. Resident/site-faithful sharks are
-   most likely to be recognized; wide-ranging migrants rarely are. */
-const REUNION_ODDS = { resident: 0.50, coastal: 0.25, migratory: 0.10 };
+   most likely to be recognized; wide-ranging migrants rarely are.
+   v1.7.23-beta: halved across the board (Avery: 4 re-sightings of one nurse
+   shark in 4 days felt spammy, not special). No time gating — the same odds
+   apply on every encounter (Avery: we're not time-gating the game). */
+const REUNION_ODDS = { resident: 0.25, coastal: 0.125, migratory: 0.05 };
 const ECOLOGY_TIER = {
   /* Resident/site-faithful (17) — reef residents, bottom-dwellers, site-attached */
   nurse: "resident", sandtiger: "resident", galapagos: "resident",
@@ -2105,13 +2116,14 @@ function doEncounter(species, plan) {
     /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
        encountering the species rolls: is it YOUR shark (reunion) or a different
        untagged animal? Odds by ecology tier (game-balance, not science):
-       resident 50%, coastal 25%, migratory 10%. */
+       resident 25%, coastal 12.5%, migratory 5%. No time gating — the same
+       odds apply on every encounter. */
     const existingRec = state.tagged[species.id];
     let isReunion = false;
     let isDifferentShark = false;
     if (existingRec) {
       const tier = (typeof ECOLOGY_TIER !== "undefined" && ECOLOGY_TIER[species.id]) || "coastal";
-      const odds = (typeof REUNION_ODDS !== "undefined" && REUNION_ODDS[tier]) || 0.25;
+      const odds = (typeof REUNION_ODDS !== "undefined" && REUNION_ODDS[tier]) || 0.125;
       isReunion = Math.random() < odds;
       isDifferentShark = !isReunion;
     }
@@ -2299,8 +2311,13 @@ function doEncounter(species, plan) {
       followBtn.type = "button";
       const _followRec = state.tagged[species.id];
       const _followName = (_followRec && _followRec.name) || species.name;
-      followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>`;
-      followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)`);
+      /* v1.7.23-beta: show insight progress on the Follow button. */
+      const _factTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
+      const _factHave = (state.unlockedFacts[species.id] || []).length;
+      const _factLine = _factTotal ? `<br><small class="dim">(insights: ${_factHave}/${_factTotal})</small>` : "";
+      followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>${_factLine}`;
+      const _factLabel = _factTotal ? ` (${_factHave} of ${_factTotal} insights learned)` : "";
+      followBtn.setAttribute("aria-label", `Follow ${_followName} for the rest of this trip (ends expedition)${_factLabel}`);
       followBtn.addEventListener("click", () => {
         actions.classList.add("hidden");
         actions.innerHTML = "";
@@ -4496,13 +4513,23 @@ function openDetail(id) {
       📅 ${esc(t.date)}
     </p>
     <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px">📍 Track this shark</button>
-    ${t.resightings && t.resightings.length ? `
-    <div class="resight-block">
-      <h4>🔁 Re-sightings (${t.resightings.length})</h4>
-      <ul class="track-stops">
-        ${t.resightings.map(r => `<li>📍 ${esc(r.date)} — ${esc(r.location)}<br><span class="dim">${esc(r.note)}</span></li>`).join("")}
-      </ul>
-    </div>` : ""}
+    ${(() => {
+      /* v1.7.23-beta: show only the most recent 3 re-sightings; older ones
+         hide behind a "Show all" toggle. Re-sightings are stored
+         oldest-first, so the visible slice is the tail of the list. */
+      if (!t.resightings || !t.resightings.length) return "";
+      const total = t.resightings.length;
+      const VISIBLE = 3;
+      const recent = t.resightings.slice(-VISIBLE);
+      const older = t.resightings.slice(0, -VISIBLE);
+      const li = r => `<li>📍 ${esc(r.date)} — ${esc(r.location)}<br><span class="dim">${esc(r.note)}</span></li>`;
+      return `<div class="resight-block">
+      <h4>🔁 Re-sightings (${total})</h4>
+      ${older.length ? `<ul id="resightOlder" class="track-stops hidden">${older.map(li).join("")}</ul>` : ""}
+      <ul class="track-stops">${recent.map(li).join("")}</ul>
+      ${older.length ? `<button id="resightMore" class="mini-button" type="button" aria-expanded="false">Show all (${total})</button>` : ""}
+    </div>`;
+    })()}
     ${t.notes && t.notes.length ? `
     <div class="watch-notes-block">
       <h4>📓 Field notes from watching (${t.notes.length})</h4>
@@ -4529,6 +4556,18 @@ function openDetail(id) {
   `;
   $("detailOverlay").classList.remove("hidden");
   $("trackBtn").addEventListener("click", () => openTrack(id));
+  /* v1.7.23-beta: re-sightings "Show all" toggle. Collapsed again on reopen
+     because openDetail re-renders from scratch each time. */
+  const resightMore = $("resightMore");
+  if (resightMore) {
+    let resightsExpanded = false;
+    resightMore.addEventListener("click", () => {
+      resightsExpanded = !resightsExpanded;
+      $("resightOlder").classList.toggle("hidden", !resightsExpanded);
+      resightMore.textContent = resightsExpanded ? "Show fewer" : `Show all (${t.resightings.length})`;
+      resightMore.setAttribute("aria-expanded", String(resightsExpanded));
+    });
+  }
   $("renameBtn").addEventListener("click", () => {
     $("renameForm").classList.remove("hidden");
     $("renameBtn").classList.add("hidden");
@@ -4610,6 +4649,11 @@ $("trackOverlay").addEventListener("click", (e) => {
 $("detailClose").addEventListener("click", () => {
   $("detailOverlay").classList.add("hidden");
 });
+/* v1.7.23-beta: top-right ✕ buttons delegate to the bottom Close buttons,
+   so the exit is visible the moment the modal opens and behaviour stays
+   in exactly one place. */
+$("detailCloseTop").addEventListener("click", () => $("detailClose").click());
+$("trackCloseTop").addEventListener("click", () => $("trackClose").click());
 $("detailOverlay").addEventListener("click", (e) => {
   if (e.target === $("detailOverlay")) $("detailOverlay").classList.add("hidden");
 });
@@ -5243,6 +5287,9 @@ setTimeout(() => { try { advanceBruceChain(); } catch {} }, 5000);
     $("whatsNewOverlay").classList.add("hidden");
     markWhatsNewSeen();
   });
+  /* v1.7.23-beta: top-right ✕ delegates to the bottom button (which also
+     marks the notes seen) — same one-source-of-truth pattern as detail/track. */
+  $("whatsNewCloseTop").addEventListener("click", () => $("whatsNewClose").click());
 })();
 const tickPhoneClock = () => {
   $("phoneTime").textContent =

@@ -134,12 +134,22 @@ body::before {
   position: absolute; border-radius: 50%;
   border: 1.5px solid rgba(180,220,250,0.35); background: rgba(180,220,250,0.06);
   opacity: 0;
+  /* v1.7.23-beta: will-change promotes each bubble to its own composited
+     layer, so the rise runs on the compositor thread and can't stall when
+     the main thread is busy with the synchronous initial renderAll() —
+     the first few bubbles used to freeze at the bottom on iPad/WKWebView. */
+  will-change: transform, opacity;
   animation-name: bubble-rise; animation-timing-function: linear; animation-iteration-count: infinite;
 }
 @keyframes bubble-rise {
+  /* v1.7.23-beta: every keyframe states its transform explicitly (the 8%/85%
+     stops used to omit it and rely on interpolation across the gap, which
+     WebKit handled inconsistently — bubbles could stick at the bottom).
+     The intermediate translateY values are exactly proportional to --rise,
+     so the piecewise-linear motion is identical to the old straight line. */
   0% { transform: translateY(0) translateX(0); opacity: 0; }
-  8% { opacity: 0.85; }
-  85% { opacity: 0.45; }
+  8% { transform: translateY(calc(var(--rise, -105vh) * 0.08)) translateX(2px); opacity: 0.85; }
+  85% { transform: translateY(calc(var(--rise, -105vh) * 0.85)) translateX(20px); opacity: 0.45; }
   100% { transform: translateY(var(--rise, -105vh)) translateX(24px); opacity: 0; }
 }
 /* column A — full riser, 4 bubbles */
@@ -379,10 +389,15 @@ body { overflow-x: clip; }
    instead of truncating — the stack has room, so no ellipsis needed here. */
 .guide-row-head .ach-texts .guide-row-name { flex: none; white-space: normal; overflow: visible; text-overflow: clip; }
 .guide-row-head .ach-texts .ach-hint { flex: none; }
-/* v1.7.22-beta: achievement cards are uniform height — the grid stretches cards
-   in each row to match, so unlocked and locked cards are the same size.
-   Overrides the align-items:start on .guide-list at the 768px+ breakpoint. */
-#achieveList { align-items: stretch; }
+/* v1.7.23-beta: achievement cards are identical height across ALL rows, not
+   just within each row. The grid tracks themselves are equal:
+   grid-auto-rows: minmax(140px, 1fr) keeps every implicit row at least 140px
+   while wrapping stays automatic; align-items: stretch pulls every card to
+   fill its track (overrides the align-items:start on .guide-list at the
+   768px+ breakpoint from v1.7.22). The per-card min-height is a fallback so
+   a single orphan card still holds the 140px floor. */
+#achieveList { grid-auto-rows: minmax(140px, 1fr); align-items: stretch; }
+#achieveList .guide-row { min-height: 140px; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 3px 10px; margin-bottom: 8px;
@@ -1020,9 +1035,23 @@ select option:disabled { color: #7a8a9e; }
 }
 .overlay > * { margin: auto; }
 .phone {
+  position: relative; /* v1.7.23-beta: anchor for the top-right .modal-close ✕ */
   background: var(--bg-panel); border-radius: 22px; padding: 16px;
   width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
+/* v1.7.23-beta: top-right ✕ on long-content modals (Collection detail,
+   Tracking, What's New). The bottom Close button sits below the fold on
+   mobile, so the exit must be visible the moment the modal opens.
+   44×44px touch target; semi-opaque so it reads over shark art. */
+.modal-close {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0;
+  border-radius: 50%; border: 1px solid var(--line);
+  background: rgba(2, 8, 16, 0.55); color: #fff;
+  font-size: 20px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:active { transform: scale(0.94); }
 .phone-head { font-weight: 800; margin-bottom: 10px; font-size: 15px; }
 /* v0.12.0: one conversation scroll, like a real phone — threads no longer
    get their own nested scrollboxes; #messagesList (.phone-convo) is the
