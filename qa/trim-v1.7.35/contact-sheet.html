@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tag Along v1.7.35 — illustration re-trim contact sheet (QA artifact)</title>
+<style>
+  body { background:#050d18; color:#dfeeff; font-family:system-ui, sans-serif; margin:0; padding:24px; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  .intro { color:#9fb8d8; max-width:900px; line-height:1.5; }
+  .intro code { color:#fff; }
+  .row { display:grid; grid-template-columns:220px 320px 320px; gap:16px; align-items:center;
+         border-top:1px solid #1c3350; padding:14px 0; }
+  .meta h2 { font-size:16px; margin:0 0 4px; }
+  .meta p { font-size:12px; color:#9fb8d8; margin:0; line-height:1.5; }
+  figure { margin:0; }
+  figure img { width:300px; height:auto; display:block; background:#050d18; }
+  figcaption { font-size:11px; color:#7d96b5; margin-top:4px; letter-spacing:.08em; }
+</style>
+</head>
+<body>
+<h1>Illustration re-trim — before / after contact sheet (24 re-trimmed species)</h1>
+<p class="intro">QA artifact for Tag Along <strong>v1.7.35-beta</strong> — NOT game content.
+Each pair shows the same species at the same display width (300px) on the game's dark background.
+<strong>BEFORE</strong> images are the v1.7.34 files from <code>main @ 2f19cb5</code>
+(alpha&gt;0 bbox trim — faint alpha noise kept the bbox near-full-canvas);
+<strong>AFTER</strong> images are the re-trimmed files from <code>v1.7.35-retrim-alpha @ 5e4ac9a</code>
+(alpha≥200 bbox trim). The other 26 species are unchanged since v1.7.34 and are not shown.
+Look for clipped fin/tail tips, halos, or missing parts in the AFTER column.
+Full numeric record: <code>qa/trim-v1.7.35/manifest.json</code>
+(crop offsets, geometry + alpha checks, per-species RGB diff vs original).</p>
+  <section class="row">
+    <div class="meta"><h2>Goblin Shark</h2>
+      <p>900×668 → 885×202<br>cut T221 B245 L9 R6<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/goblin-illustration.webp" alt="Before: Goblin Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/goblin-illustration.webp" alt="After: Goblin Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Galápagos Shark</h2>
+      <p>900×668 → 877×345<br>cut T149 B174 L16 R7<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/galapagos-illustration.webp" alt="Before: Galápagos Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/galapagos-illustration.webp" alt="After: Galápagos Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Great White Shark</h2>
+      <p>900×668 → 870×464<br>cut T37 B167 L16 R14<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/great-white-illustration.webp" alt="Before: Great White Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/great-white-illustration.webp" alt="After: Great White Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Shortfin Mako</h2>
+      <p>900×668 → 870×296<br>cut T182 B190 L17 R13<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/mako-illustration.webp" alt="Before: Shortfin Mako" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/mako-illustration.webp" alt="After: Shortfin Mako" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Epaulette Shark</h2>
+      <p>900×668 → 864×187<br>cut T240 B241 L19 R17<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/epaulette-illustration.webp" alt="Before: Epaulette Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/epaulette-illustration.webp" alt="After: Epaulette Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Lemon Shark</h2>
+      <p>900×668 → 869×295<br>cut T192 B181 L19 R12<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/lemon-illustration.webp" alt="Before: Lemon Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/lemon-illustration.webp" alt="After: Lemon Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Blacktip Reef Shark</h2>
+      <p>900×668 → 862×273<br>cut T187 B208 L22 R16<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/blacktip-reef-illustration.webp" alt="Before: Blacktip Reef Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/blacktip-reef-illustration.webp" alt="After: Blacktip Reef Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Porbeagle</h2>
+      <p>900×668 → 876×366<br>cut T146 B156 L17 R7<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/porbeagle-illustration.webp" alt="Before: Porbeagle" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/porbeagle-illustration.webp" alt="After: Porbeagle" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Broadnose Sevengill</h2>
+      <p>900×669 → 877×286<br>cut T202 B181 L14 R9<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/sevengill-illustration.webp" alt="Before: Broadnose Sevengill" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/sevengill-illustration.webp" alt="After: Broadnose Sevengill" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Frilled Shark</h2>
+      <p>900×668 → 867×415<br>cut T244 B9 L16 R17<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/frilled-illustration.webp" alt="Before: Frilled Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/frilled-illustration.webp" alt="After: Frilled Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Scalloped Hammerhead</h2>
+      <p>900×668 → 861×451<br>cut T100 B117 L21 R18<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/scalloped-hammerhead-illustration.webp" alt="Before: Scalloped Hammerhead" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/scalloped-hammerhead-illustration.webp" alt="After: Scalloped Hammerhead" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Bonnethead</h2>
+      <p>900×669 → 844×383<br>cut T155 B131 L37 R19<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/bonnethead-illustration.webp" alt="Before: Bonnethead" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/bonnethead-illustration.webp" alt="After: Bonnethead" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Bull Shark</h2>
+      <p>900×668 → 877×339<br>cut T161 B168 L17 R6<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/bull-illustration.webp" alt="Before: Bull Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/bull-illustration.webp" alt="After: Bull Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Sandbar Shark</h2>
+      <p>900×668 → 876×473<br>cut T157 B38 L18 R6<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/sandbar-illustration.webp" alt="Before: Sandbar Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/sandbar-illustration.webp" alt="After: Sandbar Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Dusky Shark</h2>
+      <p>900×668 → 881×398<br>cut T161 B109 L13 R6<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/dusky-illustration.webp" alt="Before: Dusky Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/dusky-illustration.webp" alt="After: Dusky Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Silvertip Shark</h2>
+      <p>900×668 → 880×478<br>cut T66 B124 L13 R7<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/silvertip-illustration.webp" alt="Before: Silvertip Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/silvertip-illustration.webp" alt="After: Silvertip Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Spinner Shark</h2>
+      <p>900×668 → 871×275<br>cut T196 B197 L19 R10<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/spinner-illustration.webp" alt="Before: Spinner Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/spinner-illustration.webp" alt="After: Spinner Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Port Jackson Shark</h2>
+      <p>900×668 → 858×546<br>cut T61 B61 L21 R21<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/port-jackson-illustration.webp" alt="Before: Port Jackson Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/port-jackson-illustration.webp" alt="After: Port Jackson Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Common Angelshark</h2>
+      <p>900×668 → 660×642<br>cut T14 B12 L89 R151<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/angelshark-illustration.webp" alt="Before: Common Angelshark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/angelshark-illustration.webp" alt="After: Common Angelshark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Greenland Shark</h2>
+      <p>900×668 → 869×407<br>cut T188 B73 L17 R14<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/greenland-illustration.webp" alt="Before: Greenland Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/greenland-illustration.webp" alt="After: Greenland Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Bluntnose Sixgill Shark</h2>
+      <p>900×669 → 878×357<br>cut T201 B111 L14 R8<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/sixgill-illustration.webp" alt="Before: Bluntnose Sixgill Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/sixgill-illustration.webp" alt="After: Bluntnose Sixgill Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Velvet-Belly Lanternshark</h2>
+      <p>900×668 → 874×249<br>cut T184 B235 L15 R11<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/velvet-belly-illustration.webp" alt="Before: Velvet-Belly Lanternshark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/velvet-belly-illustration.webp" alt="After: Velvet-Belly Lanternshark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Pacific Sleeper Shark</h2>
+      <p>900×668 → 868×372<br>cut T56 B240 L17 R15<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/pacific-sleeper-illustration.webp" alt="Before: Pacific Sleeper Shark" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/pacific-sleeper-illustration.webp" alt="After: Pacific Sleeper Shark" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Spiny Dogfish</h2>
+      <p>900×668 → 867×367<br>cut T104 B197 L24 R9<br>VP8X · alpha thr 200</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/2f19cb5590d26d2355761f9582e1eb024cd3476f/assets/sharks-webp/spiny-dogfish-illustration.webp" alt="Before: Spiny Dogfish" loading="lazy"><figcaption>BEFORE (v1.7.34)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/5e4ac9a5d1db387ac984d22f318d439f9b9edd61/assets/sharks-webp/spiny-dogfish-illustration.webp" alt="After: Spiny Dogfish" loading="lazy"><figcaption>AFTER (re-trimmed)</figcaption></figure>
+  </section>
+</body>
+</html>

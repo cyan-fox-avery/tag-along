@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.34-beta";
+const VERSION = "v1.7.35-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.35-beta": [
+"✂️ <strong>Shark art re-trimmed, properly this time.</strong> The v1.7.34 trim used an alpha>0 bounding box, but the source illustrations carry faint alpha noise across the canvas, so 24 species barely got trimmed at all. Those 24 are re-trimmed to the bbox of alpha≥200 pixels — the noise no longer counts as shark — so thin species like the epaulette and goblin finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
+  ],
   "v1.7.34-beta": [
 "✂️ <strong>Shark art trimmed.</strong> The transparent padding baked into the 50 species illustrations is gone — every shark now fills its image box, so sharks render bigger and more consistently across the Collection, Research, and dive encounters. Only fully transparent borders were cut; the files were re-encoded lossy, so tiny color differences are possible.",
   ],
