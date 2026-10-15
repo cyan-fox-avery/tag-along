@@ -224,10 +224,19 @@ const ACHIEVEMENTS = [
          trusting state.achievements, so it fires in the same
          checkAchievements() pass that unlocks the last one, regardless
          of array order. The other checks are pure predicates on state,
-         so no recursion: none of them calls back into this check. */
+         so no recursion: none of them calls back into this check.
+         v1.7.28-beta Mira review: several achievements are historical
+         milestones, not invariant current-state conditions — best-cousin
+         (rename the Sarah shark and check() goes false) and first-name
+         (clear a nickname and check() goes false) — but the earned flag
+         persists in state.achievements. So count a persisted earned flag
+         OR a currently passing check. The OR preserves same-pass
+         behavior: an achievement unlocked earlier in this pass already
+         has its flag set, and one whose check() passes now is caught by
+         the predicate. */
       if (typeof ACHIEVEMENTS === "undefined") return false;
       return ACHIEVEMENTS.filter(a => !a.hidden && a.id !== "certified-nerd").every(a => {
-        try { return typeof a.check === "function" && !!a.check(st); } catch { return false; }
+        try { return !!st.achievements?.[a.id] || (typeof a.check === "function" && !!a.check(st)); } catch { return false; }
       });
     }
   },

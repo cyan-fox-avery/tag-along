@@ -923,19 +923,50 @@ code += `
     // One visible achievement incomplete -> Nerd stays locked.
     ok('Certified Shark Nerd stays locked when Dedicated is incomplete',
       nerd.check({ ...fullState, unlockedFacts: oneMissing }) === false);
+    // v1.7.28-beta Mira review: historical milestones — a persisted earned
+    // flag counts even when the live check() no longer passes (renamed the
+    // Sarah shark / cleared a nickname). Without the flag-or-check fix,
+    // Nerd would stay locked forever for such a player.
+    const otherVisible = ACHIEVEMENTS.filter(a => !a.hidden && a.id !== 'certified-nerd');
+    const earnedMinusNerd = Object.fromEntries(otherVisible.map(a => [a.id, 1]));
+    // (a) best-cousin earned, but no shark is currently named Sarah.
+    const noSarahTagged = {};
+    SHARKS.forEach(s => { noSarahTagged[s.id] = { name: 'X', researchId: 'R' }; });
+    ok('Certified Shark Nerd counts persisted best-cousin after rename',
+      nerd.check({ tagged: noSarahTagged, stats: fullState.stats, unlockedFacts: allFacts, achievements: earnedMinusNerd }) === true);
+    ok('... and best-cousin check itself is false with no Sarah',
+      ACHIEVEMENTS.find(a => a.id === 'best-cousin').check({ tagged: noSarahTagged }) === false);
+    // (b) first-name earned, but one shark's nickname was later cleared.
+    const oneCleared = JSON.parse(JSON.stringify(noSarahTagged));
+    oneCleared.nurse.name = '';
+    ok('Certified Shark Nerd counts persisted first-name after nickname cleared',
+      nerd.check({ tagged: oneCleared, stats: fullState.stats, unlockedFacts: allFacts, achievements: earnedMinusNerd }) === true);
+    ok('... and first-name check itself is false with a cleared nickname',
+      ACHIEVEMENTS.find(a => a.id === 'first-name').check({ tagged: oneCleared }) === false);
     // End-to-end: checkAchievements fires Nerd on full completion, not Bruce.
+    // v1.7.28-beta Mira review: pre-earn every other visible achievement so
+    // this pass unlocks ONLY Nerd — the old from-empty fixture called the
+    // real unlockAchievement() ~20 times, persisting synthetic achievements
+    // and leaving queue/modal state behind. Snapshot/restore the persisted
+    // blob, the queue, the showing flag, and the overlay too.
     const saveTagged = state.tagged, saveStats = state.stats, saveFacts = state.unlockedFacts;
     const saveEgg = state.bruceEgg, saveDone = state.bruceChainComplete, saveAch = state.achievements;
+    const savePersisted = achieveStore.load();
+    const saveQueue = [...achieveQueue];
+    const saveShowing = achieveShowing;
+    const saveOvHidden = $("achieveOverlay").classList.contains("hidden");
     try {
       state.tagged = fullState.tagged;
       state.stats = fullState.stats;
       state.unlockedFacts = fullState.unlockedFacts;
       state.bruceEgg = null;
       state.bruceChainComplete = false;
-      state.achievements = {};
+      state.achievements = Object.fromEntries(otherVisible.map(a => [a.id, 1]));
       checkAchievements();
       ok('checkAchievements unlocks Certified Shark Nerd on full completion', !!state.achievements['certified-nerd']);
       ok('checkAchievements does not unlock hidden Bruce on full completion', !state.achievements.bruce);
+      ok('Nerd fixture unlocks only Nerd in this pass',
+        Object.keys(state.achievements).filter(id => !earnedMinusNerd[id]).join() === 'certified-nerd');
     } finally {
       state.tagged = saveTagged;
       state.stats = saveStats;
@@ -943,7 +974,18 @@ code += `
       state.bruceEgg = saveEgg;
       state.bruceChainComplete = saveDone;
       state.achievements = saveAch;
+      achieveStore.save(savePersisted);
+      achieveQueue.length = 0;
+      achieveQueue.push(...saveQueue);
+      achieveShowing = saveShowing;
+      if (saveOvHidden) $("achieveOverlay").classList.add("hidden");
+      else $("achieveOverlay").classList.remove("hidden");
     }
+    ok('Nerd fixture restores persisted achievements',
+      JSON.stringify(achieveStore.load()) === JSON.stringify(savePersisted));
+    ok('Nerd fixture restores achievement queue/modal state',
+      achieveQueue.length === saveQueue.length && achieveShowing === saveShowing &&
+      $("achieveOverlay").classList.contains("hidden") === saveOvHidden);
   })();
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
