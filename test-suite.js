@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.23-beta', VERSION === 'v1.7.23-beta');
+  ok('version v1.7.24-beta', VERSION === 'v1.7.24-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -413,7 +413,210 @@ code += `
       else if (state.stats) delete state.stats.resights;
     }
   })();
-  // v1.7.22-beta: PR #47 bubbles (rays excluded) — 8 columns, 26 spans
+  // v1.7.24-beta: tiered SARAH reactions — resightThread ordinal 1
+  // returns the generic closer fallback (the reunion closer variants
+  // are delivered by maybeReunionReaction), 2nd uses the middle
+  // pool, 3rd+ uses the excited pool. These lines live in Sarah's
+  // chat bubble only, never in the field note.
+  (function () {
+    const n1 = resightSarahReactionFor(1);
+    const n2 = resightSarahReactionFor(2);
+    const n3 = resightSarahReactionFor(3);
+    const n5 = resightSarahReactionFor(5);
+    ok('resightSarahReactionFor(1) returns generic closer fallback',
+      n1 === RESIGHT_GENERIC_CLOSER && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
+    ok('resightSarahReactionFor(2) uses middle pool',
+      RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_REUNION_CLOSERS.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
+    ok('resightSarahReactionFor(3) uses excited pool',
+      RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_REUNION_CLOSERS.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
+    ok('resightSarahReactionFor(5) still uses excited pool',
+      RESIGHT_NOTES_EXCITED.includes(n5));
+  })();
+  // v1.7.24-beta Mira review: pool separation is deterministic — the
+  // field-note pool shares NOTHING with any Sarah pool, so no random
+  // field note can ever speak Sarah's voice.
+  ok('field notes are observational only, disjoint from Sarah pools',
+    FIELD_RESIGHT_NOTES.length === 8 &&
+    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l)));
+  ok('reunion closers have original closer + all four Avery-picked Sarah lines',
+    RESIGHT_REUNION_CLOSERS.length === 5 &&
+    RESIGHT_REUNION_CLOSERS.includes("That's incredible! They came back! I'm actually emotional rn \u{1F979}") &&
+    RESIGHT_REUNION_CLOSERS.includes("Oh wow, it's back! I was literally just thinking about this one.") &&
+    RESIGHT_REUNION_CLOSERS.includes("Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.") &&
+    RESIGHT_REUNION_CLOSERS.includes("The tag's holding up great. This shark is basically wearing a Fitbit and thriving.") &&
+    RESIGHT_REUNION_CLOSERS.includes("Back again! At this point I'm starting to think it likes us."));
+  ok('excited pool has all five Avery picks',
+    RESIGHT_NOTES_EXCITED.length === 5 &&
+    RESIGHT_NOTES_EXCITED.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+    RESIGHT_NOTES_EXCITED.includes("It's back AGAIN! I think this shark has adopted us. We're its humans now."));
+  ok('middle pool has all five Avery picks',
+    RESIGHT_NOTES_2ND.length === 5 &&
+    RESIGHT_NOTES_2ND.includes("It's back! I was hoping we'd see this one again.") &&
+    RESIGHT_NOTES_2ND.includes("Twice now! Either it likes this spot or it likes us. Probably both."));
+  // v1.7.24-beta: tiers count RE-sightings — the numbered lines say so,
+  // with no forward-looking "more sightings coming" language.
+  ok('2nd pool line says re-sighting, no future-sightings implication',
+    RESIGHT_NOTES_2ND.includes("Second re-sighting! Okay, this one keeps showing up.") &&
+    !RESIGHT_NOTES_2ND.some(l => l.includes("Second sighting!") || l.includes("keeping an eye on")));
+  ok('3rd+ pool line says re-sightings',
+    RESIGHT_NOTES_EXCITED.includes("Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!") &&
+    !RESIGHT_NOTES_EXCITED.some(l => l.includes("Three sightings of the same shark!")));
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const origTagged = state.tagged;
+    const origSaveStats = saveStats;
+    const origCheck = checkAchievements;
+    const origRenderColl = renderCollection;
+    const origStoreSave = store.save;
+    // v1.7.24-beta Mira review: recordResighting() increments
+    // state.stats.resights; snapshot/restore it (incl. absent case).
+    const hadResights = state.stats && ("resights" in state.stats);
+    const origResights = hadResights ? state.stats.resights : undefined;
+    saveStats = () => {};
+    checkAchievements = () => {};
+    renderCollection = () => {};
+    store.save = () => {};
+    const plan = { region: 'caribbean', depth: 'shallow', bait: 'chum' };
+    function noteAfter(priorCount) {
+      const prior = [];
+      for (let i = 0; i < priorCount; i++) prior.push({ date: 'Jan 1, 2026', location: 'Caribbean Sea', note: 'old', ts: 1 });
+      state.tagged = { nurse: { name: '', researchId: 'NS-1', resightings: prior } };
+      const entry = recordResighting(nurse, plan);
+      return entry.note;
+    }
+    try {
+      // v1.7.24-beta Mira review: the persisted field note is ALWAYS from
+      // FIELD_RESIGHT_NOTES — the tiered Sarah reactions live in her bubble.
+      ok('recordResighting note stays observational (1st)', FIELD_RESIGHT_NOTES.includes(noteAfter(0)));
+      ok('recordResighting note stays observational (2nd)', FIELD_RESIGHT_NOTES.includes(noteAfter(1)));
+      ok('recordResighting note stays observational (3rd)', FIELD_RESIGHT_NOTES.includes(noteAfter(2)));
+      ok('recordResighting note stays observational (4th)', FIELD_RESIGHT_NOTES.includes(noteAfter(3)));
+    } catch (e) {
+      ok('recordResighting field notes (threw: ' + e.message + ')', false);
+    } finally {
+      saveStats = origSaveStats;
+      checkAchievements = origCheck;
+      renderCollection = origRenderColl;
+      store.save = origStoreSave;
+      state.tagged = origTagged;
+      if (hadResights) state.stats.resights = origResights;
+      else if (state.stats) delete state.stats.resights;
+    }
+  })();
+  // v1.7.24-beta Mira review: WHO says the dialogue — Sarah's reactions
+  // live in HER bubble; the player's bubble reports the field note only.
+  // Regression: the player must never speak Sarah's lines. The food
+  // reply follows ONLY the "likes us" line.
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    function threadWith(count, sex) {
+      const rs = [];
+      for (let i = 0; i < count; i++) rs.push({ date: 'Jan 1, 2026', location: 'Caribbean Sea', note: 'Looking healthy and unhurried.', ts: 1 });
+      const rec = { name: '', researchId: 'NS-1', sex, resightings: rs };
+      return resightThread(nurse, rec);
+    }
+    try {
+      // 1st re-sighting via resightThread (unusual history only — the
+      // normal first reunion is handled by maybeReunionReaction):
+      // opener + player field note + generic closer fallback. Never
+      // a food reply — the likes-us line is delivered by the reunion
+      // reaction, not by this thread.
+      const t1 = threadWith(1, 'female');
+      ok('1st resightThread Sarah bubble uses generic closer fallback',
+        t1.length === 3 && t1[2].who === 'them' && t1[2].text === RESIGHT_GENERIC_CLOSER);
+      ok('1st resightThread never gets food reply',
+        t1.length === 3);
+      ok('1st resightThread player bubble reports field note only',
+        t1[1].who === 'me' && t1[1].text.includes('Looking healthy and unhurried.') &&
+        !RESIGHT_REUNION_CLOSERS.some(l => t1[1].text.includes(l)) &&
+        !RESIGHT_NOTES_2ND.some(l => t1[1].text.includes(l)) &&
+        !RESIGHT_NOTES_EXCITED.some(l => t1[1].text.includes(l)));
+      // 2nd re-sighting (female): Sarah middle-pool line, no food reply
+      // (the likes-us line is a reunion-closer line only).
+      const t2 = threadWith(2, 'female');
+      ok('2nd resightThread Sarah bubble uses middle pool, no food reply',
+        t2.length === 3 && t2[2].who === 'them' && RESIGHT_NOTES_2ND.includes(t2[2].text));
+      ok('2nd resightThread player bubble never speaks Sarah lines',
+        !RESIGHT_REUNION_CLOSERS.some(l => t2[1].text.includes(l)) &&
+        !RESIGHT_NOTES_2ND.some(l => t2[1].text.includes(l)) &&
+        !RESIGHT_NOTES_EXCITED.some(l => t2[1].text.includes(l)));
+      // 3rd re-sighting (male): Sarah excited-pool line, no food reply.
+      const t3 = threadWith(3, 'male');
+      ok('3rd resightThread Sarah bubble uses excited pool, no food reply',
+        t3.length === 3 && t3[2].who === 'them' && RESIGHT_NOTES_EXCITED.includes(t3[2].text));
+      // Food-reply gating, deterministic: only after the likes-us line.
+      ok('food reply follows likes-us line, she pronoun',
+        resightFoodReplyFor(RESIGHT_LIKES_US_LINE, { sex: 'female' }) === 'Maybe. Or maybe she just knows where the food is.');
+      ok('food reply follows likes-us line, he pronoun',
+        resightFoodReplyFor(RESIGHT_LIKES_US_LINE, { sex: 'male' }) === 'Maybe. Or maybe he just knows where the food is.');
+      ok('food reply falls back to it pronoun',
+        resightFoodReplyFor(RESIGHT_LIKES_US_LINE, {}) === 'Maybe. Or maybe it just knows where the food is.');
+      ok('food reply is null after other Sarah lines',
+        resightFoodReplyFor(RESIGHT_NOTES_2ND[0], { sex: 'female' }) === null &&
+        resightFoodReplyFor(RESIGHT_NOTES_EXCITED[0], { sex: 'male' }) === null &&
+        resightFoodReplyFor(RESIGHT_GENERIC_CLOSER, {}) === null);
+    } catch (e) {
+      ok('resightThread voice regression (threw: ' + e.message + ')', false);
+    }
+  })();
+  // v1.7.24-beta: the four Avery-picked Sarah lines are delivered by
+  // maybeReunionReaction() (the reaction that actually fires on first
+  // reunion), via the reunionReactionThread() helper — deterministic
+  // to test, unlike the random pick in maybeReunionReaction.
+  (function () {
+    try {
+      // Likes-us closer (female): 4 messages, food reply with she-pronoun.
+      const tLike = reunionReactionThread('“Bubbles”', RESIGHT_LIKES_US_LINE, { sex: 'female' });
+      ok('reunion thread appends food reply after likes-us closer',
+        tLike.length === 4 && tLike[2].who === 'them' && tLike[2].text === RESIGHT_LIKES_US_LINE &&
+        tLike[3].who === 'me' && tLike[3].text === 'Maybe. Or maybe she just knows where the food is.');
+      // Original closer: 3 messages, no food reply.
+      const tOrig = reunionReactionThread('“Bubbles”', RESIGHT_REUNION_CLOSERS[0], { sex: 'male' });
+      ok('reunion thread has no food reply after original closer',
+        tOrig.length === 3 && tOrig[2].text === RESIGHT_REUNION_CLOSERS[0]);
+      // Another variant closer: 3 messages, no food reply.
+      const tVar = reunionReactionThread('“Bubbles”', RESIGHT_REUNION_CLOSERS[1], { sex: 'male' });
+      ok('reunion thread has no food reply after other variant closers',
+        tVar.length === 3 && tVar[2].text === RESIGHT_REUNION_CLOSERS[1]);
+      // Opener + confirm structure is preserved for every closer.
+      ok('reunion thread keeps WAIT opener + tag confirm',
+        tLike[0].text.startsWith('WAIT. You saw') && tLike[1].text === "The tag matched — it's really them.");
+    } catch (e) {
+      ok('reunionReactionThread (threw: ' + e.message + ')', false);
+    }
+  })();
+  // v1.7.24-beta: maybeReunionReaction() delivers a closer from the
+  // reunion pool (not a resightThread ordinal-1 branch) and appends
+  // the food reply only when the picked closer is the likes-us line.
+  // Holds for whichever closer the random pick lands on.
+  (function () {
+    const savedReacted = state.reunionReacted;
+    const savedMsgCount = state.messages.length;
+    state.reunionReacted = {};
+    const species = SHARKS.find(s => s.id === 'mako');
+    const rec = { name: '', researchId: 'MK-2026-019', sex: 'female', resightings: [] };
+    try {
+      const fired = maybeReunionReaction(species, rec);
+      const thread = state.messages[state.messages.length - 1].msgs;
+      ok('maybeReunionReaction delivers a reunion-pool closer',
+        fired === true && thread[2].who === 'them' && RESIGHT_REUNION_CLOSERS.includes(thread[2].text));
+      ok('maybeReunionReaction food reply only after likes-us closer',
+        (thread.length === 4) === (thread[2].text === RESIGHT_LIKES_US_LINE) &&
+        (thread.length === 3 || thread[3].text === 'Maybe. Or maybe she just knows where the food is.'));
+    } catch (e) {
+      ok('maybeReunionReaction delivery (threw: ' + e.message + ')', false);
+    } finally {
+      state.messages.length = savedMsgCount;
+      state.reunionReacted = savedReacted;
+      try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
+    }
+  })();
+  // v1.7.24-beta Mira review: exhausted Observe (3/3) must not promise a
+  // secret fact or claim the expedition ends — finish() keeps diving.
+  ok('observe exhausted copy is accurate',
+    fileCode.includes('all insights learned, just enjoy watching') &&
+    fileCode.includes('_obsExhausted') &&
+    fileCode.includes('all insights already learned'));
   ok('bubbles have 26 spans', (htmlCode.match(/<div class="bubbles">(<span><\\/span>){26}<\\/div>/) || []).length > 0);
   ok('bubble CSS uses bubble-rise keyframes', cssCode.includes('@keyframes bubble-rise'));
   ok('bubble CSS has 8 staggered columns', cssCode.includes('column H'));
@@ -423,6 +626,20 @@ code += `
   ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
   ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
   ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
+  // v1.7.24-beta: Observe species button shows insight progress too
+  // (insights: n/total), same pattern as Follow — wild-shark encounters.
+  ok('observe button shows insight count', fileCode.includes('_obsFactHave') && fileCode.includes('_obsFactTotal') && fileCode.includes('insights: '));
+  ok('observe button computes fact totals from SECRET_FACTS', fileCode.includes('_obsFactTotal = (typeof SECRET_FACTS'));
+  ok('observe button aria-label includes insight progress', fileCode.includes('_obsFactLabel'));
+  // v1.7.24-beta: Observe on an untagged shark must show the Map popup.
+  // Before this fix it resolved with bare true and never set
+  // pendingTagAlong / pendingTagAlongFact, so the fact only lived in the
+  // dive log and Avery never saw the popup. Now it mirrors Follow: stash
+  // the fact (mode "observe") and resolve with tagAlong intent so closeDive
+  // navigates to the Map and shows the popup.
+  ok('observe stashes pendingTagAlongFact in observe mode', fileCode.includes('mode: "observe"') && fileCode.includes('pendingTagAlongFact = { speciesId: species.id, fact'));
+  ok('observe resolves with tagAlong intent', fileCode.includes('resolve({ tagAlong: species.id })'));
+  ok('observe fact NOT duplicated in expedition log', !fileCode.includes('Species insight:</strong> \${esc(fact)}'));
   // v1.7.23-beta: achievement cards identical height across ALL rows —
   // grid tracks are equal (grid-auto-rows: minmax(140px, 1fr)) plus a
   // per-card 140px min-height fallback, not just per-row stretch.
@@ -1725,6 +1942,68 @@ code += `
     ok("doFollowTagged exists", typeof doFollowTagged === "function");
     ok("showTagAlongFact exists", typeof showTagAlongFact === "function");
   })();
+  // v1.7.24-beta: showTagAlongFact observe mode — popup copy must say
+  // studying/observing, never following, for a wild untagged shark.
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    state.tagged = {}; // untagged shark
+    state.unlockedFacts = { nurse: [0] };
+    try {
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false, mode: "observe" });
+      const html = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("observe popup heading says Species insight", html.includes("Species insight"));
+      ok("observe popup says Observing, not Following", html.includes("Observing") && !html.includes("Following") && !html.includes("Tagging along"));
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false });
+      const html2 = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("follow popup keeps Tagging along copy", html2.includes("Tagging along") && html2.includes("Following"));
+    } catch (e) {
+      ok("observe popup copy (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+    }
+  })();
+  // v1.7.24-beta Mira review (blocker): Observe studies a DIFFERENT wild
+  // shark — the popup must never use the tagged individual's nickname, the
+  // close button must not say "Continue following", and closeDive must not
+  // focus the tagged track for Observe.
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    // Tagged nurse shark named Bubbles; observing a DIFFERENT nurse shark.
+    state.tagged = { nurse: { name: "Bubbles", researchId: "NS-2026-001" } };
+    state.unlockedFacts = { nurse: [0] };
+    try {
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false, mode: "observe" });
+      const html = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("observe popup never uses tagged nickname", !html.includes("Bubbles"));
+      ok("observe popup uses species name", html.includes("Nurse Shark"));
+      ok("observe close button says Back to map",
+        document.getElementById("tagAlongFactClose").textContent === "Back to map");
+      // Follow mode still uses the nickname and the follow close label.
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false });
+      const html2 = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("follow popup keeps tagged nickname", html2.includes("Bubbles"));
+      ok("follow close button says Continue following",
+        document.getElementById("tagAlongFactClose").textContent === "Continue following 🧭");
+      // Exhausted observe popup also avoids the nickname.
+      showTagAlongFact({ speciesId: "nurse", fact: null, exhausted: true, mode: "observe" });
+      const html3 = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("observe exhausted popup never uses tagged nickname", !html3.includes("Bubbles"));
+    } catch (e) {
+      ok("observe different-individual popup (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+    }
+    // closeDive / win-path focus guards (source-level: closeDive is a
+    // closure inside the trip function, not directly callable).
+    ok("closeDive skips map focus for Observe",
+      fileCode.includes('factInfo.mode === "observe"') && fileCode.includes("isObserveClose"));
+    ok("win-path defers map focus for Observe",
+      fileCode.includes('deferred.factInfo.mode === "observe"') && fileCode.includes("isObserveDeferred"));
+  })();
   // v1.4.0-beta Mira review (blocker): already-tagged follow must resolve
   // doEncounter's Promise via the passed callback — not via state.encounterDone
   // (which is null when no tagging overlay was opened). Behavioral test drives
@@ -2529,6 +2808,7 @@ ok('WHATS_NEW has v1.7.18-beta', Array.isArray(WHATS_NEW['v1.7.18-beta']) && WHA
 ok('WHATS_NEW has v1.7.20-beta', Array.isArray(WHATS_NEW['v1.7.20-beta']) && WHATS_NEW['v1.7.20-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.21-beta', Array.isArray(WHATS_NEW['v1.7.21-beta']) && WHATS_NEW['v1.7.21-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.22-beta', Array.isArray(WHATS_NEW['v1.7.22-beta']) && WHATS_NEW['v1.7.22-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHATS_NEW['v1.7.24-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
@@ -2809,7 +3089,10 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   // v1.7.8-beta: species insight ends the expedition
   ok('WHATS_NEW has v1.7.8-beta entry', Array.isArray(WHATS_NEW['v1.7.8-beta']) && WHATS_NEW['v1.7.8-beta'].length >= 1);
   ok('observe button ends expedition on new insight', /v1\\.7\\.8-beta: a new species insight ends the expedition/.test(fileCode));
-  ok('observe button logs insight when fact unlocked', /Species insight:.*esc/.test(fileCode));
+  // v1.7.24-beta: the insight lives on the Map popup only (pendingTagAlongFact),
+  // NOT in the expedition log — mirroring Follow's v1.7.22 cleanup. The old
+  // assertion that Observe logs the insight is obsolete.
+  ok('observe button does NOT log insight (lives in popup)', !/Species insight:<\\/strong>.*esc\\(fact\\)/.test(fileCode));
   ok('observe button warns it ends expedition', /may reveal a secret fact/.test(fileCode));
   ok('archiveSortCompare falls back to insertion order for legacy saves', (() => {
     const saved = state.tagged;

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.23-beta";
+const VERSION = "v1.7.24-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,11 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.24-beta": [
+"🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
+"🔬 <strong>Observe insight popup fixed.</strong> Observing a wild, untagged shark now shows the unlocked insight in the Map popup when the expedition ends — before this fix the fact only lived in the dive log and the popup never appeared. (Same as Follow's v1.7.22 fix.)",
+"🔁 <strong>Tiered re-sighting reactions.</strong> Sarah gets more excited each time you re-sight the same shark — warm recognition on the 2nd re-sighting, full best-friend energy from the 3rd on. Her reactions now live in her own chat bubble, and your field notes stay observational.",
+  ],
   "v1.7.23-beta": [
 "🐋 <strong>WHAAAAAAALE.</strong> New achievement for tagging a whale shark — the biggest fish in the ocean. (White Whale stays with the megamouth, where it belongs.)",
 "🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
@@ -2368,20 +2373,45 @@ function doEncounter(species, plan) {
       const observeBtn = document.createElement("button");
       observeBtn.className = "secondary-button";
       observeBtn.type = "button";
-      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)</small>`;
-      observeBtn.setAttribute("aria-label", `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)`);
+      /* v1.7.24-beta: show insight progress on the Observe button, same as
+         Follow (v1.7.23-beta) — the player should know what observing this
+         wild shark will get them before committing the expedition. */
+      const _obsFactTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
+      const _obsFactHave = (state.unlockedFacts[species.id] || []).length;
+      const _obsFactLine = _obsFactTotal ? `<br><small class="dim">(insights: ${_obsFactHave}/${_obsFactTotal})</small>` : "";
+      /* v1.7.24-beta Mira review: when all insights are learned, the
+         exhausted branch calls finish() — it does NOT end the expedition
+         and reveals no new fact — so the copy must not promise either. */
+      const _obsExhausted = _obsFactTotal > 0 && _obsFactHave >= _obsFactTotal;
+      const _obsSub = _obsExhausted
+        ? `study this ${esc(species.name)} — all insights learned, just enjoy watching`
+        : `study this ${esc(species.name)} — may reveal a secret fact (ends the expedition)`;
+      observeBtn.innerHTML = `🔬 Observe species<br><small class="dim">${_obsSub}</small>${_obsFactLine}`;
+      const _obsFactLabel = _obsFactTotal ? ` (${_obsFactHave} of ${_obsFactTotal} insights learned)` : "";
+      observeBtn.setAttribute("aria-label", _obsExhausted
+        ? `Observe this ${species.name} (species study, not your tagged shark; all insights already learned)${_obsFactLabel}`
+        : `Observe this ${species.name} (species study, not your tagged shark; learning a new fact ends the expedition)${_obsFactLabel}`);
       observeBtn.addEventListener("click", () => {
         const fact = unlockSecretFact(species.id);
         logTripEncounter(species, "observed");
         if (fact) {
-          logLine(`🔬 <strong>Species insight:</strong> ${esc(fact)}`);
+          /* v1.7.24-beta: mirror the Follow flow (v1.7.22-beta) — the insight
+             lives on the Map popup only, not duplicated in the log. Before
+             this fix Observe resolved with bare `true` and never set
+             pendingTagAlong / pendingTagAlongFact, so closeDive had nothing
+             to show: the fact only existed in the dive log and Avery never
+             saw the popup for an untagged shark. Now it stashes the fact
+             and resolves with { tagAlong } so closeDive navigates to the Map
+             and shows the popup — same as Follow. mode: "observe" keeps the
+             popup copy honest (studying, not following). */
+          state.pendingTagAlongFact = { speciesId: species.id, fact, exhausted: false, mode: "observe" };
           /* v1.7.8-beta: a new species insight ends the expedition — you're
              spending the rest of the day processing what you learned. */
           logLine(`🧭 That discovery deserves a full debrief — heading back to the ship to log it properly.`);
           actions.classList.add("hidden");
           actions.innerHTML = "";
           renderAll();
-          resolve(true);
+          resolve({ tagAlong: species.id });
         } else {
           logLine(`🔬 <em>You watch carefully, but learn nothing new about the ${esc(species.name)} today.</em>`);
           finish();
@@ -2614,7 +2644,13 @@ async function runExpedition(plan) {
       afterExpedition(plan);
       if (tagAlongSid) {
         goTab("map");
-        setTimeout(() => { try { ensureMapFocusedOn(tagAlongSid); } catch {} }, 200);
+        /* v1.7.24-beta Mira review: Observe studied a DIFFERENT wild shark —
+           do not focus the tagged individual's track. Follow/tag-along keep
+           the focus. The mode rides on factInfo. */
+        const isObserveClose = factInfo && factInfo.mode === "observe";
+        if (!isObserveClose) {
+          setTimeout(() => { try { ensureMapFocusedOn(tagAlongSid); } catch {} }, 200);
+        }
         /* v1.4.0-beta Mira review (important): show the unlocked fact in a
            readable overlay with learned X/3 progression — at quick pace the
            dive-log line may never be read before auto-navigation. */
@@ -2681,7 +2717,11 @@ function renderSightings() {
    waters. Logging the re-sighting adds a field entry to the shark's
    collection card and extends its tracking story — warm, not a
    progression track. */
-const RESIGHT_NOTES = [
+/* v1.7.24-beta Mira review: the persisted field note comes ONLY from
+   FIELD_RESIGHT_NOTES — genuinely observational entries, no Sarah
+   voice. Sarah's lines live in their own reaction pools and reach the
+   player only through her chat bubble. */
+const FIELD_RESIGHT_NOTES = [
   "Looking healthy and unhurried.",
   "A fresh scar on the dorsal fin — a story there.",
   "A little bigger than at tagging, if the eye can be trusted.",
@@ -2692,15 +2732,79 @@ const RESIGHT_NOTES = [
   "The tag is still seated perfectly. Good work, past us."
 ];
 
+/* The one Sarah line that earns the player's food reply (Avery). */
+const RESIGHT_LIKES_US_LINE = "Back again! At this point I'm starting to think it likes us.";
+
+/* v1.7.24-beta: Sarah's first-reunion closer variants. The original
+   closer ("That's incredible!...") + Avery's four picks. These are
+   Sarah's voice — conversational, affectionate — and are NEVER
+   stored as the field note. They are delivered by
+   maybeReunionReaction() — the reaction that ACTUALLY fires on
+   first reunion. The four picks used to live in a resightThread
+   ordinal-1 branch that never ran in the normal flow (the reunion
+   reaction fires first and Log skips the thread), so they moved here
+   where they have a reliable delivery point. One thread per encounter. */
+const RESIGHT_REUNION_CLOSERS = [
+  "That's incredible! They came back! I'm actually emotional rn \u{1F979}",
+  "Oh wow, it's back! I was literally just thinking about this one.",
+  "Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.",
+  "The tag's holding up great. This shark is basically wearing a Fitbit and thriving.",
+  RESIGHT_LIKES_US_LINE
+];
+
+/* The generic closer — fallback for resightThread ordinal 1, which
+   only runs in unusual histories (an earlier encounter consumed the
+   reunion reaction without logging a re-sighting). */
+const RESIGHT_GENERIC_CLOSER = "That's the best part of tagging — you get to know it's them. Do you think it recognized you?";
+
+/* v1.7.24-beta: tiered re-sighting reactions — Sarah gets more excited
+   as she sees the same shark again. 2nd re-sighting: warm recognition.
+   3rd+: full best-friend energy. Tiers count RE-sightings
+   (ordinal = resightings.length + 1). */
+const RESIGHT_NOTES_2ND = [
+  "It's back! I was hoping we'd see this one again.",
+  "Second re-sighting! Okay, this one keeps showing up.",
+  "Hey, it's our shark again! Starting to recognize this one.",
+  "Back for round two! This shark is becoming a regular.",
+  "Twice now! Either it likes this spot or it likes us. Probably both."
+];
+
+const RESIGHT_NOTES_EXCITED = [
+  "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
+  "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
+  "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
+  "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
+  "It's back AGAIN! I think this shark has adopted us. We're its humans now."
+];
+
+/* Pick Sarah's re-sighting reaction by which re-sighting this is
+   (1-based re-sighting ordinal for this individual). Used ONLY in
+   Sarah's chat bubble (resightThread) — never in the persisted
+   field note, so the player never speaks Sarah's lines.
+   1st: the generic closer only — the first-reunion closer variants
+   (RESIGHT_REUNION_CLOSERS) are delivered by maybeReunionReaction(),
+   which fires on the actual first reunion; resightThread ordinal 1
+   only runs in unusual histories (an earlier encounter consumed the
+   reunion reaction without logging a re-sighting). */
+function resightSarahReactionFor(ordinal) {
+  if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
+  if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
+  return RESIGHT_GENERIC_CLOSER;
+}
+
 function recordResighting(species, plan) {
   const t = state.tagged[species.id];
+  t.resightings = t.resightings || [];
+  /* v1.7.24-beta Mira review: entry.note is the player's field note —
+     always from FIELD_RESIGHT_NOTES (observational only). Sarah's
+     reactions live in her own chat bubble (resightThread), never in
+     the persisted record, so the player never speaks Sarah's lines. */
   const entry = {
     date: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
     location: REGIONS[plan.region].name,
-    note: pick(RESIGHT_NOTES),
+    note: pick(FIELD_RESIGHT_NOTES),
     ts: Date.now()
   };
-  t.resightings = t.resightings || [];
   t.resightings.push(entry);
   /* The tracking story grows: a new ping on the map. v0.9.0: the hop
      distance and ping interval come from the species' real envelope,
@@ -2738,14 +2842,51 @@ function recordResighting(species, plan) {
 function resightThread(species, rec) {
   const label = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
   const last = rec.resightings[rec.resightings.length - 1];
-  return [
+  const ordinal = rec.resightings.length;
+  const thread = [
     { who: "them", text: `You saw ${label} again? The ${species.name.toLowerCase()}?` },
+    /* The player's bubble reports the field note only — never Sarah's lines. */
     { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
-    { who: "them", text: "That's the best part of tagging — you get to know it's them. Do you think it recognized you?" }
   ];
+  /* v1.7.24-beta Mira review: Sarah's reaction goes in HER bubble.
+     2nd+ re-sightings use the tiered pools. The first-reunion closer
+     variants (incl. the likes-us line) are delivered by
+     maybeReunionReaction(), not here — so resightThread never
+     appends the food reply; that gating lives in
+     reunionReactionThread(). */
+  const sarahLine = resightSarahReactionFor(ordinal);
+  thread.push({ who: "them", text: sarahLine });
+  return thread;
+}
+
+/* The player's food reply follows ONLY Sarah's "I think it likes us"
+   line (Avery) — it answers that specific claim, so it would be a
+   non sequitur after any other reaction. Returns null otherwise.
+   Pronoun matches the shark's recorded sex; "it" when unknown. */
+function resightFoodReplyFor(sarahLine, rec) {
+  if (sarahLine !== RESIGHT_LIKES_US_LINE) return null;
+  const pron = rec && rec.sex === "female" ? "she" : rec && rec.sex === "male" ? "he" : "it";
+  return `Maybe. Or maybe ${pron} just knows where the food is.`;
 }
 /* v1.5.3-beta: one-time Sarah reaction to first reunion per species.
-   Warm, not spammy — only fires once per species, ever. */
+   Warm, not spammy — only fires once per species, ever.
+   The closer is picked from RESIGHT_REUNION_CLOSERS (the original
+   closer + Avery's four variants), so every first reunion gets a
+   fresh Sarah line at a reliable delivery point. */
+/* Pure: build the first-reunion thread for a given closer. The
+   player's food reply follows ONLY the "I think it likes us" line
+   (Avery) — it answers that specific claim, so it would be a
+   non sequitur after any other closer. */
+function reunionReactionThread(name, closer, rec) {
+  const thread = [
+    { who: "them", text: `WAIT. You saw ${name} again?!?` },
+    { who: "me", text: `The tag matched — it's really them.` },
+    { who: "them", text: closer }
+  ];
+  const foodReply = resightFoodReplyFor(closer, rec);
+  if (foodReply) thread.push({ who: "me", text: foodReply });
+  return thread;
+}
 function maybeReunionReaction(species, rec) {
   state.reunionReacted = state.reunionReacted || {};
   /* v1.6.7-beta: returns whether the thread fired, so the resight button
@@ -2755,12 +2896,7 @@ function maybeReunionReaction(species, rec) {
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
   const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : (rec.researchId || species.name);
-  const thread = [
-    { who: "them", text: `WAIT. You saw ${name} again?!?` },
-    { who: "me", text: `The tag matched — it's really them.` },
-    { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
-  ];
-  pushThread(thread);
+  pushThread(reunionReactionThread(name, pick(RESIGHT_REUNION_CLOSERS), rec));
   return true;
 }
 
@@ -3779,7 +3915,10 @@ function doFollowTagged(speciesId, doneCb) {
   /* v1.7.22-beta: Following an already-tagged shark counts as a re-sighting.
      Feeds the Pen Pal achievement, the track map, and resight stats — just
      like "📝 Log re-sighting". (Avery: players who always Follow never earned
-     Pen Pal because only the Log button recorded re-sightings.) */
+     Pen Pal because only the Log button recorded re-sightings.)
+     v1.7.24-beta: Follow records the re-sighting but pushes no
+     resightThread — Sarah's tiered reactions are for 📝 Log re-sighting
+     only. No extra Phone spam. */
   if (state.currentPlan) recordResighting(s, state.currentPlan);
   const fact = unlockSecretFact(speciesId);
   /* v1.7.22-beta: the insight lives on the Map popup only — not in the log.
@@ -3814,33 +3953,53 @@ function doFollowTagged(speciesId, doneCb) {
 function showTagAlongFact(info) {
   const s = SHARKS.find(x => x.id === info.speciesId);
   if (!s) return;
+  /* v1.7.24-beta Mira review: Observe mode studies a DIFFERENT wild shark —
+     never the player's tagged individual of that species (e.g. tagged nurse
+     shark named Bubbles + observe another nurse shark must not say
+     "Observing this Bubbles paid off"). Use the species' common name only.
+     Follow/tag-along modes keep the nickname. The mode flows through
+     pendingTagAlongFact / deferredTagAlong. */
+  const isObserve = info.mode === "observe";
   const rec = state.tagged[info.speciesId];
-  const displayName = (rec && rec.name) || s.name;
+  const displayName = isObserve ? s.name : ((rec && rec.name) || s.name);
   const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[info.speciesId]) || [];
   const unlocked = state.unlockedFacts[info.speciesId] || [];
   const total = pool.length;
   const learned = unlocked.length;
+  /* v1.7.24-beta: Observe mode — the player studied a wild, untagged shark,
+     they did not follow their own tagged shark. Keep the popup copy honest:
+     "studying/observing", never "following". Follow mode keeps the original
+     copy. */
   let bodyHtml;
   if (info.fact && !info.exhausted) {
     bodyHtml = `
       <div class="tagalong-fact-card">
-        <div class="fact-progress">Tag-along insight — learned ${learned}/${total}</div>
+        <div class="fact-progress">${isObserve ? "Species insight" : "Tag-along insight"} — learned ${learned}/${total}</div>
         <div class="fact-text">🔬 ${esc(info.fact)}</div>
       </div>
-      <p class="dim">Following ${esc(displayName)} paid off. ${total - learned > 0
-        ? `Follow ${esc(displayName)} again sometime to learn more.`
-        : `That's everything this shark had to teach.`}</p>`;
+      <p class="dim">${isObserve
+        ? `Observing this ${esc(displayName)} paid off. ${total - learned > 0
+          ? `Observe ${esc(displayName)} again sometime to learn more.`
+          : `That's everything this species had to teach.`}`
+        : `Following ${esc(displayName)} paid off. ${total - learned > 0
+          ? `Follow ${esc(displayName)} again sometime to learn more.`
+          : `That's everything this shark had to teach.`}`}</p>`;
   } else {
     bodyHtml = `
       <div class="tagalong-fact-card">
-        <div class="fact-progress">Tag-along insight — ${learned}/${total} learned</div>
+        <div class="fact-progress">${isObserve ? "Species insight" : "Tag-along insight"} — ${learned}/${total} learned</div>
         <div class="fact-text"><em>I've learned all I can — the rest is in the specialists' hands now.</em></div>
       </div>
-      <p class="dim">${esc(displayName)} still appreciates the company. 🧭</p>`;
+      <p class="dim">${isObserve
+        ? `${esc(displayName)} still appreciates being studied. 🔬`
+        : `${esc(displayName)} still appreciates the company. 🧭`}</p>`;
   }
   $("tagAlongFactContent").innerHTML = `
-    <h3 style="margin:4px 0 8px">🧭 Tagging along with ${esc(displayName)}</h3>
+    <h3 style="margin:4px 0 8px">${isObserve ? `🔬 Species insight — ${esc(displayName)}` : `🧭 Tagging along with ${esc(displayName)}`}</h3>
     ${bodyHtml}`;
+  /* v1.7.24-beta Mira review: the close button must not say "Continue
+     following" for Observe — the player studied, not followed. */
+  $("tagAlongFactClose").textContent = isObserve ? "Back to map" : "Continue following 🧭";
   $("tagAlongOverlay").classList.remove("hidden");
 }
 $("tagAlongFactClose").addEventListener("click", () => {
@@ -4091,7 +4250,11 @@ function winStep(n) {
       state.deferredTagAlong = null;
       if (deferred) {
         goTab("map");
-        setTimeout(() => { try { ensureMapFocusedOn(deferred.speciesId); } catch {} }, 200);
+        /* v1.7.24-beta Mira review: Observe must not focus the tagged track. */
+        const isObserveDeferred = deferred.factInfo && deferred.factInfo.mode === "observe";
+        if (!isObserveDeferred) {
+          setTimeout(() => { try { ensureMapFocusedOn(deferred.speciesId); } catch {} }, 200);
+        }
         if (deferred.factInfo) {
           setTimeout(() => showTagAlongFact(deferred.factInfo), 600);
         }
