@@ -5,7 +5,7 @@
   "commits": {
     "before_originals": "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2 (main, PR #99 merge)",
     "before_v1_7_34_files": "2f19cb5590d26d2355761f9582e1eb024cd3476f (main, PR #101 merge)",
-    "after_retrimmed": "PENDING"
+    "after_retrimmed": "5e4ac9a5d1db387ac984d22f318d439f9b9edd61 (v1.7.35-retrim-alpha head)"
   },
   "totals": {
     "species": 50,

@@ -63,7 +63,7 @@ OUT_DIR = REPO / "qa/trim-v1.7.35"
 BASELINE_SHA = "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2"
 # Branch head at push time (filled in after the first push; the numeric
 # record is identical regardless — only this provenance string changes).
-AFTER_SHA = "PENDING"
+AFTER_SHA = "5e4ac9a5d1db387ac984d22f318d439f9b9edd61 (v1.7.35-retrim-alpha head)"
 
 # Species re-trimmed in v1.7.35 to the alpha>=200 bbox (the other 26 keep
 # the v1.7.34 alpha>0 bbox). Scope rule: the >=200 crop removes >=15% of
