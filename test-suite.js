@@ -549,6 +549,15 @@ code += `
   ok('observe button shows insight count', fileCode.includes('_obsFactHave') && fileCode.includes('_obsFactTotal') && fileCode.includes('insights: '));
   ok('observe button computes fact totals from SECRET_FACTS', fileCode.includes('_obsFactTotal = (typeof SECRET_FACTS'));
   ok('observe button aria-label includes insight progress', fileCode.includes('_obsFactLabel'));
+  // v1.7.24-beta: Observe on an untagged shark must show the Map popup.
+  // Before this fix it resolved with bare true and never set
+  // pendingTagAlong / pendingTagAlongFact, so the fact only lived in the
+  // dive log and Avery never saw the popup. Now it mirrors Follow: stash
+  // the fact (mode "observe") and resolve with tagAlong intent so closeDive
+  // navigates to the Map and shows the popup.
+  ok('observe stashes pendingTagAlongFact in observe mode', fileCode.includes('mode: "observe"') && fileCode.includes('pendingTagAlongFact = { speciesId: species.id, fact'));
+  ok('observe resolves with tagAlong intent', fileCode.includes('resolve({ tagAlong: species.id })'));
+  ok('observe fact NOT duplicated in expedition log', !fileCode.includes('Species insight:</strong> \${esc(fact)}'));
   // v1.7.23-beta: achievement cards identical height across ALL rows —
   // grid tracks are equal (grid-auto-rows: minmax(140px, 1fr)) plus a
   // per-card 140px min-height fallback, not just per-row stretch.
@@ -1851,6 +1860,28 @@ code += `
     ok("doFollowTagged exists", typeof doFollowTagged === "function");
     ok("showTagAlongFact exists", typeof showTagAlongFact === "function");
   })();
+  // v1.7.24-beta: showTagAlongFact observe mode — popup copy must say
+  // studying/observing, never following, for a wild untagged shark.
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    state.tagged = {}; // untagged shark
+    state.unlockedFacts = { nurse: [0] };
+    try {
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false, mode: "observe" });
+      const html = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("observe popup heading says Species insight", html.includes("Species insight"));
+      ok("observe popup says Observing, not Following", html.includes("Observing") && !html.includes("Following") && !html.includes("Tagging along"));
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false });
+      const html2 = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("follow popup keeps Tagging along copy", html2.includes("Tagging along") && html2.includes("Following"));
+    } catch (e) {
+      ok("observe popup copy (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+    }
+  })();
   // v1.4.0-beta Mira review (blocker): already-tagged follow must resolve
   // doEncounter's Promise via the passed callback — not via state.encounterDone
   // (which is null when no tagging overlay was opened). Behavioral test drives
@@ -2936,7 +2967,10 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   // v1.7.8-beta: species insight ends the expedition
   ok('WHATS_NEW has v1.7.8-beta entry', Array.isArray(WHATS_NEW['v1.7.8-beta']) && WHATS_NEW['v1.7.8-beta'].length >= 1);
   ok('observe button ends expedition on new insight', /v1\\.7\\.8-beta: a new species insight ends the expedition/.test(fileCode));
-  ok('observe button logs insight when fact unlocked', /Species insight:.*esc/.test(fileCode));
+  // v1.7.24-beta: the insight lives on the Map popup only (pendingTagAlongFact),
+  // NOT in the expedition log — mirroring Follow's v1.7.22 cleanup. The old
+  // assertion that Observe logs the insight is obsolete.
+  ok('observe button does NOT log insight (lives in popup)', !/Species insight:<\\/strong>.*esc\\(fact\\)/.test(fileCode));
   ok('observe button warns it ends expedition', /may reveal a secret fact/.test(fileCode));
   ok('archiveSortCompare falls back to insertion order for legacy saves', (() => {
     const saved = state.tagged;

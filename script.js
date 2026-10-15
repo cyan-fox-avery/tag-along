@@ -22,6 +22,7 @@ const IUCN_ABBR = {
 const WHATS_NEW = {
   "v1.7.24-beta": [
 "🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
+"🔬 <strong>Observe insight popup fixed.</strong> Observing a wild, untagged shark now shows the unlocked insight in the Map popup when the expedition ends — before this fix the fact only lived in the dive log and the popup never appeared. (Same as Follow's v1.7.22 fix.)",
 "🔁 <strong>Tiered re-sighting reactions.</strong> Sarah gets more excited each time you re-sight the same shark — warm recognition on the 2nd re-sighting, full best-friend energy from the 3rd on. Her reactions now live in her own chat bubble, and your field notes stay observational.",
   ],
   "v1.7.23-beta": [
@@ -2394,14 +2395,23 @@ function doEncounter(species, plan) {
         const fact = unlockSecretFact(species.id);
         logTripEncounter(species, "observed");
         if (fact) {
-          logLine(`🔬 <strong>Species insight:</strong> ${esc(fact)}`);
+          /* v1.7.24-beta: mirror the Follow flow (v1.7.22-beta) — the insight
+             lives on the Map popup only, not duplicated in the log. Before
+             this fix Observe resolved with bare `true` and never set
+             pendingTagAlong / pendingTagAlongFact, so closeDive had nothing
+             to show: the fact only existed in the dive log and Avery never
+             saw the popup for an untagged shark. Now it stashes the fact
+             and resolves with { tagAlong } so closeDive navigates to the Map
+             and shows the popup — same as Follow. mode: "observe" keeps the
+             popup copy honest (studying, not following). */
+          state.pendingTagAlongFact = { speciesId: species.id, fact, exhausted: false, mode: "observe" };
           /* v1.7.8-beta: a new species insight ends the expedition — you're
              spending the rest of the day processing what you learned. */
           logLine(`🧭 That discovery deserves a full debrief — heading back to the ship to log it properly.`);
           actions.classList.add("hidden");
           actions.innerHTML = "";
           renderAll();
-          resolve(true);
+          resolve({ tagAlong: species.id });
         } else {
           logLine(`🔬 <em>You watch carefully, but learn nothing new about the ${esc(species.name)} today.</em>`);
           finish();
@@ -3897,26 +3907,37 @@ function showTagAlongFact(info) {
   const unlocked = state.unlockedFacts[info.speciesId] || [];
   const total = pool.length;
   const learned = unlocked.length;
+  /* v1.7.24-beta: Observe mode — the player studied a wild, untagged shark,
+     they did not follow their own tagged shark. Keep the popup copy honest:
+     "studying/observing", never "following". Follow mode keeps the original
+     copy. The mode flows through pendingTagAlongFact / deferredTagAlong. */
+  const isObserve = info.mode === "observe";
   let bodyHtml;
   if (info.fact && !info.exhausted) {
     bodyHtml = `
       <div class="tagalong-fact-card">
-        <div class="fact-progress">Tag-along insight — learned ${learned}/${total}</div>
+        <div class="fact-progress">${isObserve ? "Species insight" : "Tag-along insight"} — learned ${learned}/${total}</div>
         <div class="fact-text">🔬 ${esc(info.fact)}</div>
       </div>
-      <p class="dim">Following ${esc(displayName)} paid off. ${total - learned > 0
-        ? `Follow ${esc(displayName)} again sometime to learn more.`
-        : `That's everything this shark had to teach.`}</p>`;
+      <p class="dim">${isObserve
+        ? `Observing this ${esc(displayName)} paid off. ${total - learned > 0
+          ? `Observe ${esc(displayName)} again sometime to learn more.`
+          : `That's everything this species had to teach.`}`
+        : `Following ${esc(displayName)} paid off. ${total - learned > 0
+          ? `Follow ${esc(displayName)} again sometime to learn more.`
+          : `That's everything this shark had to teach.`}`}</p>`;
   } else {
     bodyHtml = `
       <div class="tagalong-fact-card">
-        <div class="fact-progress">Tag-along insight — ${learned}/${total} learned</div>
+        <div class="fact-progress">${isObserve ? "Species insight" : "Tag-along insight"} — ${learned}/${total} learned</div>
         <div class="fact-text"><em>I've learned all I can — the rest is in the specialists' hands now.</em></div>
       </div>
-      <p class="dim">${esc(displayName)} still appreciates the company. 🧭</p>`;
+      <p class="dim">${isObserve
+        ? `${esc(displayName)} still appreciates being studied. 🔬`
+        : `${esc(displayName)} still appreciates the company. 🧭`}</p>`;
   }
   $("tagAlongFactContent").innerHTML = `
-    <h3 style="margin:4px 0 8px">🧭 Tagging along with ${esc(displayName)}</h3>
+    <h3 style="margin:4px 0 8px">${isObserve ? `🔬 Species insight — ${esc(displayName)}` : `🧭 Tagging along with ${esc(displayName)}`}</h3>
     ${bodyHtml}`;
   $("tagAlongOverlay").classList.remove("hidden");
 }
