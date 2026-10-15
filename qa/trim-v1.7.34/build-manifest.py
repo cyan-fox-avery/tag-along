@@ -14,19 +14,41 @@ Per species records:
   - encoding (VP8L lossless / VP8X lossy) and file sizes
 
 Writes qa/trim-v1.7.34/manifest.json in the repo working tree.
+
+Portable: the repo root is derived from this file's own location, and the
+ORIGINAL illustrations are read from pinned baseline commit d1df7b6 via
+`git show <sha>:assets/sharks-webp/<file>` inside the repo — no
+machine-local scratch directories are needed.
+
+Usage (from anywhere):
+  python3 qa/trim-v1.7.34/build-manifest.py
+  python3 qa/trim-v1.7.34/build-manifest.py --original-dir <dir>
+
+With --original-dir, originals are read from <dir> instead of the pinned
+baseline commit. Populate it reproducibly with:
+  git archive d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2 assets/sharks-webp \\
+    | tar -x -C <dir>
+  python3 qa/trim-v1.7.34/build-manifest.py --original-dir <dir>/assets/sharks-webp
 """
+import argparse
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 from PIL import Image
 
-REPO = "/tmp/ta101fix/repo"
-ORIG_DIR = "/tmp/ta101fix/orig/assets/sharks-webp"
-NEW_DIR = os.path.join(REPO, "assets/sharks-webp")
-OUT_DIR = os.path.join(REPO, "qa/trim-v1.7.34")
+REPO = Path(__file__).resolve().parents[2]
+NEW_DIR = REPO / "assets/sharks-webp"
+OUT_DIR = REPO / "qa/trim-v1.7.34"
+
+# Baseline commit whose illustrations are the "before" side of the
+# comparison (main at the PR #99 merge). Pinned so a re-run in any clone
+# compares against the same originals.
+BASELINE_SHA = "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2"
 
 SLUG_MAP = {
     "blacktip": "blacktip-reef",
@@ -46,9 +68,35 @@ SLUG_MAP = {
 
 def species_list():
     """Parse id/name pairs from sharks-data.js SHARKS array."""
-    src = open(os.path.join(REPO, "sharks-data.js")).read()
+    src = (REPO / "sharks-data.js").read_text()
     pairs = re.findall(r'id:\s*"([^"]+)",\s*\n\s*name:\s*"([^"]+)"', src)
     return pairs
+
+
+def load_original_bytes(fname, original_dir):
+    """Return the bytes of an ORIGINAL illustration file.
+
+    Default: `git show <BASELINE_SHA>:assets/sharks-webp/<file>` in REPO,
+    so a fresh clone needs no pre-staged originals. With --original-dir,
+    read from that directory instead.
+    """
+    if original_dir is not None:
+        path = Path(original_dir) / fname
+        if not path.is_file():
+            raise SystemExit(f"original not found: {path}")
+        return path.read_bytes()
+    try:
+        proc = subprocess.run(
+            ["git", "show", f"{BASELINE_SHA}:assets/sharks-webp/{fname}"],
+            cwd=REPO, capture_output=True, check=True,
+        )
+    except subprocess.CalledProcessError:
+        raise SystemExit(
+            f"could not read {fname} from baseline commit {BASELINE_SHA} "
+            f"(is it present in this clone? try a full clone, or pass "
+            f"--original-dir with the originals extracted)"
+        )
+    return proc.stdout
 
 
 def webp_fourcc(path):
@@ -57,13 +105,13 @@ def webp_fourcc(path):
     return head[12:16].decode("ascii")
 
 
-def analyze(sid, name):
+def analyze(sid, name, original_dir):
     slug = SLUG_MAP.get(sid, sid)
     fname = f"{slug}-illustration.webp"
-    orig_path = os.path.join(ORIG_DIR, fname)
-    new_path = os.path.join(NEW_DIR, fname)
+    orig_bytes = load_original_bytes(fname, original_dir)
+    new_path = NEW_DIR / fname
 
-    orig = Image.open(orig_path).convert("RGBA")
+    orig = Image.open(io.BytesIO(orig_bytes)).convert("RGBA")
     new = Image.open(new_path).convert("RGBA")
     ow, oh = orig.size
     nw, nh = new.size
@@ -105,7 +153,7 @@ def analyze(sid, name):
         "encoding": webp_fourcc(new_path),
         "original": {
             "width": ow, "height": oh,
-            "bytes": os.path.getsize(orig_path),
+            "bytes": len(orig_bytes),
         },
         "trimmed": {
             "width": nw, "height": nh,
@@ -128,13 +176,27 @@ def analyze(sid, name):
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Build qa/trim-v1.7.34/manifest.json by comparing the "
+        "pinned-baseline original illustrations against the trimmed files "
+        "in this working tree."
+    )
+    parser.add_argument(
+        "--original-dir",
+        default=None,
+        help="Read ORIGINAL illustrations from this directory instead of "
+        "the pinned baseline commit (see module docstring for the "
+        "reproducible command to populate it).",
+    )
+    args = parser.parse_args()
+
     species = species_list()
     print(f"{len(species)} species in sharks-data.js")
     assert len(species) == 50, f"expected 50 species, got {len(species)}"
 
     entries = []
     for sid, name in species:
-        e = analyze(sid, name)
+        e = analyze(sid, name, args.original_dir)
         entries.append(e)
         c = e["checks"]
         print(
