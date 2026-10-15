@@ -2292,7 +2292,51 @@ code += `
   })());
   ok('REUNION_ODDS has three tiers', (() => {
     if (typeof REUNION_ODDS === 'undefined') return false;
-    return REUNION_ODDS.resident === 0.50 && REUNION_ODDS.coastal === 0.25 && REUNION_ODDS.migratory === 0.10;
+    return REUNION_ODDS.resident === 0.25 && REUNION_ODDS.coastal === 0.125 && REUNION_ODDS.migratory === 0.05;
+  })());
+  // v1.7.23-beta: re-sighting tuning — halved odds + 24h cooldown per shark
+  ok('reunion roll respects 24h resight cooldown', /!recentlyResighted\\(existingRec\\) && Math\\.random\\(\\) < odds/.test(code));
+  ok('recentlyResighted cooldown behaves', (() => {
+    if (typeof recentlyResighted === 'undefined') return false;
+    const now = Date.now();
+    return recentlyResighted({ resightings: [{ ts: now }] }) === true
+      && recentlyResighted({ resightings: [{ ts: now - 25 * 3600 * 1000 }] }) === false
+      && recentlyResighted({ resightings: [{ date: 'Oct 10, 2026' }] }) === false
+      && recentlyResighted({}) === false
+      && recentlyResighted(null) === false;
+  })());
+  ok('re-sightings list collapses to 3 with Show all', (() => {
+    const savedTagged = state.tagged;
+    state.tagged = { nurse: { name: '', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [
+      { date: 'Oct 10, 2026', location: 'Caribbean Sea', note: 'n1-oldest' },
+      { date: 'Oct 11, 2026', location: 'Caribbean Sea', note: 'n2-older' },
+      { date: 'Oct 12, 2026', location: 'Caribbean Sea', note: 'n3' },
+      { date: 'Oct 13, 2026', location: 'Caribbean Sea', note: 'n4' },
+      { date: 'Oct 14, 2026', location: 'Caribbean Sea', note: 'n5-newest' },
+    ] } };
+    try { openDetail('nurse'); } catch (e) { state.tagged = savedTagged; return false; }
+    const html = document.getElementById('detailContent').innerHTML;
+    state.tagged = savedTagged;
+    // header keeps the total; older entries live inside the hidden block
+    // (between resightOlder and its closing </ul>); newest entries render after it
+    const olderStart = html.indexOf('resightOlder');
+    const olderEnd = html.indexOf('</ul>', olderStart);
+    const n1Idx = html.indexOf('n1-oldest');
+    const n5Idx = html.indexOf('n5-newest');
+    return html.includes('Re-sightings (5)') && html.includes('Show all (5)')
+      && olderStart !== -1 && olderEnd !== -1
+      && n1Idx > olderStart && n1Idx < olderEnd
+      && n5Idx > olderEnd;
+  })());
+  ok('re-sightings list with 3 or fewer has no Show all button', (() => {
+    const savedTagged = state.tagged;
+    state.tagged = { nurse: { name: '', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [
+      { date: 'Oct 10, 2026', location: 'Caribbean Sea', note: 'only-one' },
+    ] } };
+    try { openDetail('nurse'); } catch (e) { state.tagged = savedTagged; return false; }
+    const html = document.getElementById('detailContent').innerHTML;
+    state.tagged = savedTagged;
+    return html.includes('Re-sightings (1)') && !html.includes('resightMore') && html.includes('only-one');
   })());
   ok('maybeReunionReaction defined', /function maybeReunionReaction/.test(code));
   ok('reunion reaction is one-time per species', /state\\.reunionReacted\\[species\\.id\\]/.test(code));
