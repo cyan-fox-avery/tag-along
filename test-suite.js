@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.35-beta', VERSION === 'v1.7.35-beta');
+  ok('version v1.7.36-beta', VERSION === 'v1.7.36-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -1947,9 +1947,12 @@ code += `
   })());
   // v1.7.35-beta: 24 species re-trimmed to the bbox of alpha>=200 pixels
   // (the v1.7.34 alpha>0 bbox kept faint alpha noise, so those trims barely
-  // cut anything). Spot-check the five biggest re-trims and guard the new
+  // cut anything). Spot-check five re-trims and guard the new
   // total area (14.65M px after the re-trim) so a future noisy re-export
-  // fails loudly.
+  // fails loudly. v1.7.36-beta: sixgill was component-cropped (884x286),
+  // so its spot-check moved to the v1.7.36 test; lemon (unchanged since
+  // v1.7.35) takes its place here. The total-area guard is an upper bound
+  // only, so the smaller v1.7.36 total still passes.
   ok('v1.7.35-beta: 24 species re-trimmed to the alpha>=200 bbox', (() => {
     function webpDims(buf) {
       if (!buf || buf.length < 30) return null;
@@ -1979,13 +1982,56 @@ code += `
       totalArea += d.w * d.h;
     }
     const ep = dims['epaulette'], sv = dims['sevengill'], go = dims['goblin'],
-          bl = dims['blacktip'], sx = dims['sixgill'];
+          bl = dims['blacktip'], lm = dims['lemon'];
     return ep && ep.w === 864 && ep.h === 187 &&
            sv && sv.w === 877 && sv.h === 286 &&
            go && go.w === 885 && go.h === 202 &&
            bl && bl.w === 862 && bl.h === 273 &&
-           sx && sx.w === 878 && sx.h === 357 &&
+           lm && lm.w === 869 && lm.h === 295 &&
            totalArea < 15500000;
+  })());
+  // v1.7.36-beta: 13 species component-cropped to the bbox of the largest
+  // 8-connected component of alpha>=200 pixels + 3px margin (their source
+  // art carries full-opacity detached specks that kept the alpha>=200 bbox
+  // wide, so the v1.7.35 trim left dead space). Spot-check the five biggest
+  // component cuts and guard the new total area (13.13M px after the
+  // component crop) so a future speck-laden re-export fails loudly.
+  ok('v1.7.36-beta: 13 species component-cropped to the shark shape', (() => {
+    function webpDims(buf) {
+      if (!buf || buf.length < 30) return null;
+      if (buf.toString('ascii', 0, 4) !== 'RIFF') return null;
+      if (buf.toString('ascii', 8, 12) !== 'WEBP') return null;
+      const fourcc = buf.toString('ascii', 12, 16);
+      if (fourcc === 'VP8L') {
+        const v = buf.readUInt32LE(21);
+        return { w: (v & 0x3FFF) + 1, h: ((v >> 14) & 0x3FFF) + 1 };
+      }
+      if (fourcc === 'VP8X') {
+        return { w: buf.readUIntLE(24, 3) + 1, h: buf.readUIntLE(27, 3) + 1 };
+      }
+      if (fourcc === 'VP8 ') {
+        if (buf[23] !== 0x9D || buf[24] !== 0x01 || buf[25] !== 0x2A) return null;
+        return { w: buf.readUInt16LE(26) & 0x3FFF, h: buf.readUInt16LE(28) & 0x3FFF };
+      }
+      return null;
+    }
+    let totalArea = 0;
+    const dims = {};
+    for (const s of SHARKS) {
+      const buf = fs.readFileSync(path.join(DIR, ART_URL(s.id, 'illustration')));
+      const d = webpDims(buf);
+      if (!d) return false;
+      dims[s.id] = d;
+      totalArea += d.w * d.h;
+    }
+    const fr = dims['frilled'], ti = dims['tiger'], pj = dims['portjackson'],
+          gr = dims['greenland'], ps = dims['pacificsleeper'];
+    return fr && fr.w === 873 && fr.h === 140 &&
+           ti && ti.w === 890 && ti.h === 325 &&
+           pj && pj.w === 864 && pj.h === 333 &&
+           gr && gr.w === 875 && gr.h === 232 &&
+           ps && ps.w === 874 && ps.h === 201 &&
+           totalArea < 14000000;
   })());
   ok('v0.26.0: background creature sprites exist on disk', (() => {
     return ['bg-sea-turtle', 'bg-dolphin', 'bg-fish-school',
@@ -3270,7 +3316,7 @@ ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHA
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
-  ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHATS_NEW['v1.7.35-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

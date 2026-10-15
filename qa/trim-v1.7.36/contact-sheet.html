@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tag Along v1.7.36 — illustration component-crop contact sheet (QA artifact)</title>
+<style>
+  body { background:#050d18; color:#dfeeff; font-family:system-ui, sans-serif; margin:0; padding:24px; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  .intro { color:#9fb8d8; max-width:900px; line-height:1.5; }
+  .intro code { color:#fff; }
+  .row { display:grid; grid-template-columns:220px 320px 320px; gap:16px; align-items:center;
+         border-top:1px solid #1c3350; padding:14px 0; }
+  .meta h2 { font-size:16px; margin:0 0 4px; }
+  .meta p { font-size:12px; color:#9fb8d8; margin:0; line-height:1.5; }
+  figure { margin:0; }
+  figure img { width:300px; height:auto; display:block; background:#050d18; }
+  figcaption { font-size:11px; color:#7d96b5; margin-top:4px; letter-spacing:.08em; }
+</style>
+</head>
+<body>
+<h1>Illustration component crop — before / after contact sheet (13 component-cropped species)</h1>
+<p class="intro">QA artifact for Tag Along <strong>v1.7.36-beta</strong> — NOT game content.
+Each pair shows the same species at the same display width (300px) on the game's dark background.
+<strong>BEFORE</strong> images are the v1.7.35 files from <code>main @ 34b5556</code>
+(alpha≥200 bbox trim — full-opacity detached specks kept the bbox wide);
+<strong>AFTER</strong> images are the component-cropped files
+(largest 8-connected component of alpha≥200 pixels + 3px margin).
+The other 37 species are unchanged since v1.7.35 / v1.7.34 and are not shown.
+Look for clipped fin/tail tips, halos, or missing parts in the AFTER column.
+Full numeric record: <code>qa/trim-v1.7.36/manifest.json</code>
+(crop offsets, component analysis, geometry + alpha checks, per-species RGB diff vs original).</p>
+  <section class="row">
+    <div class="meta"><h2>Tiger Shark</h2>
+      <p>900×668 → 890×325<br>cut T163 B180 L10 R0<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/tiger-illustration.webp" alt="Before: Tiger Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/tiger-illustration.webp" alt="After: Tiger Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Galápagos Shark</h2>
+      <p>900×668 → 883×344<br>cut T153 B171 L13 R4<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/galapagos-illustration.webp" alt="Before: Galápagos Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/galapagos-illustration.webp" alt="After: Galápagos Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Great White Shark</h2>
+      <p>900×668 → 876×350<br>cut T154 B164 L13 R11<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/great-white-illustration.webp" alt="Before: Great White Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/great-white-illustration.webp" alt="After: Great White Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Frilled Shark</h2>
+      <p>900×668 → 873×140<br>cut T274 B254 L13 R14<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/frilled-illustration.webp" alt="Before: Frilled Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/frilled-illustration.webp" alt="After: Frilled Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Bonnethead</h2>
+      <p>900×669 → 850×350<br>cut T152 B167 L34 R16<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/bonnethead-illustration.webp" alt="Before: Bonnethead" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/bonnethead-illustration.webp" alt="After: Bonnethead" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Sandbar Shark</h2>
+      <p>900×668 → 882×351<br>cut T154 B163 L15 R3<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/sandbar-illustration.webp" alt="Before: Sandbar Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/sandbar-illustration.webp" alt="After: Sandbar Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Dusky Shark</h2>
+      <p>900×668 → 887×371<br>cut T158 B139 L10 R3<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/dusky-illustration.webp" alt="Before: Dusky Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/dusky-illustration.webp" alt="After: Dusky Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Silvertip Shark</h2>
+      <p>900×668 → 886×333<br>cut T157 B178 L10 R4<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/silvertip-illustration.webp" alt="Before: Silvertip Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/silvertip-illustration.webp" alt="After: Silvertip Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Port Jackson Shark</h2>
+      <p>900×668 → 864×333<br>cut T170 B165 L18 R18<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/port-jackson-illustration.webp" alt="Before: Port Jackson Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/port-jackson-illustration.webp" alt="After: Port Jackson Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Greenland Shark</h2>
+      <p>900×668 → 875×232<br>cut T216 B220 L14 R11<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/greenland-illustration.webp" alt="Before: Greenland Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/greenland-illustration.webp" alt="After: Greenland Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Bluntnose Sixgill Shark</h2>
+      <p>900×669 → 884×286<br>cut T198 B185 L11 R5<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/sixgill-illustration.webp" alt="Before: Bluntnose Sixgill Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/sixgill-illustration.webp" alt="After: Bluntnose Sixgill Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Pacific Sleeper Shark</h2>
+      <p>900×668 → 874×201<br>cut T230 B237 L14 R12<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/pacific-sleeper-illustration.webp" alt="Before: Pacific Sleeper Shark" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/pacific-sleeper-illustration.webp" alt="After: Pacific Sleeper Shark" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+  <section class="row">
+    <div class="meta"><h2>Spiny Dogfish</h2>
+      <p>900×668 → 873×274<br>cut T200 B194 L21 R6<br>VP8X · component crop + 3px margin</p></div>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/34b5556c13496cc75778fa8c2c6a73a6bc3502a4/assets/sharks-webp/spiny-dogfish-illustration.webp" alt="Before: Spiny Dogfish" loading="lazy"><figcaption>BEFORE (v1.7.35)</figcaption></figure>
+    <figure><img src="https://raw.githubusercontent.com/cyan-fox-avery/tag-along/TBD/assets/sharks-webp/spiny-dogfish-illustration.webp" alt="After: Spiny Dogfish" loading="lazy"><figcaption>AFTER (component-cropped)</figcaption></figure>
+  </section>
+</body>
+</html>

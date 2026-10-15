@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.35-beta";
+const VERSION = "v1.7.36-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.36-beta": [
+"✂️ <strong>Shark art component-cropped — the last stragglers.</strong> After the v1.7.35 re-trim, 13 species still had dead space: their source art carries full-opacity single-pixel specks, detached from the shark, with hundreds of empty rows between specks and shark — no alpha threshold could remove them. Those 13 are now cropped to the shark's own connected shape (plus a 3px safety margin), so the tiger, great white, frilled, and friends finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
+  ],
   "v1.7.35-beta": [
 "✂️ <strong>Shark art re-trimmed, properly this time.</strong> The v1.7.34 trim used an alpha>0 bounding box, but the source illustrations carry faint alpha noise across the canvas, so 24 species barely got trimmed at all. Those 24 are re-trimmed to the bbox of alpha≥200 pixels — the noise no longer counts as shark — so thin species like the epaulette and goblin finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
   ],
