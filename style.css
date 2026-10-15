@@ -1025,9 +1025,23 @@ select option:disabled { color: #7a8a9e; }
 }
 .overlay > * { margin: auto; }
 .phone {
+  position: relative; /* v1.7.23-beta: anchor for the top-right .modal-close ✕ */
   background: var(--bg-panel); border-radius: 22px; padding: 16px;
   width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
+/* v1.7.23-beta: top-right ✕ on long-content modals (Collection detail,
+   Tracking, What's New). The bottom Close button sits below the fold on
+   mobile, so the exit must be visible the moment the modal opens.
+   44×44px touch target; semi-opaque so it reads over shark art. */
+.modal-close {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0;
+  border-radius: 50%; border: 1px solid var(--line);
+  background: rgba(2, 8, 16, 0.55); color: #fff;
+  font-size: 20px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:active { transform: scale(0.94); }
 .phone-head { font-weight: 800; margin-bottom: 10px; font-size: 15px; }
 /* v0.12.0: one conversation scroll, like a real phone — threads no longer
    get their own nested scrollboxes; #messagesList (.phone-convo) is the

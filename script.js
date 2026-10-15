@@ -25,6 +25,7 @@ const WHATS_NEW = {
 "🏅 <strong>Uniform achievement cards.</strong> Every achievement card is now exactly the same size across the whole grid — no more short rows and tall rows.",
 "🧭 <strong>Follow shows insight progress.</strong> The Follow button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — so you know what following will get you.",
 "🦈 <strong>Cookiecutter archive illustration-only.</strong> The cookiecutter's archive entry now shows only the scientific illustration — no more dead specimens.",
+"✕ <strong>Close button on modals.</strong> Collection detail, Tracking, and What's New now have a ✕ in the top-right corner — the old Close button sat below the fold on mobile, leaving no visible way out.",
   ],
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
@@ -4621,6 +4622,11 @@ $("trackOverlay").addEventListener("click", (e) => {
 $("detailClose").addEventListener("click", () => {
   $("detailOverlay").classList.add("hidden");
 });
+/* v1.7.23-beta: top-right ✕ buttons delegate to the bottom Close buttons,
+   so the exit is visible the moment the modal opens and behaviour stays
+   in exactly one place. */
+$("detailCloseTop").addEventListener("click", () => $("detailClose").click());
+$("trackCloseTop").addEventListener("click", () => $("trackClose").click());
 $("detailOverlay").addEventListener("click", (e) => {
   if (e.target === $("detailOverlay")) $("detailOverlay").classList.add("hidden");
 });
@@ -5254,6 +5260,9 @@ setTimeout(() => { try { advanceBruceChain(); } catch {} }, 5000);
     $("whatsNewOverlay").classList.add("hidden");
     markWhatsNewSeen();
   });
+  /* v1.7.23-beta: top-right ✕ delegates to the bottom button (which also
+     marks the notes seen) — same one-source-of-truth pattern as detail/track. */
+  $("whatsNewCloseTop").addEventListener("click", () => $("whatsNewClose").click());
 })();
 const tickPhoneClock = () => {
   $("phoneTime").textContent =

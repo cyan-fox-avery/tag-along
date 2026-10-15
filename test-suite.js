@@ -428,6 +428,23 @@ code += `
   // per-card 140px min-height fallback, not just per-row stretch.
   ok('achievement cards have fixed min-height', cssCode.includes('#achieveList .guide-row') && cssCode.includes('min-height: 140px'));
   ok('achievement grid rows are equal tracks', cssCode.includes('grid-auto-rows: minmax(140px, 1fr)'));
+  // v1.7.23-beta: Collection detail had no visible exit on mobile — the
+  // Close button sat below the fold. Top-right ✕ on the long-content
+  // modals (detail, tracking, what's-new), 44×44px touch target.
+  ok('detail modal has top-right close button',
+    htmlCode.includes('id="detailCloseTop"') && htmlCode.includes('aria-label="Close details"'));
+  ok('track modal has top-right close button',
+    htmlCode.includes('id="trackCloseTop"') && htmlCode.includes('aria-label="Close tracking"'));
+  ok('whats-new modal has top-right close button',
+    htmlCode.includes('id="whatsNewCloseTop"') && htmlCode.includes('aria-label="Close what\\'s new"'));
+  ok('modal-close is a 44px touch target',
+    cssCode.includes('.modal-close') && cssCode.includes('width: 44px') && cssCode.includes('height: 44px'));
+  ok('modal-close is positioned top-right of the card',
+    cssCode.includes('.modal-close') && cssCode.includes('position: absolute') && cssCode.includes('top: 8px') && cssCode.includes('right: 8px'));
+  ok('top close buttons delegate to the bottom Close buttons',
+    fileCode.includes('$("detailCloseTop").addEventListener("click", () => $("detailClose").click())') &&
+    fileCode.includes('$("trackCloseTop").addEventListener("click", () => $("trackClose").click())') &&
+    fileCode.includes('$("whatsNewCloseTop").addEventListener("click", () => $("whatsNewClose").click())'));
   ok('tab click handler skips disabled tabs',
     code.includes('if (btn.disabled) return;'));
   ok('disabled tabs are greyed out',

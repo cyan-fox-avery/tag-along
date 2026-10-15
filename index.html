@@ -340,6 +340,9 @@
   <!-- Collection detail modal -->
   <div id="detailOverlay" class="overlay hidden">
     <div class="phone">
+      <!-- v1.7.23-beta: top-right ✕ — the bottom Close button sits below the
+           fold on mobile (long detail content), leaving no visible exit. -->
+      <button id="detailCloseTop" class="modal-close" type="button" aria-label="Close details">✕</button>
       <div id="detailContent"></div>
       <button id="detailClose" class="secondary-button" type="button">Close</button>
     </div>
@@ -348,6 +351,7 @@
   <!-- Tracking modal -->
   <div id="trackOverlay" class="overlay hidden">
     <div class="phone">
+      <button id="trackCloseTop" class="modal-close" type="button" aria-label="Close tracking">✕</button>
       <div id="trackContent"></div>
       <button id="trackClose" class="secondary-button" type="button">Close</button>
     </div>
@@ -356,6 +360,7 @@
   <!-- v0.22.0: What's New screen -->
   <div id="whatsNewOverlay" class="overlay hidden">
     <div class="phone">
+      <button id="whatsNewCloseTop" class="modal-close" type="button" aria-label="Close what's new">✕</button>
       <div id="whatsNewContent"></div>
       <button id="whatsNewClose" class="primary-button" type="button">Let's go diving 🤿</button>
     </div>
