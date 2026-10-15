@@ -131,7 +131,7 @@ body::before {
    offscreen (desktop WebKit and Chromium run the same CSS fine — this is
    iOS-specific; the caustics rays, which launch onscreen, were never
    affected). A time-based loop recomputes every bubble's position from
-   wall-clock time each frame, so a bubble can pause while the main thread
+   the rAF timestamp each frame, so a bubble can pause while the main thread
    is busy but can never get permanently stuck at a wrong position;
    backgrounding/foregrounding resumes cleanly for the same reason.
    Per-bubble config lives here as custom properties (single source of

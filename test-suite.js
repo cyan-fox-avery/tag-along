@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.27-beta', VERSION === 'v1.7.27-beta');
+  ok('version v1.7.28-beta', VERSION === 'v1.7.28-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -592,6 +592,10 @@ code += `
   (function () {
     const savedReacted = state.reunionReacted;
     const savedMsgCount = state.messages.length;
+    // v1.7.28-beta: pushThread() also bumps state.unread and persists the
+    // tyi-messages blob — snapshot both so later tests don't inherit
+    // synthetic Phone notifications (Mira's PR #91 hygiene note).
+    const savedUnread = state.unread;
     state.reunionReacted = {};
     const species = SHARKS.find(s => s.id === 'mako');
     const rec = { name: '', researchId: 'MK-2026-019', sex: 'female', resightings: [] };
@@ -608,9 +612,43 @@ code += `
     } finally {
       state.messages.length = savedMsgCount;
       state.reunionReacted = savedReacted;
+      state.unread = savedUnread;
+      // Re-persist the restored state so the tyi-messages blob matches,
+      // and refresh the badge from the restored unread count.
+      saveMsgs();
+      updateMsgBadge();
       try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
     }
   })();
+  // v1.7.28-beta: reunion fixtures restore unread + persisted messages.
+  // A pushThread round-trip with the fixtures' restore recipe must leave
+  // state.unread and the tyi-messages blob exactly as they were.
+  ok('reunion fixture restore leaves unread + message blob untouched', (() => {
+    const beforeUnread = state.unread;
+    const beforeCount = state.messages.length;
+    const savedReacted = state.reunionReacted;
+    state.reunionReacted = {};
+    try {
+      maybeReunionReaction(SHARKS.find(s => s.id === 'mako'),
+        { name: '', researchId: 'MK-2026-019', sex: 'female', resightings: [] });
+      // Fixture restore recipe (same steps as the fixtures above):
+      state.messages.length = beforeCount;
+      state.reunionReacted = savedReacted;
+      state.unread = beforeUnread;
+      saveMsgs();
+      updateMsgBadge();
+      let blob = null;
+      try { blob = JSON.parse(localStorage.getItem("tyi-messages") || "{}"); } catch {}
+      return state.unread === beforeUnread &&
+        !!blob && blob.unread === beforeUnread &&
+        Array.isArray(blob.messages) && blob.messages.length === beforeCount;
+    } catch (e) {
+      state.messages.length = beforeCount;
+      state.reunionReacted = savedReacted;
+      state.unread = beforeUnread;
+      return false;
+    }
+  })());
   // v1.7.25-beta: exhausted Observe (all insights learned) still ends
   // the expedition and shows the popup — same as Follow's exhausted
   // flow. Before this fix the branch called finish() (Keep diving /
@@ -844,8 +882,69 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('19 achievements (18 visible + Bruce hidden)', ACHIEVEMENTS.length === 19 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 18);
+  ok('21 achievements (20 visible + Bruce hidden)', ACHIEVEMENTS.length === 21 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 20);
+  // v1.7.28-beta: Dedicated + Certified Shark Nerd.
+  (function () {
+    const dedicated = ACHIEVEMENTS.find(a => a.id === 'dedicated');
+    const nerd = ACHIEVEMENTS.find(a => a.id === 'certified-nerd');
+    ok('Dedicated exists, visible, has breadcrumb', !!dedicated && !dedicated.hidden && !!dedicated.breadcrumb);
+    ok('Certified Shark Nerd exists, visible, has breadcrumb', !!nerd && !nerd.hidden && !!nerd.breadcrumb);
+    // Dedicated: all 101 facts across all 50 species learned via Follow/Observe.
+    const allFacts = {};
+    Object.keys(SECRET_FACTS).forEach(id => { allFacts[id] = SECRET_FACTS[id].map((_, i) => i); });
+    ok('Dedicated unlocks with every fact learned', dedicated.check({ unlockedFacts: allFacts }) === true);
+    const oneMissing = JSON.parse(JSON.stringify(allFacts));
+    oneMissing.nurse = oneMissing.nurse.slice(0, -1);
+    ok('Dedicated stays locked with one fact missing', dedicated.check({ unlockedFacts: oneMissing }) === false);
+    ok('Dedicated stays locked with no facts', dedicated.check({ unlockedFacts: {} }) === false);
+    // Certified Shark Nerd: full-completion state (every visible check passes).
+    const fullTagged = {};
+    SHARKS.forEach(s => { fullTagged[s.id] = { name: 'X', researchId: 'R' }; });
+    fullTagged.nurse.name = 'Sarah';
+    fullTagged.nurse.resightings = [{}, {}, {}];
+    const fullState = {
+      tagged: fullTagged,
+      stats: {
+        resights: 1, expeditions: 10,
+        regionsVisited: Object.keys(REGIONS),
+        baitsUsed: Object.keys(BAITS),
+        depthsTagged: Object.keys(DEPTHS),
+      },
+      unlockedFacts: allFacts,
+      bruceEgg: null,
+      bruceChainComplete: false,
+      achievements: {},
+    };
+    ok('Certified Shark Nerd check passes on full completion', nerd.check(fullState) === true);
+    // Visible-only: the hidden Bruce chain is NOT required.
+    ok('Certified Shark Nerd does not require hidden Bruce',
+      nerd.check({ ...fullState, bruceEgg: null, bruceChainComplete: false }) === true);
+    // One visible achievement incomplete -> Nerd stays locked.
+    ok('Certified Shark Nerd stays locked when Dedicated is incomplete',
+      nerd.check({ ...fullState, unlockedFacts: oneMissing }) === false);
+    // End-to-end: checkAchievements fires Nerd on full completion, not Bruce.
+    const saveTagged = state.tagged, saveStats = state.stats, saveFacts = state.unlockedFacts;
+    const saveEgg = state.bruceEgg, saveDone = state.bruceChainComplete, saveAch = state.achievements;
+    try {
+      state.tagged = fullState.tagged;
+      state.stats = fullState.stats;
+      state.unlockedFacts = fullState.unlockedFacts;
+      state.bruceEgg = null;
+      state.bruceChainComplete = false;
+      state.achievements = {};
+      checkAchievements();
+      ok('checkAchievements unlocks Certified Shark Nerd on full completion', !!state.achievements['certified-nerd']);
+      ok('checkAchievements does not unlock hidden Bruce on full completion', !state.achievements.bruce);
+    } finally {
+      state.tagged = saveTagged;
+      state.stats = saveStats;
+      state.unlockedFacts = saveFacts;
+      state.bruceEgg = saveEgg;
+      state.bruceChainComplete = saveDone;
+      state.achievements = saveAch;
+    }
+  })();
   // v0.19.0: six new achievements
   const resetA = () => { state.tagged = {}; state.achievements = {};
     state.stats = { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0,
@@ -2198,7 +2297,7 @@ code += `
   // v1.7.25-beta: bubbles are driven by a time-based JS loop (initBubbles),
   // not CSS keyframes — iOS WKWebView froze the CSS compositor animations
   // for bubbles launching from below the viewport. The JS loop recomputes
-  // each bubble from wall-clock time, so it can pause but never sticks.
+  // each bubble from the rAF timestamp, so it can pause but never sticks.
   (() => {
     const bubbleCount = (cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{/g) || []).length;
     ok("bubbles number 26 (8 staggered columns)", bubbleCount === 26);
@@ -2898,6 +2997,8 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.28-beta', Array.isArray(WHATS_NEW['v1.7.28-beta']) && WHATS_NEW['v1.7.28-beta'].length >= 1);
+ok('no wall-clock claim remains (rAF timestamp)', !/wall-clock/.test(fileCode + cssCode) && /rAF timestamp/.test(fileCode));
 ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHATS_NEW['v1.7.23-beta'].length >= 1);
 
   // v1.7.16-beta: derpy retroactive unlock — explicit full-roster gate, stateful migration tests
@@ -3162,15 +3263,23 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   ok('maybeReunionReaction returns true when it fires, false when already reacted', (() => {
     const savedReacted = state.reunionReacted;
     const savedMsgCount = state.messages.length;
+    // v1.7.28-beta: same unread/blob hygiene as the delivery fixture above.
+    const savedUnread = state.unread;
     state.reunionReacted = {};
     const species = SHARKS.find(s => s.id === 'mako');
     const rec = { name: '', researchId: 'MK-2026-019', resightings: [] };
-    const first = maybeReunionReaction(species, rec);
-    const second = maybeReunionReaction(species, rec);
-    state.messages.length = savedMsgCount;
-    state.reunionReacted = savedReacted;
-    try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
-    return first === true && second === false;
+    try {
+      const first = maybeReunionReaction(species, rec);
+      const second = maybeReunionReaction(species, rec);
+      return first === true && second === false;
+    } finally {
+      state.messages.length = savedMsgCount;
+      state.reunionReacted = savedReacted;
+      state.unread = savedUnread;
+      saveMsgs();
+      updateMsgBadge();
+      try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
+    }
   })());
   ok('resight button skips resightThread when reunion reaction fired', /if\\s*\\(!reunionReactedThisEncounter\\)\\s*pushThread\\(resightThread/.test(fileCode));
   ok('reunion call site captures return value', /const reunionReactedThisEncounter = maybeReunionReaction\\(species, rec\\)/.test(fileCode));

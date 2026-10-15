@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.27-beta";
+const VERSION = "v1.7.28-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.28-beta": [
+"🏅 <strong>Two new achievements.</strong> <strong>Dedicated</strong> — unlock every extra fact obtainable by following sharks. <strong>Certified Shark Nerd</strong> — complete every other visible achievement (the hidden Bruce one doesn't count).",
+"🧹 <strong>Test hygiene.</strong> The reunion-reaction fixtures now restore the unread count and saved messages too, so no test inherits synthetic Phone notifications.",
+  ],
   "v1.7.27-beta": [
 "🖥️ <strong>Wider layouts on big screens.</strong> The Collection detail card now splits into two columns on wide screens (art + identity on the left, stats / notes / insights on the right) instead of one tall narrow strip — and the Research tab uses 2 wider columns instead of 3 narrow ones, so expanded entries are shorter. Phone / narrow layouts are unchanged.",
   ],
@@ -28,7 +32,7 @@ const WHATS_NEW = {
   ],
   "v1.7.25-beta": [
 "🔬 <strong>Exhausted Observe ends the expedition.</strong> Observing a species with no insights left now ends the expedition and shows the “learned all I can” Map popup — before this fix it just offered Keep diving / Head back and showed nothing.",
-"🫧 <strong>Bubbles no longer freeze at the bottom.</strong> The rising bubbles are now driven by a small time-based JS loop instead of CSS keyframe animations — iOS WKWebView didn't reliably tick compositor animations for bubbles that launch from below the viewport, so they could stick at the bottom. The loop recomputes each bubble from wall-clock time every frame, so it can pause under load but never gets permanently stuck. Same 26 bubbles, same motion.",
+"🫧 <strong>Bubbles no longer freeze at the bottom.</strong> The rising bubbles are now driven by a small time-based JS loop instead of CSS keyframe animations — iOS WKWebView didn't reliably tick compositor animations for bubbles that launch from below the viewport, so they could stick at the bottom. The loop recomputes each bubble from the animation timestamp every frame, so it can pause under load but never gets permanently stuck. Same 26 bubbles, same motion.",
   ],
   "v1.7.24-beta": [
 "🔬 <strong>Observe shows insight progress.</strong> The Observe species button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — just like Follow does, so you know what observing will get you.",
@@ -5520,7 +5524,7 @@ setInterval(tickPhoneClock, 30000);
    are pure and unit-tested in test-suite.js; the IIFE wires them to the
    26 spans, reading per-bubble config (--bubble-rise / --bubble-duration /
    --bubble-delay) from CSS so style.css stays the single source of truth.
-   Position is recomputed from wall-clock time every frame, so the loop
+   Position is recomputed from the rAF timestamp every frame, so the loop
    can pause while the main thread is busy or the tab is hidden and
    resume at the correct position — a bubble can never get permanently
    stuck at a wrong position. */
