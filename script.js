@@ -2644,7 +2644,13 @@ async function runExpedition(plan) {
       afterExpedition(plan);
       if (tagAlongSid) {
         goTab("map");
-        setTimeout(() => { try { ensureMapFocusedOn(tagAlongSid); } catch {} }, 200);
+        /* v1.7.24-beta Mira review: Observe studied a DIFFERENT wild shark —
+           do not focus the tagged individual's track. Follow/tag-along keep
+           the focus. The mode rides on factInfo. */
+        const isObserveClose = factInfo && factInfo.mode === "observe";
+        if (!isObserveClose) {
+          setTimeout(() => { try { ensureMapFocusedOn(tagAlongSid); } catch {} }, 200);
+        }
         /* v1.4.0-beta Mira review (important): show the unlocked fact in a
            readable overlay with learned X/3 progression — at quick pace the
            dive-log line may never be read before auto-navigation. */
@@ -3925,8 +3931,15 @@ function doFollowTagged(speciesId, doneCb) {
 function showTagAlongFact(info) {
   const s = SHARKS.find(x => x.id === info.speciesId);
   if (!s) return;
+  /* v1.7.24-beta Mira review: Observe mode studies a DIFFERENT wild shark —
+     never the player's tagged individual of that species (e.g. tagged nurse
+     shark named Bubbles + observe another nurse shark must not say
+     "Observing this Bubbles paid off"). Use the species' common name only.
+     Follow/tag-along modes keep the nickname. The mode flows through
+     pendingTagAlongFact / deferredTagAlong. */
+  const isObserve = info.mode === "observe";
   const rec = state.tagged[info.speciesId];
-  const displayName = (rec && rec.name) || s.name;
+  const displayName = isObserve ? s.name : ((rec && rec.name) || s.name);
   const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[info.speciesId]) || [];
   const unlocked = state.unlockedFacts[info.speciesId] || [];
   const total = pool.length;
@@ -3934,8 +3947,7 @@ function showTagAlongFact(info) {
   /* v1.7.24-beta: Observe mode — the player studied a wild, untagged shark,
      they did not follow their own tagged shark. Keep the popup copy honest:
      "studying/observing", never "following". Follow mode keeps the original
-     copy. The mode flows through pendingTagAlongFact / deferredTagAlong. */
-  const isObserve = info.mode === "observe";
+     copy. */
   let bodyHtml;
   if (info.fact && !info.exhausted) {
     bodyHtml = `
@@ -3963,6 +3975,9 @@ function showTagAlongFact(info) {
   $("tagAlongFactContent").innerHTML = `
     <h3 style="margin:4px 0 8px">${isObserve ? `🔬 Species insight — ${esc(displayName)}` : `🧭 Tagging along with ${esc(displayName)}`}</h3>
     ${bodyHtml}`;
+  /* v1.7.24-beta Mira review: the close button must not say "Continue
+     following" for Observe — the player studied, not followed. */
+  $("tagAlongFactClose").textContent = isObserve ? "Back to map" : "Continue following 🧭";
   $("tagAlongOverlay").classList.remove("hidden");
 }
 $("tagAlongFactClose").addEventListener("click", () => {
@@ -4213,7 +4228,11 @@ function winStep(n) {
       state.deferredTagAlong = null;
       if (deferred) {
         goTab("map");
-        setTimeout(() => { try { ensureMapFocusedOn(deferred.speciesId); } catch {} }, 200);
+        /* v1.7.24-beta Mira review: Observe must not focus the tagged track. */
+        const isObserveDeferred = deferred.factInfo && deferred.factInfo.mode === "observe";
+        if (!isObserveDeferred) {
+          setTimeout(() => { try { ensureMapFocusedOn(deferred.speciesId); } catch {} }, 200);
+        }
         if (deferred.factInfo) {
           setTimeout(() => showTagAlongFact(deferred.factInfo), 600);
         }

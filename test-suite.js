@@ -1911,6 +1911,46 @@ code += `
       state.unlockedFacts = origFacts;
     }
   })();
+  // v1.7.24-beta Mira review (blocker): Observe studies a DIFFERENT wild
+  // shark — the popup must never use the tagged individual's nickname, the
+  // close button must not say "Continue following", and closeDive must not
+  // focus the tagged track for Observe.
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    // Tagged nurse shark named Bubbles; observing a DIFFERENT nurse shark.
+    state.tagged = { nurse: { name: "Bubbles", researchId: "NS-2026-001" } };
+    state.unlockedFacts = { nurse: [0] };
+    try {
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false, mode: "observe" });
+      const html = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("observe popup never uses tagged nickname", !html.includes("Bubbles"));
+      ok("observe popup uses species name", html.includes("Nurse Shark"));
+      ok("observe close button says Back to map",
+        document.getElementById("tagAlongFactClose").textContent === "Back to map");
+      // Follow mode still uses the nickname and the follow close label.
+      showTagAlongFact({ speciesId: "nurse", fact: "A test fact.", exhausted: false });
+      const html2 = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("follow popup keeps tagged nickname", html2.includes("Bubbles"));
+      ok("follow close button says Continue following",
+        document.getElementById("tagAlongFactClose").textContent === "Continue following 🧭");
+      // Exhausted observe popup also avoids the nickname.
+      showTagAlongFact({ speciesId: "nurse", fact: null, exhausted: true, mode: "observe" });
+      const html3 = document.getElementById("tagAlongFactContent").innerHTML;
+      ok("observe exhausted popup never uses tagged nickname", !html3.includes("Bubbles"));
+    } catch (e) {
+      ok("observe different-individual popup (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+    }
+    // closeDive / win-path focus guards (source-level: closeDive is a
+    // closure inside the trip function, not directly callable).
+    ok("closeDive skips map focus for Observe",
+      fileCode.includes('factInfo.mode === "observe"') && fileCode.includes("isObserveClose"));
+    ok("win-path defers map focus for Observe",
+      fileCode.includes('deferred.factInfo.mode === "observe"') && fileCode.includes("isObserveDeferred"));
+  })();
   // v1.4.0-beta Mira review (blocker): already-tagged follow must resolve
   // doEncounter's Promise via the passed callback — not via state.encounterDone
   // (which is null when no tagging overlay was opened). Behavioral test drives
