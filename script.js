@@ -2732,24 +2732,30 @@ const FIELD_RESIGHT_NOTES = [
   "The tag is still seated perfectly. Good work, past us."
 ];
 
-/* v1.7.24-beta: Sarah's first-reunion closer variants (Avery's picks).
-   These are Sarah's voice — conversational, affectionate — and are
-   NEVER stored as the field note. They are alternatives within the
-   existing first-reunion resightThread (ordinal 1), alongside the
-   generic closer below. One thread per encounter; resightThread is
-   skipped when maybeReunionReaction already spoke this encounter. */
-const RESIGHT_NOTES_1ST = [
+/* The one Sarah line that earns the player's food reply (Avery). */
+const RESIGHT_LIKES_US_LINE = "Back again! At this point I'm starting to think it likes us.";
+
+/* v1.7.24-beta: Sarah's first-reunion closer variants. The original
+   closer ("That's incredible!...") + Avery's four picks. These are
+   Sarah's voice — conversational, affectionate — and are NEVER
+   stored as the field note. They are delivered by
+   maybeReunionReaction() — the reaction that ACTUALLY fires on
+   first reunion. The four picks used to live in a resightThread
+   ordinal-1 branch that never ran in the normal flow (the reunion
+   reaction fires first and Log skips the thread), so they moved here
+   where they have a reliable delivery point. One thread per encounter. */
+const RESIGHT_REUNION_CLOSERS = [
+  "That's incredible! They came back! I'm actually emotional rn \u{1F979}",
   "Oh wow, it's back! I was literally just thinking about this one.",
   "Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.",
   "The tag's holding up great. This shark is basically wearing a Fitbit and thriving.",
-  "Back again! At this point I'm starting to think it likes us."
+  RESIGHT_LIKES_US_LINE
 ];
 
-/* The original first-reunion closer, kept as one of the ordinal-1 variants. */
+/* The generic closer — fallback for resightThread ordinal 1, which
+   only runs in unusual histories (an earlier encounter consumed the
+   reunion reaction without logging a re-sighting). */
 const RESIGHT_GENERIC_CLOSER = "That's the best part of tagging — you get to know it's them. Do you think it recognized you?";
-
-/* The one Sarah line that earns the player's food reply (Avery). */
-const RESIGHT_LIKES_US_LINE = "Back again! At this point I'm starting to think it likes us.";
 
 /* v1.7.24-beta: tiered re-sighting reactions — Sarah gets more excited
    as she sees the same shark again. 2nd re-sighting: warm recognition.
@@ -2775,11 +2781,15 @@ const RESIGHT_NOTES_EXCITED = [
    (1-based re-sighting ordinal for this individual). Used ONLY in
    Sarah's chat bubble (resightThread) — never in the persisted
    field note, so the player never speaks Sarah's lines.
-   1st: first-reunion closer variants (generic closer + 1ST pool). */
+   1st: the generic closer only — the first-reunion closer variants
+   (RESIGHT_REUNION_CLOSERS) are delivered by maybeReunionReaction(),
+   which fires on the actual first reunion; resightThread ordinal 1
+   only runs in unusual histories (an earlier encounter consumed the
+   reunion reaction without logging a re-sighting). */
 function resightSarahReactionFor(ordinal) {
   if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
   if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
-  return pick([RESIGHT_GENERIC_CLOSER, ...RESIGHT_NOTES_1ST]);
+  return RESIGHT_GENERIC_CLOSER;
 }
 
 function recordResighting(species, plan) {
@@ -2839,13 +2849,13 @@ function resightThread(species, rec) {
     { who: "me", text: `${species.name}, off ${last.location}. ${last.note}` },
   ];
   /* v1.7.24-beta Mira review: Sarah's reaction goes in HER bubble.
-     1st re-sighting picks from the first-reunion closer variants;
-     2nd+ from the tiered pools. The player's food reply follows ONLY
-     the "I think it likes us" line — never after other lines. */
+     2nd+ re-sightings use the tiered pools. The first-reunion closer
+     variants (incl. the likes-us line) are delivered by
+     maybeReunionReaction(), not here — so resightThread never
+     appends the food reply; that gating lives in
+     reunionReactionThread(). */
   const sarahLine = resightSarahReactionFor(ordinal);
   thread.push({ who: "them", text: sarahLine });
-  const foodReply = resightFoodReplyFor(sarahLine, rec);
-  if (foodReply) thread.push({ who: "me", text: foodReply });
   return thread;
 }
 
@@ -2859,7 +2869,24 @@ function resightFoodReplyFor(sarahLine, rec) {
   return `Maybe. Or maybe ${pron} just knows where the food is.`;
 }
 /* v1.5.3-beta: one-time Sarah reaction to first reunion per species.
-   Warm, not spammy — only fires once per species, ever. */
+   Warm, not spammy — only fires once per species, ever.
+   The closer is picked from RESIGHT_REUNION_CLOSERS (the original
+   closer + Avery's four variants), so every first reunion gets a
+   fresh Sarah line at a reliable delivery point. */
+/* Pure: build the first-reunion thread for a given closer. The
+   player's food reply follows ONLY the "I think it likes us" line
+   (Avery) — it answers that specific claim, so it would be a
+   non sequitur after any other closer. */
+function reunionReactionThread(name, closer, rec) {
+  const thread = [
+    { who: "them", text: `WAIT. You saw ${name} again?!?` },
+    { who: "me", text: `The tag matched — it's really them.` },
+    { who: "them", text: closer }
+  ];
+  const foodReply = resightFoodReplyFor(closer, rec);
+  if (foodReply) thread.push({ who: "me", text: foodReply });
+  return thread;
+}
 function maybeReunionReaction(species, rec) {
   state.reunionReacted = state.reunionReacted || {};
   /* v1.6.7-beta: returns whether the thread fired, so the resight button
@@ -2869,12 +2896,7 @@ function maybeReunionReaction(species, rec) {
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name. */
   const name = rec.name ? `\u201c${esc(rec.name)}\u201d` : (rec.researchId || species.name);
-  const thread = [
-    { who: "them", text: `WAIT. You saw ${name} again?!?` },
-    { who: "me", text: `The tag matched — it's really them.` },
-    { who: "them", text: `That's incredible! They came back! I'm actually emotional rn \u{1F979}` }
-  ];
-  pushThread(thread);
+  pushThread(reunionReactionThread(name, pick(RESIGHT_REUNION_CLOSERS), rec));
   return true;
 }
 

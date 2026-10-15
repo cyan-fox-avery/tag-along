@@ -413,21 +413,22 @@ code += `
       else if (state.stats) delete state.stats.resights;
     }
   })();
-  // v1.7.24-beta: tiered SARAH reactions — 1st picks from the
-  // first-reunion closer variants (generic closer + 1ST pool), 2nd uses
-  // the middle pool, 3rd+ uses the excited pool. These lines live in
-  // Sarah's chat bubble only, never in the field note.
+  // v1.7.24-beta: tiered SARAH reactions — resightThread ordinal 1
+  // returns the generic closer fallback (the reunion closer variants
+  // are delivered by maybeReunionReaction), 2nd uses the middle
+  // pool, 3rd+ uses the excited pool. These lines live in Sarah's
+  // chat bubble only, never in the field note.
   (function () {
     const n1 = resightSarahReactionFor(1);
     const n2 = resightSarahReactionFor(2);
     const n3 = resightSarahReactionFor(3);
     const n5 = resightSarahReactionFor(5);
-    ok('resightSarahReactionFor(1) uses first-reunion variants',
-      (n1 === RESIGHT_GENERIC_CLOSER || RESIGHT_NOTES_1ST.includes(n1)) && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
+    ok('resightSarahReactionFor(1) returns generic closer fallback',
+      n1 === RESIGHT_GENERIC_CLOSER && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
     ok('resightSarahReactionFor(2) uses middle pool',
-      RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_NOTES_1ST.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
+      RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_REUNION_CLOSERS.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
     ok('resightSarahReactionFor(3) uses excited pool',
-      RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_NOTES_1ST.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
+      RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_REUNION_CLOSERS.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
     ok('resightSarahReactionFor(5) still uses excited pool',
       RESIGHT_NOTES_EXCITED.includes(n5));
   })();
@@ -436,13 +437,14 @@ code += `
   // field note can ever speak Sarah's voice.
   ok('field notes are observational only, disjoint from Sarah pools',
     FIELD_RESIGHT_NOTES.length === 8 &&
-    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_NOTES_1ST.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l)));
-  ok('1st pool has all four Avery-picked Sarah lines',
-    RESIGHT_NOTES_1ST.length === 4 &&
-    RESIGHT_NOTES_1ST.includes("Oh wow, it's back! I was literally just thinking about this one.") &&
-    RESIGHT_NOTES_1ST.includes("Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.") &&
-    RESIGHT_NOTES_1ST.includes("The tag's holding up great. This shark is basically wearing a Fitbit and thriving.") &&
-    RESIGHT_NOTES_1ST.includes("Back again! At this point I'm starting to think it likes us."));
+    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l)));
+  ok('reunion closers have original closer + all four Avery-picked Sarah lines',
+    RESIGHT_REUNION_CLOSERS.length === 5 &&
+    RESIGHT_REUNION_CLOSERS.includes("That's incredible! They came back! I'm actually emotional rn \u{1F979}") &&
+    RESIGHT_REUNION_CLOSERS.includes("Oh wow, it's back! I was literally just thinking about this one.") &&
+    RESIGHT_REUNION_CLOSERS.includes("Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.") &&
+    RESIGHT_REUNION_CLOSERS.includes("The tag's holding up great. This shark is basically wearing a Fitbit and thriving.") &&
+    RESIGHT_REUNION_CLOSERS.includes("Back again! At this point I'm starting to think it likes us."));
   ok('excited pool has all five Avery picks',
     RESIGHT_NOTES_EXCITED.length === 5 &&
     RESIGHT_NOTES_EXCITED.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
@@ -514,29 +516,28 @@ code += `
       return resightThread(nurse, rec);
     }
     try {
-      // 1st re-sighting: opener + player field note + Sarah closer variant.
-      // Length is 3, or 4 when the picked variant is the likes-us line
-      // (which earns the food reply). Either way the player bubble
-      // reports the field note only.
+      // 1st re-sighting via resightThread (unusual history only — the
+      // normal first reunion is handled by maybeReunionReaction):
+      // opener + player field note + generic closer fallback. Never
+      // a food reply — the likes-us line is delivered by the reunion
+      // reaction, not by this thread.
       const t1 = threadWith(1, 'female');
-      ok('1st resightThread Sarah bubble uses first-reunion variants',
-        (t1.length === 3 || t1.length === 4) && t1[2].who === 'them' &&
-        (t1[2].text === RESIGHT_GENERIC_CLOSER || RESIGHT_NOTES_1ST.includes(t1[2].text)));
-      ok('1st resightThread food reply only after likes-us line',
-        (t1.length === 4) === (t1[2].text === RESIGHT_LIKES_US_LINE) &&
-        (t1.length === 3 || t1[3].text === 'Maybe. Or maybe she just knows where the food is.'));
+      ok('1st resightThread Sarah bubble uses generic closer fallback',
+        t1.length === 3 && t1[2].who === 'them' && t1[2].text === RESIGHT_GENERIC_CLOSER);
+      ok('1st resightThread never gets food reply',
+        t1.length === 3);
       ok('1st resightThread player bubble reports field note only',
         t1[1].who === 'me' && t1[1].text.includes('Looking healthy and unhurried.') &&
-        !RESIGHT_NOTES_1ST.some(l => t1[1].text.includes(l)) &&
+        !RESIGHT_REUNION_CLOSERS.some(l => t1[1].text.includes(l)) &&
         !RESIGHT_NOTES_2ND.some(l => t1[1].text.includes(l)) &&
         !RESIGHT_NOTES_EXCITED.some(l => t1[1].text.includes(l)));
       // 2nd re-sighting (female): Sarah middle-pool line, no food reply
-      // (the likes-us line is a 1st-pool line only).
+      // (the likes-us line is a reunion-closer line only).
       const t2 = threadWith(2, 'female');
       ok('2nd resightThread Sarah bubble uses middle pool, no food reply',
         t2.length === 3 && t2[2].who === 'them' && RESIGHT_NOTES_2ND.includes(t2[2].text));
       ok('2nd resightThread player bubble never speaks Sarah lines',
-        !RESIGHT_NOTES_1ST.some(l => t2[1].text.includes(l)) &&
+        !RESIGHT_REUNION_CLOSERS.some(l => t2[1].text.includes(l)) &&
         !RESIGHT_NOTES_2ND.some(l => t2[1].text.includes(l)) &&
         !RESIGHT_NOTES_EXCITED.some(l => t2[1].text.includes(l)));
       // 3rd re-sighting (male): Sarah excited-pool line, no food reply.
@@ -556,6 +557,58 @@ code += `
         resightFoodReplyFor(RESIGHT_GENERIC_CLOSER, {}) === null);
     } catch (e) {
       ok('resightThread voice regression (threw: ' + e.message + ')', false);
+    }
+  })();
+  // v1.7.24-beta: the four Avery-picked Sarah lines are delivered by
+  // maybeReunionReaction() (the reaction that actually fires on first
+  // reunion), via the reunionReactionThread() helper — deterministic
+  // to test, unlike the random pick in maybeReunionReaction.
+  (function () {
+    try {
+      // Likes-us closer (female): 4 messages, food reply with she-pronoun.
+      const tLike = reunionReactionThread('“Bubbles”', RESIGHT_LIKES_US_LINE, { sex: 'female' });
+      ok('reunion thread appends food reply after likes-us closer',
+        tLike.length === 4 && tLike[2].who === 'them' && tLike[2].text === RESIGHT_LIKES_US_LINE &&
+        tLike[3].who === 'me' && tLike[3].text === 'Maybe. Or maybe she just knows where the food is.');
+      // Original closer: 3 messages, no food reply.
+      const tOrig = reunionReactionThread('“Bubbles”', RESIGHT_REUNION_CLOSERS[0], { sex: 'male' });
+      ok('reunion thread has no food reply after original closer',
+        tOrig.length === 3 && tOrig[2].text === RESIGHT_REUNION_CLOSERS[0]);
+      // Another variant closer: 3 messages, no food reply.
+      const tVar = reunionReactionThread('“Bubbles”', RESIGHT_REUNION_CLOSERS[1], { sex: 'male' });
+      ok('reunion thread has no food reply after other variant closers',
+        tVar.length === 3 && tVar[2].text === RESIGHT_REUNION_CLOSERS[1]);
+      // Opener + confirm structure is preserved for every closer.
+      ok('reunion thread keeps WAIT opener + tag confirm',
+        tLike[0].text.startsWith('WAIT. You saw') && tLike[1].text === "The tag matched — it's really them.");
+    } catch (e) {
+      ok('reunionReactionThread (threw: ' + e.message + ')', false);
+    }
+  })();
+  // v1.7.24-beta: maybeReunionReaction() delivers a closer from the
+  // reunion pool (not a resightThread ordinal-1 branch) and appends
+  // the food reply only when the picked closer is the likes-us line.
+  // Holds for whichever closer the random pick lands on.
+  (function () {
+    const savedReacted = state.reunionReacted;
+    const savedMsgCount = state.messages.length;
+    state.reunionReacted = {};
+    const species = SHARKS.find(s => s.id === 'mako');
+    const rec = { name: '', researchId: 'MK-2026-019', sex: 'female', resightings: [] };
+    try {
+      const fired = maybeReunionReaction(species, rec);
+      const thread = state.messages[state.messages.length - 1].msgs;
+      ok('maybeReunionReaction delivers a reunion-pool closer',
+        fired === true && thread[2].who === 'them' && RESIGHT_REUNION_CLOSERS.includes(thread[2].text));
+      ok('maybeReunionReaction food reply only after likes-us closer',
+        (thread.length === 4) === (thread[2].text === RESIGHT_LIKES_US_LINE) &&
+        (thread.length === 3 || thread[3].text === 'Maybe. Or maybe she just knows where the food is.'));
+    } catch (e) {
+      ok('maybeReunionReaction delivery (threw: ' + e.message + ')', false);
+    } finally {
+      state.messages.length = savedMsgCount;
+      state.reunionReacted = savedReacted;
+      try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
     }
   })();
   // v1.7.24-beta Mira review: exhausted Observe (3/3) must not promise a
