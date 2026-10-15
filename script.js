@@ -2699,7 +2699,11 @@ const RESIGHT_NOTES = [
   "Same calm circuit as ever — this one knows these waters.",
   "Bold as brass, came in close to look at the boat.",
   "Feeding well; good body condition.",
-  "The tag is still seated perfectly. Good work, past us."
+  "The tag is still seated perfectly. Good work, past us.",
+  "Oh wow, it's back! I was literally just thinking about this one.",
+  "Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.",
+  "The tag's holding up great. This shark is basically wearing a Fitbit and thriving.",
+  "Back again! At this point I'm starting to think it likes us."
 ];
 
 function recordResighting(species, plan) {
