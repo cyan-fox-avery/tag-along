@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.33-beta', VERSION === 'v1.7.33-beta');
+  ok('version v1.7.34-beta', VERSION === 'v1.7.34-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -1889,6 +1889,58 @@ code += `
       fs.existsSync(path.join(DIR, ART_URL(s.id, 'silhouette')))
     );
   })());
+  // v1.7.34-beta: illustration WebPs are trimmed — transparent borders cut,
+  // shark pixels untouched by the crop. Most files are lossy VP8X (q90;
+  // lemon/wobbegong q95); zebra stays lossless VP8L because its spot
+  // pattern does not compress cleanly. Spot-check the three heaviest
+  // trims, and guard the total area so a future untrimmed re-export
+  // (original total ≈ 29.8M px) fails loudly. Sevengill is the one file whose
+  // art already touched all four edges, so it is unchanged at 900x669.
+  ok('v1.7.34-beta: illustration WebPs are trimmed of transparent borders', (() => {
+    function webpDims(buf) {
+      // Encoding-agnostic: VP8L, VP8X, or plain VP8 all carry the canvas
+      // size near the front. Returns { w, h } or null.
+      if (!buf || buf.length < 30) return null;
+      if (buf.toString('ascii', 0, 4) !== 'RIFF') return null;
+      if (buf.toString('ascii', 8, 12) !== 'WEBP') return null;
+      const fourcc = buf.toString('ascii', 12, 16);
+      if (fourcc === 'VP8L') {
+        // VP8L chunk: chunk-size (4 bytes) + 0x2F signature, then a 4-byte
+        // LE word at byte 21: 14 bits (width-1), 14 bits (height-1).
+        const v = buf.readUInt32LE(21);
+        return { w: (v & 0x3FFF) + 1, h: ((v >> 14) & 0x3FFF) + 1 };
+      }
+      if (fourcc === 'VP8X') {
+        // VP8X chunk: chunk-size + flags + reserved, then canvas width-1
+        // (3 bytes LE at 24) and height-1 (3 bytes LE at 27).
+        return { w: buf.readUIntLE(24, 3) + 1, h: buf.readUIntLE(27, 3) + 1 };
+      }
+      if (fourcc === 'VP8 ') {
+        // VP8 chunk: frame tag (20-22) + start code 9D 01 2A (23-25),
+        // then width (LE16 at 26, 14 bits) and height (LE16 at 28).
+        if (buf[23] !== 0x9D || buf[24] !== 0x01 || buf[25] !== 0x2A) return null;
+        return { w: buf.readUInt16LE(26) & 0x3FFF, h: buf.readUInt16LE(28) & 0x3FFF };
+      }
+      return null;
+    }
+    let totalArea = 0;
+    const dims = {};
+    for (const s of SHARKS) {
+      const buf = fs.readFileSync(path.join(DIR, ART_URL(s.id, 'illustration')));
+      const d = webpDims(buf);
+      if (!d) return false;
+      if (d.w > 900 || d.h > 669) return false;
+      dims[s.id] = d;
+      totalArea += d.w * d.h;
+    }
+    const nurse = dims['nurse'];
+    const sawshark = dims['sawshark'];
+    const catshark = dims['catshark'];
+    return nurse && nurse.w === 871 && nurse.h === 229 &&
+           sawshark && sawshark.w === 884 && sawshark.h === 160 &&
+           catshark && catshark.w === 869 && catshark.h === 219 &&
+           totalArea < 21200000;
+  })());
   ok('v0.26.0: background creature sprites exist on disk', (() => {
     return ['bg-sea-turtle', 'bg-dolphin', 'bg-fish-school',
             'bg-ray', 'bg-seal', 'bg-jellyfish']
@@ -3171,6 +3223,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

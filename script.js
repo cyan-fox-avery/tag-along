@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.33-beta";
+const VERSION = "v1.7.34-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.34-beta": [
+"✂️ <strong>Shark art trimmed.</strong> The transparent padding baked into the 50 species illustrations is gone — every shark now fills its image box, so sharks render bigger and more consistently across the Collection, Research, and dive encounters. Only fully transparent borders were cut; the files were re-encoded lossy, so tiny color differences are possible.",
+  ],
   "v1.7.33-beta": [
 "🖼️ <strong>Collection detail: tighter art, re-sightings on the left.</strong> The shark illustration sits tighter in the modal — less empty blue above and below it — and the Re-sightings block moved from the right column to the left, under the stats and Track button, so the columns balance better on long entries.",
   ],
