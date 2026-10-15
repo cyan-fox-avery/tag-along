@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.30-beta', VERSION === 'v1.7.30-beta');
+  ok('version v1.7.31-beta', VERSION === 'v1.7.31-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2459,9 +2459,15 @@ code += `
   ok('wide Research dropdown overrides base max-width', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*none/.test(cssCode));
   ok('wide Research last-column dropdown anchors right', /#researchList\\s+\\.guide-row:nth-child\\(3n\\)\\.open\\s+\\.guide-row-body\\s*\\{[^}]*right:\\s*0/.test(cssCode));
   ok('detail columns are two wrappers', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-identity\\s*\{[^}]*grid-column:\\s*1/.test(cssCode) && /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-record\\s*\{[^}]*grid-column:\\s*2/.test(cssCode));
+  // v1.7.31-beta: art is a full-width row across the top of the modal,
+  // identity + record in two columns below it. Art is large on wide screens.
+  ok('detail art spans both columns on top', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-art\\s*\{[^}]*grid-column:\\s*1\\s*\\/\\s*-1/.test(cssCode));
+  ok('detail art is large on wide screens', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-art\\s+\.shark-art[^{]*\{[^}]*max-width:\\s*600px/.test(cssCode));
   ok('detail grid does not place individual blocks', !/#detailOverlay\\s+#detailContent\\s*>\\s*\.(shark-art|book-stats|resight-block|hook)/.test(cssCode));
-  // v1.7.27-beta Mira fix: two independent column wrappers — identity first,
-  // record second; each column flows its own block content from the top.
+  // v1.7.27-beta Mira fix: independent wrappers — art row first, then
+  // identity and record columns; each flows its own block content from
+  // the top. v1.7.31-beta: stats + Track moved into identity; art is
+  // its own full-width row above the columns.
   // The mocked DOM has no layout engine, so these assert the DOM structure
   // the CSS relies on (a real-browser rect check runs separately).
   ok('detail modal wraps identity and record columns in order', (() => {
@@ -2478,16 +2484,20 @@ code += `
     const html = document.getElementById('detailContent').innerHTML;
     state.tagged = savedTagged;
     state.unlockedFacts = savedFacts;
+    const artIdx = html.indexOf('detail-art');
     const idIdx = html.indexOf('detail-identity');
     const recIdx = html.indexOf('detail-record');
-    if (idIdx === -1 || recIdx === -1 || idIdx > recIdx) return false;
+    if (artIdx === -1 || idIdx === -1 || recIdx === -1 || artIdx > idIdx || idIdx > recIdx) return false;
+    const artHtml = html.slice(artIdx, idIdx);
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
-    const inId = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"'].every(c => idHtml.includes(c));
-    const notInId = ['class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
-    const inRec = ['class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
-    const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"'].every(c => !recHtml.includes(c));
-    return inId && notInId && inRec && notInRec;
+    const inArt = ['class="shark-art"'].every(c => artHtml.includes(c));
+    const notInArt = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !artHtml.includes(c));
+    const inId = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"'].every(c => idHtml.includes(c));
+    const notInId = ['class="shark-art"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
+    const inRec = ['class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
+    const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"'].every(c => !recHtml.includes(c));
+    return inArt && notInArt && inId && notInId && inRec && notInRec;
   })());
   ok('detail modal keeps conditional blocks out when empty', (() => {
     const savedTagged = state.tagged;
@@ -2498,17 +2508,21 @@ code += `
     const html = document.getElementById('detailContent').innerHTML;
     state.tagged = savedTagged;
     state.unlockedFacts = savedFacts;
+    const artIdx = html.indexOf('detail-art');
     const idIdx = html.indexOf('detail-identity');
     const recIdx = html.indexOf('detail-record');
-    if (idIdx === -1 || recIdx === -1 || idIdx > recIdx) return false;
+    if (artIdx === -1 || idIdx === -1 || recIdx === -1 || artIdx > idIdx || idIdx > recIdx) return false;
+    const artHtml = html.slice(artIdx, idIdx);
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
     // nickname, re-sightings, field notes, insights all absent — but the
     // wrappers, the rename form, and the always-present blocks remain
-    return !idHtml.includes('class="given-name"') && idHtml.includes('id="renameForm"')
+    return artHtml.includes('class="shark-art"')
+      && !idHtml.includes('class="given-name"') && idHtml.includes('id="renameForm"')
+      && idHtml.includes('class="book-stats"') && idHtml.includes('id="trackBtn"')
       && !recHtml.includes('class="resight-block"') && !recHtml.includes('class="watch-notes-block"')
       && !recHtml.includes('class="secret-facts-block"')
-      && recHtml.includes('class="book-stats"') && recHtml.includes('class="hook"');
+      && recHtml.includes('class="hook"');
   })());
   ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
@@ -3050,6 +3064,7 @@ ok('WHATS_NEW has v1.7.24-beta', Array.isArray(WHATS_NEW['v1.7.24-beta']) && WHA
 ok('WHATS_NEW has v1.7.25-beta', Array.isArray(WHATS_NEW['v1.7.25-beta']) && WHATS_NEW['v1.7.25-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.27-beta', Array.isArray(WHATS_NEW['v1.7.27-beta']) && WHATS_NEW['v1.7.27-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHATS_NEW['v1.7.26-beta'].length >= 1);
+ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.30-beta', Array.isArray(WHATS_NEW['v1.7.30-beta']) && WHATS_NEW['v1.7.30-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.29-beta', Array.isArray(WHATS_NEW['v1.7.29-beta']) && WHATS_NEW['v1.7.29-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.28-beta', Array.isArray(WHATS_NEW['v1.7.28-beta']) && WHATS_NEW['v1.7.28-beta'].length >= 1);

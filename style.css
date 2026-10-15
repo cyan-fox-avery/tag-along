@@ -1577,22 +1577,31 @@ video.archive-media { max-height: 420px; }
 
   /* v1.7.27-beta: Collection detail modal goes two-column on wide screens.
      The 380px single column was a tall narrow strip on iPad landscape /
-     desktop with wasted space on both sides. Identity (art, name, ID,
-     status) on the left; stats / notes / insights on the right. The
-     Close button sits below the grid, full width. Scoped to
-     #detailOverlay so Tracking / Phone / What's New modals (same .phone
-     class) are untouched. Single-column layout below 1024px is unchanged.
-     Mira fix: the grid holds exactly TWO wrapper children, not one rule
-     per content block. The per-child version set grid-column only and
-     left grid-row on auto, so sparse auto-placement started column 2 near
-     the last column-1 row and shared grid tracks coupled row heights
-     across unrelated content (gaps when re-sightings/notes were long).
-     Each wrapper now flows its own block content from the top,
-     independently. */
+     desktop with wasted space on both sides. The Close button sits below
+     the grid, full width. Scoped to #detailOverlay so Tracking / Phone /
+     What's New modals (same .phone class) are untouched. Single-column
+     layout below 1024px is unchanged.
+     v1.7.27 Mira fix: the grid holds wrapper children, not one rule per
+     content block. The per-child version set grid-column only and left
+     grid-row on auto, so sparse auto-placement started column 2 near the
+     last column-1 row and shared grid tracks coupled row heights across
+     unrelated content (gaps when re-sightings/notes were long). Each
+     wrapper flows its own block content from the top, independently.
+     v1.7.31-beta: art moves out of the left column to a full-width row
+     across the top of the modal (large illustration), with identity and
+     record in two columns below it. The old left column ended at the
+     IUCN pill and left a big empty gap beside long record entries;
+     the art row + stats-in-identity balance the columns instead. */
   #detailOverlay .detail-modal { max-width: 820px; }
   #detailOverlay #detailContent {
     display: grid; grid-template-columns: 1fr 1.15fr; gap: 4px 20px; align-items: start;
   }
+  #detailOverlay #detailContent > .detail-art { grid-column: 1 / -1; min-width: 0; }
+  /* Large art across the top: scoped to the detail modal so the
+     Collection grid cells (140px art) and other .shark-art uses are
+     untouched. height:auto keeps the illustration's aspect ratio. */
+  #detailOverlay #detailContent > .detail-art .shark-art img,
+  #detailOverlay #detailContent > .detail-art .shark-art svg { max-width: 600px; }
   #detailOverlay #detailContent > .detail-identity { grid-column: 1; min-width: 0; }
   #detailOverlay #detailContent > .detail-record { grid-column: 2; min-width: 0; }
 
