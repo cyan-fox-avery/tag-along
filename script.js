@@ -26,7 +26,7 @@ const WHATS_NEW = {
 "🧭 <strong>Follow shows insight progress.</strong> The Follow button now tells you how many secret insights you've unlocked for that shark — e.g. (insights: 2/3) — so you know what following will get you.",
 "🦈 <strong>Cookiecutter archive illustration-only.</strong> The cookiecutter's archive entry now shows only the scientific illustration — no more dead specimens.",
 "✕ <strong>Close button on modals.</strong> Collection detail, Tracking, and What's New now have a ✕ in the top-right corner — the old Close button sat below the fold on mobile, leaving no visible way out.",
-"🔁 <strong>Re-sightings, less spammy.</strong> Reunion odds are halved (resident 25%, coastal 12.5%, migratory 5%) and a shark can't be re-sighted twice in one day — Pen Pal (3 re-sightings of one shark) now takes at least three days. The detail card shows only the 3 most recent re-sightings, with a Show all button for the rest.",
+"🔁 <strong>Re-sightings, less spammy.</strong> Reunion odds are halved (resident 25%, coastal 12.5%, migratory 5%) — same chance on every encounter, no time gating. The detail card shows only the 3 most recent re-sightings, with a Show all button for the rest.",
   ],
   "v1.7.22-beta": [
 "📚 <strong>Archive accordion.</strong> Opening an archive entry now closes any other open entry — one at a time, no more stacked expansions.",
@@ -1306,18 +1306,9 @@ const sharkById = (id) => SHARKS.find(s => s.id === id);
    NOT scientific re-sighting probabilities. Resident/site-faithful sharks are
    most likely to be recognized; wide-ranging migrants rarely are.
    v1.7.23-beta: halved across the board (Avery: 4 re-sightings of one nurse
-   shark in 4 days felt spammy, not special). Combined with the 24h cooldown
-   below, Pen Pal (3 re-sightings of one individual) now takes at least
-   three days of play. */
+   shark in 4 days felt spammy, not special). No time gating — the same odds
+   apply on every encounter (Avery: we're not time-gating the game). */
 const REUNION_ODDS = { resident: 0.25, coastal: 0.125, migratory: 0.05 };
-/* v1.7.23-beta: re-sighting cooldown — a shark re-sighted within the last
-   24 hours can't be a reunion again yet. At most one recorded re-sighting
-   per shark per day. Legacy entries without a timestamp don't trigger it. */
-const RESIGHT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-function recentlyResighted(rec) {
-  const last = ((rec && rec.resightings) || []).slice(-1)[0];
-  return !!(last && typeof last.ts === "number" && (Date.now() - last.ts) < RESIGHT_COOLDOWN_MS);
-}
 const ECOLOGY_TIER = {
   /* Resident/site-faithful (17) — reef residents, bottom-dwellers, site-attached */
   nurse: "resident", sandtiger: "resident", galapagos: "resident",
@@ -2125,16 +2116,15 @@ function doEncounter(species, plan) {
     /* v1.5.3-beta: reunion system — one tagged shark per species. After tagging,
        encountering the species rolls: is it YOUR shark (reunion) or a different
        untagged animal? Odds by ecology tier (game-balance, not science):
-       resident 25%, coastal 12.5%, migratory 5%. v1.7.23-beta: a shark
-       re-sighted in the last 24h can't be a reunion again yet — the
-       encounter is a different wild shark instead. */
+       resident 25%, coastal 12.5%, migratory 5%. No time gating — the same
+       odds apply on every encounter. */
     const existingRec = state.tagged[species.id];
     let isReunion = false;
     let isDifferentShark = false;
     if (existingRec) {
       const tier = (typeof ECOLOGY_TIER !== "undefined" && ECOLOGY_TIER[species.id]) || "coastal";
       const odds = (typeof REUNION_ODDS !== "undefined" && REUNION_ODDS[tier]) || 0.125;
-      isReunion = !recentlyResighted(existingRec) && Math.random() < odds;
+      isReunion = Math.random() < odds;
       isDifferentShark = !isReunion;
     }
     const rec = isReunion ? existingRec : null;

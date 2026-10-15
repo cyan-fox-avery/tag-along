@@ -2294,17 +2294,11 @@ code += `
     if (typeof REUNION_ODDS === 'undefined') return false;
     return REUNION_ODDS.resident === 0.25 && REUNION_ODDS.coastal === 0.125 && REUNION_ODDS.migratory === 0.05;
   })());
-  // v1.7.23-beta: re-sighting tuning — halved odds + 24h cooldown per shark
-  ok('reunion roll respects 24h resight cooldown', /!recentlyResighted\\(existingRec\\) && Math\\.random\\(\\) < odds/.test(code));
-  ok('recentlyResighted cooldown behaves', (() => {
-    if (typeof recentlyResighted === 'undefined') return false;
-    const now = Date.now();
-    return recentlyResighted({ resightings: [{ ts: now }] }) === true
-      && recentlyResighted({ resightings: [{ ts: now - 25 * 3600 * 1000 }] }) === false
-      && recentlyResighted({ resightings: [{ date: 'Oct 10, 2026' }] }) === false
-      && recentlyResighted({}) === false
-      && recentlyResighted(null) === false;
-  })());
+  // v1.7.23-beta: re-sighting tuning — halved odds, no time gating (Avery:
+  // "we're not time gating the game" — the 24h cooldown was removed).
+  // The reunion roll is a pure odds roll on every encounter.
+  ok('reunion roll has no time gating', /isReunion = Math\\.random\\(\\) < odds;/.test(fileCode)
+    && !/recentlyResighted/.test(fileCode) && !/RESIGHT_COOLDOWN/.test(fileCode));
   ok('re-sightings list collapses to 3 with Show all', (() => {
     const savedTagged = state.tagged;
     state.tagged = { nurse: { name: '', researchId: 'NS-2026-002', length: 2.9, sex: 'female', location: 'Caribbean Sea', date: 'Oct 10, 2026', resightings: [
