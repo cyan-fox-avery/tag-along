@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.29-beta";
+const VERSION = "v1.7.30-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.30-beta": [
+"📖 <strong>Research tab back to 3 columns.</strong> The 2-column grid from v1.7.27 wasn't right — the field guide is 3 columns again on wide screens. Instead, an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column.",
+  ],
   "v1.7.29-beta": [
 "🌊 <strong>Seafloor removed.</strong> The seafloor silhouette (sediment + kelp) at the bottom of the screen is gone — its kelp strands were rendering oversized on iPad as mysterious blue squiggles. The background gradient still fades from light blue to pure black, so the ocean just has no floor now.",
   ],
