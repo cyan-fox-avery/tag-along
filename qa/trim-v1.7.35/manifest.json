@@ -1,0 +1,1775 @@
+{
+  "version": "v1.7.35-beta",
+  "generated_by": "qa/trim-v1.7.35/build-manifest.py",
+  "method": "v1.7.35 re-trims 24 species to the bbox of alpha>=200 pixels in the original (the v1.7.34 alpha>0 bbox kept faint alpha noise, so those trims barely cut anything). The other 26 species are untouched since v1.7.34 (alpha>0 bbox). Re-trimmed files re-encoded lossy WebP (q90; lemon q95). Alpha verified by pasting each current file back at its crop offset onto an original-size transparent canvas and diffing the alpha channel.",
+  "commits": {
+    "before_originals": "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2 (main, PR #99 merge)",
+    "before_v1_7_34_files": "2f19cb5590d26d2355761f9582e1eb024cd3476f (main, PR #101 merge)",
+    "after_retrimmed": "PENDING"
+  },
+  "totals": {
+    "species": 50,
+    "original_bytes": 1895784,
+    "trimmed_bytes": 2631828,
+    "original_area_px": 29791800,
+    "trimmed_area_px": 14650132
+  },
+  "global_checks": {
+    "all_geometry_ok": true,
+    "geometry_failures": [],
+    "all_alpha_exact": true,
+    "alpha_failures": []
+  },
+  "species": [
+    {
+      "id": "nurse",
+      "name": "Nurse Shark",
+      "file": "nurse-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 29724
+      },
+      "trimmed": {
+        "width": 871,
+        "height": 229,
+        "bytes": 40808
+      },
+      "crop": {
+        "left": 14,
+        "top": 224,
+        "cut_top": 224,
+        "cut_bottom": 215,
+        "cut_left": 14,
+        "cut_right": 15
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.805,
+        "rgb_pct_visible_px_diff_gt10": 0.04
+      }
+    },
+    {
+      "id": "thresher",
+      "name": "Thresher Shark",
+      "file": "thresher-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35916
+      },
+      "trimmed": {
+        "width": 862,
+        "height": 443,
+        "bytes": 46788
+      },
+      "crop": {
+        "left": 21,
+        "top": 70,
+        "cut_top": 70,
+        "cut_bottom": 155,
+        "cut_left": 21,
+        "cut_right": 17
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 2.148,
+        "rgb_pct_visible_px_diff_gt10": 0.013
+      }
+    },
+    {
+      "id": "whale",
+      "name": "Whale Shark",
+      "file": "whale-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 55346
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 354,
+        "bytes": 76714
+      },
+      "crop": {
+        "left": 14,
+        "top": 152,
+        "cut_top": 152,
+        "cut_bottom": 162,
+        "cut_left": 14,
+        "cut_right": 8
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.964,
+        "rgb_pct_visible_px_diff_gt10": 0.005
+      }
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin Shark",
+      "file": "goblin-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 24820
+      },
+      "trimmed": {
+        "width": 885,
+        "height": 202,
+        "bytes": 31366
+      },
+      "crop": {
+        "left": 9,
+        "top": 221,
+        "cut_top": 221,
+        "cut_bottom": 245,
+        "cut_left": 9,
+        "cut_right": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 131,
+        "rgb_mean_abs_diff_visible_px": 1.802,
+        "rgb_pct_visible_px_diff_gt10": 0.016
+      }
+    },
+    {
+      "id": "tiger",
+      "name": "Tiger Shark",
+      "file": "tiger-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 39700
+      },
+      "trimmed": {
+        "width": 889,
+        "height": 653,
+        "bytes": 53424
+      },
+      "crop": {
+        "left": 10,
+        "top": 0,
+        "cut_top": 0,
+        "cut_bottom": 15,
+        "cut_left": 10,
+        "cut_right": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.814,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "sandtiger",
+      "name": "Sand Tiger Shark",
+      "file": "sandtiger-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 35744
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 263,
+        "bytes": 48730
+      },
+      "crop": {
+        "left": 12,
+        "top": 235,
+        "cut_top": 235,
+        "cut_bottom": 171,
+        "cut_left": 12,
+        "cut_right": 10
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.767,
+        "rgb_pct_visible_px_diff_gt10": 0.014
+      }
+    },
+    {
+      "id": "galapagos",
+      "name": "Gal\u00e1pagos Shark",
+      "file": "galapagos-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35532
+      },
+      "trimmed": {
+        "width": 877,
+        "height": 345,
+        "bytes": 43844
+      },
+      "crop": {
+        "left": 16,
+        "top": 149,
+        "cut_top": 149,
+        "cut_bottom": 174,
+        "cut_left": 16,
+        "cut_right": 7
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 195,
+        "rgb_mean_abs_diff_visible_px": 1.63,
+        "rgb_pct_visible_px_diff_gt10": 0.005
+      }
+    },
+    {
+      "id": "greatwhite",
+      "name": "Great White Shark",
+      "file": "great-white-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 43454
+      },
+      "trimmed": {
+        "width": 870,
+        "height": 464,
+        "bytes": 56316
+      },
+      "crop": {
+        "left": 16,
+        "top": 37,
+        "cut_top": 37,
+        "cut_bottom": 167,
+        "cut_left": 16,
+        "cut_right": 14
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 197,
+        "rgb_mean_abs_diff_visible_px": 1.893,
+        "rgb_pct_visible_px_diff_gt10": 0.014
+      }
+    },
+    {
+      "id": "hammerhead",
+      "name": "Great Hammerhead",
+      "file": "hammerhead-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 43974
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 419,
+        "bytes": 58536
+      },
+      "crop": {
+        "left": 12,
+        "top": 119,
+        "cut_top": 119,
+        "cut_bottom": 131,
+        "cut_left": 12,
+        "cut_right": 12
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.808,
+        "rgb_pct_visible_px_diff_gt10": 0.016
+      }
+    },
+    {
+      "id": "mako",
+      "name": "Shortfin Mako",
+      "file": "mako-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 34558
+      },
+      "trimmed": {
+        "width": 870,
+        "height": 296,
+        "bytes": 44826
+      },
+      "crop": {
+        "left": 17,
+        "top": 182,
+        "cut_top": 182,
+        "cut_bottom": 190,
+        "cut_left": 17,
+        "cut_right": 13
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 185,
+        "rgb_mean_abs_diff_visible_px": 1.932,
+        "rgb_pct_visible_px_diff_gt10": 0.009
+      }
+    },
+    {
+      "id": "basking",
+      "name": "Basking Shark",
+      "file": "basking-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 51698
+      },
+      "trimmed": {
+        "width": 883,
+        "height": 396,
+        "bytes": 73634
+      },
+      "crop": {
+        "left": 11,
+        "top": 134,
+        "cut_top": 134,
+        "cut_bottom": 139,
+        "cut_left": 11,
+        "cut_right": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.929,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "epaulette",
+      "name": "Epaulette Shark",
+      "file": "epaulette-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31876
+      },
+      "trimmed": {
+        "width": 864,
+        "height": 187,
+        "bytes": 39826
+      },
+      "crop": {
+        "left": 19,
+        "top": 240,
+        "cut_top": 240,
+        "cut_bottom": 241,
+        "cut_left": 19,
+        "cut_right": 17
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 189,
+        "rgb_mean_abs_diff_visible_px": 2.169,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "lemon",
+      "name": "Lemon Shark",
+      "file": "lemon-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35914
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 295,
+        "bytes": 57936
+      },
+      "crop": {
+        "left": 19,
+        "top": 192,
+        "cut_top": 192,
+        "cut_bottom": 181,
+        "cut_left": 19,
+        "cut_right": 12
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 193,
+        "rgb_mean_abs_diff_visible_px": 1.237,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "blacktip",
+      "name": "Blacktip Reef Shark",
+      "file": "blacktip-reef-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 30992
+      },
+      "trimmed": {
+        "width": 862,
+        "height": 273,
+        "bytes": 40310
+      },
+      "crop": {
+        "left": 22,
+        "top": 187,
+        "cut_top": 187,
+        "cut_bottom": 208,
+        "cut_left": 22,
+        "cut_right": 16
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 199,
+        "rgb_mean_abs_diff_visible_px": 1.88,
+        "rgb_pct_visible_px_diff_gt10": 0.019
+      }
+    },
+    {
+      "id": "whitetip",
+      "name": "Whitetip Reef Shark",
+      "file": "whitetip-reef-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 29074
+      },
+      "trimmed": {
+        "width": 872,
+        "height": 254,
+        "bytes": 39784
+      },
+      "crop": {
+        "left": 18,
+        "top": 197,
+        "cut_top": 197,
+        "cut_bottom": 217,
+        "cut_left": 18,
+        "cut_right": 10
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.877,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "blue",
+      "name": "Blue Shark",
+      "file": "blue-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 32468
+      },
+      "trimmed": {
+        "width": 861,
+        "height": 302,
+        "bytes": 43058
+      },
+      "crop": {
+        "left": 28,
+        "top": 197,
+        "cut_top": 197,
+        "cut_bottom": 169,
+        "cut_left": 28,
+        "cut_right": 11
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.831,
+        "rgb_pct_visible_px_diff_gt10": 0.029
+      }
+    },
+    {
+      "id": "porbeagle",
+      "name": "Porbeagle",
+      "file": "porbeagle-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 38676
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 366,
+        "bytes": 53380
+      },
+      "crop": {
+        "left": 17,
+        "top": 146,
+        "cut_top": 146,
+        "cut_bottom": 156,
+        "cut_left": 17,
+        "cut_right": 7
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 198,
+        "rgb_mean_abs_diff_visible_px": 1.974,
+        "rgb_pct_visible_px_diff_gt10": 0.012
+      }
+    },
+    {
+      "id": "silky",
+      "name": "Silky Shark",
+      "file": "silky-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 29206
+      },
+      "trimmed": {
+        "width": 865,
+        "height": 277,
+        "bytes": 39628
+      },
+      "crop": {
+        "left": 25,
+        "top": 199,
+        "cut_top": 199,
+        "cut_bottom": 192,
+        "cut_left": 25,
+        "cut_right": 10
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.822,
+        "rgb_pct_visible_px_diff_gt10": 0.014
+      }
+    },
+    {
+      "id": "oceanic",
+      "name": "Oceanic Whitetip",
+      "file": "oceanic-whitetip-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35356
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 334,
+        "bytes": 48270
+      },
+      "crop": {
+        "left": 18,
+        "top": 164,
+        "cut_top": 164,
+        "cut_bottom": 170,
+        "cut_left": 18,
+        "cut_right": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.64,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "sevengill",
+      "name": "Broadnose Sevengill",
+      "file": "sevengill-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 39586
+      },
+      "trimmed": {
+        "width": 877,
+        "height": 286,
+        "bytes": 51566
+      },
+      "crop": {
+        "left": 14,
+        "top": 202,
+        "cut_top": 202,
+        "cut_bottom": 181,
+        "cut_left": 14,
+        "cut_right": 9
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 189,
+        "rgb_mean_abs_diff_visible_px": 1.876,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "bronze",
+      "name": "Bronze Whaler",
+      "file": "bronze-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 32418
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 282,
+        "bytes": 45124
+      },
+      "crop": {
+        "left": 22,
+        "top": 195,
+        "cut_top": 195,
+        "cut_bottom": 191,
+        "cut_left": 22,
+        "cut_right": 2
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.996,
+        "rgb_pct_visible_px_diff_gt10": 0.043
+      }
+    },
+    {
+      "id": "frilled",
+      "name": "Frilled Shark",
+      "file": "frilled-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 24352
+      },
+      "trimmed": {
+        "width": 867,
+        "height": 415,
+        "bytes": 26642
+      },
+      "crop": {
+        "left": 16,
+        "top": 244,
+        "cut_top": 244,
+        "cut_bottom": 9,
+        "cut_left": 16,
+        "cut_right": 17
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 171,
+        "rgb_mean_abs_diff_visible_px": 1.496,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "zebra",
+      "name": "Zebra Shark",
+      "file": "zebra-illustration.webp",
+      "encoding": "VP8L",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 42270
+      },
+      "trimmed": {
+        "width": 873,
+        "height": 248,
+        "bytes": 157512
+      },
+      "crop": {
+        "left": 16,
+        "top": 222,
+        "cut_top": 222,
+        "cut_bottom": 198,
+        "cut_left": 16,
+        "cut_right": 11
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 0.0,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "scalloped",
+      "name": "Scalloped Hammerhead",
+      "file": "scalloped-hammerhead-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 51194
+      },
+      "trimmed": {
+        "width": 861,
+        "height": 451,
+        "bytes": 67780
+      },
+      "crop": {
+        "left": 21,
+        "top": 100,
+        "cut_top": 100,
+        "cut_bottom": 117,
+        "cut_left": 21,
+        "cut_right": 18
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 172,
+        "rgb_mean_abs_diff_visible_px": 1.857,
+        "rgb_pct_visible_px_diff_gt10": 0.011
+      }
+    },
+    {
+      "id": "smooth",
+      "name": "Smooth Hammerhead",
+      "file": "smooth-hammerhead-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 41820
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 429,
+        "bytes": 57818
+      },
+      "crop": {
+        "left": 17,
+        "top": 121,
+        "cut_top": 121,
+        "cut_bottom": 119,
+        "cut_left": 17,
+        "cut_right": 14
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.857,
+        "rgb_pct_visible_px_diff_gt10": 0.016
+      }
+    },
+    {
+      "id": "bonnethead",
+      "name": "Bonnethead",
+      "file": "bonnethead-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 45890
+      },
+      "trimmed": {
+        "width": 844,
+        "height": 383,
+        "bytes": 58930
+      },
+      "crop": {
+        "left": 37,
+        "top": 155,
+        "cut_top": 155,
+        "cut_bottom": 131,
+        "cut_left": 37,
+        "cut_right": 19
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 195,
+        "rgb_mean_abs_diff_visible_px": 2.03,
+        "rgb_pct_visible_px_diff_gt10": 0.015
+      }
+    },
+    {
+      "id": "bull",
+      "name": "Bull Shark",
+      "file": "bull-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 33066
+      },
+      "trimmed": {
+        "width": 877,
+        "height": 339,
+        "bytes": 44668
+      },
+      "crop": {
+        "left": 17,
+        "top": 161,
+        "cut_top": 161,
+        "cut_bottom": 168,
+        "cut_left": 17,
+        "cut_right": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 118,
+        "rgb_mean_abs_diff_visible_px": 1.688,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "greyreef",
+      "name": "Grey Reef Shark",
+      "file": "grey-reef-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 33974
+      },
+      "trimmed": {
+        "width": 884,
+        "height": 311,
+        "bytes": 48240
+      },
+      "crop": {
+        "left": 14,
+        "top": 174,
+        "cut_top": 174,
+        "cut_bottom": 183,
+        "cut_left": 14,
+        "cut_right": 2
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.826,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "caribbean",
+      "name": "Caribbean Reef Shark",
+      "file": "caribbean-reef-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31080
+      },
+      "trimmed": {
+        "width": 879,
+        "height": 308,
+        "bytes": 41542
+      },
+      "crop": {
+        "left": 16,
+        "top": 173,
+        "cut_top": 173,
+        "cut_bottom": 187,
+        "cut_left": 16,
+        "cut_right": 5
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.572,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "sandbar",
+      "name": "Sandbar Shark",
+      "file": "sandbar-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 36152
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 473,
+        "bytes": 47060
+      },
+      "crop": {
+        "left": 18,
+        "top": 157,
+        "cut_top": 157,
+        "cut_bottom": 38,
+        "cut_left": 18,
+        "cut_right": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 135,
+        "rgb_mean_abs_diff_visible_px": 1.825,
+        "rgb_pct_visible_px_diff_gt10": 0.009
+      }
+    },
+    {
+      "id": "salmon",
+      "name": "Salmon Shark",
+      "file": "salmon-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 47784
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 325,
+        "bytes": 54730
+      },
+      "crop": {
+        "left": 16,
+        "top": 156,
+        "cut_top": 156,
+        "cut_bottom": 187,
+        "cut_left": 16,
+        "cut_right": 15
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.136,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "dusky",
+      "name": "Dusky Shark",
+      "file": "dusky-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 36550
+      },
+      "trimmed": {
+        "width": 881,
+        "height": 398,
+        "bytes": 49292
+      },
+      "crop": {
+        "left": 13,
+        "top": 161,
+        "cut_top": 161,
+        "cut_bottom": 109,
+        "cut_left": 13,
+        "cut_right": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 138,
+        "rgb_mean_abs_diff_visible_px": 1.934,
+        "rgb_pct_visible_px_diff_gt10": 0.009
+      }
+    },
+    {
+      "id": "silvertip",
+      "name": "Silvertip Shark",
+      "file": "silvertip-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 37218
+      },
+      "trimmed": {
+        "width": 880,
+        "height": 478,
+        "bytes": 46720
+      },
+      "crop": {
+        "left": 13,
+        "top": 66,
+        "cut_top": 66,
+        "cut_bottom": 124,
+        "cut_left": 13,
+        "cut_right": 7
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 195,
+        "rgb_mean_abs_diff_visible_px": 1.891,
+        "rgb_pct_visible_px_diff_gt10": 0.013
+      }
+    },
+    {
+      "id": "spinner",
+      "name": "Spinner Shark",
+      "file": "spinner-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 32366
+      },
+      "trimmed": {
+        "width": 871,
+        "height": 275,
+        "bytes": 42564
+      },
+      "crop": {
+        "left": 19,
+        "top": 196,
+        "cut_top": 196,
+        "cut_bottom": 197,
+        "cut_left": 19,
+        "cut_right": 10
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 76,
+        "rgb_mean_abs_diff_visible_px": 1.824,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "wobbegong",
+      "name": "Spotted Wobbegong",
+      "file": "wobbegong-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 59558
+      },
+      "trimmed": {
+        "width": 882,
+        "height": 287,
+        "bytes": 96176
+      },
+      "crop": {
+        "left": 10,
+        "top": 205,
+        "cut_top": 205,
+        "cut_bottom": 176,
+        "cut_left": 10,
+        "cut_right": 8
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.608,
+        "rgb_pct_visible_px_diff_gt10": 0.038
+      }
+    },
+    {
+      "id": "leopard",
+      "name": "Leopard Shark",
+      "file": "leopard-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31510
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 218,
+        "bytes": 44112
+      },
+      "crop": {
+        "left": 18,
+        "top": 221,
+        "cut_top": 221,
+        "cut_bottom": 229,
+        "cut_left": 18,
+        "cut_right": 4
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.99,
+        "rgb_pct_visible_px_diff_gt10": 0.028
+      }
+    },
+    {
+      "id": "horn",
+      "name": "Horn Shark",
+      "file": "horn-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 42806
+      },
+      "trimmed": {
+        "width": 864,
+        "height": 349,
+        "bytes": 60668
+      },
+      "crop": {
+        "left": 27,
+        "top": 157,
+        "cut_top": 157,
+        "cut_bottom": 162,
+        "cut_left": 27,
+        "cut_right": 9
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 2.021,
+        "rgb_pct_visible_px_diff_gt10": 0.021
+      }
+    },
+    {
+      "id": "portjackson",
+      "name": "Port Jackson Shark",
+      "file": "port-jackson-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 46220
+      },
+      "trimmed": {
+        "width": 858,
+        "height": 546,
+        "bytes": 61418
+      },
+      "crop": {
+        "left": 21,
+        "top": 61,
+        "cut_top": 61,
+        "cut_bottom": 61,
+        "cut_left": 21,
+        "cut_right": 21
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 154,
+        "rgb_mean_abs_diff_visible_px": 2.138,
+        "rgb_pct_visible_px_diff_gt10": 0.009
+      }
+    },
+    {
+      "id": "angelshark",
+      "name": "Common Angelshark",
+      "file": "angelshark-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 61054
+      },
+      "trimmed": {
+        "width": 660,
+        "height": 642,
+        "bytes": 79782
+      },
+      "crop": {
+        "left": 89,
+        "top": 14,
+        "cut_top": 14,
+        "cut_bottom": 12,
+        "cut_left": 89,
+        "cut_right": 151
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 194,
+        "rgb_mean_abs_diff_visible_px": 2.227,
+        "rgb_pct_visible_px_diff_gt10": 0.007
+      }
+    },
+    {
+      "id": "megamouth",
+      "name": "Megamouth Shark",
+      "file": "megamouth-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 45862
+      },
+      "trimmed": {
+        "width": 859,
+        "height": 445,
+        "bytes": 64800
+      },
+      "crop": {
+        "left": 25,
+        "top": 102,
+        "cut_top": 102,
+        "cut_bottom": 122,
+        "cut_left": 25,
+        "cut_right": 16
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 2.013,
+        "rgb_pct_visible_px_diff_gt10": 0.016
+      }
+    },
+    {
+      "id": "sawshark",
+      "name": "Common Sawshark",
+      "file": "sawshark-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 25314
+      },
+      "trimmed": {
+        "width": 884,
+        "height": 160,
+        "bytes": 31804
+      },
+      "crop": {
+        "left": 9,
+        "top": 243,
+        "cut_top": 243,
+        "cut_bottom": 266,
+        "cut_left": 9,
+        "cut_right": 7
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 2.063,
+        "rgb_pct_visible_px_diff_gt10": 0.055
+      }
+    },
+    {
+      "id": "greenland",
+      "name": "Greenland Shark",
+      "file": "greenland-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 39528
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 407,
+        "bytes": 53430
+      },
+      "crop": {
+        "left": 17,
+        "top": 188,
+        "cut_top": 188,
+        "cut_bottom": 73,
+        "cut_left": 17,
+        "cut_right": 14
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 187,
+        "rgb_mean_abs_diff_visible_px": 1.813,
+        "rgb_pct_visible_px_diff_gt10": 0.005
+      }
+    },
+    {
+      "id": "cookiecutter",
+      "name": "Cookiecutter Shark",
+      "file": "cookiecutter-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 360,
+        "bytes": 26764
+      },
+      "trimmed": {
+        "width": 860,
+        "height": 147,
+        "bytes": 37654
+      },
+      "crop": {
+        "left": 23,
+        "top": 115,
+        "cut_top": 115,
+        "cut_bottom": 98,
+        "cut_left": 23,
+        "cut_right": 17
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.863,
+        "rgb_pct_visible_px_diff_gt10": 0.017
+      }
+    },
+    {
+      "id": "sixgill",
+      "name": "Bluntnose Sixgill Shark",
+      "file": "sixgill-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 40368
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 357,
+        "bytes": 49566
+      },
+      "crop": {
+        "left": 14,
+        "top": 201,
+        "cut_top": 201,
+        "cut_bottom": 111,
+        "cut_left": 14,
+        "cut_right": 8
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 199,
+        "rgb_mean_abs_diff_visible_px": 1.877,
+        "rgb_pct_visible_px_diff_gt10": 0.013
+      }
+    },
+    {
+      "id": "velvetbelly",
+      "name": "Velvet-Belly Lanternshark",
+      "file": "velvet-belly-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 40920
+      },
+      "trimmed": {
+        "width": 874,
+        "height": 249,
+        "bytes": 53498
+      },
+      "crop": {
+        "left": 15,
+        "top": 184,
+        "cut_top": 184,
+        "cut_bottom": 235,
+        "cut_left": 15,
+        "cut_right": 11
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 147,
+        "rgb_mean_abs_diff_visible_px": 1.91,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "dwarflantern",
+      "name": "Dwarf Lanternshark",
+      "file": "dwarflantern-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 40112
+      },
+      "trimmed": {
+        "width": 861,
+        "height": 231,
+        "bytes": 55838
+      },
+      "crop": {
+        "left": 19,
+        "top": 294,
+        "cut_top": 294,
+        "cut_bottom": 144,
+        "cut_left": 19,
+        "cut_right": 20
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.947,
+        "rgb_pct_visible_px_diff_gt10": 0.031
+      }
+    },
+    {
+      "id": "kitefin",
+      "name": "Kitefin Shark",
+      "file": "kitefin-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 30552
+      },
+      "trimmed": {
+        "width": 867,
+        "height": 216,
+        "bytes": 34726
+      },
+      "crop": {
+        "left": 20,
+        "top": 224,
+        "cut_top": 224,
+        "cut_bottom": 228,
+        "cut_left": 20,
+        "cut_right": 13
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 1.086,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "pacificsleeper",
+      "name": "Pacific Sleeper Shark",
+      "file": "pacific-sleeper-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31120
+      },
+      "trimmed": {
+        "width": 868,
+        "height": 372,
+        "bytes": 39922
+      },
+      "crop": {
+        "left": 17,
+        "top": 56,
+        "cut_top": 56,
+        "cut_bottom": 240,
+        "cut_left": 17,
+        "cut_right": 15
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 189,
+        "rgb_mean_abs_diff_visible_px": 1.617,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "spinydogfish",
+      "name": "Spiny Dogfish",
+      "file": "spiny-dogfish-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 200,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 33902
+      },
+      "trimmed": {
+        "width": 867,
+        "height": 367,
+        "bytes": 37668
+      },
+      "crop": {
+        "left": 24,
+        "top": 104,
+        "cut_top": 104,
+        "cut_bottom": 197,
+        "cut_left": 24,
+        "cut_right": 9
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 119,
+        "rgb_mean_abs_diff_visible_px": 1.376,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "catshark",
+      "name": "Small-Spotted Catshark",
+      "file": "catshark-illustration.webp",
+      "encoding": "VP8X",
+      "alpha_threshold": 1,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 40446
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 219,
+        "bytes": 53400
+      },
+      "crop": {
+        "left": 17,
+        "top": 230,
+        "cut_top": 230,
+        "cut_bottom": 219,
+        "cut_left": 17,
+        "cut_right": 14
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_alpha_bbox": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "alpha_max_outside_crop": 0,
+        "rgb_mean_abs_diff_visible_px": 2.306,
+        "rgb_pct_visible_px_diff_gt10": 0.025
+      }
+    }
+  ]
+}
