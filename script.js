@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.37-beta";
+const VERSION = "v1.8.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,10 +20,11 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
-  "v1.7.37-beta": [
+  "v1.8.0-beta": [
 "📖 <strong>Archive tab back to 3 columns.</strong> The Wild Archive is 3 columns again on wide screens, like the Research tab — and an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column. Phone / narrow layouts are unchanged.",
 "🦄 <strong>White Whale is now Deep-Sea Unicorn.</strong> The megamouth achievement got a new name and emoji — White Whale was too close to WHAAAAAAALE, the whale-shark one. Same achievement, same unlock; WHAAAAAAALE is untouched.",
 "🔬 <strong>Hook + bonus are real insights now.</strong> Every species' hook (💡) and bonus (✨) are now unlockable tag-along insights, learned via Follow/Observe like the rest — 4 insights per species (5 for the nurse shark), all shown in the Tag-along insights section, with a 0/4 when none are learned yet. The separate 💡/✨ blocks are gone, and hook + bonus text was rewritten across all 50 species to remove overlaps with the existing facts. Your existing unlocks carry over; hook + bonus start locked. Dedicated now means all 201 insights. A second semantic sweep caught repeats the word-overlap check missed (nurse heaps, thresher tail-whipping, wobbegong ambush, and others) — those insights were rewritten, and Sarah's nurse chat no longer repeats the gill-pumping fact.",
+"🔧 <strong>Mira's review fixes.</strong> Sarah's named-shark check-ins no longer leak a locked hook insight in Phone chat — you get a neutral line until that insight is earned. The thresher hook no longer credits the common thresher with the bigeye's huge eyes, and the sand tiger hook no longer claims its mouth is always open (those teeth show even with its mouth shut). Salmon, leopard, wobbegong and porbeagle wording tightened the same way. This release was renumbered from v1.7.37 to v1.8.0 — same update, bigger number.",
   ],
   "v1.7.36-beta": [
 "✂️ <strong>Shark art component-cropped — the last stragglers.</strong> After the v1.7.35 re-trim, 13 species still had dead space: their source art carries full-opacity single-pixel specks, detached from the shark, with hundreds of empty rows between specks and shark — no alpha threshold could remove them. Those 13 are now cropped to the shark's own connected shape (plus a 3px safety margin), so the tiger, great white, frilled, and friends finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
@@ -2965,13 +2966,21 @@ function maybeReunionReaction(species, rec) {
    your NAMED sharks. Genuine family conversation — the fact stays
    with the species she asked about. */
 const NAMED_CHECKINS = [
-  /* v0.12.0 voice pass: the cousin who remembers, calmly. */
+  /* v0.12.0 voice pass: the cousin who remembers, calmly.
+     v1.8.0-beta Mira blocker: the hook is a LOCKED insight now, so
+     each template carries a neutral meLocked fallback. The hook text
+     is used only when that insight is already unlocked (see
+     maybeCheckinThread) — Sarah must never leak an unearned insight
+     in ordinary Phone chat while Collection still shows it locked. */
   { them: "Hey — how's {name} doing? I was just thinking about your {species}.",
-    me: "Still out there pinging away. {hook}" },
+    me: "Still out there pinging away. {hook}",
+    meLocked: "Still out there pinging away. No news, just vibes." },
   { them: "Do you think {name} remembers you?",
-    me: "If sharks hold grudges about boats, I'm in trouble. {hook}" },
+    me: "If sharks hold grudges about boats, I'm in trouble. {hook}",
+    meLocked: "If sharks hold grudges about boats, I'm in trouble. No news though." },
   { them: "Any news from {name}? I need a {species} update.",
-    me: "No new pings since yesterday. Probably busy being a shark. {hook}" }
+    me: "No new pings since yesterday. Probably busy being a shark. {hook}",
+    meLocked: "No new pings since yesterday. Probably busy being a shark." }
 ];
 
 function maybeCheckinThread() {
@@ -2980,13 +2989,19 @@ function maybeCheckinThread() {
   const s = pick(named);
   const rec = state.tagged[s.id];
   const t = pick(NAMED_CHECKINS);
+  /* v1.8.0-beta: the hook is insight index SECRET_FACTS.length for this
+     species (hook appends first in insightPoolFor). Only quote it when
+     the player has earned it; otherwise use the neutral fallback. */
+  const hookIdx = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[s.id] || []).length;
+  const hookUnlocked = (state.unlockedFacts[s.id] || []).includes(hookIdx);
+  const meText = hookUnlocked ? t.me : t.meLocked;
   const fill = (str) => str
     .replaceAll("{name}", rec.name)
     .replaceAll("{species}", s.name.toLowerCase())
     .replaceAll("{hook}", s.hook);
   return [
     { who: "them", text: fill(t.them) },
-    { who: "me", text: fill(t.me) }
+    { who: "me", text: fill(meText) }
   ];
 }
 
@@ -3400,6 +3415,10 @@ function askSarahAdvice(sid) {
 function saveStats() {
   statsStore.save(state.stats);
 }
+/* Grandfathering (v1.8.0-beta): already-earned achievements are never
+   re-checked, so a Dedicated earned under an earlier rule (e.g. the old
+   101-fact pool) stays earned even though the check now requires all 201
+   insights. The 201-fact bar applies to NEW awards only. */
 function checkAchievements() {
   if (typeof ACHIEVEMENTS === "undefined") return;
   ACHIEVEMENTS.forEach(a => {
@@ -3417,7 +3436,7 @@ function unlockAchievement(a) {
      achievements shows each card in turn instead of overwriting. */
   achieveQueue.push(a);
   showNextAchievement();
-  /* v1.4.9: Deep-Sea Unicorn (renamed from White Whale in v1.7.37)
+  /* v1.4.9: Deep-Sea Unicorn (renamed from White Whale in v1.8.0)
      gets a Sarah reaction — she'd lose her mind over a megamouth.
      Fires alongside the achievement celebration. */
   if (a.id === "white-whale" && typeof WHITE_WHALE_THREAD !== "undefined") {
@@ -3784,7 +3803,7 @@ const SECRET_FACTS = {
   ],
   porbeagle: [
     "Porbeagles run hot — among the warmest-bodied of all sharks, they keep their core heated well above the icy North Atlantic water they hunt in.",
-    "That internal furnace lets them chase prey in near-freezing seas where cold-blooded fish slow down — porbeagles stay fast in water that would numb most predators."
+    "Porbeagles are slow breeders — after a pregnancy of eight or nine months, a female gives birth to just a handful of live pups, usually around four."
   ],
   silky: [
     "Silky sharks are named for their skin: their tiny scales are so smooth the hide feels like silk, unlike the sandpaper of most sharks.",
@@ -3922,10 +3941,11 @@ const SECRET_FACTS = {
 
 /* Returns the next unlearned fact for a species, or null if exhausted.
    Guarantees one unlearned fact if any remain (Mira's guardrail). */
-/* v1.7.37-beta: the full insight pool for a species — SECRET_FACTS plus
+/* v1.8.0-beta: the full insight pool for a species — SECRET_FACTS plus
    the hook + bonus, which are now real unlockable insights. Hook/bonus
    text still lives on the shark record (sharks-data.js) because Sarah's
-   named-checkin replies use s.hook. Appending keeps old unlockedFacts
+   named-checkin replies quote s.hook ONLY when that insight is unlocked
+   (see maybeCheckinThread) — never to leak a locked insight. Appending keeps old unlockedFacts
    indices stable: existing players keep their SECRET_FACTS unlocks, and
    hook (index N) + bonus (index N+1) start locked. */
 function insightPoolFor(speciesId) {
@@ -4786,7 +4806,7 @@ function openDetail(id) {
     </div>` : ""}
     ${(() => {
       /* v1.4.0-beta: show unlocked tag-along facts in the collection detail.
-         v1.7.37-beta: the block ALWAYS renders — 0/N when nothing is
+         v1.8.0-beta: the block ALWAYS renders — 0/N when nothing is
          unlocked yet — so the player can see what there is to learn.
          Hook + bonus are real insights now (insightPoolFor), not
          separate 💡/✨ blocks. */

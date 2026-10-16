@@ -178,7 +178,7 @@ const ACHIEVEMENTS = [
   },
   {
     id: "white-whale",
-    /* v1.7.37-beta: renamed from "White Whale" to "Deep-Sea Unicorn"
+    /* v1.8.0-beta: renamed from "White Whale" to "Deep-Sea Unicorn"
        (new 🦄 icon) — White Whale was too close to WHAAAAAAALE, the
        whale-shark achievement. The internal id stays "white-whale" so
        players who already earned it keep the unlock. */
@@ -206,10 +206,13 @@ const ACHIEVEMENTS = [
       /* v1.7.28-beta: every SECRET_FACTS entry across all species learned
          via Follow/Observe. Pools are never empty (50 species, 201 insights),
          and unlockedFacts only grows via unlockSecretFact.
-         v1.7.37-beta: hook + bonus are real insights now — Dedicated means
+         v1.8.0-beta: hook + bonus are real insights now — Dedicated means
          the full combined pool (insightPoolFor: 4 per species, 5 for the
          nurse shark, 201 total). Old unlockedFacts indices stay valid
-         because hook/bonus append after SECRET_FACTS. */
+         because hook/bonus append after SECRET_FACTS.
+         Grandfathering: checkAchievements() skips already-earned
+         achievements, so a Dedicated earned under the old 101-fact rule
+         stays earned; the 201-fact bar applies to NEW awards only. */
       if (typeof SHARKS === "undefined" || typeof insightPoolFor === "undefined") return false;
       return SHARKS.length > 0 && SHARKS.every(s => {
         const pool = insightPoolFor(s.id);

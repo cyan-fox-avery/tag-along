@@ -247,7 +247,7 @@ const PICK_ICONS = {
 };
 
 /* v1.4.9: Deep-Sea Unicorn achievement (renamed from White Whale in
-   v1.7.37) — Sarah's reaction to a megamouth tag.
+   v1.8.0) — Sarah's reaction to a megamouth tag.
    The megamouth is famously elusive (unknown to science until 1976, only
    around 300 ever documented). Sarah would absolutely lose her mind. */
 const WHITE_WHALE_THREAD = [

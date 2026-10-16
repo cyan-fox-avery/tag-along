@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.37-beta', VERSION === 'v1.7.37-beta');
+  ok('version v1.8.0-beta', VERSION === 'v1.8.0-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -382,7 +382,9 @@ code += `
     // tagged nurse with zero re-sightings so far
     state.tagged = { nurse: { name: "", researchId: "NS-1", resightings: [] } };
     state.currentPlan = { region: "caribbean", depth: "shallow", bait: "chum" };
-    state.unlockedFacts = { nurse: [0, 1, 2] }; // exhausted, so no fact branch noise
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 4] }; // exhausted (all 5 nurse insights), so no fact branch noise
+    ok("follow fixture: nurse insights exhausted",
+      insightPoolFor("nurse").every((_, i) => state.unlockedFacts.nurse.includes(i)));
     state.pendingTagAlongFact = null;
     state.encounterDone = null;
     state.followedThisTrip = false;
@@ -2263,7 +2265,7 @@ code += `
     state.unlockedFacts = origFacts;
     factStore.save = origSave;
   })();
-  // v1.7.37-beta: hook + bonus are real insights — insightPoolFor.
+  // v1.8.0-beta: hook + bonus are real insights — insightPoolFor.
   (() => {
     ok("insightPoolFor: nurse has 5 (3 facts + hook + bonus)", insightPoolFor("nurse").length === 5);
     ok("insightPoolFor: epaulette has 4 (2 facts + hook + bonus)", insightPoolFor("epaulette").length === 4);
@@ -2329,7 +2331,7 @@ code += `
     state.pendingTagAlongFact = origPendingFact;
   })();
   // v1.4.0-beta Mira review: full 1->2->3->4->5->exhausted fact progression
-  // (v1.7.37-beta: nurse has 5 insights — 3 facts + hook + bonus)
+  // (v1.8.0-beta: nurse has 5 insights — 3 facts + hook + bonus)
   (() => {
     const origFacts = state.unlockedFacts;
     const origSave = factStore.save;
@@ -2688,7 +2690,7 @@ code += `
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
-  // v1.7.37: the megamouth achievement was renamed from "White Whale"
+  // v1.8.0: the megamouth achievement was renamed from "White Whale"
   // to "Deep-Sea Unicorn" (too close to WHAAAAAAALE, the whale-shark
   // one). The internal id stays "white-whale" so earned flags survive.
   ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "Deep-Sea Unicorn" && a.icon === "🦄"));
@@ -2736,7 +2738,7 @@ code += `
   // 2-column grid was wrong per Avery's iPad acceptance).
   // Expanded Research dropdowns span two columns; last-column ones
   // anchor right so they don't overflow the app container.
-  // v1.7.37-beta: Archive joins Research at 3 columns at >=1024px,
+  // v1.8.0-beta: Archive joins Research at 3 columns at >=1024px,
   // with the same two-column dropdown treatment. Achievements stays
   // on the shared 2-column .guide-list rule.
   ok('wide Research grid is 3 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?#researchList\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3/.test(cssCode));
@@ -2794,7 +2796,7 @@ code += `
     const notInId = ['class="shark-art"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
     const inRec = ['class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => recHtml.includes(c));
     const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"'].every(c => !recHtml.includes(c));
-    // v1.7.37-beta: hook + bonus are insights now — no separate 💡/✨ blocks.
+    // v1.8.0-beta: hook + bonus are insights now — no separate 💡/✨ blocks.
     const noHookBonus = !html.includes('class="hook"') && !html.includes('class="bonus-fact"');
     const insightsCount = html.includes('Tag-along insights (1/5)');
     return inArt && notInArt && inId && notInId && inRec && notInRec && noHookBonus && insightsCount;
@@ -2816,7 +2818,7 @@ code += `
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
     // nickname, re-sightings, field notes all absent — but the wrappers,
-    // the rename form, and the always-present blocks remain. v1.7.37-beta:
+    // the rename form, and the always-present blocks remain. v1.8.0-beta:
     // the insights block ALWAYS renders (0/5 when nothing unlocked);
     // the separate hook/bonus blocks are gone.
     return artHtml.includes('class="shark-art"')
@@ -3369,7 +3371,7 @@ ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHA
 ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHATS_NEW['v1.7.35-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
-  ok('WHATS_NEW has v1.7.37-beta', Array.isArray(WHATS_NEW['v1.7.37-beta']) && WHATS_NEW['v1.7.37-beta'].length === 3);
+  ok('WHATS_NEW has v1.8.0-beta', Array.isArray(WHATS_NEW['v1.8.0-beta']) && WHATS_NEW['v1.8.0-beta'].length === 4);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
@@ -3818,13 +3820,43 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   ok('v1.7.19 dusky species exists in roster',
     SHARKS.some(function(s){ return s.id === 'dusky'; }));
   /* v1.7.26-beta: thresher hook — "perpetually nervous" describes the whole
-     shark, not just its tail. v1.7.37-beta: hook rewritten (tail-whipping
-     repeated SECRET_FACTS) — huge eyes instead, nervousness kept. */
+     shark, not just its tail. v1.8.0-beta: hook rewritten (tail-whipping
+     repeated SECRET_FACTS) — huge eyes instead, nervousness kept.
+     v1.8.0-beta Mira blocker: huge eyes are a BIGEYE thresher trait, not
+     common thresher — hook rewritten to breaching instead. */
   ok('thresher hook attributes nervousness to the shark, not the tail',
-    SHARKS.some(function(s){ return s.id === 'thresher' && s.hook === 'It looks perpetually nervous — and those huge eyes are part of the look, big and dark for hunting in dim water.'; }));
-  /* v1.7.37-beta: second semantic sweep — rewrites for repeats the
+    SHARKS.some(function(s){ return s.id === 'thresher' && s.hook === 'It looks perpetually nervous — and it can launch its whole body clear out of the water, tail and all.'; }));
+  /* v1.8.0-beta Mira blocker: named-shark check-ins must not leak a
+     locked hook insight — Sarah quotes the hook only once earned,
+     otherwise a neutral fallback. */
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origRandom = Math.random;
+    Math.random = () => 0; // passes the 0.4 gate; picks first named + first template
+    try {
+      state.tagged = { thresher: { name: "Testy", researchId: "TS-1", resightings: [] } };
+      const thresherHook = SHARKS.find(function(s){ return s.id === "thresher"; }).hook;
+      // Locked: hook insight (index 2) NOT unlocked -> neutral fallback.
+      state.unlockedFacts = {};
+      const lockedThread = maybeCheckinThread();
+      ok("checkin: locked hook uses neutral fallback, no hook leak",
+        !!lockedThread && lockedThread[1].text.indexOf("No news, just vibes") !== -1 &&
+        lockedThread[1].text.indexOf(thresherHook) === -1);
+      // Unlocked: hook insight (index 2) earned -> hook text quoted.
+      state.unlockedFacts = { thresher: [2] };
+      const unlockedThread = maybeCheckinThread();
+      ok("checkin: unlocked hook is quoted",
+        !!unlockedThread && unlockedThread[1].text.indexOf(thresherHook) !== -1);
+    } finally {
+      Math.random = origRandom;
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+    }
+  })();
+  /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */
-  ok('v1.7.37 second sweep: rewritten insights present',
+  ok('v1.8.0 second sweep: rewritten insights present',
     SHARKS.some(function(s){ return s.id === 'nurse' && s.hook.indexOf('two dozen') !== -1; }) &&
     SHARKS.some(function(s){ return s.id === 'thresher' && s.bonus.indexOf('tail-slap') === -1; }) &&
     SHARKS.some(function(s){ return s.id === 'blue' && s.bonus.indexOf('Ireland') === -1; }) &&
@@ -3835,6 +3867,15 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     SECRET_FACTS.hammerhead[1].indexOf('stingray') === -1 &&
     SECRET_FACTS.porbeagle.join(' ').indexOf('migration') === -1 &&
     COUSIN_CHATS.nurse[0].them.indexOf('pump') === -1);
+  /* v1.8.0-beta Mira blockers: sand-tiger hook no longer claims the
+     mouth is always open; porbeagle F2 no longer rehashes F1's body-heat
+     mechanism; salmon drops the unsupported "only shark" claim; leopard
+     drops categorical "harmless". */
+  ok("v1.8.0 Mira blockers: corrected insight wording present",
+    SHARKS.some(function(s){ return s.id === "sandtiger" && s.hook.indexOf("mouth shut") !== -1 && s.hook.indexOf("always open") === -1; }) &&
+    SECRET_FACTS.porbeagle[1].indexOf("pups") !== -1 && SECRET_FACTS.porbeagle[1].indexOf("furnace") === -1 &&
+    SHARKS.some(function(s){ return s.id === "salmon" && s.hook.indexOf("only shark") === -1; }) &&
+    SHARKS.some(function(s){ return s.id === "leopard" && s.bonus.indexOf("harmless to people") === -1; }));
   /* v1.7.19-beta Mira review: trophy refreshes without a reload */
   ok('v1.7.19 doWin renders Achievements',
     (function(){

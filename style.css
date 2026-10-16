@@ -1533,7 +1533,7 @@ video.archive-media { max-height: 420px; }
      v1.7.29) — the 2-column grid wasn't the right fix. Instead the
      expanded dropdown below widens to span two columns, so expanded
      content gets room without the grid itself losing a column.
-     v1.7.37-beta: Archive joins Research at 3 columns on wide screens.
+     v1.8.0-beta: Archive joins Research at 3 columns on wide screens.
      Achievements keeps the 2-column .guide-list rule. */
   .guide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #researchList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1559,7 +1559,7 @@ video.archive-media { max-height: 420px; }
     left: auto; right: 0;
   }
 
-  /* v1.7.37-beta: expanded Archive entries widen the same way as
+  /* v1.8.0-beta: expanded Archive entries widen the same way as
      Research (two columns, last-column anchors right). The
      :nth-child(3n) count holds because renderArchive clears
      #archiveList and appends only .guide-row children — no intro
