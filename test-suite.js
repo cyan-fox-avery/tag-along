@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.36-beta', VERSION === 'v1.7.36-beta');
+  ok('version v1.7.37-beta', VERSION === 'v1.7.37-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2650,8 +2650,10 @@ code += `
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
-  // v1.7.23: WHAAAAAAALE achievement (renamed from White Whale) — tag a whale shark
-  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
+  // v1.7.37: the megamouth achievement was renamed from "White Whale"
+  // to "Deep-Sea Unicorn" (too close to WHAAAAAAALE, the whale-shark
+  // one). The internal id stays "white-whale" so earned flags survive.
+  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "Deep-Sea Unicorn" && a.icon === "🦄"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
   // v1.7.23: WHAAAAAAALE achievement — tag a whale shark (separate from White Whale)
   ok("whaaaaale achievement exists", ACHIEVEMENTS.some(a => a.id === "whaaaaale" && a.name === "WHAAAAAAALE"));
@@ -2693,15 +2695,21 @@ code += `
   ok('wide detail modal widens past phone width', /#detailOverlay\\s+\\.detail-modal\\s*\\{[^}]*max-width:\\s*820px/.test(cssCode));
   ok('detail modal HTML carries detail-modal class', /id=\"detailOverlay\"[\\s\\S]*?class=\"phone detail-modal\"/.test(htmlCode));
   // v1.7.30-beta: Research back to 3 columns at >=1024px (v1.7.27's
-  // 2-column grid was wrong per Avery's iPad acceptance); Archive and
-  // Achievements stay on the shared 2-column .guide-list rule.
+  // 2-column grid was wrong per Avery's iPad acceptance).
   // Expanded Research dropdowns span two columns; last-column ones
   // anchor right so they don't overflow the app container.
+  // v1.7.37-beta: Archive joins Research at 3 columns at >=1024px,
+  // with the same two-column dropdown treatment. Achievements stays
+  // on the shared 2-column .guide-list rule.
   ok('wide Research grid is 3 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?#researchList\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3/.test(cssCode));
-  ok('wide Archive/Achievements grids stay 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
+  ok('wide Archive grid is 3 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?#archiveList\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3/.test(cssCode));
+  ok('wide Achievements grid stays 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
   ok('wide Research dropdown spans two columns', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*width:\\s*calc\\(200% \\+ 12px\\)/.test(cssCode));
   ok('wide Research dropdown overrides base max-width', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*none/.test(cssCode));
   ok('wide Research last-column dropdown anchors right', /#researchList\\s+\\.guide-row:nth-child\\(3n\\)\\.open\\s+\\.guide-row-body\\s*\\{[^}]*right:\\s*0/.test(cssCode));
+  ok('wide Archive dropdown spans two columns', /#archiveList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*width:\\s*calc\\(200% \\+ 12px\\)/.test(cssCode));
+  ok('wide Archive dropdown overrides base max-width', /#archiveList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*none/.test(cssCode));
+  ok('wide Archive last-column dropdown anchors right', /#archiveList\\s+\\.guide-row:nth-child\\(3n\\)\\.open\\s+\\.guide-row-body\\s*\\{[^}]*right:\\s*0/.test(cssCode));
   ok('detail columns are two wrappers', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-identity\\s*\{[^}]*grid-column:\\s*1/.test(cssCode) && /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-record\\s*\{[^}]*grid-column:\\s*2/.test(cssCode));
   // v1.7.31-beta: art is a full-width row across the top of the modal,
   // identity + record in two columns below it. Art is large on wide screens.
@@ -3318,6 +3326,7 @@ ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHA
 ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHATS_NEW['v1.7.35-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
+  ok('WHATS_NEW has v1.7.37-beta', Array.isArray(WHATS_NEW['v1.7.37-beta']) && WHATS_NEW['v1.7.37-beta'].length === 2);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

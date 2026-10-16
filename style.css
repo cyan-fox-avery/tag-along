@@ -1533,10 +1533,11 @@ video.archive-media { max-height: 420px; }
      v1.7.29) — the 2-column grid wasn't the right fix. Instead the
      expanded dropdown below widens to span two columns, so expanded
      content gets room without the grid itself losing a column.
-     Scoped to #researchList: Archive and Achievements keep the
-     2-column .guide-list rule (v1.7.27 state, no complaint). */
+     v1.7.37-beta: Archive joins Research at 3 columns on wide screens.
+     Achievements keeps the 2-column .guide-list rule. */
   .guide-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #researchList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #archiveList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   /* v1.7.30-beta: expanded Research entries widen to span two columns
      (2 columns + the 12px gap between them) instead of squeezing into
@@ -1550,11 +1551,24 @@ video.archive-media { max-height: 420px; }
      count holds because #researchList holds only .guide-row children —
      the pinned card lives in the separate #pinnedSlot above the grid —
      so children 3, 6, 9, … land in column 3. Scoped to
-     #researchList so Archive/Achievements dropdowns are untouched. */
+     #researchList so Achievements dropdowns are untouched. */
   #researchList .guide-row.open .guide-row-body {
     width: calc(200% + 12px); max-width: none;
   }
   #researchList .guide-row:nth-child(3n).open .guide-row-body {
+    left: auto; right: 0;
+  }
+
+  /* v1.7.37-beta: expanded Archive entries widen the same way as
+     Research (two columns, last-column anchors right). The
+     :nth-child(3n) count holds because renderArchive clears
+     #archiveList and appends only .guide-row children — no intro
+     card or empty-state element lives inside the grid. Scoped to
+     #archiveList so Achievements dropdowns are untouched. */
+  #archiveList .guide-row.open .guide-row-body {
+    width: calc(200% + 12px); max-width: none;
+  }
+  #archiveList .guide-row:nth-child(3n).open .guide-row-body {
     left: auto; right: 0;
   }
 

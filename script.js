@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.7.36-beta";
+const VERSION = "v1.7.37-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.7.37-beta": [
+"📖 <strong>Archive tab back to 3 columns.</strong> The Wild Archive is 3 columns again on wide screens, like the Research tab — and an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column. Phone / narrow layouts are unchanged.",
+"🦄 <strong>White Whale is now Deep-Sea Unicorn.</strong> The megamouth achievement got a new name and emoji — White Whale was too close to WHAAAAAAALE, the whale-shark one. Same achievement, same unlock; WHAAAAAAALE is untouched.",
+  ],
   "v1.7.36-beta": [
 "✂️ <strong>Shark art component-cropped — the last stragglers.</strong> After the v1.7.35 re-trim, 13 species still had dead space: their source art carries full-opacity single-pixel specks, detached from the shark, with hundreds of empty rows between specks and shark — no alpha threshold could remove them. Those 13 are now cropped to the shark's own connected shape (plus a 3px safety margin), so the tiger, great white, frilled, and friends finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
   ],
@@ -3412,8 +3416,9 @@ function unlockAchievement(a) {
      achievements shows each card in turn instead of overwriting. */
   achieveQueue.push(a);
   showNextAchievement();
-  /* v1.4.9: White Whale gets a Sarah reaction — she'd lose her mind
-     over a megamouth. Fires alongside the achievement celebration. */
+  /* v1.4.9: Deep-Sea Unicorn (renamed from White Whale in v1.7.37)
+     gets a Sarah reaction — she'd lose her mind over a megamouth.
+     Fires alongside the achievement celebration. */
   if (a.id === "white-whale" && typeof WHITE_WHALE_THREAD !== "undefined") {
     pushThread(WHITE_WHALE_THREAD.map(m => ({ ...m })));
   }

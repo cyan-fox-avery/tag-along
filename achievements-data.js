@@ -178,8 +178,12 @@ const ACHIEVEMENTS = [
   },
   {
     id: "white-whale",
-    name: "White Whale",
-    icon: "🐋",
+    /* v1.7.37-beta: renamed from "White Whale" to "Deep-Sea Unicorn"
+       (new 🦄 icon) — White Whale was too close to WHAAAAAAALE, the
+       whale-shark achievement. The internal id stays "white-whale" so
+       players who already earned it keep the unlock. */
+    name: "Deep-Sea Unicorn",
+    icon: "🦄",
     breadcrumb: "the rarest shark in the sea",
     description: "Tagged a megamouth shark. Only around 300 have ever been documented. This is the big one.",
     check: (st) => !!st.tagged.megamouth
