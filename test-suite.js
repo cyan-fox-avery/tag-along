@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.2-beta', VERSION === 'v1.8.2-beta');
+  ok('version v1.8.3-beta', VERSION === 'v1.8.3-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2582,6 +2582,73 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
+  // v1.8.3-beta: Sarah throttle — at most one ROUTINE message per 5 min.
+  // Special dialogue + Ask Sarah always go through; routine messages
+  // inside the window are DROPPED, not queued.
+  (() => {
+    const origMsgsLen = state.messages.length;
+    const origUnread = state.unread;
+    const origLast = state.lastSarahMsgAt;
+    // Routine inside the window is dropped
+    state.lastSarahMsgAt = Date.now();
+    const dropped = pushThread([{ who: 'them', text: 'throttle drop test' }], 'routine');
+    ok('routine Sarah message inside 5-min window is dropped', dropped === false && state.messages.length === origMsgsLen);
+    // Special dialogue bypasses the throttle
+    const specialSent = pushThread([{ who: 'them', text: 'throttle special test' }], 'special');
+    ok('special dialogue bypasses the Sarah throttle', specialSent === true && state.messages.length === origMsgsLen + 1);
+    // Ask Sarah bypasses the throttle
+    const askSent = pushThread([{ who: 'them', text: 'throttle ask test' }], 'ask');
+    ok('Ask Sarah bypasses the Sarah throttle', askSent === true && state.messages.length === origMsgsLen + 2);
+    // Routine after the window goes through
+    state.lastSarahMsgAt = Date.now() - 6 * 60 * 1000;
+    const routineSent = pushThread([{ who: 'them', text: 'throttle routine test' }], 'routine');
+    ok('routine Sarah message after 5 minutes goes through', routineSent === true && state.messages.length === origMsgsLen + 3);
+    // Every sent thread restarts the window
+    ok('sent Sarah thread updates lastSarahMsgAt', typeof state.lastSarahMsgAt === 'number' && Date.now() - state.lastSarahMsgAt < 5000);
+    // restore
+    state.messages.length = origMsgsLen;
+    state.unread = origUnread;
+    state.lastSarahMsgAt = origLast;
+    saveMsgs();
+  })();
+  // v1.8.3-beta: afterExpedition classifies its thread kind — ambient
+  // check-in/chat is routine (throttled), the 5-failure nudge is special.
+  (() => {
+    const origMsgsLen = state.messages.length;
+    const origUnread = state.unread;
+    const origLast = state.lastSarahMsgAt;
+    const origFailures = state.failures;
+    const origOffered = state.sarahAdviceOffered;
+    const origFlags = [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip];
+    const origChatSeen = { ...state.chatSeen };
+    state.taggedThisTrip = false; state.resightedThisTrip = false; state.followedThisTrip = false;
+    // Ambient chatter inside the window is dropped
+    state.lastSarahMsgAt = Date.now();
+    state.failures = 0;
+    state.sarahAdviceOffered = true;
+    afterExpedition(null);
+    ok('afterExpedition ambient chatter inside window is dropped', state.messages.length === origMsgsLen);
+    // 5-failure nudge is special: goes through despite the window
+    state.lastSarahMsgAt = Date.now();
+    state.failures = 5;
+    afterExpedition(null);
+    ok('afterExpedition 5-failure nudge bypasses the throttle', state.messages.length === origMsgsLen + 1);
+    // restore
+    state.messages.length = origMsgsLen;
+    state.unread = origUnread;
+    state.lastSarahMsgAt = origLast;
+    state.failures = origFailures;
+    state.sarahAdviceOffered = origOffered;
+    [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip] = origFlags;
+    state.chatSeen = origChatSeen;
+    saveMsgs();
+  })();
+  // v1.8.3-beta: Blue Shark hook drops the beauty superlative — opinion
+  // stated as fact becomes a factual countershading description.
+  ok('blue hook drops the beauty superlative', (() => {
+    const hook = sharkById('blue').hook;
+    return /countershading/.test(hook) && !/most beautiful/.test(hook);
+  })());
   // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
   // iPad layout) — brighter, wider fan, clearly visible motion
   (() => {
@@ -3509,6 +3576,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   ok('WHATS_NEW has v1.8.0-beta', Array.isArray(WHATS_NEW['v1.8.0-beta']) && WHATS_NEW['v1.8.0-beta'].length === 4);
   ok('WHATS_NEW has v1.8.1-beta', Array.isArray(WHATS_NEW['v1.8.1-beta']) && WHATS_NEW['v1.8.1-beta'].length === 3);
   ok('WHATS_NEW has v1.8.2-beta', Array.isArray(WHATS_NEW['v1.8.2-beta']) && WHATS_NEW['v1.8.2-beta'].length === 1);
+  ok('WHATS_NEW has v1.8.3-beta', Array.isArray(WHATS_NEW['v1.8.3-beta']) && WHATS_NEW['v1.8.3-beta'].length === 2);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

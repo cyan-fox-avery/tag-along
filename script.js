@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.2-beta";
+const VERSION = "v1.8.3-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.3-beta": [
+"💬 <strong>Sarah is less spammy.</strong> Other than special dialogue and Ask Sarah, she now sends at most one message per 5 minutes — a routine message that would fire inside the window is dropped, not queued. Special event threads and Ask Sarah always go through, and every Sarah message restarts the 5-minute window.",
+"🦈 <strong>Blue shark insight reworded.</strong> “The most beautiful shark in the Atlantic” was opinion stated as fact — it now describes the countershading instead.",
+  ],
   "v1.8.2-beta": [
 "🏷️ <strong>IUCN badge hugs the pin — for real this time.</strong> v1.8.1 closed the gap to the pin button's edge, but the 📌 glyph sits centered inside the 52px button, so the visual gap was still ~22px. The 6px is now measured to the glyph itself — the pin button's glyph is left-aligned with 5px of left padding. Touch target unchanged.",
   ],
@@ -1194,6 +1198,10 @@ const state = {
   /* v1.6.10-beta: throttle single-shark congratulations — expedition number
      of Sarah's last single-shark cheer (null until the first one). */
   lastSingleCheerExp: (typeof _savedMsgs.lastSingleCheerExp === "number") ? _savedMsgs.lastSingleCheerExp : null,
+  /* v1.8.3-beta: Sarah throttle — timestamp (ms) of the last Sarah
+     message sent, any kind. Routine messages within 5 min of it are
+     dropped, not queued. Persists so a reload doesn't reset the window. */
+  lastSarahMsgAt: (typeof _savedMsgs.lastSarahMsgAt === "number") ? _savedMsgs.lastSarahMsgAt : null,
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
@@ -1266,18 +1274,35 @@ function saveMsgs() {
     lastRegion: state.lastRegion, chatSeen: state.chatSeen,
     sarahAdviceOffered: state.sarahAdviceOffered,
     bigDayBags: state.bigDayBags,
+    lastSarahMsgAt: state.lastSarahMsgAt,
     lastSingleCheerExp: state.lastSingleCheerExp });
 }
 /* Every new thread gets a timestamp for the Phone tab.
    v1.4.0: if the Phone panel is already open, the new thread renders
-   immediately — count it as read instead of leaving a stale badge. */
-function pushThread(msgs) {
+   immediately — count it as read instead of leaving a stale badge.
+   v1.8.3-beta: Sarah throttle — at most one ROUTINE message per 5 min.
+   `kind` is "routine" for ambient chatter (post-expedition check-ins /
+   random chats), "special" for scripted event threads, "ask" for
+   player-initiated Ask Sarah. Special + ask always go through;
+   routine messages inside the window are DROPPED, not queued.
+   The default kind is "special" (fail-open) so unclassified call
+   sites keep working. Every SENT thread — any kind — updates
+   lastSarahMsgAt. Returns true if sent, false if dropped. */
+const SARAH_THROTTLE_MS = 5 * 60 * 1000;
+function pushThread(msgs, kind) {
+  if (kind === "routine") {
+    const last = state.lastSarahMsgAt;
+    const age = (typeof last === "number") ? Date.now() - last : Infinity;
+    if (age >= 0 && age < SARAH_THROTTLE_MS) return false;
+  }
   state.messages.push({ ts: Date.now(), msgs });
+  state.lastSarahMsgAt = Date.now();
   const phoneTab = document.querySelector('.tab[data-tab="phone"]');
   if (!(phoneTab && phoneTab.classList.contains('active'))) state.unread += 1;
   saveMsgs();
   updateMsgBadge();
   renderMessages();
+  return true;
 }
 function fmtTime(ts) {
   return new Date(ts).toLocaleString(undefined,
@@ -3343,6 +3368,10 @@ function afterExpedition(plan) {
   if (plan && plan.region) { state.lastRegion = plan.region; saveMsgs(); }
   if (state.taggedThisTrip || state.resightedThisTrip || state.followedThisTrip) return;
   let thread;
+  /* v1.8.3-beta: throttle kind — the 5-failure nudge and the one-time
+     advice offer are condition-triggered guidance (special), while the
+     check-in / random chat is ambient chatter (routine, throttled). */
+  let threadKind = "routine";
   if (state.failures >= 5) {
     // gentle nudge, genuine-conversation style — about YOUR waters.
     // v0.17.1: Sarah only butts in on her own after five; before that,
@@ -3354,6 +3383,7 @@ function afterExpedition(plan) {
       { who: "them", text: COUSIN_NUDGES[s.id] || "You'll get the next one. I believe in you." },
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks." }
     ];
+    threadKind = "special";
     state.failures = 0;
   } else if (state.failures === 1 && !state.sarahAdviceOffered) {
     /* v0.17.1: after the first failed trip, Sarah offers her notes — the
@@ -3365,6 +3395,7 @@ function afterExpedition(plan) {
       { who: "them", text: "I've got notes on every shark we've studied. Pick one below and I'll tell you what I know — where to look, what they like." }
     ];
     state.sarahAdviceOffered = true;
+    threadKind = "special";
     saveMsgs(); // v0.17.1 review fix: the offer must survive a reload
   } else {
     /* v0.8.0: sometimes she just checks in about one of your named
@@ -3380,7 +3411,7 @@ function afterExpedition(plan) {
       ];
     }
   }
-  pushThread(thread);
+  pushThread(thread, threadKind);
   renderSarahAsk();
 }
 
@@ -3406,11 +3437,13 @@ function renderSarahAsk() {
 function askSarahAdvice(sid) {
   const s = sharkById(sid);
   if (!s) return;
+  /* v1.8.3-beta: Ask Sarah is player-initiated — always goes through
+     the throttle. */
   pushThread([
     { who: "me", text: `I'm striking out — any advice on the ${s.name.toLowerCase()}?` },
     { who: "them", text: COUSIN_NUDGES[sid] || "You'll get the next one. I believe in you." },
     { who: "me", text: "Thanks. That's actually really helpful." }
-  ]);
+  ], "ask");
   state.sarahAdviceOffered = false;
   saveMsgs(); // v0.17.1 review fix: a used offer stays used across reloads
   renderSarahAsk();
