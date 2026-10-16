@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.7.36-beta', VERSION === 'v1.7.36-beta');
+  ok('version v1.8.0-beta', VERSION === 'v1.8.0-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -319,7 +319,7 @@ code += `
       state.pendingTagAlongFact = null;
       logged = [];
       doFollowTagged("nurse", () => {});
-      const factPool = SECRET_FACTS.nurse || [];
+      const factPool = insightPoolFor("nurse");
       ok("follow: fact branch sets pendingTagAlongFact",
         !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === false);
       ok("follow: fact branch stashes one of the pool facts",
@@ -329,7 +329,7 @@ code += `
           h.includes(state.pendingTagAlongFact.fact.slice(0, 40))));
       // Branch 2: all facts exhausted -> exhausted flag, exhaustion line NOT in log
       // (it lives only in the Map popup via pendingTagAlongFact)
-      state.unlockedFacts = { nurse: [0, 1, 2] }; // all 3 nurse facts used
+      state.unlockedFacts = { nurse: [0, 1, 2, 3, 4] }; // all 5 nurse insights used
       state.pendingTagAlongFact = null;
       logged = [];
       doFollowTagged("nurse", () => {});
@@ -382,7 +382,9 @@ code += `
     // tagged nurse with zero re-sightings so far
     state.tagged = { nurse: { name: "", researchId: "NS-1", resightings: [] } };
     state.currentPlan = { region: "caribbean", depth: "shallow", bait: "chum" };
-    state.unlockedFacts = { nurse: [0, 1, 2] }; // exhausted, so no fact branch noise
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 4] }; // exhausted (all 5 nurse insights), so no fact branch noise
+    ok("follow fixture: nurse insights exhausted",
+      insightPoolFor("nurse").every((_, i) => state.unlockedFacts.nurse.includes(i)));
     state.pendingTagAlongFact = null;
     state.encounterDone = null;
     state.followedThisTrip = false;
@@ -755,12 +757,12 @@ code += `
   ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
   // v1.7.23-beta: Follow button shows insight progress (insights: n/total).
   ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
-  ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
+  ok('follow button computes fact totals from insightPoolFor', fileCode.includes('_factTotal = insightPoolFor(species.id).length'));
   ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
   // v1.7.24-beta: Observe species button shows insight progress too
   // (insights: n/total), same pattern as Follow — wild-shark encounters.
   ok('observe button shows insight count', fileCode.includes('_obsFactHave') && fileCode.includes('_obsFactTotal') && fileCode.includes('insights: '));
-  ok('observe button computes fact totals from SECRET_FACTS', fileCode.includes('_obsFactTotal = (typeof SECRET_FACTS'));
+  ok('observe button computes fact totals from insightPoolFor', fileCode.includes('_obsFactTotal = insightPoolFor(species.id).length'));
   ok('observe button aria-label includes insight progress', fileCode.includes('_obsFactLabel'));
   // v1.7.24-beta: Observe on an untagged shark must show the Map popup.
   // Before this fix it resolved with bare true and never set
@@ -976,9 +978,10 @@ code += `
     const nerd = ACHIEVEMENTS.find(a => a.id === 'certified-nerd');
     ok('Dedicated exists, visible, has breadcrumb', !!dedicated && !dedicated.hidden && !!dedicated.breadcrumb);
     ok('Certified Shark Nerd exists, visible, has breadcrumb', !!nerd && !nerd.hidden && !!nerd.breadcrumb);
-    // Dedicated: all 101 facts across all 50 species learned via Follow/Observe.
+    // Dedicated: all 201 facts across all 50 species learned via Follow/Observe
+    // (SECRET_FACTS + hook + bonus per species, via insightPoolFor).
     const allFacts = {};
-    Object.keys(SECRET_FACTS).forEach(id => { allFacts[id] = SECRET_FACTS[id].map((_, i) => i); });
+    Object.keys(SECRET_FACTS).forEach(id => { allFacts[id] = insightPoolFor(id).map((_, i) => i); });
     ok('Dedicated unlocks with every fact learned', dedicated.check({ unlockedFacts: allFacts }) === true);
     const oneMissing = JSON.parse(JSON.stringify(allFacts));
     oneMissing.nurse = oneMissing.nurse.slice(0, -1);
@@ -2262,6 +2265,40 @@ code += `
     state.unlockedFacts = origFacts;
     factStore.save = origSave;
   })();
+  // v1.8.0-beta: hook + bonus are real insights — insightPoolFor.
+  (() => {
+    ok("insightPoolFor: nurse has 5 (3 facts + hook + bonus)", insightPoolFor("nurse").length === 5);
+    ok("insightPoolFor: epaulette has 4 (2 facts + hook + bonus)", insightPoolFor("epaulette").length === 4);
+    ok("insightPoolFor: all 50 species have 4-5 insights", SHARKS.every(s => {
+      const n = insightPoolFor(s.id).length;
+      return n === 4 || n === 5;
+    }));
+    ok("insightPoolFor: 201 total insights", SHARKS.reduce((t, s) => t + insightPoolFor(s.id).length, 0) === 201);
+    ok("insightPoolFor: hook + bonus are the last two entries", SHARKS.every(s => {
+      const pool = insightPoolFor(s.id);
+      return pool[pool.length - 2] === s.hook && pool[pool.length - 1] === s.bonus;
+    }));
+    ok("insightPoolFor: no exact duplicates in any pool", SHARKS.every(s => {
+      const pool = insightPoolFor(s.id);
+      return new Set(pool).size === pool.length;
+    }));
+    ok("insightPoolFor: old save indices stay valid (SECRET_FACTS first)", SHARKS.every(s => {
+      const pool = insightPoolFor(s.id);
+      return (SECRET_FACTS[s.id] || []).every((f, i) => pool[i] === f);
+    }));
+    ok("insightPoolFor: unknown species gives empty pool", insightPoolFor("not-a-shark").length === 0);
+    // Exhaustion: unlocking all 5 nurse insights then one more returns null.
+    const origFacts = state.unlockedFacts;
+    const origSave = factStore.save;
+    factStore.save = () => {};
+    state.unlockedFacts = {};
+    const got = [];
+    for (let i = 0; i < 5; i++) got.push(unlockSecretFact("nurse"));
+    ok("unlockSecretFact: all 5 nurse insights unlockable", got.every(Boolean) && new Set(got).size === 5);
+    ok("unlockSecretFact: null after all 5 learned", unlockSecretFact("nurse") === null);
+    state.unlockedFacts = origFacts;
+    factStore.save = origSave;
+  })();
   // v1.4.0-beta: doTagAlong resolves with tag-along intent
   // (v1.4.0-beta Mira review: restore ALL mocked state)
   (() => {
@@ -2293,7 +2330,8 @@ code += `
     state.healthSpecies = origHealth;
     state.pendingTagAlongFact = origPendingFact;
   })();
-  // v1.4.0-beta Mira review: full 1->2->3->exhausted fact progression
+  // v1.4.0-beta Mira review: full 1->2->3->4->5->exhausted fact progression
+  // (v1.8.0-beta: nurse has 5 insights — 3 facts + hook + bonus)
   (() => {
     const origFacts = state.unlockedFacts;
     const origSave = factStore.save;
@@ -2301,14 +2339,16 @@ code += `
     factStore.save = () => {};
     logLine = () => {};
     state.unlockedFacts = {};
-    // Nurse has 3 facts — unlock all 3, then verify exhaustion
+    // Nurse has 5 insights — unlock all 5, then verify exhaustion
     const f1 = unlockSecretFact("nurse");
     const f2 = unlockSecretFact("nurse");
     const f3 = unlockSecretFact("nurse");
     const f4 = unlockSecretFact("nurse");
-    ok("fact progression unlocks 3 distinct", f1 && f2 && f3 && f1 !== f2 && f2 !== f3 && f1 !== f3);
-    ok("fact progression exhausts at 4th", f4 === null);
-    ok("fact progression tracks 3 unlocked", (state.unlockedFacts["nurse"] || []).length === 3);
+    const f5 = unlockSecretFact("nurse");
+    const f6 = unlockSecretFact("nurse");
+    ok("fact progression unlocks 5 distinct", [f1, f2, f3, f4, f5].every(Boolean) && new Set([f1, f2, f3, f4, f5]).size === 5);
+    ok("fact progression exhausts at 6th", f6 === null);
+    ok("fact progression tracks 5 unlocked", (state.unlockedFacts["nurse"] || []).length === 5);
     state.unlockedFacts = origFacts;
     factStore.save = origSave;
     logLine = origLog;
@@ -2650,8 +2690,10 @@ code += `
   ok("WHATS_NEW has v1.4.14-beta", !!(WHATS_NEW["v1.4.14-beta"] && WHATS_NEW["v1.4.14-beta"].length));
   ok("WHATS_NEW has v1.4.15-beta", !!(WHATS_NEW["v1.4.15-beta"] && WHATS_NEW["v1.4.15-beta"].length));
   ok("WHATS_NEW has v1.4.18-beta", !!(WHATS_NEW["v1.4.18-beta"] && WHATS_NEW["v1.4.18-beta"].length));
-  // v1.7.23: WHAAAAAAALE achievement (renamed from White Whale) — tag a whale shark
-  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "White Whale"));
+  // v1.8.0: the megamouth achievement was renamed from "White Whale"
+  // to "Deep-Sea Unicorn" (too close to WHAAAAAAALE, the whale-shark
+  // one). The internal id stays "white-whale" so earned flags survive.
+  ok("white-whale achievement exists", ACHIEVEMENTS.some(a => a.id === "white-whale" && a.name === "Deep-Sea Unicorn" && a.icon === "🦄"));
   ok("white-whale checks megamouth tag", (() => { const a = ACHIEVEMENTS.find(x => x.id === "white-whale"); return a && a.check({ tagged: { megamouth: {} } }) === true && a.check({ tagged: {} }) === false; })());
   // v1.7.23: WHAAAAAAALE achievement — tag a whale shark (separate from White Whale)
   ok("whaaaaale achievement exists", ACHIEVEMENTS.some(a => a.id === "whaaaaale" && a.name === "WHAAAAAAALE"));
@@ -2693,15 +2735,21 @@ code += `
   ok('wide detail modal widens past phone width', /#detailOverlay\\s+\\.detail-modal\\s*\\{[^}]*max-width:\\s*820px/.test(cssCode));
   ok('detail modal HTML carries detail-modal class', /id=\"detailOverlay\"[\\s\\S]*?class=\"phone detail-modal\"/.test(htmlCode));
   // v1.7.30-beta: Research back to 3 columns at >=1024px (v1.7.27's
-  // 2-column grid was wrong per Avery's iPad acceptance); Archive and
-  // Achievements stay on the shared 2-column .guide-list rule.
+  // 2-column grid was wrong per Avery's iPad acceptance).
   // Expanded Research dropdowns span two columns; last-column ones
   // anchor right so they don't overflow the app container.
+  // v1.8.0-beta: Archive joins Research at 3 columns at >=1024px,
+  // with the same two-column dropdown treatment. Achievements stays
+  // on the shared 2-column .guide-list rule.
   ok('wide Research grid is 3 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?#researchList\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3/.test(cssCode));
-  ok('wide Archive/Achievements grids stay 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
+  ok('wide Archive grid is 3 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?#archiveList\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(3/.test(cssCode));
+  ok('wide Achievements grid stays 2 columns', /@media\\s*\\(min-width:\\s*1024px\\)[\\s\\S]*?\\.guide-list\\s*\\{[^}]*grid-template-columns:\\s*repeat\\(2/.test(cssCode));
   ok('wide Research dropdown spans two columns', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*width:\\s*calc\\(200% \\+ 12px\\)/.test(cssCode));
   ok('wide Research dropdown overrides base max-width', /#researchList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*none/.test(cssCode));
   ok('wide Research last-column dropdown anchors right', /#researchList\\s+\\.guide-row:nth-child\\(3n\\)\\.open\\s+\\.guide-row-body\\s*\\{[^}]*right:\\s*0/.test(cssCode));
+  ok('wide Archive dropdown spans two columns', /#archiveList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*width:\\s*calc\\(200% \\+ 12px\\)/.test(cssCode));
+  ok('wide Archive dropdown overrides base max-width', /#archiveList\\s+\\.guide-row\\.open\\s+\\.guide-row-body\\s*\\{[^}]*max-width:\\s*none/.test(cssCode));
+  ok('wide Archive last-column dropdown anchors right', /#archiveList\\s+\\.guide-row:nth-child\\(3n\\)\\.open\\s+\\.guide-row-body\\s*\\{[^}]*right:\\s*0/.test(cssCode));
   ok('detail columns are two wrappers', /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-identity\\s*\{[^}]*grid-column:\\s*1/.test(cssCode) && /#detailOverlay\\s+#detailContent\\s*>\\s*\.detail-record\\s*\{[^}]*grid-column:\\s*2/.test(cssCode));
   // v1.7.31-beta: art is a full-width row across the top of the modal,
   // identity + record in two columns below it. Art is large on wide screens.
@@ -2743,12 +2791,15 @@ code += `
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
     const inArt = ['class="shark-art"'].every(c => artHtml.includes(c));
-    const notInArt = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !artHtml.includes(c));
+    const notInArt = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => !artHtml.includes(c));
     const inId = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'id="resightMore"'].every(c => idHtml.includes(c));
-    const notInId = ['class="shark-art"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
-    const inRec = ['class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
+    const notInId = ['class="shark-art"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
+    const inRec = ['class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => recHtml.includes(c));
     const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"'].every(c => !recHtml.includes(c));
-    return inArt && notInArt && inId && notInId && inRec && notInRec;
+    // v1.8.0-beta: hook + bonus are insights now — no separate 💡/✨ blocks.
+    const noHookBonus = !html.includes('class="hook"') && !html.includes('class="bonus-fact"');
+    const insightsCount = html.includes('Tag-along insights (1/5)');
+    return inArt && notInArt && inId && notInId && inRec && notInRec && noHookBonus && insightsCount;
   })());
   ok('detail modal keeps conditional blocks out when empty', (() => {
     const savedTagged = state.tagged;
@@ -2766,14 +2817,16 @@ code += `
     const artHtml = html.slice(artIdx, idIdx);
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
-    // nickname, re-sightings, field notes, insights all absent — but the
-    // wrappers, the rename form, and the always-present blocks remain
+    // nickname, re-sightings, field notes all absent — but the wrappers,
+    // the rename form, and the always-present blocks remain. v1.8.0-beta:
+    // the insights block ALWAYS renders (0/5 when nothing unlocked);
+    // the separate hook/bonus blocks are gone.
     return artHtml.includes('class="shark-art"')
       && !idHtml.includes('class="given-name"') && idHtml.includes('id="renameForm"')
       && idHtml.includes('class="book-stats"') && idHtml.includes('id="trackBtn"')
       && !idHtml.includes('class="resight-block"') && !recHtml.includes('class="resight-block"') && !recHtml.includes('class="watch-notes-block"')
-      && !recHtml.includes('class="secret-facts-block"')
-      && recHtml.includes('class="hook"');
+      && recHtml.includes('class="secret-facts-block"') && recHtml.includes('Tag-along insights (0/5)')
+      && !recHtml.includes('class="hook"') && !recHtml.includes('class="bonus-fact"');
   })());
   ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
@@ -3318,6 +3371,7 @@ ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHA
 ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHATS_NEW['v1.7.35-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
+  ok('WHATS_NEW has v1.8.0-beta', Array.isArray(WHATS_NEW['v1.8.0-beta']) && WHATS_NEW['v1.8.0-beta'].length === 4);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
@@ -3766,9 +3820,62 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   ok('v1.7.19 dusky species exists in roster',
     SHARKS.some(function(s){ return s.id === 'dusky'; }));
   /* v1.7.26-beta: thresher hook — "perpetually nervous" describes the whole
-     shark, not just its tail. */
+     shark, not just its tail. v1.8.0-beta: hook rewritten (tail-whipping
+     repeated SECRET_FACTS) — huge eyes instead, nervousness kept.
+     v1.8.0-beta Mira blocker: huge eyes are a BIGEYE thresher trait, not
+     common thresher — hook rewritten to breaching instead. */
   ok('thresher hook attributes nervousness to the shark, not the tail',
-    SHARKS.some(function(s){ return s.id === 'thresher' && s.hook === 'It looks perpetually nervous, but that tail is actually a sword. Threshers hunt by tail-whipping.'; }));
+    SHARKS.some(function(s){ return s.id === 'thresher' && s.hook === 'It looks perpetually nervous — and it can launch its whole body clear out of the water, tail and all.'; }));
+  /* v1.8.0-beta Mira blocker: named-shark check-ins must not leak a
+     locked hook insight — Sarah quotes the hook only once earned,
+     otherwise a neutral fallback. */
+  (() => {
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origRandom = Math.random;
+    Math.random = () => 0; // passes the 0.4 gate; picks first named + first template
+    try {
+      state.tagged = { thresher: { name: "Testy", researchId: "TS-1", resightings: [] } };
+      const thresherHook = SHARKS.find(function(s){ return s.id === "thresher"; }).hook;
+      // Locked: hook insight (index 2) NOT unlocked -> neutral fallback.
+      state.unlockedFacts = {};
+      const lockedThread = maybeCheckinThread();
+      ok("checkin: locked hook uses neutral fallback, no hook leak",
+        !!lockedThread && lockedThread[1].text.indexOf("No news, just vibes") !== -1 &&
+        lockedThread[1].text.indexOf(thresherHook) === -1);
+      // Unlocked: hook insight (index 2) earned -> hook text quoted.
+      state.unlockedFacts = { thresher: [2] };
+      const unlockedThread = maybeCheckinThread();
+      ok("checkin: unlocked hook is quoted",
+        !!unlockedThread && unlockedThread[1].text.indexOf(thresherHook) !== -1);
+    } finally {
+      Math.random = origRandom;
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+    }
+  })();
+  /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
+     word-overlap check missed. Guards the specific fixes. */
+  ok('v1.8.0 second sweep: rewritten insights present',
+    SHARKS.some(function(s){ return s.id === 'nurse' && s.hook.indexOf('two dozen') !== -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'thresher' && s.bonus.indexOf('tail-slap') === -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'blue' && s.bonus.indexOf('Ireland') === -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'sevengill' && s.hook.indexOf('dinosaurs') === -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'wobbegong' && s.hook.indexOf('shaggy beard') !== -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'oceanic' && s.hook.indexOf('litters of up to 15') !== -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'pacificsleeper' && s.hook.indexOf('2,000 metres') !== -1; }) &&
+    SECRET_FACTS.hammerhead[1].indexOf('stingray') === -1 &&
+    SECRET_FACTS.porbeagle.join(' ').indexOf('migration') === -1 &&
+    COUSIN_CHATS.nurse[0].them.indexOf('pump') === -1);
+  /* v1.8.0-beta Mira blockers: sand-tiger hook no longer claims the
+     mouth is always open; porbeagle F2 no longer rehashes F1's body-heat
+     mechanism; salmon drops the unsupported "only shark" claim; leopard
+     drops categorical "harmless". */
+  ok("v1.8.0 Mira blockers: corrected insight wording present",
+    SHARKS.some(function(s){ return s.id === "sandtiger" && s.hook.indexOf("mouth shut") !== -1 && s.hook.indexOf("always open") === -1; }) &&
+    SECRET_FACTS.porbeagle[1].indexOf("pups") !== -1 && SECRET_FACTS.porbeagle[1].indexOf("furnace") === -1 &&
+    SHARKS.some(function(s){ return s.id === "salmon" && s.hook.indexOf("only shark") === -1; }) &&
+    SHARKS.some(function(s){ return s.id === "leopard" && s.bonus.indexOf("harmless to people") === -1; }));
   /* v1.7.19-beta Mira review: trophy refreshes without a reload */
   ok('v1.7.19 doWin renders Achievements',
     (function(){

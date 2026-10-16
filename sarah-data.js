@@ -11,7 +11,7 @@
    is actually searching for. */
 const COUSIN_CHATS = {
   nurse: [
-    { them: "Nurse sharks can breathe without swimming, did you know that? Most sharks have to keep moving to push water over their gills, but nurse sharks just pump it through while sitting still. That's the whole secret behind the cuddle heaps.", me: "That explains the piles of forty. Remarkable." },
+    { them: "Nurse sharks hunt at night, alone over the sand flats — they find crabs and lobster by smell in the dark, while the rest of the reef sleeps.", me: "The reef's night shift." },
     { them: "Nurse sharks have these little whisker things on their snouts \u2014 barbels. They drag them through the sand like fingers, feeling for crabs. It's the most tactile hunting I've ever heard of.", me: "Hunting by touch. In the dark, no less." },
     { them: "Forty nurse sharks in one pile. I keep trying to picture it and my brain just gives me a heap of puppies with fins.", me: "The cuddle heap is real and it is spectacular." }
   ],
