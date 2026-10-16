@@ -1200,8 +1200,13 @@ select option:disabled { color: #7a8a9e; }
    pin-to-edge distance so Latin names have more room.
    v1.8.1-beta: Avery — 6px now, real close, maximum room for the name.
    (The head's right padding is zeroed on .guide-row-top rows, so this
-   6px margin is the whole pill-to-pin gap.) */
-.guide-row-head .status-pill { margin-bottom: 0; margin-right: 6px; flex: none; }
+   6px margin is the whole pill-to-pin gap.)
+   v1.8.2-beta: correction — v1.8.1 measured the 6px to the pin BUTTON's
+   edge, but the 📌 glyph sits centered inside the 52px button, so the
+   visual gap was still ~22px. Pill margin is now 0; the 6px lives in the
+   pin button's left padding instead (see .guide-row-top .pin-btn below),
+   measured to the glyph itself. */
+.guide-row-head .status-pill { margin-bottom: 0; margin-right: 0; flex: none; }
 /* v1.6.1-beta: checklist-style tag status — an empty circle before each name
    that fills green when the shark is tagged. Replaces the ✅ prefix. */
 .tag-check {
@@ -1273,8 +1278,16 @@ select option:disabled { color: #7a8a9e; }
    name. The head's 14px right padding used to sit between pill and pin
    (8px pill margin + 14px padding = 22px gap); zero it here so the pill's
    6px margin is the whole gap. Scoped to .guide-row-top so Achievements
-   heads (no pin) keep their padding. */
+   heads (no pin) keep their padding.
+   v1.8.2-beta: correction — the 6px must be measured to the 📌 GLYPH, not
+   the button edge: the glyph sits centered inside the 52px button, so
+   v1.8.1's visual gap was still ~22px. Pill margin is now 0 (see above);
+   this rule left-aligns the glyph with 5px left padding, so the visual
+   gap is 1px button border + 5px padding = ~6px. Button stays 52px wide
+   (44px+ touch target untouched). Scoped to .guide-row-top so the
+   pinned-card ✕ unpin button keeps its centered glyph. */
 .guide-row-top .guide-row-head { flex: 1; min-width: 0; padding-right: 0; }
+.guide-row-top .pin-btn { text-align: left; padding-left: 5px; }
 .pin-btn {
   flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
   background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.08);
