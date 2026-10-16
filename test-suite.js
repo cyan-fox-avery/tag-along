@@ -319,7 +319,7 @@ code += `
       state.pendingTagAlongFact = null;
       logged = [];
       doFollowTagged("nurse", () => {});
-      const factPool = SECRET_FACTS.nurse || [];
+      const factPool = insightPoolFor("nurse");
       ok("follow: fact branch sets pendingTagAlongFact",
         !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === false);
       ok("follow: fact branch stashes one of the pool facts",
@@ -329,7 +329,7 @@ code += `
           h.includes(state.pendingTagAlongFact.fact.slice(0, 40))));
       // Branch 2: all facts exhausted -> exhausted flag, exhaustion line NOT in log
       // (it lives only in the Map popup via pendingTagAlongFact)
-      state.unlockedFacts = { nurse: [0, 1, 2] }; // all 3 nurse facts used
+      state.unlockedFacts = { nurse: [0, 1, 2, 3, 4] }; // all 5 nurse insights used
       state.pendingTagAlongFact = null;
       logged = [];
       doFollowTagged("nurse", () => {});
@@ -755,12 +755,12 @@ code += `
   ok('achieveList uses align-items stretch', cssCode.includes('#achieveList') && cssCode.includes('align-items: stretch'));
   // v1.7.23-beta: Follow button shows insight progress (insights: n/total).
   ok('follow button shows insight count', fileCode.includes('insights: ') && fileCode.includes('_factHave') && fileCode.includes('_factTotal'));
-  ok('follow button computes fact totals from SECRET_FACTS', fileCode.includes('_factTotal = (typeof SECRET_FACTS'));
+  ok('follow button computes fact totals from insightPoolFor', fileCode.includes('_factTotal = insightPoolFor(species.id).length'));
   ok('follow button aria-label includes insight progress', fileCode.includes('insights learned') && fileCode.includes('_factLabel'));
   // v1.7.24-beta: Observe species button shows insight progress too
   // (insights: n/total), same pattern as Follow — wild-shark encounters.
   ok('observe button shows insight count', fileCode.includes('_obsFactHave') && fileCode.includes('_obsFactTotal') && fileCode.includes('insights: '));
-  ok('observe button computes fact totals from SECRET_FACTS', fileCode.includes('_obsFactTotal = (typeof SECRET_FACTS'));
+  ok('observe button computes fact totals from insightPoolFor', fileCode.includes('_obsFactTotal = insightPoolFor(species.id).length'));
   ok('observe button aria-label includes insight progress', fileCode.includes('_obsFactLabel'));
   // v1.7.24-beta: Observe on an untagged shark must show the Map popup.
   // Before this fix it resolved with bare true and never set
@@ -976,9 +976,10 @@ code += `
     const nerd = ACHIEVEMENTS.find(a => a.id === 'certified-nerd');
     ok('Dedicated exists, visible, has breadcrumb', !!dedicated && !dedicated.hidden && !!dedicated.breadcrumb);
     ok('Certified Shark Nerd exists, visible, has breadcrumb', !!nerd && !nerd.hidden && !!nerd.breadcrumb);
-    // Dedicated: all 101 facts across all 50 species learned via Follow/Observe.
+    // Dedicated: all 201 facts across all 50 species learned via Follow/Observe
+    // (SECRET_FACTS + hook + bonus per species, via insightPoolFor).
     const allFacts = {};
-    Object.keys(SECRET_FACTS).forEach(id => { allFacts[id] = SECRET_FACTS[id].map((_, i) => i); });
+    Object.keys(SECRET_FACTS).forEach(id => { allFacts[id] = insightPoolFor(id).map((_, i) => i); });
     ok('Dedicated unlocks with every fact learned', dedicated.check({ unlockedFacts: allFacts }) === true);
     const oneMissing = JSON.parse(JSON.stringify(allFacts));
     oneMissing.nurse = oneMissing.nurse.slice(0, -1);
@@ -2262,6 +2263,40 @@ code += `
     state.unlockedFacts = origFacts;
     factStore.save = origSave;
   })();
+  // v1.7.37-beta: hook + bonus are real insights — insightPoolFor.
+  (() => {
+    ok("insightPoolFor: nurse has 5 (3 facts + hook + bonus)", insightPoolFor("nurse").length === 5);
+    ok("insightPoolFor: epaulette has 4 (2 facts + hook + bonus)", insightPoolFor("epaulette").length === 4);
+    ok("insightPoolFor: all 50 species have 4-5 insights", SHARKS.every(s => {
+      const n = insightPoolFor(s.id).length;
+      return n === 4 || n === 5;
+    }));
+    ok("insightPoolFor: 201 total insights", SHARKS.reduce((t, s) => t + insightPoolFor(s.id).length, 0) === 201);
+    ok("insightPoolFor: hook + bonus are the last two entries", SHARKS.every(s => {
+      const pool = insightPoolFor(s.id);
+      return pool[pool.length - 2] === s.hook && pool[pool.length - 1] === s.bonus;
+    }));
+    ok("insightPoolFor: no exact duplicates in any pool", SHARKS.every(s => {
+      const pool = insightPoolFor(s.id);
+      return new Set(pool).size === pool.length;
+    }));
+    ok("insightPoolFor: old save indices stay valid (SECRET_FACTS first)", SHARKS.every(s => {
+      const pool = insightPoolFor(s.id);
+      return (SECRET_FACTS[s.id] || []).every((f, i) => pool[i] === f);
+    }));
+    ok("insightPoolFor: unknown species gives empty pool", insightPoolFor("not-a-shark").length === 0);
+    // Exhaustion: unlocking all 5 nurse insights then one more returns null.
+    const origFacts = state.unlockedFacts;
+    const origSave = factStore.save;
+    factStore.save = () => {};
+    state.unlockedFacts = {};
+    const got = [];
+    for (let i = 0; i < 5; i++) got.push(unlockSecretFact("nurse"));
+    ok("unlockSecretFact: all 5 nurse insights unlockable", got.every(Boolean) && new Set(got).size === 5);
+    ok("unlockSecretFact: null after all 5 learned", unlockSecretFact("nurse") === null);
+    state.unlockedFacts = origFacts;
+    factStore.save = origSave;
+  })();
   // v1.4.0-beta: doTagAlong resolves with tag-along intent
   // (v1.4.0-beta Mira review: restore ALL mocked state)
   (() => {
@@ -2293,7 +2328,8 @@ code += `
     state.healthSpecies = origHealth;
     state.pendingTagAlongFact = origPendingFact;
   })();
-  // v1.4.0-beta Mira review: full 1->2->3->exhausted fact progression
+  // v1.4.0-beta Mira review: full 1->2->3->4->5->exhausted fact progression
+  // (v1.7.37-beta: nurse has 5 insights — 3 facts + hook + bonus)
   (() => {
     const origFacts = state.unlockedFacts;
     const origSave = factStore.save;
@@ -2301,14 +2337,16 @@ code += `
     factStore.save = () => {};
     logLine = () => {};
     state.unlockedFacts = {};
-    // Nurse has 3 facts — unlock all 3, then verify exhaustion
+    // Nurse has 5 insights — unlock all 5, then verify exhaustion
     const f1 = unlockSecretFact("nurse");
     const f2 = unlockSecretFact("nurse");
     const f3 = unlockSecretFact("nurse");
     const f4 = unlockSecretFact("nurse");
-    ok("fact progression unlocks 3 distinct", f1 && f2 && f3 && f1 !== f2 && f2 !== f3 && f1 !== f3);
-    ok("fact progression exhausts at 4th", f4 === null);
-    ok("fact progression tracks 3 unlocked", (state.unlockedFacts["nurse"] || []).length === 3);
+    const f5 = unlockSecretFact("nurse");
+    const f6 = unlockSecretFact("nurse");
+    ok("fact progression unlocks 5 distinct", [f1, f2, f3, f4, f5].every(Boolean) && new Set([f1, f2, f3, f4, f5]).size === 5);
+    ok("fact progression exhausts at 6th", f6 === null);
+    ok("fact progression tracks 5 unlocked", (state.unlockedFacts["nurse"] || []).length === 5);
     state.unlockedFacts = origFacts;
     factStore.save = origSave;
     logLine = origLog;
@@ -2751,12 +2789,15 @@ code += `
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
     const inArt = ['class="shark-art"'].every(c => artHtml.includes(c));
-    const notInArt = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !artHtml.includes(c));
+    const notInArt = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => !artHtml.includes(c));
     const inId = ['class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"', 'id="resightMore"'].every(c => idHtml.includes(c));
-    const notInId = ['class="shark-art"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
-    const inRec = ['class="watch-notes-block"', 'class="secret-facts-block"', 'class="hook"', 'class="bonus-fact"', 'class="conservation-note"'].every(c => recHtml.includes(c));
+    const notInId = ['class="shark-art"', 'class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => !idHtml.includes(c));
+    const inRec = ['class="watch-notes-block"', 'class="secret-facts-block"', 'class="conservation-note"'].every(c => recHtml.includes(c));
     const notInRec = ['class="shark-art"', 'class="given-name"', 'class="detail-name-row"', 'id="renameForm"', 'class="latin detail-scientific"', 'class="status-pill"', 'class="book-stats"', 'id="trackBtn"', 'class="resight-block"'].every(c => !recHtml.includes(c));
-    return inArt && notInArt && inId && notInId && inRec && notInRec;
+    // v1.7.37-beta: hook + bonus are insights now — no separate 💡/✨ blocks.
+    const noHookBonus = !html.includes('class="hook"') && !html.includes('class="bonus-fact"');
+    const insightsCount = html.includes('Tag-along insights (1/5)');
+    return inArt && notInArt && inId && notInId && inRec && notInRec && noHookBonus && insightsCount;
   })());
   ok('detail modal keeps conditional blocks out when empty', (() => {
     const savedTagged = state.tagged;
@@ -2774,14 +2815,16 @@ code += `
     const artHtml = html.slice(artIdx, idIdx);
     const idHtml = html.slice(idIdx, recIdx);
     const recHtml = html.slice(recIdx);
-    // nickname, re-sightings, field notes, insights all absent — but the
-    // wrappers, the rename form, and the always-present blocks remain
+    // nickname, re-sightings, field notes all absent — but the wrappers,
+    // the rename form, and the always-present blocks remain. v1.7.37-beta:
+    // the insights block ALWAYS renders (0/5 when nothing unlocked);
+    // the separate hook/bonus blocks are gone.
     return artHtml.includes('class="shark-art"')
       && !idHtml.includes('class="given-name"') && idHtml.includes('id="renameForm"')
       && idHtml.includes('class="book-stats"') && idHtml.includes('id="trackBtn"')
       && !idHtml.includes('class="resight-block"') && !recHtml.includes('class="resight-block"') && !recHtml.includes('class="watch-notes-block"')
-      && !recHtml.includes('class="secret-facts-block"')
-      && recHtml.includes('class="hook"');
+      && recHtml.includes('class="secret-facts-block"') && recHtml.includes('Tag-along insights (0/5)')
+      && !recHtml.includes('class="hook"') && !recHtml.includes('class="bonus-fact"');
   })());
   ok('bubbles rise in staggered columns', /8 columns, 2-5 bubbles each/i.test(cssCode));
   ok('near wave is bigger', /\\.pw-near\\s*\\{[^}]*height:\\s*210px/.test(cssCode));
@@ -3326,7 +3369,7 @@ ok('WHATS_NEW has v1.7.26-beta', Array.isArray(WHATS_NEW['v1.7.26-beta']) && WHA
 ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHATS_NEW['v1.7.34-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHATS_NEW['v1.7.35-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
-  ok('WHATS_NEW has v1.7.37-beta', Array.isArray(WHATS_NEW['v1.7.37-beta']) && WHATS_NEW['v1.7.37-beta'].length === 2);
+  ok('WHATS_NEW has v1.7.37-beta', Array.isArray(WHATS_NEW['v1.7.37-beta']) && WHATS_NEW['v1.7.37-beta'].length === 3);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

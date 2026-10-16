@@ -23,6 +23,7 @@ const WHATS_NEW = {
   "v1.7.37-beta": [
 "📖 <strong>Archive tab back to 3 columns.</strong> The Wild Archive is 3 columns again on wide screens, like the Research tab — and an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column. Phone / narrow layouts are unchanged.",
 "🦄 <strong>White Whale is now Deep-Sea Unicorn.</strong> The megamouth achievement got a new name and emoji — White Whale was too close to WHAAAAAAALE, the whale-shark one. Same achievement, same unlock; WHAAAAAAALE is untouched.",
+"🔬 <strong>Hook + bonus are real insights now.</strong> Every species' hook (💡) and bonus (✨) are now unlockable tag-along insights, learned via Follow/Observe like the rest — 4 insights per species (5 for the nurse shark), all shown in the Tag-along insights section, with a 0/4 when none are learned yet. The separate 💡/✨ blocks are gone, and hook + bonus text was rewritten across all 50 species to remove overlaps with the existing facts. Your existing unlocks carry over; hook + bonus start locked. Dedicated now means all 201 insights.",
   ],
   "v1.7.36-beta": [
 "✂️ <strong>Shark art component-cropped — the last stragglers.</strong> After the v1.7.35 re-trim, 13 species still had dead space: their source art carries full-opacity single-pixel specks, detached from the shark, with hundreds of empty rows between specks and shark — no alpha threshold could remove them. Those 13 are now cropped to the shark's own connected shape (plus a 3px safety margin), so the tiger, great white, frilled, and friends finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
@@ -2359,7 +2360,7 @@ function doEncounter(species, plan) {
       const _followRec = state.tagged[species.id];
       const _followName = (_followRec && _followRec.name) || species.name;
       /* v1.7.23-beta: show insight progress on the Follow button. */
-      const _factTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
+      const _factTotal = insightPoolFor(species.id).length;
       const _factHave = (state.unlockedFacts[species.id] || []).length;
       const _factLine = _factTotal ? `<br><small class="dim">(insights: ${_factHave}/${_factTotal})</small>` : "";
       followBtn.innerHTML = `🧭 Follow ${esc(_followName)}<br><small class="dim">ends this expedition — no more shark encounters today</small>${_factLine}`;
@@ -2418,7 +2419,7 @@ function doEncounter(species, plan) {
       /* v1.7.24-beta: show insight progress on the Observe button, same as
          Follow (v1.7.23-beta) — the player should know what observing this
          wild shark will get them before committing the expedition. */
-      const _obsFactTotal = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[species.id] || []).length;
+      const _obsFactTotal = insightPoolFor(species.id).length;
       const _obsFactHave = (state.unlockedFacts[species.id] || []).length;
       const _obsFactLine = _obsFactTotal ? `<br><small class="dim">(insights: ${_obsFactHave}/${_obsFactTotal})</small>` : "";
       /* v1.7.25-beta: when all insights are learned, the exhausted
@@ -3921,8 +3922,24 @@ const SECRET_FACTS = {
 
 /* Returns the next unlearned fact for a species, or null if exhausted.
    Guarantees one unlearned fact if any remain (Mira's guardrail). */
+/* v1.7.37-beta: the full insight pool for a species — SECRET_FACTS plus
+   the hook + bonus, which are now real unlockable insights. Hook/bonus
+   text still lives on the shark record (sharks-data.js) because Sarah's
+   named-checkin replies use s.hook. Appending keeps old unlockedFacts
+   indices stable: existing players keep their SECRET_FACTS unlocks, and
+   hook (index N) + bonus (index N+1) start locked. */
+function insightPoolFor(speciesId) {
+  const base = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[speciesId]) || [];
+  const s = typeof SHARKS !== "undefined" ? SHARKS.find(x => x.id === speciesId) : null;
+  const extra = [];
+  if (s) {
+    if (s.hook) extra.push(s.hook);
+    if (s.bonus) extra.push(s.bonus);
+  }
+  return [...base, ...extra];
+}
 function unlockSecretFact(speciesId) {
-  const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[speciesId]) || [];
+  const pool = insightPoolFor(speciesId);
   if (!pool.length) return null;
   const unlocked = state.unlockedFacts[speciesId] || [];
   const remaining = pool.map((_, i) => i).filter(i => !unlocked.includes(i));
@@ -4022,7 +4039,7 @@ function showTagAlongFact(info) {
   const isObserve = info.mode === "observe";
   const rec = state.tagged[info.speciesId];
   const displayName = isObserve ? s.name : ((rec && rec.name) || s.name);
-  const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[info.speciesId]) || [];
+  const pool = insightPoolFor(info.speciesId);
   const unlocked = state.unlockedFacts[info.speciesId] || [];
   const total = pool.length;
   const learned = unlocked.length;
@@ -4768,20 +4785,21 @@ function openDetail(id) {
       </ul>
     </div>` : ""}
     ${(() => {
-      /* v1.4.0-beta: show unlocked tag-along facts in the collection detail. */
+      /* v1.4.0-beta: show unlocked tag-along facts in the collection detail.
+         v1.7.37-beta: the block ALWAYS renders — 0/N when nothing is
+         unlocked yet — so the player can see what there is to learn.
+         Hook + bonus are real insights now (insightPoolFor), not
+         separate 💡/✨ blocks. */
       const unlocked = state.unlockedFacts[id] || [];
-      const pool = (typeof SECRET_FACTS !== "undefined" && SECRET_FACTS[id]) || [];
+      const pool = insightPoolFor(id);
       const shown = unlocked.map(i => pool[i]).filter(Boolean);
-      if (!shown.length) return "";
       return `<div class="secret-facts-block">
         <h4>🔬 Tag-along insights (${shown.length}/${pool.length})</h4>
-        <ul class="track-stops">
+        ${shown.length ? `<ul class="track-stops">
           ${shown.map(f => `<li>🔬 ${esc(f)}</li>`).join("")}
-        </ul>
+        </ul>` : ""}
       </div>`;
     })()}
-    <p class="hook">💡 ${s.hook}</p>
-    <p class="bonus-fact">✨ ${s.bonus}</p>
     ${s.conservation ? `<p class="conservation-note">🌊 <strong>Conservation:</strong> ${s.conservation}</p>` : ""}
     </div>
   `;
