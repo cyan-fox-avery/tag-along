@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.0-beta";
+const VERSION = "v1.8.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,11 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.1-beta": [
+"⭐ <strong>100%-complete sharks get a yellow border.</strong> Once every insight is discovered for a species, that shark's Collection card gets a subtle yellow border — a quick visual for which sharks are fully complete.",
+"🏷️ <strong>IUCN badge hugs the pin.</strong> In Research rows, the IUCN badge now sits 6px from the pin icon instead of 22px — maximum room for the shark's name.",
+"🫧 <strong>Far-right bubbles start at the bottom.</strong> The far-right bubble column used to launch halfway up the screen, leaving the bottom-right corner bubble-less. It now rises the full height like the other full-riser columns.",
+  ],
   "v1.8.0-beta": [
 "📖 <strong>Archive tab back to 3 columns.</strong> The Wild Archive is 3 columns again on wide screens, like the Research tab — and an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column. Phone / narrow layouts are unchanged.",
 "🦄 <strong>White Whale is now Deep-Sea Unicorn.</strong> The megamouth achievement got a new name and emoji — White Whale was too close to WHAAAAAAALE, the whale-shark one. Same achievement, same unlock; WHAAAAAAALE is untouched.",
@@ -4718,8 +4723,17 @@ function renderCollection() {
     const t = state.tagged[s.id];
     const cell = document.createElement("button");
     cell.type = "button";
-    cell.className = "grid-cell";
-    cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}`);
+    /* v1.8.1-beta: 100%-complete indicator — every insight discovered for
+       this species. Derived from existing unlock data; no save change.
+       Index-membership check (same definition as Dedicated): a
+       full-length array with a missing index (e.g. an imported
+       [0,1,2,99] or duplicate [0,0,1,2]) must NOT count as complete. */
+    const _pool = insightPoolFor(s.id);
+    const _unlocked = state.unlockedFacts[s.id] || [];
+    const _insightsComplete = _pool.length > 0 && _pool.every((_, i) => _unlocked.includes(i));
+    cell.className = "grid-cell" + (_insightsComplete ? " insights-complete" : "");
+    if (_insightsComplete) cell.title = "All insights discovered — 100% complete";
+    cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}${_insightsComplete ? " — all insights discovered" : ""}`);
     cell.innerHTML = `
       <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
       <div class="grid-cell-text">

@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.0-beta', VERSION === 'v1.8.0-beta');
+  ok('version v1.8.1-beta', VERSION === 'v1.8.1-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2630,6 +2630,10 @@ code += `
     // Every bubble rule carries its own JS-loop config as custom properties.
     const bubbleRules = cssCode.match(/\\.bubbles\\s+span:nth-child\\(\\d+\\)\\s*\\{[^}]*\\}/g) || [];
     ok("every bubble rule has JS-loop config", bubbleRules.length === 26 && bubbleRules.every(r => /--bubble-rise:/.test(r) && /--bubble-duration:/.test(r) && /--bubble-delay:/.test(r)));
+    // v1.8.1-beta: far-right column H (spans 25-26) was a short hop starting
+    // 45% up, leaving a bubble-less bottom-right corner. Full riser now.
+    const colH = [25, 26].map(n => bubbleRules.find(r => r.startsWith(".bubbles span:nth-child(" + n + ")")) || "");
+    ok("far-right bubbles (col H) launch from the bottom", colH.every(r => /bottom:\\s*-20px/.test(r) && /--bubble-rise:\\s*-105vh/.test(r)));
     ok("bubbles have no CSS keyframe animation", !/@keyframes\\s+bubble-rise/.test(cssCode) && !/\\.bubbles\\s+span\\s*\\{[^}]*animation-name/.test(cssCode));
     // The loop wires itself to the spans and honours reduced motion.
     ok("bubble loop reads config + respects reduced motion",
@@ -2897,7 +2901,8 @@ code += `
   ok('collapseGuideRow has restoreFocus flag', /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
   ok('focus only restored when flag is true', /if \\(restoreFocus\\) head\\.focus\\(\\);/.test(code));
   // v1.6.0: IUCN badge spacing — more room between badge and pin
-  ok('iucn badge has right margin', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*8px/.test(cssCode));
+  ok('iucn badge has 6px right margin (v1.8.1)', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*6px/.test(cssCode));
+  ok('guide-row-top head has no right padding (v1.8.1)', /\\.guide-row-top\\s+\\.guide-row-head\\s*\\{[^}]*padding-right:\\s*0/.test(cssCode));
   // v1.7.12-beta: IUCN badge text no longer clips vertically on iPad Safari
   ok('status-pill has explicit line-height', /\\.status-pill\\s*\\{[^}]*line-height:\\s*1\\.35/.test(cssCode));
   ok('legend pill overrides inherited line-height', /\\.iucn-legend\\s+\\.status-pill[^}]*line-height:\\s*1\\.35/.test(cssCode));
@@ -3218,6 +3223,130 @@ code += `
   ok('desktop collection cards are horizontal', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.grid-cell \\{ display: flex/.test(cssCode));
   ok('desktop collection is 3 columns', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.collection-grid \\{ grid-template-columns: repeat\\(3, 1fr\\)/.test(cssCode));
   ok('collection cell has text wrapper', /class="grid-cell-text"/.test(fileCode));
+  // v1.8.1-beta: 100%-complete Collection cards get a subtle yellow border.
+  (() => {
+    const origTagged = state.tagged;
+    const origUnlocked = state.unlockedFacts;
+    const origWon = state.won;
+    const origDerpy = state.derpyUnlocked;
+    const origPendingWin = state.pendingWin;
+    const listEl = document.getElementById("collectionList");
+    const before = listEl.children.length;
+    state.tagged = {
+      nurse: { name: "Helen", researchId: "NS-2026-001" },
+      thresher: { name: "", researchId: "TS-2026-001" },
+    };
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 4], thresher: [0] };
+    state.won = false;
+    state.derpyUnlocked = false;
+    state.pendingWin = false;
+    try {
+      renderCollection();
+      const cells = listEl.children.slice(before);
+      ok("complete Collection card gets insights-complete class",
+        cells.some(c => (c.className || "").includes("insights-complete")));
+      ok("incomplete Collection card has no insights-complete class",
+        cells.filter(c => !(c.className || "").includes("insights-complete")).length === 1);
+    } catch (e) {
+      ok("collection complete-border render (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origUnlocked;
+      state.won = origWon;
+      state.derpyUnlocked = origDerpy;
+      state.pendingWin = origPendingWin;
+    }
+  })();
+  ok('complete Collection card has yellow border CSS', /\\.grid-cell\\.insights-complete\\s*\\{[^}]*border:[^}]*255,\\s*209,\\s*102/.test(cssCode));
+  // v1.8.1-beta (Mira review): a full-length array with a missing index
+  // must NOT count as complete — index membership, not length.
+  (() => {
+    const origTagged = state.tagged;
+    const origUnlocked = state.unlockedFacts;
+    const origWon = state.won;
+    const origDerpy = state.derpyUnlocked;
+    const origPendingWin = state.pendingWin;
+    const listEl = document.getElementById("collectionList");
+    const before = listEl.children.length;
+    state.tagged = {
+      nurse: { name: "Helen", researchId: "NS-2026-001" },
+      thresher: { name: "", researchId: "TS-2026-001" },
+    };
+    // Out-of-range [0,1,2,3,99] and duplicate [0,0,1,2]: both full-length
+    // but each missing an index — neither card may show the border.
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 99], thresher: [0, 0, 1, 2] };
+    state.won = false;
+    state.derpyUnlocked = false;
+    state.pendingWin = false;
+    try {
+      renderCollection();
+      const cells = listEl.children.slice(before);
+      ok("full-length array with missing index gets no insights-complete class",
+        !cells.some(c => (c.className || "").includes("insights-complete")));
+    } catch (e) {
+      ok("collection complete-border missing-index render (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origUnlocked;
+      state.won = origWon;
+      state.derpyUnlocked = origDerpy;
+      state.pendingWin = origPendingWin;
+    }
+  })();
+  // v1.8.1-beta (Mira review): complete cards announce completion in the
+  // aria-label — touch users get no hover tooltip. The global headless
+  // mock's setAttribute is a no-op, so this test swaps in a storing
+  // createElement (same pattern as the v1.7.22 accordion test).
+  (() => {
+    const origTagged = state.tagged;
+    const origUnlocked = state.unlockedFacts;
+    const origWon = state.won;
+    const origDerpy = state.derpyUnlocked;
+    const origPendingWin = state.pendingWin;
+    const origCreate = document.createElement;
+    const listEl = document.getElementById("collectionList");
+    const before = listEl.children.length;
+    state.tagged = {
+      nurse: { name: "Helen", researchId: "NS-2026-001" },
+      thresher: { name: "", researchId: "TS-2026-001" },
+    };
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 4], thresher: [0] };
+    state.won = false;
+    state.derpyUnlocked = false;
+    state.pendingWin = false;
+    document.createElement = () => {
+      const el = {
+        children: [], _attrs: {}, className: "", title: "", innerHTML: "",
+        style: {}, dataset: {},
+        classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
+        setAttribute(k, v) { el._attrs[k] = String(v); },
+        getAttribute(k) { return (k in el._attrs) ? el._attrs[k] : null; },
+        addEventListener() {}, removeEventListener() {},
+        appendChild(c) { el.children.push(c); return c; },
+        querySelector() { return null; }, querySelectorAll() { return []; },
+      };
+      return el;
+    };
+    try {
+      renderCollection();
+      const cells = listEl.children.slice(before);
+      const helen = cells.find(c => (c.getAttribute("aria-label") || "").includes("Helen"));
+      ok("complete Collection card aria-label mentions all insights discovered",
+        !!helen && (helen.getAttribute("aria-label") || "").includes("all insights discovered"));
+      const thresherCell = cells.find(c => (c.getAttribute("aria-label") || "").includes("TS-2026-001"));
+      ok("incomplete Collection card aria-label omits completion",
+        !!thresherCell && !(thresherCell.getAttribute("aria-label") || "").includes("all insights discovered"));
+    } catch (e) {
+      ok("collection complete-border aria-label render (threw: " + e.message + ")", false);
+    } finally {
+      document.createElement = origCreate;
+      state.tagged = origTagged;
+      state.unlockedFacts = origUnlocked;
+      state.won = origWon;
+      state.derpyUnlocked = origDerpy;
+      state.pendingWin = origPendingWin;
+    }
+  })();
   ok('checklist circle CSS present', /\\.tag-check \\{/.test(cssCode) && /\\.tag-check\\.is-done/.test(cssCode));
   ok('field-guide rows use checklist circles', /class="tag-check/.test(fileCode));
   ok('sr-only utility CSS present', /\.sr-only \{/.test(cssCode));
@@ -3372,6 +3501,7 @@ ok('WHATS_NEW has v1.7.34-beta', Array.isArray(WHATS_NEW['v1.7.34-beta']) && WHA
 ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHATS_NEW['v1.7.35-beta'].length >= 1);
   ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
   ok('WHATS_NEW has v1.8.0-beta', Array.isArray(WHATS_NEW['v1.8.0-beta']) && WHATS_NEW['v1.8.0-beta'].length === 4);
+  ok('WHATS_NEW has v1.8.1-beta', Array.isArray(WHATS_NEW['v1.8.1-beta']) && WHATS_NEW['v1.8.1-beta'].length === 3);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

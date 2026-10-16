@@ -179,9 +179,12 @@ body::before {
 .bubbles span:nth-child(22) { left: 80%;   bottom: -20px; --bubble-rise: -105vh; width: 8px;  height: 8px;  --bubble-delay: -2s;  --bubble-duration: 22s; }
 .bubbles span:nth-child(23) { left: 83.6%; bottom: -20px; --bubble-rise: -105vh; width: 12px; height: 12px; --bubble-delay: -2s;  --bubble-duration: 18s; }
 .bubbles span:nth-child(24) { left: 77.9%; bottom: -20px; --bubble-rise: -105vh; width: 7px;  height: 7px;  --bubble-delay: -2s;  --bubble-duration: 24s; }
-/* column H — short hop, 2 bubbles */
-.bubbles span:nth-child(25) { left: 90%;   bottom: 45%; --bubble-rise: -45vh; width: 10px; height: 10px; --bubble-delay: -13s; --bubble-duration: 20s; }
-.bubbles span:nth-child(26) { left: 93.2%; bottom: 45%; --bubble-rise: -45vh; width: 6px;  height: 6px;  --bubble-delay: -13s; --bubble-duration: 26s; }
+/* column H — full riser, 2 bubbles.
+   v1.8.1-beta: was a short hop (bottom: 45%, rise -45vh) — far-right
+   bubbles appeared halfway up, leaving a bubble-less bottom-right corner.
+   Now a full riser like columns A/C/E/G. */
+.bubbles span:nth-child(25) { left: 90%;   bottom: -20px; --bubble-rise: -105vh; width: 10px; height: 10px; --bubble-delay: -13s; --bubble-duration: 20s; }
+.bubbles span:nth-child(26) { left: 93.2%; bottom: -20px; --bubble-rise: -105vh; width: 6px;  height: 6px;  --bubble-delay: -13s; --bubble-duration: 26s; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
   .surface-shimmer, .caustics span, .bubbles span { animation: none; }
@@ -1074,6 +1077,10 @@ select option:disabled { color: #7a8a9e; }
   box-shadow: 0 4px 14px rgba(0,0,0,0.25); text-align: center;
 }
 .grid-cell:active { transform: scale(0.97); }
+/* v1.8.1-beta: 100%-complete indicator — subtle yellow border when every
+   insight for that species is discovered. Border-box sizing (global *)
+   keeps the border inside the cell's grid track. */
+.grid-cell.insights-complete { border: 2px solid rgba(255, 209, 102, 0.55); }
 .grid-cell h3 { margin: 4px 0 0; font-size: 15px; }
 .grid-cell .latin { margin: 2px 0 0; font-size: 11px; }
 .grid-cell .shark-art { margin: 0; }
@@ -1190,8 +1197,11 @@ select option:disabled { color: #7a8a9e; }
 .guide-row-head .guide-names .guide-row-name { flex: none; max-width: 100%; }
 .guide-row-head .guide-names .latin { flex: none; font-size: 12px; }
 /* v1.6.0-beta: more space between IUCN badge and pin icon — matches the
-   pin-to-edge distance so Latin names have more room. */
-.guide-row-head .status-pill { margin-bottom: 0; margin-right: 8px; flex: none; }
+   pin-to-edge distance so Latin names have more room.
+   v1.8.1-beta: Avery — 6px now, real close, maximum room for the name.
+   (The head's right padding is zeroed on .guide-row-top rows, so this
+   6px margin is the whole pill-to-pin gap.) */
+.guide-row-head .status-pill { margin-bottom: 0; margin-right: 6px; flex: none; }
 /* v1.6.1-beta: checklist-style tag status — an empty circle before each name
    that fills green when the shark is tagged. Replaces the ✅ prefix. */
 .tag-check {
@@ -1259,7 +1269,12 @@ select option:disabled { color: #7a8a9e; }
 .guide-row-top { display: flex; align-items: stretch; }
 /* v1.5.17-beta: pill moved inside the head button (whole header is one tap
    target); the .guide-row-head .status-pill rule above covers its sizing. */
-.guide-row-top .guide-row-head { flex: 1; min-width: 0; }
+/* v1.8.1-beta: Avery — IUCN badge 6px from the pin icon, max room for the
+   name. The head's 14px right padding used to sit between pill and pin
+   (8px pill margin + 14px padding = 22px gap); zero it here so the pill's
+   6px margin is the whole gap. Scoped to .guide-row-top so Achievements
+   heads (no pin) keep their padding. */
+.guide-row-top .guide-row-head { flex: 1; min-width: 0; padding-right: 0; }
 .pin-btn {
   flex: none; width: 52px; min-height: 52px; font-size: 1.3rem;
   background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.08);
