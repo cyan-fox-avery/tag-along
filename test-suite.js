@@ -3818,9 +3818,23 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   ok('v1.7.19 dusky species exists in roster',
     SHARKS.some(function(s){ return s.id === 'dusky'; }));
   /* v1.7.26-beta: thresher hook — "perpetually nervous" describes the whole
-     shark, not just its tail. */
+     shark, not just its tail. v1.7.37-beta: hook rewritten (tail-whipping
+     repeated SECRET_FACTS) — huge eyes instead, nervousness kept. */
   ok('thresher hook attributes nervousness to the shark, not the tail',
-    SHARKS.some(function(s){ return s.id === 'thresher' && s.hook === 'It looks perpetually nervous, but that tail is actually a sword. Threshers hunt by tail-whipping.'; }));
+    SHARKS.some(function(s){ return s.id === 'thresher' && s.hook === 'It looks perpetually nervous — and those huge eyes are part of the look, big and dark for hunting in dim water.'; }));
+  /* v1.7.37-beta: second semantic sweep — rewrites for repeats the
+     word-overlap check missed. Guards the specific fixes. */
+  ok('v1.7.37 second sweep: rewritten insights present',
+    SHARKS.some(function(s){ return s.id === 'nurse' && s.hook.indexOf('two dozen') !== -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'thresher' && s.bonus.indexOf('tail-slap') === -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'blue' && s.bonus.indexOf('Ireland') === -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'sevengill' && s.hook.indexOf('dinosaurs') === -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'wobbegong' && s.hook.indexOf('shaggy beard') !== -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'oceanic' && s.hook.indexOf('litters of up to 15') !== -1; }) &&
+    SHARKS.some(function(s){ return s.id === 'pacificsleeper' && s.hook.indexOf('2,000 metres') !== -1; }) &&
+    SECRET_FACTS.hammerhead[1].indexOf('stingray') === -1 &&
+    SECRET_FACTS.porbeagle.join(' ').indexOf('migration') === -1 &&
+    COUSIN_CHATS.nurse[0].them.indexOf('pump') === -1);
   /* v1.7.19-beta Mira review: trophy refreshes without a reload */
   ok('v1.7.19 doWin renders Achievements',
     (function(){

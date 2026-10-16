@@ -23,7 +23,7 @@ const WHATS_NEW = {
   "v1.7.37-beta": [
 "📖 <strong>Archive tab back to 3 columns.</strong> The Wild Archive is 3 columns again on wide screens, like the Research tab — and an expanded entry's dropdown info box now widens to span two columns, so the expanded content gets room without the grid losing a column. Phone / narrow layouts are unchanged.",
 "🦄 <strong>White Whale is now Deep-Sea Unicorn.</strong> The megamouth achievement got a new name and emoji — White Whale was too close to WHAAAAAAALE, the whale-shark one. Same achievement, same unlock; WHAAAAAAALE is untouched.",
-"🔬 <strong>Hook + bonus are real insights now.</strong> Every species' hook (💡) and bonus (✨) are now unlockable tag-along insights, learned via Follow/Observe like the rest — 4 insights per species (5 for the nurse shark), all shown in the Tag-along insights section, with a 0/4 when none are learned yet. The separate 💡/✨ blocks are gone, and hook + bonus text was rewritten across all 50 species to remove overlaps with the existing facts. Your existing unlocks carry over; hook + bonus start locked. Dedicated now means all 201 insights.",
+"🔬 <strong>Hook + bonus are real insights now.</strong> Every species' hook (💡) and bonus (✨) are now unlockable tag-along insights, learned via Follow/Observe like the rest — 4 insights per species (5 for the nurse shark), all shown in the Tag-along insights section, with a 0/4 when none are learned yet. The separate 💡/✨ blocks are gone, and hook + bonus text was rewritten across all 50 species to remove overlaps with the existing facts. Your existing unlocks carry over; hook + bonus start locked. Dedicated now means all 201 insights. A second semantic sweep caught repeats the word-overlap check missed (nurse heaps, thresher tail-whipping, wobbegong ambush, and others) — those insights were rewritten, and Sarah's nurse chat no longer repeats the gill-pumping fact.",
   ],
   "v1.7.36-beta": [
 "✂️ <strong>Shark art component-cropped — the last stragglers.</strong> After the v1.7.35 re-trim, 13 species still had dead space: their source art carries full-opacity single-pixel specks, detached from the shark, with hundreds of empty rows between specks and shark — no alpha threshold could remove them. Those 13 are now cropped to the shark's own connected shape (plus a 3px safety margin), so the tiger, great white, frilled, and friends finally fill their image boxes. Alpha is exact inside the crop; files re-encoded lossy, so tiny color differences are possible.",
@@ -3752,7 +3752,7 @@ const SECRET_FACTS = {
   ],
   hammerhead: [
     "That hammer isn't just for show — spreading the eyes wide gives hammerheads wider binocular overlap in front than most sharks, and sweeping the head side to side lets them scan the sand for the electric whispers of buried stingrays.",
-    "Great hammerheads are mostly loners — solitary hunters that sweep their wide heads over the sand to pin down stingrays, their favorite prey, before swinging down to scoop them up; their first dorsal fin is exceptionally tall and sickle-shaped."
+    "Great hammerheads are mostly loners — solitary hunters, not schoolers — and their first dorsal fin is exceptionally tall and sickle-shaped, the tallest of any hammerhead."
   ],
   mako: [
     "The shortfin mako is the fastest shark alive, built like a torpedo with a heated engine — its warm muscles let it explode after tuna and even leap clear out of the water.",
@@ -3784,7 +3784,7 @@ const SECRET_FACTS = {
   ],
   porbeagle: [
     "Porbeagles run hot — among the warmest-bodied of all sharks, they keep their core heated well above the icy North Atlantic water they hunt in.",
-    "That internal furnace lets them chase prey in near-freezing seas and power long migrations across whole ocean basins."
+    "That internal furnace lets them chase prey in near-freezing seas where cold-blooded fish slow down — porbeagles stay fast in water that would numb most predators."
   ],
   silky: [
     "Silky sharks are named for their skin: their tiny scales are so smooth the hide feels like silk, unlike the sandpaper of most sharks.",
