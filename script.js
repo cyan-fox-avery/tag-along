@@ -4724,12 +4724,16 @@ function renderCollection() {
     const cell = document.createElement("button");
     cell.type = "button";
     /* v1.8.1-beta: 100%-complete indicator — every insight discovered for
-       this species. Derived from existing unlock data; no save change. */
-    const _poolTotal = insightPoolFor(s.id).length;
-    const _insightsComplete = _poolTotal > 0 && (state.unlockedFacts[s.id] || []).length >= _poolTotal;
+       this species. Derived from existing unlock data; no save change.
+       Index-membership check (same definition as Dedicated): a
+       full-length array with a missing index (e.g. an imported
+       [0,1,2,99] or duplicate [0,0,1,2]) must NOT count as complete. */
+    const _pool = insightPoolFor(s.id);
+    const _unlocked = state.unlockedFacts[s.id] || [];
+    const _insightsComplete = _pool.length > 0 && _pool.every((_, i) => _unlocked.includes(i));
     cell.className = "grid-cell" + (_insightsComplete ? " insights-complete" : "");
     if (_insightsComplete) cell.title = "All insights discovered — 100% complete";
-    cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}`);
+    cell.setAttribute("aria-label", `Open details for ${t.name ? esc(t.name) : esc(t.researchId)} ${s.name}${_insightsComplete ? " — all insights discovered" : ""}`);
     cell.innerHTML = `
       <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
       <div class="grid-cell-text">

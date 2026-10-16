@@ -3258,6 +3258,95 @@ code += `
     }
   })();
   ok('complete Collection card has yellow border CSS', /\\.grid-cell\\.insights-complete\\s*\\{[^}]*border:[^}]*255,\\s*209,\\s*102/.test(cssCode));
+  // v1.8.1-beta (Mira review): a full-length array with a missing index
+  // must NOT count as complete — index membership, not length.
+  (() => {
+    const origTagged = state.tagged;
+    const origUnlocked = state.unlockedFacts;
+    const origWon = state.won;
+    const origDerpy = state.derpyUnlocked;
+    const origPendingWin = state.pendingWin;
+    const listEl = document.getElementById("collectionList");
+    const before = listEl.children.length;
+    state.tagged = {
+      nurse: { name: "Helen", researchId: "NS-2026-001" },
+      thresher: { name: "", researchId: "TS-2026-001" },
+    };
+    // Out-of-range [0,1,2,3,99] and duplicate [0,0,1,2]: both full-length
+    // but each missing an index — neither card may show the border.
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 99], thresher: [0, 0, 1, 2] };
+    state.won = false;
+    state.derpyUnlocked = false;
+    state.pendingWin = false;
+    try {
+      renderCollection();
+      const cells = listEl.children.slice(before);
+      ok("full-length array with missing index gets no insights-complete class",
+        !cells.some(c => (c.className || "").includes("insights-complete")));
+    } catch (e) {
+      ok("collection complete-border missing-index render (threw: " + e.message + ")", false);
+    } finally {
+      state.tagged = origTagged;
+      state.unlockedFacts = origUnlocked;
+      state.won = origWon;
+      state.derpyUnlocked = origDerpy;
+      state.pendingWin = origPendingWin;
+    }
+  })();
+  // v1.8.1-beta (Mira review): complete cards announce completion in the
+  // aria-label — touch users get no hover tooltip. The global headless
+  // mock's setAttribute is a no-op, so this test swaps in a storing
+  // createElement (same pattern as the v1.7.22 accordion test).
+  (() => {
+    const origTagged = state.tagged;
+    const origUnlocked = state.unlockedFacts;
+    const origWon = state.won;
+    const origDerpy = state.derpyUnlocked;
+    const origPendingWin = state.pendingWin;
+    const origCreate = document.createElement;
+    const listEl = document.getElementById("collectionList");
+    const before = listEl.children.length;
+    state.tagged = {
+      nurse: { name: "Helen", researchId: "NS-2026-001" },
+      thresher: { name: "", researchId: "TS-2026-001" },
+    };
+    state.unlockedFacts = { nurse: [0, 1, 2, 3, 4], thresher: [0] };
+    state.won = false;
+    state.derpyUnlocked = false;
+    state.pendingWin = false;
+    document.createElement = () => {
+      const el = {
+        children: [], _attrs: {}, className: "", title: "", innerHTML: "",
+        style: {}, dataset: {},
+        classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
+        setAttribute(k, v) { el._attrs[k] = String(v); },
+        getAttribute(k) { return (k in el._attrs) ? el._attrs[k] : null; },
+        addEventListener() {}, removeEventListener() {},
+        appendChild(c) { el.children.push(c); return c; },
+        querySelector() { return null; }, querySelectorAll() { return []; },
+      };
+      return el;
+    };
+    try {
+      renderCollection();
+      const cells = listEl.children.slice(before);
+      const helen = cells.find(c => (c.getAttribute("aria-label") || "").includes("Helen"));
+      ok("complete Collection card aria-label mentions all insights discovered",
+        !!helen && (helen.getAttribute("aria-label") || "").includes("all insights discovered"));
+      const thresherCell = cells.find(c => (c.getAttribute("aria-label") || "").includes("TS-2026-001"));
+      ok("incomplete Collection card aria-label omits completion",
+        !!thresherCell && !(thresherCell.getAttribute("aria-label") || "").includes("all insights discovered"));
+    } catch (e) {
+      ok("collection complete-border aria-label render (threw: " + e.message + ")", false);
+    } finally {
+      document.createElement = origCreate;
+      state.tagged = origTagged;
+      state.unlockedFacts = origUnlocked;
+      state.won = origWon;
+      state.derpyUnlocked = origDerpy;
+      state.pendingWin = origPendingWin;
+    }
+  })();
   ok('checklist circle CSS present', /\\.tag-check \\{/.test(cssCode) && /\\.tag-check\\.is-done/.test(cssCode));
   ok('field-guide rows use checklist circles', /class="tag-check/.test(fileCode));
   ok('sr-only utility CSS present', /\.sr-only \{/.test(cssCode));
