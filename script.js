@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.1-beta";
+const VERSION = "v1.8.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.2-beta": [
+"🏷️ <strong>IUCN badge hugs the pin — for real this time.</strong> v1.8.1 closed the gap to the pin button's edge, but the 📌 glyph sits centered inside the 52px button, so the visual gap was still ~22px. The 6px is now measured to the glyph itself — the pin button's glyph is left-aligned with 5px of left padding. Touch target unchanged.",
+  ],
   "v1.8.1-beta": [
 "⭐ <strong>100%-complete sharks get a yellow border.</strong> Once every insight is discovered for a species, that shark's Collection card gets a subtle yellow border — a quick visual for which sharks are fully complete.",
 "🏷️ <strong>IUCN badge hugs the pin.</strong> In Research rows, the IUCN badge now sits 6px from the pin icon instead of 22px — maximum room for the shark's name.",

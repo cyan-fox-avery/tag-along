@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.1-beta', VERSION === 'v1.8.1-beta');
+  ok('version v1.8.2-beta', VERSION === 'v1.8.2-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2901,8 +2901,14 @@ code += `
   ok('collapseGuideRow has restoreFocus flag', /function collapseGuideRow\\(row, restoreFocus = true\\)/.test(code));
   ok('focus only restored when flag is true', /if \\(restoreFocus\\) head\\.focus\\(\\);/.test(code));
   // v1.6.0: IUCN badge spacing — more room between badge and pin
-  ok('iucn badge has 6px right margin (v1.8.1)', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*6px/.test(cssCode));
+  // v1.8.2-beta: correction — v1.8.1 measured the 6px to the pin BUTTON's
+  // edge, but the glyph sits centered inside the 52px button, so the
+  // visual gap was still ~22px. Pill margin is now 0; the 6px is the pin
+  // button's left padding, measured to the glyph itself.
+  ok('iucn badge has no right margin (v1.8.2)', /\\.guide-row-head\\s+\\.status-pill[^}]*margin-right:\\s*0/.test(cssCode));
   ok('guide-row-top head has no right padding (v1.8.1)', /\\.guide-row-top\\s+\\.guide-row-head\\s*\\{[^}]*padding-right:\\s*0/.test(cssCode));
+  ok('guide-row-top pin button left-aligns glyph with 5px padding (v1.8.2)', /\\.guide-row-top\\s+\\.pin-btn\\s*\\{[^}]*text-align:\\s*left[^}]*padding-left:\\s*5px/.test(cssCode));
+  ok('pin button keeps 52px touch target (v1.8.2)', /\\.pin-btn\\s*\\{[^}]*width:\\s*52px[^}]*min-height:\\s*52px/.test(cssCode));
   // v1.7.12-beta: IUCN badge text no longer clips vertically on iPad Safari
   ok('status-pill has explicit line-height', /\\.status-pill\\s*\\{[^}]*line-height:\\s*1\\.35/.test(cssCode));
   ok('legend pill overrides inherited line-height', /\\.iucn-legend\\s+\\.status-pill[^}]*line-height:\\s*1\\.35/.test(cssCode));
@@ -3502,6 +3508,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   ok('WHATS_NEW has v1.7.36-beta', Array.isArray(WHATS_NEW['v1.7.36-beta']) && WHATS_NEW['v1.7.36-beta'].length >= 1);
   ok('WHATS_NEW has v1.8.0-beta', Array.isArray(WHATS_NEW['v1.8.0-beta']) && WHATS_NEW['v1.8.0-beta'].length === 4);
   ok('WHATS_NEW has v1.8.1-beta', Array.isArray(WHATS_NEW['v1.8.1-beta']) && WHATS_NEW['v1.8.1-beta'].length === 3);
+  ok('WHATS_NEW has v1.8.2-beta', Array.isArray(WHATS_NEW['v1.8.2-beta']) && WHATS_NEW['v1.8.2-beta'].length === 1);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
