@@ -1,0 +1,3027 @@
+{
+  "version": "v1.7.36-beta",
+  "generated_by": "qa/trim-v1.7.36/build-manifest.py",
+  "method": "v1.7.36 component-crops 13 species to the bbox of the largest 8-connected component of alpha>=200 pixels in the original, plus a 3px safety margin on all sides. Those 13 still had dead space after the v1.7.35 alpha>=200 trim because their source art carries full-opacity (alpha 200-255) single-pixel specks, detached from the shark, with hundreds of empty rows between specks and shark \u2014 no alpha threshold can remove them. The other 37 species are untouched since v1.7.35 (12 at the alpha>=200 bbox) or v1.7.34 (25 at the alpha>0 bbox). Component-cropped files re-encoded lossy WebP (q90). Alpha verified by pasting each current file back at its crop offset onto an original-size transparent canvas and diffing the alpha channel inside the crop.",
+  "commits": {
+    "before_originals": "d1df7b687ee9f2aa0b8657ce7c1b19ab3f25c2d2 (main, PR #99 merge)",
+    "before_v1_7_35_files": "34b5556c13496cc75778fa8c2c6a73a6bc3502a4 (main, PR #102 merge)",
+    "after_component_cropped": "99580c7237593154a2fcc844c60fdb0940155fec (v1.7.36-component-crop head)"
+  },
+  "totals": {
+    "species": 50,
+    "original_bytes": 1895784,
+    "trimmed_bytes": 2657064,
+    "original_area_px": 29791800,
+    "trimmed_area_px": 13129436
+  },
+  "global_checks": {
+    "all_geometry_ok": true,
+    "geometry_failures": [],
+    "all_alpha_exact": true,
+    "alpha_failures": [],
+    "all_removed_only_specks": true,
+    "removed_failures": []
+  },
+  "species": [
+    {
+      "id": "nurse",
+      "name": "Nurse Shark",
+      "file": "nurse-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 29724
+      },
+      "trimmed": {
+        "width": 871,
+        "height": 229,
+        "bytes": 40808
+      },
+      "crop": {
+        "left": 14,
+        "top": 224,
+        "cut_top": 224,
+        "cut_bottom": 215,
+        "cut_left": 14,
+        "cut_right": 15
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 81937,
+        "largest_component_px": 81937,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          16,
+          227,
+          882,
+          450
+        ],
+        "alpha200_bbox": [
+          16,
+          227,
+          882,
+          450
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.758,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "thresher",
+      "name": "Thresher Shark",
+      "file": "thresher-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35916
+      },
+      "trimmed": {
+        "width": 862,
+        "height": 443,
+        "bytes": 46788
+      },
+      "crop": {
+        "left": 21,
+        "top": 70,
+        "cut_top": 70,
+        "cut_bottom": 155,
+        "cut_left": 21,
+        "cut_right": 17
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 72508,
+        "largest_component_px": 72508,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          24,
+          73,
+          880,
+          510
+        ],
+        "alpha200_bbox": [
+          24,
+          73,
+          880,
+          510
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.143,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "whale",
+      "name": "Whale Shark",
+      "file": "whale-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 55346
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 354,
+        "bytes": 76714
+      },
+      "crop": {
+        "left": 14,
+        "top": 152,
+        "cut_top": 152,
+        "cut_bottom": 162,
+        "cut_left": 14,
+        "cut_right": 8
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 142546,
+        "largest_component_px": 142546,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          17,
+          155,
+          889,
+          503
+        ],
+        "alpha200_bbox": [
+          17,
+          155,
+          889,
+          503
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.963,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin Shark",
+      "file": "goblin-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 24820
+      },
+      "trimmed": {
+        "width": 885,
+        "height": 202,
+        "bytes": 31366
+      },
+      "crop": {
+        "left": 9,
+        "top": 221,
+        "cut_top": 221,
+        "cut_bottom": 245,
+        "cut_left": 9,
+        "cut_right": 6
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 63378,
+        "largest_component_px": 63378,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          9,
+          221,
+          894,
+          423
+        ],
+        "alpha200_bbox": [
+          9,
+          221,
+          894,
+          423
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.802,
+        "rgb_pct_visible_px_diff_gt10": 0.016
+      }
+    },
+    {
+      "id": "tiger",
+      "name": "Tiger Shark",
+      "file": "tiger-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 39700
+      },
+      "trimmed": {
+        "width": 890,
+        "height": 325,
+        "bytes": 53110
+      },
+      "crop": {
+        "left": 10,
+        "top": 163,
+        "cut_top": 163,
+        "cut_bottom": 180,
+        "cut_left": 10,
+        "cut_right": 0
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 112741,
+        "largest_component_px": 112737,
+        "largest_component_share_of_opaque": 0.999965,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          13,
+          166,
+          897,
+          485
+        ],
+        "alpha200_bbox": [
+          13,
+          82,
+          897,
+          652
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 3,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.878,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "sandtiger",
+      "name": "Sand Tiger Shark",
+      "file": "sandtiger-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 35744
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 263,
+        "bytes": 48730
+      },
+      "crop": {
+        "left": 12,
+        "top": 235,
+        "cut_top": 235,
+        "cut_bottom": 171,
+        "cut_left": 12,
+        "cut_right": 10
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 103625,
+        "largest_component_px": 103625,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          15,
+          238,
+          887,
+          495
+        ],
+        "alpha200_bbox": [
+          15,
+          238,
+          887,
+          495
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.75,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "galapagos",
+      "name": "Gal\u00e1pagos Shark",
+      "file": "galapagos-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35532
+      },
+      "trimmed": {
+        "width": 883,
+        "height": 344,
+        "bytes": 45812
+      },
+      "crop": {
+        "left": 13,
+        "top": 153,
+        "cut_top": 153,
+        "cut_bottom": 171,
+        "cut_left": 13,
+        "cut_right": 4
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 106630,
+        "largest_component_px": 106629,
+        "largest_component_share_of_opaque": 0.999991,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          16,
+          156,
+          893,
+          494
+        ],
+        "alpha200_bbox": [
+          16,
+          149,
+          893,
+          494
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 1,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.721,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "greatwhite",
+      "name": "Great White Shark",
+      "file": "great-white-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 43454
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 350,
+        "bytes": 59834
+      },
+      "crop": {
+        "left": 13,
+        "top": 154,
+        "cut_top": 154,
+        "cut_bottom": 164,
+        "cut_left": 13,
+        "cut_right": 11
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 116399,
+        "largest_component_px": 116395,
+        "largest_component_share_of_opaque": 0.999966,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          16,
+          157,
+          886,
+          501
+        ],
+        "alpha200_bbox": [
+          16,
+          37,
+          886,
+          501
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 2,
+        "detached_opaque_px_inside_crop": 2
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.992,
+        "rgb_pct_visible_px_diff_gt10": 0.003
+      }
+    },
+    {
+      "id": "hammerhead",
+      "name": "Great Hammerhead",
+      "file": "hammerhead-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 43974
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 419,
+        "bytes": 58536
+      },
+      "crop": {
+        "left": 12,
+        "top": 119,
+        "cut_top": 119,
+        "cut_bottom": 131,
+        "cut_left": 12,
+        "cut_right": 12
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 116631,
+        "largest_component_px": 116631,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          15,
+          122,
+          885,
+          535
+        ],
+        "alpha200_bbox": [
+          15,
+          122,
+          885,
+          535
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.788,
+        "rgb_pct_visible_px_diff_gt10": 0.005
+      }
+    },
+    {
+      "id": "mako",
+      "name": "Shortfin Mako",
+      "file": "mako-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 34558
+      },
+      "trimmed": {
+        "width": 870,
+        "height": 296,
+        "bytes": 44826
+      },
+      "crop": {
+        "left": 17,
+        "top": 182,
+        "cut_top": 182,
+        "cut_bottom": 190,
+        "cut_left": 17,
+        "cut_right": 13
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 87161,
+        "largest_component_px": 87161,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          17,
+          182,
+          887,
+          478
+        ],
+        "alpha200_bbox": [
+          17,
+          182,
+          887,
+          478
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.932,
+        "rgb_pct_visible_px_diff_gt10": 0.009
+      }
+    },
+    {
+      "id": "basking",
+      "name": "Basking Shark",
+      "file": "basking-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 51698
+      },
+      "trimmed": {
+        "width": 883,
+        "height": 396,
+        "bytes": 73634
+      },
+      "crop": {
+        "left": 11,
+        "top": 134,
+        "cut_top": 134,
+        "cut_bottom": 139,
+        "cut_left": 11,
+        "cut_right": 6
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 157561,
+        "largest_component_px": 157561,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          14,
+          137,
+          891,
+          527
+        ],
+        "alpha200_bbox": [
+          14,
+          137,
+          891,
+          527
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.924,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "epaulette",
+      "name": "Epaulette Shark",
+      "file": "epaulette-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31876
+      },
+      "trimmed": {
+        "width": 864,
+        "height": 187,
+        "bytes": 39826
+      },
+      "crop": {
+        "left": 19,
+        "top": 240,
+        "cut_top": 240,
+        "cut_bottom": 241,
+        "cut_left": 19,
+        "cut_right": 17
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 61825,
+        "largest_component_px": 61825,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          19,
+          240,
+          883,
+          427
+        ],
+        "alpha200_bbox": [
+          19,
+          240,
+          883,
+          427
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.169,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "lemon",
+      "name": "Lemon Shark",
+      "file": "lemon-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35914
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 295,
+        "bytes": 57936
+      },
+      "crop": {
+        "left": 19,
+        "top": 192,
+        "cut_top": 192,
+        "cut_bottom": 181,
+        "cut_left": 19,
+        "cut_right": 12
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 101861,
+        "largest_component_px": 101861,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          19,
+          192,
+          888,
+          487
+        ],
+        "alpha200_bbox": [
+          19,
+          192,
+          888,
+          487
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.237,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "blacktip",
+      "name": "Blacktip Reef Shark",
+      "file": "blacktip-reef-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 30992
+      },
+      "trimmed": {
+        "width": 862,
+        "height": 273,
+        "bytes": 40310
+      },
+      "crop": {
+        "left": 22,
+        "top": 187,
+        "cut_top": 187,
+        "cut_bottom": 208,
+        "cut_left": 22,
+        "cut_right": 16
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 89491,
+        "largest_component_px": 89491,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          22,
+          187,
+          884,
+          460
+        ],
+        "alpha200_bbox": [
+          22,
+          187,
+          884,
+          460
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.88,
+        "rgb_pct_visible_px_diff_gt10": 0.019
+      }
+    },
+    {
+      "id": "whitetip",
+      "name": "Whitetip Reef Shark",
+      "file": "whitetip-reef-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 29074
+      },
+      "trimmed": {
+        "width": 872,
+        "height": 254,
+        "bytes": 39784
+      },
+      "crop": {
+        "left": 18,
+        "top": 197,
+        "cut_top": 197,
+        "cut_bottom": 217,
+        "cut_left": 18,
+        "cut_right": 10
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 80112,
+        "largest_component_px": 80112,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          21,
+          199,
+          886,
+          448
+        ],
+        "alpha200_bbox": [
+          21,
+          199,
+          886,
+          448
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.87,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "blue",
+      "name": "Blue Shark",
+      "file": "blue-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 32468
+      },
+      "trimmed": {
+        "width": 861,
+        "height": 302,
+        "bytes": 43058
+      },
+      "crop": {
+        "left": 28,
+        "top": 197,
+        "cut_top": 197,
+        "cut_bottom": 169,
+        "cut_left": 28,
+        "cut_right": 11
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 78407,
+        "largest_component_px": 78406,
+        "largest_component_share_of_opaque": 0.999987,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          31,
+          200,
+          886,
+          495
+        ],
+        "alpha200_bbox": [
+          31,
+          200,
+          886,
+          495
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.807,
+        "rgb_pct_visible_px_diff_gt10": 0.003
+      }
+    },
+    {
+      "id": "porbeagle",
+      "name": "Porbeagle",
+      "file": "porbeagle-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 38676
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 366,
+        "bytes": 53380
+      },
+      "crop": {
+        "left": 17,
+        "top": 146,
+        "cut_top": 146,
+        "cut_bottom": 156,
+        "cut_left": 17,
+        "cut_right": 7
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 113302,
+        "largest_component_px": 113302,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          17,
+          146,
+          893,
+          512
+        ],
+        "alpha200_bbox": [
+          17,
+          146,
+          893,
+          512
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.974,
+        "rgb_pct_visible_px_diff_gt10": 0.012
+      }
+    },
+    {
+      "id": "silky",
+      "name": "Silky Shark",
+      "file": "silky-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 29206
+      },
+      "trimmed": {
+        "width": 865,
+        "height": 277,
+        "bytes": 39628
+      },
+      "crop": {
+        "left": 25,
+        "top": 199,
+        "cut_top": 199,
+        "cut_bottom": 192,
+        "cut_left": 25,
+        "cut_right": 10
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 78695,
+        "largest_component_px": 78694,
+        "largest_component_share_of_opaque": 0.999987,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          28,
+          202,
+          887,
+          473
+        ],
+        "alpha200_bbox": [
+          28,
+          202,
+          887,
+          473
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.808,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "oceanic",
+      "name": "Oceanic Whitetip",
+      "file": "oceanic-whitetip-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 35356
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 334,
+        "bytes": 48270
+      },
+      "crop": {
+        "left": 18,
+        "top": 164,
+        "cut_top": 164,
+        "cut_bottom": 170,
+        "cut_left": 18,
+        "cut_right": 6
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 103223,
+        "largest_component_px": 103223,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          21,
+          167,
+          891,
+          495
+        ],
+        "alpha200_bbox": [
+          21,
+          167,
+          891,
+          495
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.623,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "sevengill",
+      "name": "Broadnose Sevengill",
+      "file": "sevengill-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 39586
+      },
+      "trimmed": {
+        "width": 877,
+        "height": 286,
+        "bytes": 51566
+      },
+      "crop": {
+        "left": 14,
+        "top": 202,
+        "cut_top": 202,
+        "cut_bottom": 181,
+        "cut_left": 14,
+        "cut_right": 9
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 101559,
+        "largest_component_px": 101559,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          14,
+          202,
+          891,
+          488
+        ],
+        "alpha200_bbox": [
+          14,
+          202,
+          891,
+          488
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.876,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "bronze",
+      "name": "Bronze Whaler",
+      "file": "bronze-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 32418
+      },
+      "trimmed": {
+        "width": 876,
+        "height": 282,
+        "bytes": 45124
+      },
+      "crop": {
+        "left": 22,
+        "top": 195,
+        "cut_top": 195,
+        "cut_bottom": 191,
+        "cut_left": 22,
+        "cut_right": 2
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 84469,
+        "largest_component_px": 84469,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          24,
+          198,
+          895,
+          474
+        ],
+        "alpha200_bbox": [
+          24,
+          198,
+          895,
+          474
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.98,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "frilled",
+      "name": "Frilled Shark",
+      "file": "frilled-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 24352
+      },
+      "trimmed": {
+        "width": 873,
+        "height": 140,
+        "bytes": 28828
+      },
+      "crop": {
+        "left": 13,
+        "top": 274,
+        "cut_top": 274,
+        "cut_bottom": 254,
+        "cut_left": 13,
+        "cut_right": 14
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 52377,
+        "largest_component_px": 52375,
+        "largest_component_share_of_opaque": 0.999962,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          16,
+          277,
+          883,
+          411
+        ],
+        "alpha200_bbox": [
+          16,
+          244,
+          883,
+          659
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 2,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.851,
+        "rgb_pct_visible_px_diff_gt10": 0.011
+      }
+    },
+    {
+      "id": "zebra",
+      "name": "Zebra Shark",
+      "file": "zebra-illustration.webp",
+      "encoding": "VP8L",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 42270
+      },
+      "trimmed": {
+        "width": 873,
+        "height": 248,
+        "bytes": 157512
+      },
+      "crop": {
+        "left": 16,
+        "top": 222,
+        "cut_top": 222,
+        "cut_bottom": 198,
+        "cut_left": 16,
+        "cut_right": 11
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 85700,
+        "largest_component_px": 85700,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          19,
+          225,
+          886,
+          468
+        ],
+        "alpha200_bbox": [
+          19,
+          225,
+          886,
+          468
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 0.0,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "scalloped",
+      "name": "Scalloped Hammerhead",
+      "file": "scalloped-hammerhead-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 51194
+      },
+      "trimmed": {
+        "width": 861,
+        "height": 451,
+        "bytes": 67780
+      },
+      "crop": {
+        "left": 21,
+        "top": 100,
+        "cut_top": 100,
+        "cut_bottom": 117,
+        "cut_left": 21,
+        "cut_right": 18
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 130039,
+        "largest_component_px": 130039,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          21,
+          100,
+          882,
+          551
+        ],
+        "alpha200_bbox": [
+          21,
+          100,
+          882,
+          551
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.857,
+        "rgb_pct_visible_px_diff_gt10": 0.011
+      }
+    },
+    {
+      "id": "smooth",
+      "name": "Smooth Hammerhead",
+      "file": "smooth-hammerhead-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 41820
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 429,
+        "bytes": 57818
+      },
+      "crop": {
+        "left": 17,
+        "top": 121,
+        "cut_top": 121,
+        "cut_bottom": 119,
+        "cut_left": 17,
+        "cut_right": 14
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 115201,
+        "largest_component_px": 115201,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          20,
+          124,
+          883,
+          547
+        ],
+        "alpha200_bbox": [
+          20,
+          124,
+          883,
+          547
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.841,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "bonnethead",
+      "name": "Bonnethead",
+      "file": "bonnethead-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 45890
+      },
+      "trimmed": {
+        "width": 850,
+        "height": 350,
+        "bytes": 59676
+      },
+      "crop": {
+        "left": 34,
+        "top": 152,
+        "cut_top": 152,
+        "cut_bottom": 167,
+        "cut_left": 34,
+        "cut_right": 16
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 107049,
+        "largest_component_px": 107047,
+        "largest_component_share_of_opaque": 0.999981,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          37,
+          155,
+          881,
+          499
+        ],
+        "alpha200_bbox": [
+          37,
+          155,
+          881,
+          538
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 1,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.881,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "bull",
+      "name": "Bull Shark",
+      "file": "bull-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 33066
+      },
+      "trimmed": {
+        "width": 877,
+        "height": 339,
+        "bytes": 44668
+      },
+      "crop": {
+        "left": 17,
+        "top": 161,
+        "cut_top": 161,
+        "cut_bottom": 168,
+        "cut_left": 17,
+        "cut_right": 6
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 112374,
+        "largest_component_px": 112374,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          17,
+          161,
+          894,
+          500
+        ],
+        "alpha200_bbox": [
+          17,
+          161,
+          894,
+          500
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.688,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "greyreef",
+      "name": "Grey Reef Shark",
+      "file": "grey-reef-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 33974
+      },
+      "trimmed": {
+        "width": 884,
+        "height": 311,
+        "bytes": 48240
+      },
+      "crop": {
+        "left": 14,
+        "top": 174,
+        "cut_top": 174,
+        "cut_bottom": 183,
+        "cut_left": 14,
+        "cut_right": 2
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 100159,
+        "largest_component_px": 100159,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          17,
+          177,
+          895,
+          482
+        ],
+        "alpha200_bbox": [
+          17,
+          177,
+          895,
+          482
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.823,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "caribbean",
+      "name": "Caribbean Reef Shark",
+      "file": "caribbean-reef-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31080
+      },
+      "trimmed": {
+        "width": 879,
+        "height": 308,
+        "bytes": 41542
+      },
+      "crop": {
+        "left": 16,
+        "top": 173,
+        "cut_top": 173,
+        "cut_bottom": 187,
+        "cut_left": 16,
+        "cut_right": 5
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 97016,
+        "largest_component_px": 97016,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          19,
+          176,
+          892,
+          478
+        ],
+        "alpha200_bbox": [
+          19,
+          176,
+          892,
+          478
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.551,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "sandbar",
+      "name": "Sandbar Shark",
+      "file": "sandbar-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 36152
+      },
+      "trimmed": {
+        "width": 882,
+        "height": 351,
+        "bytes": 46548
+      },
+      "crop": {
+        "left": 15,
+        "top": 154,
+        "cut_top": 154,
+        "cut_bottom": 163,
+        "cut_left": 15,
+        "cut_right": 3
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 100849,
+        "largest_component_px": 100845,
+        "largest_component_share_of_opaque": 0.99996,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          18,
+          157,
+          894,
+          502
+        ],
+        "alpha200_bbox": [
+          18,
+          157,
+          894,
+          630
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 3,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.842,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "salmon",
+      "name": "Salmon Shark",
+      "file": "salmon-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 47784
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 325,
+        "bytes": 54730
+      },
+      "crop": {
+        "left": 16,
+        "top": 156,
+        "cut_top": 156,
+        "cut_bottom": 187,
+        "cut_left": 16,
+        "cut_right": 15
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 123989,
+        "largest_component_px": 123989,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          19,
+          159,
+          882,
+          478
+        ],
+        "alpha200_bbox": [
+          19,
+          159,
+          882,
+          478
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.109,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "dusky",
+      "name": "Dusky Shark",
+      "file": "dusky-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 36550
+      },
+      "trimmed": {
+        "width": 887,
+        "height": 371,
+        "bytes": 51576
+      },
+      "crop": {
+        "left": 10,
+        "top": 158,
+        "cut_top": 158,
+        "cut_bottom": 139,
+        "cut_left": 10,
+        "cut_right": 3
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 105733,
+        "largest_component_px": 105732,
+        "largest_component_share_of_opaque": 0.999991,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          13,
+          161,
+          894,
+          526
+        ],
+        "alpha200_bbox": [
+          13,
+          161,
+          894,
+          559
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 1,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.893,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "silvertip",
+      "name": "Silvertip Shark",
+      "file": "silvertip-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 37218
+      },
+      "trimmed": {
+        "width": 886,
+        "height": 333,
+        "bytes": 48094
+      },
+      "crop": {
+        "left": 10,
+        "top": 157,
+        "cut_top": 157,
+        "cut_bottom": 178,
+        "cut_left": 10,
+        "cut_right": 4
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 101386,
+        "largest_component_px": 101373,
+        "largest_component_share_of_opaque": 0.999872,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          13,
+          160,
+          893,
+          487
+        ],
+        "alpha200_bbox": [
+          13,
+          66,
+          893,
+          544
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 7,
+        "detached_opaque_px_inside_crop": 6
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.776,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "spinner",
+      "name": "Spinner Shark",
+      "file": "spinner-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 32366
+      },
+      "trimmed": {
+        "width": 871,
+        "height": 275,
+        "bytes": 42564
+      },
+      "crop": {
+        "left": 19,
+        "top": 196,
+        "cut_top": 196,
+        "cut_bottom": 197,
+        "cut_left": 19,
+        "cut_right": 10
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 83146,
+        "largest_component_px": 83145,
+        "largest_component_share_of_opaque": 0.999988,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          19,
+          196,
+          890,
+          471
+        ],
+        "alpha200_bbox": [
+          19,
+          196,
+          890,
+          471
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.824,
+        "rgb_pct_visible_px_diff_gt10": 0.008
+      }
+    },
+    {
+      "id": "wobbegong",
+      "name": "Spotted Wobbegong",
+      "file": "wobbegong-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 59558
+      },
+      "trimmed": {
+        "width": 882,
+        "height": 287,
+        "bytes": 96176
+      },
+      "crop": {
+        "left": 10,
+        "top": 205,
+        "cut_top": 205,
+        "cut_bottom": 176,
+        "cut_left": 10,
+        "cut_right": 8
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 120416,
+        "largest_component_px": 120416,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          13,
+          208,
+          888,
+          489
+        ],
+        "alpha200_bbox": [
+          13,
+          208,
+          888,
+          489
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.59,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "leopard",
+      "name": "Leopard Shark",
+      "file": "leopard-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31510
+      },
+      "trimmed": {
+        "width": 878,
+        "height": 218,
+        "bytes": 44112
+      },
+      "crop": {
+        "left": 18,
+        "top": 221,
+        "cut_top": 221,
+        "cut_bottom": 229,
+        "cut_left": 18,
+        "cut_right": 4
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 77370,
+        "largest_component_px": 77369,
+        "largest_component_share_of_opaque": 0.999987,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          21,
+          223,
+          893,
+          436
+        ],
+        "alpha200_bbox": [
+          21,
+          223,
+          893,
+          436
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.982,
+        "rgb_pct_visible_px_diff_gt10": 0.001
+      }
+    },
+    {
+      "id": "horn",
+      "name": "Horn Shark",
+      "file": "horn-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 42806
+      },
+      "trimmed": {
+        "width": 864,
+        "height": 349,
+        "bytes": 60668
+      },
+      "crop": {
+        "left": 27,
+        "top": 157,
+        "cut_top": 157,
+        "cut_bottom": 162,
+        "cut_left": 27,
+        "cut_right": 9
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 119507,
+        "largest_component_px": 119507,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          30,
+          160,
+          889,
+          503
+        ],
+        "alpha200_bbox": [
+          30,
+          160,
+          889,
+          503
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.004,
+        "rgb_pct_visible_px_diff_gt10": 0.003
+      }
+    },
+    {
+      "id": "portjackson",
+      "name": "Port Jackson Shark",
+      "file": "port-jackson-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 46220
+      },
+      "trimmed": {
+        "width": 864,
+        "height": 333,
+        "bytes": 62982
+      },
+      "crop": {
+        "left": 18,
+        "top": 170,
+        "cut_top": 170,
+        "cut_bottom": 165,
+        "cut_left": 18,
+        "cut_right": 18
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 114335,
+        "largest_component_px": 114329,
+        "largest_component_share_of_opaque": 0.999948,
+        "second_largest_component_px": 2,
+        "largest_component_bbox": [
+          21,
+          173,
+          879,
+          500
+        ],
+        "alpha200_bbox": [
+          21,
+          61,
+          879,
+          607
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 3,
+        "detached_opaque_px_inside_crop": 3
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.995,
+        "rgb_pct_visible_px_diff_gt10": 0.003
+      }
+    },
+    {
+      "id": "angelshark",
+      "name": "Common Angelshark",
+      "file": "angelshark-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 61054
+      },
+      "trimmed": {
+        "width": 660,
+        "height": 642,
+        "bytes": 79782
+      },
+      "crop": {
+        "left": 89,
+        "top": 14,
+        "cut_top": 14,
+        "cut_bottom": 12,
+        "cut_left": 89,
+        "cut_right": 151
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 137857,
+        "largest_component_px": 137846,
+        "largest_component_share_of_opaque": 0.99992,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          167,
+          14,
+          735,
+          656
+        ],
+        "alpha200_bbox": [
+          89,
+          14,
+          749,
+          656
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 11
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.227,
+        "rgb_pct_visible_px_diff_gt10": 0.007
+      }
+    },
+    {
+      "id": "megamouth",
+      "name": "Megamouth Shark",
+      "file": "megamouth-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 45862
+      },
+      "trimmed": {
+        "width": 859,
+        "height": 445,
+        "bytes": 64800
+      },
+      "crop": {
+        "left": 25,
+        "top": 102,
+        "cut_top": 102,
+        "cut_bottom": 122,
+        "cut_left": 25,
+        "cut_right": 16
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 142659,
+        "largest_component_px": 142659,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          28,
+          105,
+          881,
+          544
+        ],
+        "alpha200_bbox": [
+          28,
+          105,
+          881,
+          544
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.01,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "sawshark",
+      "name": "Common Sawshark",
+      "file": "sawshark-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 25314
+      },
+      "trimmed": {
+        "width": 884,
+        "height": 160,
+        "bytes": 31804
+      },
+      "crop": {
+        "left": 9,
+        "top": 243,
+        "cut_top": 243,
+        "cut_bottom": 266,
+        "cut_left": 9,
+        "cut_right": 7
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 43100,
+        "largest_component_px": 43100,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          12,
+          246,
+          890,
+          400
+        ],
+        "alpha200_bbox": [
+          12,
+          246,
+          890,
+          400
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.05,
+        "rgb_pct_visible_px_diff_gt10": 0.005
+      }
+    },
+    {
+      "id": "greenland",
+      "name": "Greenland Shark",
+      "file": "greenland-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 39528
+      },
+      "trimmed": {
+        "width": 875,
+        "height": 232,
+        "bytes": 55500
+      },
+      "crop": {
+        "left": 14,
+        "top": 216,
+        "cut_top": 216,
+        "cut_bottom": 220,
+        "cut_left": 14,
+        "cut_right": 11
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 128412,
+        "largest_component_px": 128409,
+        "largest_component_share_of_opaque": 0.999977,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          17,
+          219,
+          886,
+          445
+        ],
+        "alpha200_bbox": [
+          17,
+          188,
+          886,
+          595
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 2,
+        "detached_opaque_px_inside_crop": 1
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.685,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "cookiecutter",
+      "name": "Cookiecutter Shark",
+      "file": "cookiecutter-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 360,
+        "bytes": 26764
+      },
+      "trimmed": {
+        "width": 860,
+        "height": 147,
+        "bytes": 37654
+      },
+      "crop": {
+        "left": 23,
+        "top": 115,
+        "cut_top": 115,
+        "cut_bottom": 98,
+        "cut_left": 23,
+        "cut_right": 17
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 70936,
+        "largest_component_px": 70936,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          26,
+          118,
+          880,
+          259
+        ],
+        "alpha200_bbox": [
+          26,
+          118,
+          880,
+          259
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.844,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "sixgill",
+      "name": "Bluntnose Sixgill Shark",
+      "file": "sixgill-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 40368
+      },
+      "trimmed": {
+        "width": 884,
+        "height": 286,
+        "bytes": 50142
+      },
+      "crop": {
+        "left": 11,
+        "top": 198,
+        "cut_top": 198,
+        "cut_bottom": 185,
+        "cut_left": 11,
+        "cut_right": 5
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 100735,
+        "largest_component_px": 100734,
+        "largest_component_share_of_opaque": 0.99999,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          14,
+          201,
+          892,
+          481
+        ],
+        "alpha200_bbox": [
+          14,
+          201,
+          892,
+          558
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 1,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.806,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    },
+    {
+      "id": "velvetbelly",
+      "name": "Velvet-Belly Lanternshark",
+      "file": "velvet-belly-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>=200 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 40920
+      },
+      "trimmed": {
+        "width": 874,
+        "height": 249,
+        "bytes": 53498
+      },
+      "crop": {
+        "left": 15,
+        "top": 184,
+        "cut_top": 184,
+        "cut_bottom": 235,
+        "cut_left": 15,
+        "cut_right": 11
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 93178,
+        "largest_component_px": 93173,
+        "largest_component_share_of_opaque": 0.999946,
+        "second_largest_component_px": 5,
+        "largest_component_bbox": [
+          15,
+          184,
+          889,
+          433
+        ],
+        "alpha200_bbox": [
+          15,
+          184,
+          889,
+          433
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 5
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.91,
+        "rgb_pct_visible_px_diff_gt10": 0.004
+      }
+    },
+    {
+      "id": "dwarflantern",
+      "name": "Dwarf Lanternshark",
+      "file": "dwarflantern-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 669,
+        "bytes": 40112
+      },
+      "trimmed": {
+        "width": 861,
+        "height": 231,
+        "bytes": 55838
+      },
+      "crop": {
+        "left": 19,
+        "top": 294,
+        "cut_top": 294,
+        "cut_bottom": 144,
+        "cut_left": 19,
+        "cut_right": 20
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 105465,
+        "largest_component_px": 105465,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          22,
+          296,
+          877,
+          522
+        ],
+        "alpha200_bbox": [
+          22,
+          296,
+          877,
+          522
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.935,
+        "rgb_pct_visible_px_diff_gt10": 0.002
+      }
+    },
+    {
+      "id": "kitefin",
+      "name": "Kitefin Shark",
+      "file": "kitefin-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 30552
+      },
+      "trimmed": {
+        "width": 867,
+        "height": 216,
+        "bytes": 34726
+      },
+      "crop": {
+        "left": 20,
+        "top": 224,
+        "cut_top": 224,
+        "cut_bottom": 228,
+        "cut_left": 20,
+        "cut_right": 13
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 95952,
+        "largest_component_px": 95952,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          23,
+          227,
+          884,
+          437
+        ],
+        "alpha200_bbox": [
+          23,
+          227,
+          884,
+          437
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.053,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "pacificsleeper",
+      "name": "Pacific Sleeper Shark",
+      "file": "pacific-sleeper-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 31120
+      },
+      "trimmed": {
+        "width": 874,
+        "height": 201,
+        "bytes": 43266
+      },
+      "crop": {
+        "left": 14,
+        "top": 230,
+        "cut_top": 230,
+        "cut_bottom": 237,
+        "cut_left": 14,
+        "cut_right": 12
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 113697,
+        "largest_component_px": 113696,
+        "largest_component_share_of_opaque": 0.999991,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          17,
+          233,
+          885,
+          428
+        ],
+        "alpha200_bbox": [
+          17,
+          56,
+          885,
+          428
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 1,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.584,
+        "rgb_pct_visible_px_diff_gt10": 0.0
+      }
+    },
+    {
+      "id": "spinydogfish",
+      "name": "Spiny Dogfish",
+      "file": "spiny-dogfish-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "largest-8-connected-component bbox of alpha>=200 + 3px margin",
+      "component_cropped_in_v1_7_36": true,
+      "retrimmed_in_v1_7_35": true,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 33902
+      },
+      "trimmed": {
+        "width": 873,
+        "height": 274,
+        "bytes": 44100
+      },
+      "crop": {
+        "left": 21,
+        "top": 200,
+        "cut_top": 200,
+        "cut_bottom": 194,
+        "cut_left": 21,
+        "cut_right": 6
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 77659,
+        "largest_component_px": 77658,
+        "largest_component_share_of_opaque": 0.999987,
+        "second_largest_component_px": 1,
+        "largest_component_bbox": [
+          24,
+          203,
+          891,
+          471
+        ],
+        "alpha200_bbox": [
+          24,
+          104,
+          891,
+          471
+        ],
+        "largest_removed_connected_component_px": 1,
+        "removed_opaque_px": 1,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 1,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 1.94,
+        "rgb_pct_visible_px_diff_gt10": 0.003
+      }
+    },
+    {
+      "id": "catshark",
+      "name": "Small-Spotted Catshark",
+      "file": "catshark-illustration.webp",
+      "encoding": "VP8X",
+      "crop_method": "bbox of alpha>0 pixels",
+      "component_cropped_in_v1_7_36": false,
+      "retrimmed_in_v1_7_35": false,
+      "original": {
+        "width": 900,
+        "height": 668,
+        "bytes": 40446
+      },
+      "trimmed": {
+        "width": 869,
+        "height": 219,
+        "bytes": 53400
+      },
+      "crop": {
+        "left": 17,
+        "top": 230,
+        "cut_top": 230,
+        "cut_bottom": 219,
+        "cut_left": 17,
+        "cut_right": 14
+      },
+      "component_analysis": {
+        "connectivity": "8-connected (3x3 structuring element)",
+        "alpha_threshold": 200,
+        "total_opaque_px": 79609,
+        "largest_component_px": 79609,
+        "largest_component_share_of_opaque": 1.0,
+        "second_largest_component_px": 0,
+        "largest_component_bbox": [
+          20,
+          233,
+          883,
+          447
+        ],
+        "alpha200_bbox": [
+          20,
+          233,
+          883,
+          447
+        ],
+        "largest_removed_connected_component_px": 0,
+        "removed_opaque_px": 0,
+        "detached_opaque_px_inside_crop": 0
+      },
+      "checks": {
+        "geometry_trimmed_dims_equal_expected_crop": true,
+        "alpha_max_abs_diff": 0,
+        "alpha_pct_pixels_differing": 0.0,
+        "alpha_exact": true,
+        "largest_removed_connected_component_px": 0,
+        "removed_only_detached_specks_le_2px": true,
+        "rgb_mean_abs_diff_visible_px": 2.31,
+        "rgb_pct_visible_px_diff_gt10": 0.006
+      }
+    }
+  ]
+}
