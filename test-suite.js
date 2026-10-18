@@ -38,7 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.5-beta', VERSION === 'v1.8.5-beta');
+  ok('version v1.8.6-beta', VERSION === 'v1.8.6-beta');
+  ok('whats-new has v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -1557,6 +1558,30 @@ code += `
   ok('mira: dwarf lanternshark track is archival', TRACK_ENVELOPES.dwarflantern.kind === 'archival');
   // All 50 species have map colors (no white-marker fallback)
   ok('mira: all 50 sharks have SPECIES_COLORS', SHARKS.every(s => SPECIES_COLORS[s.id] !== undefined));
+  // v1.8.6-beta: tracking map improvements
+  (() => {
+    const colors = Object.values(SPECIES_COLORS);
+    ok('v1.8.6: all 50 SPECIES_COLORS are valid 6-digit hex', colors.length === 50 && colors.every(c => /^#[0-9a-f]{6}$/.test(c)));
+    ok('v1.8.6: all 50 SPECIES_COLORS are unique', new Set(colors).size === 50);
+    ok('v1.8.6: mapShowsTrack false when flag absent', mapShowsTrack({ researchId: 'x' }) === false);
+    ok('v1.8.6: mapShowsTrack false when explicitly off', mapShowsTrack({ mapTrack: false }) === false);
+    ok('v1.8.6: mapShowsTrack true when on', mapShowsTrack({ mapTrack: true }) === true);
+    ok('v1.8.6: mapShowsTrack false for nullish', mapShowsTrack(null) === false && mapShowsTrack(undefined) === false);
+    // renderMap gating: track path + tag-site pin only for tracked sharks,
+    // latest-location dot for every shark
+    const origTagged = state.tagged;
+    const mk = (tracked) => ({ researchId: 'T-1', name: 'Testy', mapTrack: tracked,
+      track: { kind: 'satellite', points: [{ label: 'Caribbean Sea', day: 0 }, { label: 'Caribbean Sea', day: 6 }, { label: 'Open Atlantic', day: 12 }] } });
+    state.tagged = { nurse: mk(true), lemon: mk(false) };
+    renderMap();
+    const svg = document.getElementById('worldMapWrap').innerHTML;
+    ok('v1.8.6: renderMap draws track path only for tracked shark', (svg.match(/class="map-track"/g) || []).length === 1);
+    ok('v1.8.6: renderMap draws latest dot for every shark', (svg.match(/map-marker latest/g) || []).length === 2);
+    ok('v1.8.6: renderMap draws tag-site pin only for tracked shark', (svg.match(/\(tag site\)/g) || []).length === 1);
+    const legendHtml = document.getElementById('mapLegend').innerHTML;
+    ok('v1.8.6: legend still lists every tagged shark', (legendHtml.match(/map-chip/g) || []).length === 2);
+    state.tagged = origTagged;
+  })();
 
   // v0.22.0: pin-gated soft hints
   // v0.22.0 Mira review: pin hints grounded in completed expeditions
