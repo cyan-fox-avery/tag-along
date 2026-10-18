@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.4-beta";
+const VERSION = "v1.8.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,11 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.5-beta": [
+"💬 <strong>Sarah feels more like a real person.</strong> Every ambient chat now names the shark she's talking about — no more mystery facts floating without context. Her celebration openers for the later species are re-voiced as post-tag celebrations instead of reading like pre-dive briefings. Ask Sarah is a single button naming the shark you're researching (the dropdown is gone — there was only ever one shark to ask about). The named-shark check-ins have five new variants and never repeat twice in a row, and reunion reactions have eleven new lines with the same no-repeat guard.",
+"📓 <strong>Logbook and Collection polish.</strong> 40 new weather lines keyed by climate zone — the Arctic no longer sounds like the Caribbean. Logbook entries show your shark's nickname alongside the species and tag ID. The Field sightings list shows your latest 10 with a “Show more” button. Expedition log lines no longer put nicknames in quotes — it's Kitty, not “Kitty”.",
+"🦈 <strong>Expedition art respects real size.</strong> Sharks now appear in four size tiers (small, medium, large, very large) based on their real max length — a porbeagle no longer fills the frame like a white shark. Collection art stays full-frame. The whale shark insight also drops “Gentle polka-dotted bus” for the real story: the largest fish in the ocean, feeding almost entirely on plankton.",
+  ],
   "v1.8.4-beta": [
 "⚡ <strong>Faster after expeditions.</strong> Following a shark used to re-render the whole game twice before showing your insight — now it renders once. The logbook also shows your latest 30 trips instead of every trip ever, with a “Show older trips” button for the rest. Longer saves should feel snappier after every trip.",
   ],
@@ -613,15 +618,65 @@ const EASTER_EGGS = [
 ];
 
 /* v0.22.0: failed trips feel like fieldwork — weather, sea state, and
-   wildlife make every expedition a day on the water, not just a miss. */
-const SEA_CONDITIONS = [
-  "Calm waves this morning — the sea is glass, and the boat barely rocks.",
-  "A light chop keeps things interesting; whitecaps glint in the sun.",
-  "Overcast and moody — the water looks like hammered pewter.",
-  "A fresh breeze out of the east; the swells roll in long and lazy.",
-  "Morning fog burns off by nine, leaving the water silver-green.",
-  "Choppy and bright — spray on the bow, gulls screaming overhead."
-];
+   wildlife make every expedition a day on the water, not just a miss.
+   v1.8.5-beta: keyed by climate zone like FIELD_NOTES — the Arctic no
+   longer sounds like the Caribbean. 40 lines so repeats are rare. */
+const SEA_CONDITIONS = {
+  tropical: [
+    "Trade winds out of the east, steady and warm — the water is that impossible turquoise.",
+    "A brief tropical squall at noon, gone by one. The deck steams in the sun afterward.",
+    "Glass-calm and blazing — the sea looks poured, and the horizon shimmers.",
+    "Puffy trade-wind clouds marching in rows, whitecaps glittering between them.",
+    "Hot, bright, and breezy — the chum slick stretches out straight behind us.",
+    "Morning rain, afternoon glare. The tropics can't decide, and neither can the sharks.",
+    "The water is so warm the bait barely needs ice. Flat calm, not a ripple.",
+    "A light swell from yesterday's storm, easing. The boat rolls gently, like it's thinking.",
+    "High thin cloud veiling the sun — bright but soft, the water turned to hammered silver.",
+    "Humid and still at dawn, then the sea breeze fills in by ten. Classic tropical day."
+  ],
+  temperate: [
+    "Grey swells and a low sky — the water the colour of wet slate.",
+    "Morning fog that never quite lifts; we navigate by sound and instruments.",
+    "Drizzle on and off, the sea chopped up by a restless westerly.",
+    "A cold front passed overnight — the air is sharp, the water choppy and green.",
+    "Pale sun through high cloud, the sea rolling in long grey swells.",
+    "Flat calm under a white sky — the water looks like brushed steel.",
+    "A brisk northerly kicking up whitecaps; spray rattles against the wheelhouse.",
+    "Fog banks drifting through, here then gone — the world reduced to fifty metres.",
+    "Overcast and drizzly, but the sea is kind — just a slow, easy swell.",
+    "Late-afternoon sun breaking through, turning the wave tops gold. Almost makes up for the cold."
+  ],
+  polar: [
+    "Brash ice tinkling against the hull — the sea is a slush of white and steel-blue.",
+    "Bitter wind out of the north, but the water in the lee of the ice is flat calm.",
+    "A pale sun that never climbs high, glaring off the ice. Sunglasses essential.",
+    "Flat calm and freezing — the sea looks like dark glass between the floes.",
+    "Snow squalls sweeping through, whiteouts between blue-sky gaps.",
+    "The air is so cold the spray freezes on the rails. The sea itself steams.",
+    "Low grey cloud pressing down, the water black and oily-calm.",
+    "A lead of open water between ice floes, mirror-still. We drift and listen.",
+    "Wind picking up, driving small sharp waves — the ice edge crunches and groans.",
+    "Clear and brutally cold, the horizon razor-sharp. Every breath smokes."
+  ],
+  generic: [
+    "Calm waves this morning — the sea is glass, and the boat barely rocks.",
+    "A light chop keeps things interesting; whitecaps glint in the sun.",
+    "Overcast and moody — the water looks like hammered pewter.",
+    "A fresh breeze out of the east; the swells roll in long and lazy.",
+    "Morning fog burns off by nine, leaving the water silver-green.",
+    "Choppy and bright — spray on the bow, gulls screaming overhead.",
+    "A slow swell from far away, the boat rising and falling like it's breathing.",
+    "The sea is restless today — short steep waves, the deck constantly moving.",
+    "Golden hour on the water, the sea turned to beaten copper.",
+    "Rain stippling the surface, each drop a tiny crater. The ocean doesn't mind."
+  ]
+};
+/* v1.8.5-beta: sea conditions follow the expedition's climate zone. */
+function pickSeaCondition(regionId) {
+  const zone = regionClimate(regionId);
+  const arr = SEA_CONDITIONS[zone] || SEA_CONDITIONS.generic;
+  return pick(arr);
+}
 /* v0.22.0 Mira review: wildlife sightings are region-appropriate.
    No mantas in the Arctic! */
 const FIELD_NOTES = {
@@ -2218,6 +2273,11 @@ function doEncounter(species, plan) {
     }
     const rec = isReunion ? existingRec : null;
     const sharkEl = $("diveShark");
+    /* v1.8.5-beta: size tiers — a porbeagle shouldn't fill the frame like
+       a white shark. Derived from the species' real max length; the
+       Collection stays full-frame, only the expedition encounter scales. */
+    sharkEl.classList.remove("size-small", "size-medium", "size-large", "size-xlarge");
+    sharkEl.classList.add("size-" + sizeTierFor(species));
     /* v0.26.0: tap-to-reveal encounter. Phase 1 shows the mystery
        silhouette (the species is not named yet). Tapping crossfades
        to the full-colour illustration and reveals the name.
@@ -2257,10 +2317,10 @@ function doEncounter(species, plan) {
       if (!existingRec) {
         already = ` — new to your book!`;
       } else if (isReunion) {
-        const rname = rec.name ? `\u201c${esc(rec.name)}\u201d` : rec.researchId;
+        const rname = rec.name ? esc(rec.name) : rec.researchId; // v1.8.5-beta: no quotes around nicknames
         already = ` — wait... that tag looks familiar. It's ${rname}! 🥹`;
       } else {
-        const oname = existingRec.name ? `\u201c${esc(existingRec.name)}\u201d` : "yours";
+        const oname = existingRec.name ? esc(existingRec.name) : "yours"; // v1.8.5-beta: no quotes around nicknames
         already = ` — another ${species.name}! This one has no matching tag — not ${oname}.`;
       }
       const showIllustration = () => {
@@ -2274,7 +2334,7 @@ function doEncounter(species, plan) {
         } else if (isReunion) {
           /* v1.7.14-beta Mira fix: escape once, at the HTML insertion boundary.
              rname stays raw here; esc() is applied in badgeText below. */
-          const rname = rec.name ? `\u201c${rec.name}\u201d` : rec.researchId;
+          const rname = rec.name ? rec.name : rec.researchId; // v1.8.5-beta: no quotes around nicknames
           badgeClass = "enc-reunion";
           badgeText = `🥹 YOUR SHARK — ${esc(rname)}`;
         } else {
@@ -2440,7 +2500,9 @@ function doEncounter(species, plan) {
         resightBtn.dataset.done = "true";
         resightBtn.disabled = true;
         const entry = recordResighting(species, plan);
-        logTripEncounter(species, "resighted");
+        /* v1.8.5-beta fix (Mira review): a reunion is the tagged individual
+           itself — pass its researchId so the logbook matches by identity. */
+        logTripEncounter(species, "resighted", rec ? rec.researchId : null);
         logLine(`📝 Re-sighting logged — ${species.name} off ${esc(entry.location)}. ${esc(entry.note)}`);
         /* v1.6.7-beta: one resighting = one Sarah thread. The first-ever reunion
            already got the special "WAIT... again?!?" reaction above; only later
@@ -2575,8 +2637,9 @@ async function runExpedition(plan) {
        the logbook renders "No method chosen"; "attract" was a misrecord. */
     method: plan.method || "",
     methodOpt: plan.methodOpt || "none",
-    /* v0.22.0: fieldwork conditions — weather/sea state for the logbook. */
-    conditions: pick(SEA_CONDITIONS),
+    /* v0.22.0: fieldwork conditions — weather/sea state for the logbook.
+       v1.8.5-beta: climate-zoned via pickSeaCondition. */
+    conditions: pickSeaCondition(plan.region),
     encounters: []
   };
   $("launchBtn").disabled = true;
@@ -2772,6 +2835,17 @@ async function runExpedition(plan) {
   actions.appendChild(backBtn);
 }
 
+/* v1.8.5-beta: expedition encounter size tiers — derived from each
+   species' real max length (sizeRange[1]). Four fixed tiers, Avery's
+   choice over proportional scaling. Collection art is untouched. */
+function sizeTierFor(species) {
+  const mx = species && species.sizeRange ? species.sizeRange[1] : 3;
+  if (mx < 2) return "small";
+  if (mx < 4) return "medium";
+  if (mx < 6) return "large";
+  return "xlarge";
+}
+
 /* ---------- Sightings log: watched, not tagged ----------
    v0.7.0: choosing "just watch" records a sighting — species, what it
    was doing, where and when. Spotted-but-not-tagged. Pure value, no
@@ -2799,7 +2873,10 @@ function renderSightings() {
     list.innerHTML = `<div class="empty-note">No sightings yet.<br>Watch a shark without tagging it and it'll be logged here. 👁️</div>`;
     return;
   }
-  state.sightings.forEach(e => {
+  /* v1.8.5-beta: cap the shown sightings — the list grows without bound.
+     Latest first (state.sightings is unshifted); "Show more" reveals the rest. */
+  const shown = state.sightings.slice(0, sightingsShown);
+  shown.forEach(e => {
     const div = document.createElement("div");
     div.className = "sighting-entry";
     div.innerHTML = `
@@ -2807,6 +2884,22 @@ function renderSightings() {
       <div class="sighting-detail">${esc(e.doing)} — ${esc(e.location)}, ${esc(e.date)}</div>`;
     list.appendChild(div);
   });
+  if (state.sightings.length > sightingsShown) {
+    const more = document.createElement("button");
+    more.type = "button";
+    more.className = "secondary-button sightings-more";
+    more.textContent = `👁️ Show more sightings (${state.sightings.length - sightingsShown} more)`;
+    more.addEventListener("click", sightingsShowMore);
+    list.appendChild(more);
+  }
+}
+
+/* v1.8.5-beta: reveal the next page of field sightings. Extracted for testability. */
+const SIGHTINGS_PAGE_SIZE = 10;
+let sightingsShown = SIGHTINGS_PAGE_SIZE;
+function sightingsShowMore() {
+  sightingsShown += SIGHTINGS_PAGE_SIZE;
+  renderSightings();
 }
 
 /* ---------- Re-sightings: your tagged sharks, seen again ----------
@@ -2846,7 +2939,14 @@ const RESIGHT_REUNION_CLOSERS = [
   "Oh wow, it's back! I was literally just thinking about this one.",
   "Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.",
   "The tag's holding up great. This shark is basically wearing a Fitbit and thriving.",
-  RESIGHT_LIKES_US_LINE
+  RESIGHT_LIKES_US_LINE,
+  /* v1.8.5-beta: five more variants — the pool was small enough that the
+     same closer could fire twice in a row for two different sharks. */
+  "It's really them! The tag doesn't lie. I got goosebumps, not gonna lie.",
+  "Back again! This is the part of tagging I live for — knowing it's the same shark.",
+  "The same shark, the same water. Like running into an old friend, but better.",
+  "I knew that tag would pay off! Welcome back, old friend.",
+  "Same shark, still swimming. Everything we hoped the tag would tell us, right there."
 ];
 
 /* The generic closer — fallback for resightThread ordinal 1, which
@@ -2863,7 +2963,11 @@ const RESIGHT_NOTES_2ND = [
   "Second re-sighting! Okay, this one keeps showing up.",
   "Hey, it's our shark again! Starting to recognize this one.",
   "Back for round two! This shark is becoming a regular.",
-  "Twice now! Either it likes this spot or it likes us. Probably both."
+  "Twice now! Either it likes this spot or it likes us. Probably both.",
+  /* v1.8.5-beta: more variants so repeats are rare. */
+  "Two sightings! This one's officially on our radar.",
+  "Again! I'm starting to feel like we know this shark.",
+  "Round two with this one — the tracker doesn't lie."
 ];
 
 const RESIGHT_NOTES_EXCITED = [
@@ -2871,7 +2975,11 @@ const RESIGHT_NOTES_EXCITED = [
   "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
   "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
   "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
-  "It's back AGAIN! I think this shark has adopted us. We're its humans now."
+  "It's back AGAIN! I think this shark has adopted us. We're its humans now.",
+  /* v1.8.5-beta: more variants so repeats are rare. */
+  "THREE! This shark is a regular now. I'm genuinely attached.",
+  "It keeps coming back! I'm not saying we're best friends, but we're best friends.",
+  "Another one! This shark has a favorite spot and we're lucky enough to know it."
 ];
 
 /* Pick Sarah's re-sighting reaction by which re-sighting this is
@@ -2984,6 +3092,9 @@ function reunionReactionThread(name, closer, rec) {
   if (foodReply) thread.push({ who: "me", text: foodReply });
   return thread;
 }
+/* v1.8.5-beta: index of the last-dealt reunion closer — maybeReunionReaction
+   never repeats a closer twice in a row. Module-level (not persisted). */
+let lastReunionCloserIdx = -1;
 function maybeReunionReaction(species, rec) {
   state.reunionReacted = state.reunionReacted || {};
   /* v1.6.7-beta: returns whether the thread fired, so the resight button
@@ -2997,7 +3108,12 @@ function maybeReunionReaction(species, rec) {
      escape (e.g. "Fin & Tonic" stored as "Fin &amp; Tonic", rendered
      as "Fin &amp;amp; Tonic"). */
   const name = rec.name ? rec.name : (rec.researchId || species.name);
-  pushThread(reunionReactionThread(name, pick(RESIGHT_REUNION_CLOSERS), rec));
+  /* v1.8.5-beta: never deal the same reunion closer twice in a row —
+     Avery saw "literally just thinking about this one" twice running. */
+  let ci = Math.floor(Math.random() * RESIGHT_REUNION_CLOSERS.length);
+  if (RESIGHT_REUNION_CLOSERS.length > 1 && ci === lastReunionCloserIdx) ci = (ci + 1) % RESIGHT_REUNION_CLOSERS.length;
+  lastReunionCloserIdx = ci;
+  pushThread(reunionReactionThread(name, RESIGHT_REUNION_CLOSERS[ci], rec));
   return true;
 }
 
@@ -3020,15 +3136,41 @@ const NAMED_CHECKINS = [
     meLocked: "If sharks hold grudges about boats, I'm in trouble. No news though." },
   { them: "Any news from {name}? I need a {species} update.",
     me: "No new pings since yesterday. Probably busy being a shark. {hook}",
-    meLocked: "No new pings since yesterday. Probably busy being a shark." }
+    meLocked: "No new pings since yesterday. Probably busy being a shark." },
+  /* v1.8.5-beta: five more variants — with only three templates the
+     "remembers you" line dominated. Sarah has more to say than that. */
+  { them: "I dreamed about {name} last night. Okay, I dreamed about the tracking map. Same thing.",
+    me: "The map lives in both our heads now. {hook}",
+    meLocked: "The map lives in both our heads now. Still pinging." },
+  { them: "Do you ever wonder what {name} is doing at this exact minute?",
+    me: "Being a shark, presumably. {hook}",
+    meLocked: "Being a shark, presumably. It's what they're for." },
+  { them: "Someone asked me my favourite shark and I said {name}. Don't tell the others.",
+    me: "Your secret's safe with me. {hook}",
+    meLocked: "Your secret's safe with me. Still out there." },
+  { them: "I watched a documentary and spent the whole time thinking 'that's not how {name} does it.'",
+    me: "You've gone full shark snob. {hook}",
+    meLocked: "You've gone full shark snob. No regrets." },
+  { them: "Quick question: if {name} could talk, what would it say about us?",
+    me: "'Stop putting tags on me.' {hook}",
+    meLocked: "'Stop putting tags on me.' Fair enough." }
 ];
 
+/* v1.8.5-beta: index of the last-dealt named check-in — maybeCheckinThread
+   never repeats a template twice in a row. Module-level (not persisted);
+   a reload just resets the guard, it never breaks content. */
+let lastCheckinIdx = -1;
 function maybeCheckinThread() {
   const named = SHARKS.filter(s => state.tagged[s.id] && state.tagged[s.id].name);
   if (!named.length || Math.random() > 0.4) return null;
   const s = pick(named);
   const rec = state.tagged[s.id];
-  const t = pick(NAMED_CHECKINS);
+  /* v1.8.5-beta: never deal the same check-in twice in a row — with a
+     small pool, repeats read as Sarah having only one thing to say. */
+  let ci = Math.floor(Math.random() * NAMED_CHECKINS.length);
+  if (NAMED_CHECKINS.length > 1 && ci === lastCheckinIdx) ci = (ci + 1) % NAMED_CHECKINS.length;
+  lastCheckinIdx = ci;
+  const t = NAMED_CHECKINS[ci];
   /* v1.8.0-beta: the hook is insight index SECRET_FACTS.length for this
      species (hook appends first in insightPoolFor). Only quote it when
      the player has earned it; otherwise use the neutral fallback. */
@@ -3173,7 +3315,16 @@ function renderLogbook() {
       ? t.encounters.map(e => {
           const icon = e.result === "tagged" ? "🏷️" : e.result === "resighted" ? "🔁" : e.result === "followed" ? "🧭" : "👁️";
           const idBit = e.researchId ? ` <span class="dim">🔬 ${esc(e.researchId)}</span>` : "";
-          return `${icon} ${esc(e.name)}${idBit} <span class="dim">(${e.result})</span>`;
+          /* v1.8.5-beta fix (Mira review): show the nickname ONLY when this
+             encounter is positively the same tagged individual (researchId
+             match). A "watched"/"observed" encounter may be a different wild
+             shark of the same species — that stays species-only; never
+             invent identity. Legacy entries without an individual ID also
+             stay species-only. */
+          const taggedRec = state.tagged[e.speciesId];
+          const sameIndividual = !!(e.researchId && taggedRec && taggedRec.researchId === e.researchId);
+          const nickBit = (sameIndividual && taggedRec.name) ? ` <span class="dim">· ${esc(taggedRec.name)}</span>` : "";
+          return `${icon} ${esc(e.name)}${nickBit}${idBit} <span class="dim">(${e.result})</span>`;
         }).join("<br>")
       : `<span class="dim">No sharks today.</span>`;
     div.innerHTML = `
@@ -3456,9 +3607,10 @@ function afterExpedition(plan) {
 
 /* v0.17.1: Ask Sarah — player-initiated advice. The panel appears in the
    Phone tab after the first failed trip.
-   v1.5.19-beta: the list only ever contains the pinned shark — she's advising
-   on the one you're actively researching, not the whole roster. The panel
-   only appears while there's an active pin. */
+   v1.5.19-beta: she advises on the one you're actively researching, not the
+   whole roster. The panel only appears while there's an active pin.
+   v1.8.5-beta: no species dropdown — there's only ever one shark to ask
+   about, so it's a single button naming the researched shark. */
 function renderSarahAsk() {
   const panel = $("sarahAsk");
   if (!panel) return;
@@ -3466,12 +3618,9 @@ function renderSarahAsk() {
   const show = !!state.sarahAdviceOffered && !!s;
   panel.classList.toggle("hidden", !show);
   if (!show) return;
-  const sel = $("sarahAskSelect");
-  sel.innerHTML = "";
-  const o = document.createElement("option");
-  o.value = s.id;
-  o.textContent = s.name;
-  sel.appendChild(o);
+  const btn = $("sarahAskBtn");
+  btn.textContent = `Ask Sarah about the ${s.name}`;
+  btn.setAttribute("aria-label", `Ask Sarah for advice about the ${s.name}`);
 }
 function askSarahAdvice(sid) {
   const s = sharkById(sid);
@@ -4188,10 +4337,10 @@ $("tagAlongFactClose").addEventListener("click", () => {
   $("tagAlongOverlay").classList.add("hidden");
 });
 
-/* v0.17.1: Ask Sarah for advice. */
+/* v0.17.1: Ask Sarah for advice. v1.8.5-beta: single button — the shark is
+   always the currently pinned (researched) one. */
 $("sarahAskBtn").addEventListener("click", () => {
-  const sid = $("sarahAskSelect").value;
-  if (sid) askSarahAdvice(sid);
+  if (state.pinned) askSarahAdvice(state.pinned);
 });
 
 /* ---------- Milestones & win state ----------
@@ -4505,7 +4654,7 @@ function winMapFinale() {
     } else if (count < n) {
       const { sid, t } = ordered[count - 1];
       const s = sharkById(sid);
-      const nm = t.name ? `\u201c${t.name}\u201d` : t.researchId;
+      const nm = t.name ? t.name : t.researchId; // v1.8.5-beta: no quotes around nicknames
       cap.textContent = `${nm} — ${s ? s.name : sid}  (${count} / ${n})`;
     } else {
       cap.textContent = `${n} sharks. ${n} releases. All still swimming.`;

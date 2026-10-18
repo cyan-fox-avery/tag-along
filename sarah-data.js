@@ -51,14 +51,14 @@ const COUSIN_CHATS = {
     { them: "The White Shark Caf\u00e9 \u2014 every winter, California white sharks swim to the middle of the Pacific and hang around for months. Nobody fully knows why.", me: "A mysterious mid-ocean gathering." }
   ],
   hammerhead: [
-    { them: "A hammerhead's head is packed with electroreceptors. They sweep it side to side over the sand and can feel a stingray's heartbeat buried underneath. A metal detector made of shark.", me: "Feeling a heartbeat through sand. Astonishing." },
-    { them: "That wide head gives hammerheads an unusually broad visual field and enhanced binocular overlap, which helps with depth perception. And it works like a wing, giving extra lift in turns. Hydrodynamic too.", me: "Panoramic and aerodynamic." },
+    { them: "A great hammerhead's head is packed with electroreceptors. They sweep it side to side over the sand and can feel a stingray's heartbeat buried underneath. A metal detector made of shark.", me: "Feeling a heartbeat through sand. Astonishing." },
+    { them: "That wide head gives great hammerheads an unusually broad visual field and enhanced binocular overlap, which helps with depth perception. And it works like a wing, giving extra lift in turns. Hydrodynamic too.", me: "Panoramic and aerodynamic." },
     { them: "Great hammerheads are solitary, unlike scalloped hammerheads that school in the hundreds. The big ones hunt alone.", me: "Lone wolves of the reef." }
   ],
   mako: [
     { them: "Mako is the M\u0101ori word for shark \u2014 the word. And they're warm-bodied like great whites, which is how they stay so fast in cool water.", me: "70 kilometres an hour. With teeth." },
     { them: "Makos can leap 20 feet out of the water. Twenty feet \u2014 a two-storey house, cleared by a shark chasing tuna.", me: "A two-storey breach. Absurd." },
-    { them: "They hunt by lunging up from below and biting the prey's tail first, so it can't swim away. Tactical. Ruthless. Effective.", me: "Disable the engine, then eat. Cold." }
+    { them: "Makos hunt by lunging up from below and biting the prey's tail first, so it can't swim away. Tactical. Ruthless. Effective.", me: "Disable the engine, then eat. Cold." }
   ],
   basking: [
     { them: "Basking sharks are the second-biggest fish in the ocean and they just... bask. Slow circles through plankton with their huge mouths open. The most relaxed giant alive.", me: "Maximum size, minimum effort. Respect." },
@@ -78,12 +78,12 @@ const COUSIN_CHATS = {
   blacktip: [
     { them: "Blacktip reef sharks have stable friend groups. Photo-ID in Moorea showed the same individuals choosing to hang out together, year after year. Sharks with best friends.", me: "Social lives on the reef. Lovely." },
     { them: "Blacktips are timid \u2014 divers scare them off all the time. But drop bait in the water and they turn into acrobats, leaping clean out. Shy until dinner.", me: "Stage fright, except for food." },
-    { them: "They give birth in shallow nurseries and the pups stay in the shallows for years. Knee-deep water, baby sharks, tiny home ranges. The suburbs of the sea.", me: "Suburban sharks." }
+    { them: "Blacktip reef sharks give birth in shallow nurseries and the pups stay in the shallows for years. Knee-deep water, baby sharks, tiny home ranges. The suburbs of the sea.", me: "Suburban sharks." }
   ],
   whitetip: [
     { them: "Whitetip reef sharks are the only living species in their genus, Triaenodon. An evolutionary singleton. And they pile up in caves to nap like puppies.", me: "A genus of one. That's special." },
-    { them: "Whitetips hunt in loose groups at night, but it's not a feeding frenzy \u2014 each shark hunts for itself, just nearby. Parallel play. Very relatable.", me: "Hunting together, separately. I get it." },
-    { them: "They can go six weeks without eating. Six weeks. Then they wriggle into a crevice and pull out an octopus like it was nothing.", me: "Six weeks of patience, one octopus." }
+    { them: "Whitetip reef sharks hunt in loose groups at night, but it's not a feeding frenzy \u2014 each shark hunts for itself, just nearby. Parallel play. Very relatable.", me: "Hunting together, separately. I get it." },
+    { them: "Whitetip reef sharks can go six weeks without eating. Six weeks. Then they wriggle into a crevice and pull out an octopus like it was nothing.", me: "Six weeks of patience, one octopus." }
   ],
   blue: [
     { them: "Blue sharks are the most beautiful sharks, I think. Deep indigo on top, pure white underneath — perfect countershading. From above they're the ocean, from below they're the sky.", me: "Camouflage as poetry." },
@@ -102,18 +102,18 @@ const COUSIN_CHATS = {
   ],
   oceanic: [
     { them: "Oceanic whitetips are different from the whitetip reef sharks you tagged in the Philippines — different genus, different ocean, different life. Same white fin tips, total coincidence of naming.", me: "A case of mistaken identity, resolved." },
-    { them: "They're often followed by pilot fish — little striped companions swimming alongside. Nobody fully knows what the pilot fish get out of it. Company, maybe.", me: "An entourage of unknown purpose." },
+    { them: "Oceanic whitetips are often followed by pilot fish — little striped companions swimming alongside. Nobody fully knows what the pilot fish get out of it. Company, maybe.", me: "An entourage of unknown purpose." },
     { them: "Oceanic whitetips were once thought to be the most abundant large shark in the open ocean. Then the fin trade and longlines cut some populations by 80 to 98 percent. That's why your tag matters.", me: "From countless to critical. A hard story." }
   ],
   sevengill: [
     { them: "Seven gill slits instead of five, and a single dorsal fin set way back near the tail. Sevengills belong to the Hexanchiformes — an order so old that Jurassic fossils already had seven gills.", me: "A living fossil record." },
     { them: "Sevengills spy-hop — they lift their heads clear of the water to look around. A three-metre shark, peeking. I think about that a lot.", me: "A periscope made of shark." },
-    { them: "Their teeth are different top and bottom — jagged and cusped above, comb-shaped below. The combs saw through seal blubber and tough prey.", me: "Two toolkits in one mouth." }
+    { them: "A sevengill's teeth are different top and bottom — jagged and cusped above, comb-shaped below. The combs saw through seal blubber and tough prey.", me: "Two toolkits in one mouth." }
   ],
   bronze: [
     { them: "Bronze whaler and copper shark are the same species — the name just depends where you are. South Africa and Australia say bronze whaler, the Americas say copper shark.", me: "One shark, two passports." },
     { them: "During the Sardine Run, bronze whalers drive baitballs up from below while dolphins and gannets attack from above. It's the most choreographed hunt in the ocean, and nobody rehearsed it.", me: "Dinner theatre, no rehearsal." },
-    { them: "Females don't mature until about twenty years old, and they pup every two to three years. For a coastal shark, that's extraordinarily slow — which is why the Vulnerable listing matters.", me: "Twenty years to adulthood. Patience as a life strategy." }
+    { them: "Bronze whaler females don't mature until about twenty years old, and they pup every two to three years. For a coastal shark, that's extraordinarily slow — which is why the Vulnerable listing matters.", me: "Twenty years to adulthood. Patience as a life strategy." }
   ],
   frilled: [
     { them: "Frilled sharks have six pairs of gill slits, and the edges are all frilly — that's the whole name. Most sharks have five plain ones. The frill is doing something, we just don't fully know what.", me: "Named for a ruffle. Wonderful." },
@@ -128,7 +128,7 @@ const COUSIN_CHATS = {
   /* v0.18.0 wave. */
   scalloped: [
     { them: "Scalloped hammerheads gather in schools of hundreds around seamounts. Hundreds. Of hammerheads. Swimming in formation like some kind of shark ballet company.", me: "A ballet company with teeth." },
-    { them: "The hammerhead's head is basically a giant sensor array — packed with electroreceptors that detect the electric fields of prey buried in sand. They sweep it side to side like a metal detector.", me: "A metal detector made of shark." },
+    { them: "The scalloped hammerhead's head is basically a giant sensor array — packed with electroreceptors that detect the electric fields of prey buried in sand. They sweep it side to side like a metal detector.", me: "A metal detector made of shark." },
     { them: "Female scalloped hammerheads migrate thousands of kilometres between nurseries and the seamount schools. The great aggregations are mostly females. Girl gangs of the deep.", me: "The seamount sisterhood." }
   ],
   smooth: [
@@ -175,93 +175,93 @@ const COUSIN_CHATS = {
 
   silvertip: [
     { them: "Silvertips are viviparous with a yolk-sac placenta, litters of two to eleven pups, and a gestation of about a year — they can pup more often than most big requiem sharks. A lot of large carcharhinids rest a whole year between litters. Silvertips just keep going.", me: "Overachievers of the reef slope." },
-    { them: "The white fin margins are diagnostic, but they fade on dead specimens — you can only reliably see them on a living shark in clear water. Museum skins lie. You have to meet the animal.", me: "The museum lies; the reef doesn't." },
+    { them: "A silvertip's white fin margins are diagnostic, but they fade on dead specimens — you can only reliably see them on a living shark in clear water. Museum skins lie. You have to meet the animal.", me: "The museum lies; the reef doesn't." },
     { them: "They are genuinely bold around divers. There is footage of silvertips investigating cameras at close range, unbothered, while the blacktips have already left. Curiosity as a personality trait.", me: "Bold is a good look on a shark." }
   ],
   spinner: [
-    { them: "The spin isn't a trick — it is a feeding mechanic. They rotate while biting through a school so the mouth sweeps a bigger volume of fish per pass. Physics doing the hunting.", me: "Rotational fishing. Efficient." },
+    { them: "The spinner's spin isn't a trick — it is a feeding mechanic. They rotate while biting through a school so the mouth sweeps a bigger volume of fish per pass. Physics doing the hunting.", me: "Rotational fishing. Efficient." },
     { them: "Spinner sharks launch themselves clear of the water while feeding, spinning the whole way, and often land right back in the middle of the school. Style AND function.", me: "Show-offs with a purpose." },
     { them: "Their migration along Florida's Atlantic coast is one of the great shark spectacles — hundreds of spinners moving with the baitfish in winter and spring. Black-tipped fins everywhere, all of them hungry.", me: "Winter road trip, shark edition." }
   ],
   wobbegong: [
     { them: "The dermal lobes around a wobbegong's mouth aren't decoration — they break up the head's outline against the reef, and the barbels carry taste buds. The shark is literally tasting the water with its beard.", me: "A beard that tastes. Superb." },
     { them: "Spotted wobbegongs give birth to up to thirty-seven pups in a single litter. Thirty-seven. For an animal that spends its whole life pretending to be a rug, that is ambitious.", me: "The rug delivers. Thirty-seven times." },
-    { them: "They are so sedentary that researchers use their spot patterns like fingerprints — the same individual photographed on the same reef ledge, year after year. Site fidelity as a lifestyle.", me: "Loyal to one ledge. Respect." }
+    { them: "Wobbegongs are so sedentary that researchers use their spot patterns like fingerprints — the same individual photographed on the same reef ledge, year after year. Site fidelity as a lifestyle.", me: "Loyal to one ledge. Respect." }
   ],
   leopard: [
     { them: "Leopard shark pups are born at about twenty centimetres — pocket-sized, already fully patterned. They grow into the spots. Miniature adults from day one.", me: "Pre-spotted. Efficient design." },
-    { them: "They can live over thirty years, and females don't mature until they're about ten. A decade of childhood before the first litter. Slow lives, well lived.", me: "Ten years of being a kid. Relatable." },
+    { them: "Leopard sharks can live over thirty years, and females don't mature until they're about ten. A decade of childhood before the first litter. Slow lives, well lived.", me: "Ten years of being a kid. Relatable." },
     { them: "The dark saddles are individually unique — researchers identify leopard sharks by their spot patterns, the same way whale sharks are ID'd by their constellations. Every leopard wears its own map.", me: "Constellation sharks, west coast edition." }
   ],
   horn: [
     { them: "Horn shark teeth come in two types — sharp graspers at the front, flat crushers at the back. They grab an urchin with the front and mill it with the back. A mouth that is also a toolkit.", me: "Crunch first, ask questions never." },
-    { them: "The dorsal spines are mildly venomous — not dangerous to people, but enough to teach a predator a lesson. A one-metre shark that says 'try me' and means it.", me: "Small shark, big boundaries." },
+    { them: "A horn shark's dorsal spines are mildly venomous — not dangerous to people, but enough to teach a predator a lesson. A one-metre shark that says 'try me' and means it.", me: "Small shark, big boundaries." },
     { them: "The homing experiments are my favourite — researchers moved horn sharks kilometres away and they still found their way home. They just... know where they live.", me: "GPS: Great Personal Sense-direction." }
   ],
   portjackson: [
-    { them: "The brow ridges are called supraorbital crests and nobody fully knows what they're for — protection, muscle anchoring, looking unimpressed. Science is still out. My money is on unimpressed.", me: "Resting shark face. Iconic." },
+    { them: "A Port Jackson's brow ridges are called supraorbital crests and nobody fully knows what they're for — protection, muscle anchoring, looking unimpressed. Science is still out. My money is on unimpressed.", me: "Resting shark face. Iconic." },
     { them: "Tagging studies have tracked Port Jacksons migrating from New South Wales down toward Tasmania and back — hundreds of kilometres each way, on a seasonal schedule, just to lay eggs in the right water.", me: "A commute with commitment." },
-    { them: "They lay their spiral eggs in pairs, a few at a time, across the whole summer — up to about fifteen cases a season. Each one takes the better part of a year to hatch.", me: "Fifteen screws of hope." }
+    { them: "Port Jacksons lay their spiral eggs in pairs, a few at a time, across the whole summer — up to about fifteen cases a season. Each one takes the better part of a year to hatch.", me: "Fifteen screws of hope." }
   ],
   angelshark: [
     { them: "Angelsharks bury themselves up to their eyeballs in sand and just... wait. For weeks if they have to. Then prey swims overhead and the whole seafloor detonates upward.", me: "Peak sit-and-wait. Maximum patience, minimum effort." },
-    { them: "They're Critically Endangered because of bottom trawling. A buried shark can't dodge a net, and their populations were never built to survive that. Cornwall's anglers and divers log every sighting now — that's how we know where they still are.", me: "So this tag actually joins a real conservation dataset." },
-    { them: "Their strike takes about a tenth of a second. It looks like the sand just... stands up and eats. Researchers needed high-speed cameras to even see what happened.", me: "Note to self: never walk barefoot over lumpy sand." }
+    { them: "Angelsharks are Critically Endangered because of bottom trawling. A buried shark can't dodge a net, and their populations were never built to survive that. Cornwall's anglers and divers log every sighting now — that's how we know where they still are.", me: "So this tag actually joins a real conservation dataset." },
+    { them: "An angelshark's strike takes about a tenth of a second. It looks like the sand just... stands up and eats. Researchers needed high-speed cameras to even see what happened.", me: "Note to self: never walk barefoot over lumpy sand." }
   ],
   megamouth: [
     { them: "Only about 300 megamouth sightings in all of recorded science. They were discovered in 1976 when one got caught on a Navy anchor — a whole new family of shark, found by accident!", me: "One of the last big animals to be discovered. Humbling." },
-    { them: "They're vertical migrators — deep in the twilight zone by day, rising toward the surface at night following the krill. So sightings cluster at night, near the surface, over deep water.", me: "Night watch it is. Big silhouette, bigger mouth." },
-    { them: "That silvery band on the upper jaw might glow to lure krill straight in. Nobody's proven it — it's one of those beautiful theories waiting on the right photograph.", me: "The shark is a hypothesis. You just tagged a hypothesis." }
+    { them: "Megamouths are vertical migrators — deep in the twilight zone by day, rising toward the surface at night following the krill. So sightings cluster at night, near the surface, over deep water.", me: "Night watch it is. Big silhouette, bigger mouth." },
+    { them: "That silvery band on a megamouth's upper jaw might glow to lure krill straight in. Nobody's proven it — it's one of those beautiful theories waiting on the right photograph.", me: "The shark is a hypothesis. You just tagged a hypothesis." }
   ],
   sawshark: [
     { them: "The saw isn't decoration — sawsharks slash it side to side through schools of fish, stunning and wounding everything the teeth touch. Then they pick up the pieces.", me: "A weapon and a net in one. Brutal efficiency." },
     { them: "Sawsharks are sharks, not sawfish! Gill slits on the sides = shark. Sawfish are giant rays with their gills underneath. Totally different lineages, same brilliant weapon idea.", me: "Convergent evolution strikes again." },
-    { them: "Those barbels are basically taste buds on a leash — they sweep the sand sensing prey, and the saw strikes what they find. Even a buried fish isn't safe.", me: "Death by whiskers. Undignified way to go." }
+    { them: "A sawshark's barbels are basically taste buds on a leash — they sweep the sand sensing prey, and the saw strikes what they find. Even a buried fish isn't safe.", me: "Death by whiskers. Undignified way to go." }
   ],
   greenland: [
-    { them: "The 400-year estimate comes from radiocarbon-dating the lenses of their eyes — 392 plus or minus 120 years for one big female. So the real number could be anywhere in there, but even the low end is absurd.", me: "Even being wrong about it still means centuries. Incredible." },
-    { them: "They don't reach maturity until around 150 years old. Imagine: born around 1875, reproducing for the first time this century. Evolution's most patient creature.", me: "A century and a half of childhood. Relatable, honestly." },
-    { them: "Almost all of them carry a glowing eye parasite that blinds them. They don't care — it's dark down there anyway, and the glow might actually attract curious prey. Accidental lure!", me: "Blind, ancient, and possibly baiting dinner with its own eye parasite. Respect." }
+    { them: "The 400-year Greenland shark estimate comes from radiocarbon-dating the lenses of their eyes — 392 plus or minus 120 years for one big female. So the real number could be anywhere in there, but even the low end is absurd.", me: "Even being wrong about it still means centuries. Incredible." },
+    { them: "Greenland sharks don't reach maturity until around 150 years old. Imagine: born around 1875, reproducing for the first time this century. Evolution's most patient creature.", me: "A century and a half of childhood. Relatable, honestly." },
+    { them: "Almost all Greenland sharks carry a glowing eye parasite that blinds them. They don't care — it's dark down there anyway, and the glow might actually attract curious prey. Accidental lure!", me: "Blind, ancient, and possibly baiting dinner with its own eye parasite. Respect." }
   ],
   cookiecutter: [
     { them: "The wound is the signature — a perfect round crater, like someone used a melon baller. Marine biologists can ID a cookiecutter attack on a whale from a photo of the scar alone.", me: "A shark that signs its work." },
-    { them: "Its belly glows green to match the light filtering down from above — counterillumination. But the dark collar around its throat stays unlit, so from below it looks like a little fish silhouette. Dinner comes to investigate, and dinner becomes dinner.", me: "Camouflage that moonlights as bait. Diabolical." },
-    { them: "They bit US Navy submarines! The sonar domes had round craters in the rubber coating and nobody knew what made them until they matched the bite shape. Sharks versus the military: sharks won.", me: "Undersea warfare's least expected casualty." }
+    { them: "A cookiecutter's belly glows green to match the light filtering down from above — counterillumination. But the dark collar around its throat stays unlit, so from below it looks like a little fish silhouette. Dinner comes to investigate, and dinner becomes dinner.", me: "Camouflage that moonlights as bait. Diabolical." },
+    { them: "Cookiecutters bit US Navy submarines! The sonar domes had round craters in the rubber coating and nobody knew what made them until they matched the bite shape. Sharks versus the military: sharks won.", me: "Undersea warfare's least expected casualty." }
   ],
   sixgill: [
     { them: "Six gills instead of five! Most sharks have five — sixgills and their relatives kept the ancient count. It's like finding a shark with a spare part from 200 million years ago.", me: "The extra gill is a fossil you can count." },
-    { them: "Litters over 100 pups, gestation possibly two-plus years. They make up for being slow with sheer volume — the deep-water strategy is: invest everything, all at once, very rarely.", me: "Slow life, big family. Eventually." },
-    { them: "Their eyes fluoresce green under blue light. Nobody knows why. Deep-water biofluorescence in a shark that lives where there's no blue light to begin with — it's a genuine mystery.", me: "A mystery wearing a shark. My favourite kind." }
+    { them: "Sixgill litters run over 100 pups, gestation possibly two-plus years. They make up for being slow with sheer volume — the deep-water strategy is: invest everything, all at once, very rarely.", me: "Slow life, big family. Eventually." },
+    { them: "Sixgill eyes fluoresce green under blue light. Nobody knows why. Deep-water biofluorescence in a shark that lives where there's no blue light to begin with — it's a genuine mystery.", me: "A mystery wearing a shark. My favourite kind." }
   ],
   velvetbelly: [
-    { them: "The glow isn't decoration — it's counter-illumination. Downwelling light gets brighter toward the surface, so a dark silhouette shows up against it. The photophores erase the silhouette. It's wearing invisibility.", me: "A shark that brings its own cloaking device. Respect." },
+    { them: "A velvet-belly's glow isn't decoration — it's counter-illumination. Downwelling light gets brighter toward the surface, so a dark silhouette shows up against it. The photophores erase the silhouette. It's wearing invisibility.", me: "A shark that brings its own cloaking device. Respect." },
     { them: "Lanternsharks mature fast for deep-sea sharks. Most deep species take a decade or more; velvet-bellies are ready in a few years. That's a huge reason they're still Least Concern despite the trawl bycatch.", me: "Fast-living deep-sea shark. Breaks every rule." },
-    { them: "The males grow these weird little hooks on their heads — patches of modified denticles, probably for gripping during mating. It's called a frontal tenaculum. Deep-sea dating is strange.", me: "I'm going to pretend I understand that. Sounds glorious." }
+    { them: "Male velvet-bellies grow these weird little hooks on their heads — patches of modified denticles, probably for gripping during mating. It's called a frontal tenaculum. Deep-sea dating is strange.", me: "I'm going to pretend I understand that. Sounds glorious." }
   ],
   dwarflantern: [
     { them: "Twenty centimetres. A full-grown dwarf lanternshark would barely cover your phone. It might be the smallest shark on Earth — and it lives almost half a kilometre down in the Caribbean, where nobody sees it.", me: "Smallest shark, biggest flex." },
-    { them: "It's only ever been found off Colombia and Venezuela, on the upper continental slope. We know it from a handful of specimens. A whole species, nearly invisible, living under one of the busiest seas in the world.", me: "Caribbean endemic, deepwater ghost. Noted." },
+    { them: "The dwarf lanternshark has only ever been found off Colombia and Venezuela, on the upper continental slope. We know it from a handful of specimens. A whole species, nearly invisible, living under one of the busiest seas in the world.", me: "Caribbean endemic, deepwater ghost. Noted." },
     { them: "It eats tiny deep-sea invertebrates — shrimp-like things drifting in the dark. We don't even know its litter size for sure. Some sharks you study; dwarf lanternsharks you mostly wonder about.", me: "Wondering counts as science. Probably." }
   ],
   kitefin: [
     { them: "Kitefins were fished hard for their livers — squalene, a light oil used in cosmetics and pharmaceuticals. A shark's liver can be a fifth of its body weight. Whole populations collapsed in some regions. That's the Vulnerable status, right there.", me: "Worth more as oil than as a shark. Grim math." },
-    { them: "It's a real deep-water generalist: deep fish, smaller sharks, squid, crustaceans, carrion. And look at those eyes — huge, greenish, built for the dark. No dorsal spines, unlike its dogfish cousins.", me: "Eats anything, sees everything, hurts nobody. Model citizen." },
+    { them: "The kitefin is a real deep-water generalist: deep fish, smaller sharks, squid, crustaceans, carrion. And look at those eyes — huge, greenish, built for the dark. No dorsal spines, unlike its dogfish cousins.", me: "Eats anything, sees everything, hurts nobody. Model citizen." },
     { them: "Ovoviviparous, ten to sixteen pups, and the pups are already half a metre long at birth. Kitefins don't do small. In the deep sea, big babies survive.", me: "Half-metre babies. Deep sea goes big or goes home." }
   ],
   pacificsleeper: [
     { them: "Almost every Pacific sleeper carries copepod parasites on its eyes — Ommatokoita elongata, little white crustaceans hanging off the cornea. They might be functionally blind and navigate by smell. Imagine that: a four-metre shark hunting by scent in the dark.", me: "Blind four-metre shark. Still scarier than me." },
-    { them: "They're scavengers and predators both — squid, fish, crustaceans, and marine mammal carrion. They've found seal and porpoise remains in sleeper stomachs. Slow doesn't mean harmless; it means patient.", me: "Patient is the polite word for it." },
-    { them: "They migrate vertically — deep by day, shallower at night, following food. Some cross whole ocean basins. A shark this slow, going this far, on this little energy. Masterclass in efficiency.", me: "The slow lane, taken to its logical extreme." }
+    { them: "Pacific sleepers are scavengers and predators both — squid, fish, crustaceans, and marine mammal carrion. They've found seal and porpoise remains in sleeper stomachs. Slow doesn't mean harmless; it means patient.", me: "Patient is the polite word for it." },
+    { them: "Pacific sleepers migrate vertically — deep by day, shallower at night, following food. Some cross whole ocean basins. A shark this slow, going this far, on this little energy. Masterclass in efficiency.", me: "The slow lane, taken to its logical extreme." }
   ],
   spinydogfish: [
     { them: "Spiny dogfish schools can number in the thousands, and they segregate by sex and size — all-female schools, all-male schools, juvenile schools. Orderly, massive, and constantly moving.", me: "A shark convention with seating charts." },
     { them: "The spines are genuinely venomous — grooved spines with a mild venom gland at the base. Not dangerous to us, just painful. It's why fishermen hate them: a thrashing school of dogfish is a net full of needles.", me: "Venomous and resentful of nets. Fair." },
-    { them: "Gestation is eighteen to twenty-four months — one of the longest pregnancies of any vertebrate. Small litters, late maturity. That's exactly the life history that collapses under heavy fishing, and the north-east Atlantic stock did collapse. It's rebuilding now, slowly.", me: "Two-year pregnancy. Then we fished them anyway." }
+    { them: "Spiny dogfish gestation is eighteen to twenty-four months — one of the longest pregnancies of any vertebrate. Small litters, late maturity. That's exactly the life history that collapses under heavy fishing, and the north-east Atlantic stock did collapse. It's rebuilding now, slowly.", me: "Two-year pregnancy. Then we fished them anyway." }
   ],
   catshark: [
     { them: "Small-spotted catsharks are nocturnal bottom hunters — crabs, worms, molluscs, sniffed out in the dark. By day they hide in crevices and kelp. Classic Cornwall night shift.", me: "Night shift with spots. Sign me up." },
-    { them: "The egg cases are called mermaid's purses — leathery rectangles with tendrils at the corners that wrap around seaweed. The pup develops inside for five to eleven months, then chews its way out.", me: "Five months in a purse. Luxury." },
-    { them: "They're the commonest shark around the British Isles, and totally harmless. Spots, cat-like eyes, and absolutely no interest in you. The starter shark of European waters.", me: "Gateway shark. Everyone starts somewhere." }
+    { them: "Small-spotted catshark egg cases are called mermaid's purses — leathery rectangles with tendrils at the corners that wrap around seaweed. The pup develops inside for five to eleven months, then chews its way out.", me: "Five months in a purse. Luxury." },
+    { them: "Small-spotted catsharks are the commonest shark around the British Isles, and totally harmless. Spots, cat-like eyes, and absolutely no interest in you. The starter shark of European waters.", me: "Gateway shark. Everyone starts somewhere." }
   ],};
 
 const COUSIN_NUDGES = {

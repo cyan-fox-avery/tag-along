@@ -709,6 +709,16 @@ select option:disabled { color: #7a8a9e; }
 /* v0.26.0: tap-to-reveal encounter. The silhouette is tappable; tapping
    crossfades to the full-colour illustration. */
 .dive-shark img { max-width: 100%; max-height: 130px; width: auto; height: auto; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+/* v1.8.5-beta: size tiers — the MYSTERY SILHOUETTE scales with the species'
+   real size. Small sharks no longer fill the frame like white sharks.
+   v1.8.5-beta fix (Mira review): tiers are scoped to .shark-silhouette ONLY.
+   The reveal phase keeps the deliberate 108px cap (v1.7.14) so art + the
+   identification badge always fit inside the 190px dive scene — a tier rule
+   must never override the reveal/badge safety cap. */
+.dive-shark.size-small .shark-silhouette img, .dive-shark.size-small .shark-silhouette svg { max-height: 64px; }
+.dive-shark.size-medium .shark-silhouette img, .dive-shark.size-medium .shark-silhouette svg { max-height: 96px; }
+.dive-shark.size-large .shark-silhouette img, .dive-shark.size-large .shark-silhouette svg { max-height: 130px; }
+.dive-shark.size-xlarge .shark-silhouette img, .dive-shark.size-xlarge .shark-silhouette svg { max-height: 168px; }
 /* v0.26.0: generic mystery silhouette shown if a silhouette WebP fails to
    load — sized like the real silhouette, never reveals the species. */
 .dive-shark .mystery-silhouette { max-width: 100%; max-height: 130px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
@@ -851,15 +861,9 @@ select option:disabled { color: #7a8a9e; }
   background: var(--bg-panel);
 }
 .sarah-ask p { margin: 0 0 8px; font-size: 13px; }
-/* v1.4.0: the row wraps and both children respect the panel's inner width,
-   so long shark names can't push the Ask button past the Phone's edge. */
-.sarah-ask-row { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }
-.sarah-ask-row select {
-  flex: 1 1 140px; min-width: 0; max-width: 100%; font-size: 15px; padding: 10px 8px;
-  border-radius: 10px; border: 1px solid #2c5364;
-  background: var(--bg-soft); color: var(--ink);
-}
-.sarah-ask-row .secondary-button { flex: 0 1 auto; max-width: 100%; min-width: 0; }
+/* v1.8.5-beta: Ask Sarah is a single button naming the researched shark —
+   no dropdown, so no row layout needed. The button wraps long names. */
+#sarahAskBtn { max-width: 100%; white-space: normal; text-align: center; }
 
 /* v1.4.0: decorative message composer — visual only. Divs, not inputs, plus
    aria-hidden and pointer-events:none, so it can never steal focus or
