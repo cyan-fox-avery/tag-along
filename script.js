@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.3-beta";
+const VERSION = "v1.8.4-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.4-beta": [
+"⚡ <strong>Faster after expeditions.</strong> Following a shark used to re-render the whole game twice before showing your insight — now it renders once. The logbook also shows your latest 30 trips instead of every trip ever, with a “Show older trips” button for the rest. Longer saves should feel snappier after every trip.",
+  ],
   "v1.8.3-beta": [
 "💬 <strong>Sarah messages at a more human pace.</strong> Other than special dialogue and Ask Sarah, she now sends at most one routine message per 5 minutes — a routine message that would fire inside the window is simply dropped, not queued. Special event threads and Ask Sarah always go through, and every Sarah message restarts the 5-minute window. Mira's review also fixed a subtle bug: a dropped routine chat could advance Sarah's chat rotation without being shown, silently skipping authored lines — the rotation now only advances for chats actually sent.",
 "🦈 <strong>Blue shark insight reworded.</strong> “The most beautiful shark in the Atlantic” was opinion stated as fact — it now notes their unusually long pectoral fins instead of restating the Research countershading description.",
@@ -3048,6 +3051,12 @@ function maybeCheckinThread() {
 /* v0.22.0: logbook filters — outcome, region, species. Filters narrow the
    notebook; they never solve the expedition. */
 const logbookFilters = { outcome: "all", region: "all", species: "all", dateRange: "all" };
+/* v1.8.4-beta: logbook pagination — the logbook is the largest unbounded DOM
+   list, and rendering every trip ever made post-expedition renders slower as
+   the save grows. Show the latest LOGBOOK_PAGE_SIZE trips; "Show older trips"
+   reveals more. Changing filters resets the page. */
+const LOGBOOK_PAGE_SIZE = 30;
+let logbookShown = LOGBOOK_PAGE_SIZE;
 
 /* Pure: does a logbook trip entry match the given filters? Testable. */
 /* v0.22.0 Mira review: filters represent EVENTS within the expedition.
@@ -3106,6 +3115,7 @@ function buildLogbookFilters() {
         logbookFilters.region = $("logFilterRegion").value;
         logbookFilters.species = $("logFilterSpecies").value;
         logbookFilters.dateRange = $("logFilterDate").value;
+        logbookShown = LOGBOOK_PAGE_SIZE; // v1.8.4-beta: filters reset the page
         renderLogbook();
       });
     }
@@ -3116,6 +3126,7 @@ function buildLogbookFilters() {
     clr.addEventListener("click", () => {
       logbookFilters.outcome = "all"; logbookFilters.region = "all"; logbookFilters.species = "all"; logbookFilters.dateRange = "all";
       $("logFilterOutcome").value = "all"; $("logFilterRegion").value = "all"; $("logFilterSpecies").value = "all"; $("logFilterDate").value = "all";
+      logbookShown = LOGBOOK_PAGE_SIZE; // v1.8.4-beta: clearing filters resets the page
       renderLogbook();
     });
   }
@@ -3138,7 +3149,11 @@ function renderLogbook() {
     list.innerHTML = `<div class="empty-note">No trips match those filters.<br>Try clearing something — the ocean is bigger than it looks.</div>`;
     return;
   }
-  trips.forEach(t => {
+  /* v1.8.4-beta: cap the rendered trips — the logbook grows without bound and
+     re-rendering all of it after every expedition got slower as the save grew.
+     Latest trips first; "Show older trips" reveals more. */
+  const shown = trips.slice(0, logbookShown);
+  shown.forEach(t => {
     const div = document.createElement("div");
     div.className = "logbook-entry";
     const planBits = [
@@ -3173,6 +3188,20 @@ function renderLogbook() {
     if (rb) rb.addEventListener("click", () => repeatPlan(t));
     list.appendChild(div);
   });
+  if (trips.length > logbookShown) {
+    const more = document.createElement("button");
+    more.type = "button";
+    more.className = "secondary-button logbook-more";
+    more.textContent = `📓 Show older trips (${trips.length - logbookShown} more)`;
+    more.addEventListener("click", logbookShowOlder);
+    list.appendChild(more);
+  }
+}
+
+/* v1.8.4-beta: reveal the next page of logbook trips. Extracted for testability. */
+function logbookShowOlder() {
+  logbookShown += LOGBOOK_PAGE_SIZE;
+  renderLogbook();
 }
 
 /* v1.7.13-beta: resolve the restored method option — legacy "seal" plans
@@ -4086,7 +4115,12 @@ function doFollowTagged(speciesId, doneCb) {
   logTripEncounter(s, "followed", rec ? rec.researchId : null);
   state.followedThisTrip = true;
   logLine(`🧭 You're changing course to follow ${esc(displayName)} — no more encounters this trip.`);
-  renderAll();
+  /* v1.8.4-beta: no renderAll() here — the expedition is still resolving and
+     closeDive() calls renderAll() again right after (before goTab("map") and
+     the insight popup). The intermediate render rebuilt every hidden tab
+     while the player was still on the dive view, doubling per-unlock work as
+     the save grew. The dive log above is written by logLine() directly, so
+     nothing visible depends on the removed render. */
   /* Resolve the encounter with tag-along intent, ending the expedition.
      Prefer the passed callback (already-tagged path from doEncounter);
      fall back to state.encounterDone for safety. */
