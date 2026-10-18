@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.2-beta', VERSION === 'v1.8.2-beta');
+  ok('version v1.8.3-beta', VERSION === 'v1.8.3-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -2582,6 +2582,121 @@ code += `
     state.messages.length = origMsgsLen;
     saveMsgs();
   })();
+  // v1.8.3-beta: Sarah throttle — at most one ROUTINE message per 5 min.
+  // Special dialogue + Ask Sarah always go through; routine messages
+  // inside the window are DROPPED, not queued.
+  (() => {
+    const origMsgsLen = state.messages.length;
+    const origUnread = state.unread;
+    const origLast = state.lastSarahMsgAt;
+    // Routine inside the window is dropped
+    state.lastSarahMsgAt = Date.now();
+    const dropped = pushThread([{ who: 'them', text: 'throttle drop test' }], 'routine');
+    ok('routine Sarah message inside 5-min window is dropped', dropped === false && state.messages.length === origMsgsLen);
+    // Special dialogue bypasses the throttle
+    const specialSent = pushThread([{ who: 'them', text: 'throttle special test' }], 'special');
+    ok('special dialogue bypasses the Sarah throttle', specialSent === true && state.messages.length === origMsgsLen + 1);
+    // Ask Sarah bypasses the throttle
+    const askSent = pushThread([{ who: 'them', text: 'throttle ask test' }], 'ask');
+    ok('Ask Sarah bypasses the Sarah throttle', askSent === true && state.messages.length === origMsgsLen + 2);
+    // Routine after the window goes through
+    state.lastSarahMsgAt = Date.now() - 6 * 60 * 1000;
+    const routineSent = pushThread([{ who: 'them', text: 'throttle routine test' }], 'routine');
+    ok('routine Sarah message after 5 minutes goes through', routineSent === true && state.messages.length === origMsgsLen + 3);
+    // Every sent thread restarts the window
+    ok('sent Sarah thread updates lastSarahMsgAt', typeof state.lastSarahMsgAt === 'number' && Date.now() - state.lastSarahMsgAt < 5000);
+    // restore
+    state.messages.length = origMsgsLen;
+    state.unread = origUnread;
+    state.lastSarahMsgAt = origLast;
+    saveMsgs();
+  })();
+  // v1.8.3-beta: afterExpedition classifies its thread kind — ambient
+  // check-in/chat is routine (throttled), the 5-failure nudge is special.
+  (() => {
+    const origMsgsLen = state.messages.length;
+    const origUnread = state.unread;
+    const origLast = state.lastSarahMsgAt;
+    const origFailures = state.failures;
+    const origOffered = state.sarahAdviceOffered;
+    const origFlags = [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip];
+    const origChatSeen = { ...state.chatSeen };
+    state.taggedThisTrip = false; state.resightedThisTrip = false; state.followedThisTrip = false;
+    // Ambient chatter inside the window is dropped
+    state.lastSarahMsgAt = Date.now();
+    state.failures = 0;
+    state.sarahAdviceOffered = true;
+    afterExpedition(null);
+    ok('afterExpedition ambient chatter inside window is dropped', state.messages.length === origMsgsLen);
+    // 5-failure nudge is special: goes through despite the window
+    state.lastSarahMsgAt = Date.now();
+    state.failures = 5;
+    afterExpedition(null);
+    ok('afterExpedition 5-failure nudge bypasses the throttle', state.messages.length === origMsgsLen + 1);
+    // restore
+    state.messages.length = origMsgsLen;
+    state.unread = origUnread;
+    state.lastSarahMsgAt = origLast;
+    state.failures = origFailures;
+    state.sarahAdviceOffered = origOffered;
+    [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip] = origFlags;
+    state.chatSeen = origChatSeen;
+    saveMsgs();
+  })();
+  // v1.8.3-beta: Blue Shark hook is a distinct factual detail — the beauty
+  // superlative (opinion stated as fact) is gone, and (Mira) it no longer
+  // restates the public Research countershading description.
+  ok('blue hook is a distinct factual detail', (() => {
+    const hook = sharkById('blue').hook;
+    return /pectoral fin/i.test(hook)
+      && !/most beautiful/.test(hook)
+      && !/countershad/i.test(hook)
+      && !/snow-white/.test(hook);
+  })());
+  // v1.8.3-beta Mira fix: a dropped routine chat must not advance chatSeen —
+  // the rotation is consumed only by chats actually sent.
+  (() => {
+    const origMsgsLen = state.messages.length;
+    const origUnread = state.unread;
+    const origLast = state.lastSarahMsgAt;
+    const origFailures = state.failures;
+    const origOffered = state.sarahAdviceOffered;
+    const origFlags = [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip];
+    const origChatSeen = JSON.parse(JSON.stringify(state.chatSeen));
+    const origRandom = Math.random;
+    state.taggedThisTrip = false; state.resightedThisTrip = false; state.followedThisTrip = false;
+    state.failures = 0;
+    state.sarahAdviceOffered = true;
+    // Force the random-chat (pickChat) branch: maybeCheckinThread returns null.
+    Math.random = () => 0.99;
+    // Inside the window: the thread is dropped AND chatSeen is untouched.
+    state.lastSarahMsgAt = Date.now();
+    afterExpedition(null);
+    ok('dropped routine chat leaves messages unchanged', state.messages.length === origMsgsLen);
+    ok('dropped routine chat leaves chatSeen unchanged', JSON.stringify(state.chatSeen) === JSON.stringify(origChatSeen));
+    // Window open: the next allowed chat uses the still-unseen entry.
+    state.lastSarahMsgAt = Date.now() - 6 * 60 * 1000;
+    const chatSeenBefore = JSON.parse(JSON.stringify(state.chatSeen));
+    afterExpedition(null);
+    const advanced = Object.keys(state.chatSeen).filter(k => state.chatSeen[k] !== (chatSeenBefore[k] || 0));
+    const oneEntry = advanced.length === 1 && state.chatSeen[advanced[0]] === (chatSeenBefore[advanced[0]] || 0) + 1;
+    ok('next allowed chat advances exactly one rotation entry by one', oneEntry);
+    const sid = advanced[0];
+    const chats = COUSIN_CHATS[sid];
+    const expected = chats[(chatSeenBefore[sid] || 0) % chats.length];
+    const sent = state.messages[state.messages.length - 1].msgs;
+    ok('next allowed chat uses the still-unseen entry', sent[0].text === expected.them && sent[1].text === expected.me);
+    // restore
+    Math.random = origRandom;
+    state.messages.length = origMsgsLen;
+    state.unread = origUnread;
+    state.lastSarahMsgAt = origLast;
+    state.failures = origFailures;
+    state.sarahAdviceOffered = origOffered;
+    [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip] = origFlags;
+    state.chatSeen = origChatSeen;
+    saveMsgs();
+  })();
   // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
   // iPad layout) — brighter, wider fan, clearly visible motion
   (() => {
@@ -3509,6 +3624,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   ok('WHATS_NEW has v1.8.0-beta', Array.isArray(WHATS_NEW['v1.8.0-beta']) && WHATS_NEW['v1.8.0-beta'].length === 4);
   ok('WHATS_NEW has v1.8.1-beta', Array.isArray(WHATS_NEW['v1.8.1-beta']) && WHATS_NEW['v1.8.1-beta'].length === 3);
   ok('WHATS_NEW has v1.8.2-beta', Array.isArray(WHATS_NEW['v1.8.2-beta']) && WHATS_NEW['v1.8.2-beta'].length === 1);
+  ok('WHATS_NEW has v1.8.3-beta', Array.isArray(WHATS_NEW['v1.8.3-beta']) && WHATS_NEW['v1.8.3-beta'].length === 2);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

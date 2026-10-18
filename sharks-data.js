@@ -289,7 +289,7 @@ const SHARKS = [
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.8],
     research: "Blue sharks are the open Atlantic's great wanderers \u2014 slender, long-snouted, and unmistakable: deep indigo blue on the back fading to snow-white underneath, perfect countershading. They roam temperate and tropical waters worldwide, preferring cooler water, and spend most of their lives in the upper 150 metres \u2014 surface waters down through the reefs and into the twilight zone, rarely deeper than about 400 metres. Out here they hunt small schooling fish like herring, mackerel and hake, plus squid. A drifting fish-oil chum slick with oily baitfish or squid is the honest way to draw one in.\n\nThey are among the longest migrants of any shark: New England to South America runs are classic, and one shark tagged in Ireland was recaptured 274 days later off West Africa \u2014 an estimated 6,840 kilometre cruise. Their movements follow water temperature more than anything else, strongly seasonal. Females bear litters of 25 to 135 pups, among the largest litters of any shark.",
-    hook: "Deep indigo back, snow-white belly — the most beautiful shark in the Atlantic.",
+    hook: "Slender and indigo, with pectoral fins noticeably longer than most other sharks'.",
     bonus: "Female blue sharks have much thicker skin than males \u2014 courtship involves biting \u2014 and can store sperm until conditions suit.",
     conservation: "Listed as Near Threatened — the most heavily fished shark on Earth, millions taken as longline bycatch yearly; finning bans help, but high-seas enforcement is the real battle.",
     cheer: "The indigo one! Six thousand kilometres of open ocean behind it, and it still showed up for you. What a traveller.",
