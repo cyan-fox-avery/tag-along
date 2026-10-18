@@ -53,7 +53,7 @@ const SHARKS = [
     methods: { aggregation: ["boat", "plane", "network"] },
     sizeRange: [5.5, 12.0],
     research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the aggregation. Researchers work the green water by boat, scan from the air with spotter planes that radio the boat onto a shark, and phone round the local network of fishermen and dive boats for sightings. Find the aggregation, and the sharks are already there.",
-    hook: "The biggest fish in the ocean, and it eats some of the smallest food. Gentle polka-dotted bus.",
+    hook: "The largest fish in the ocean, feeding almost entirely on plankton \u2014 some of the smallest organisms in the sea.",
     bonus: "A whale shark's mouth can stretch over a metre wide, and it sucks in water to filter out plankton — no chewing, just sieving.",
     conservation: "Listed as Endangered — ship strikes and fishing nets are the big threats, but satellite tagging in the Philippines, Mexico, and Australia is mapping their corridors, and whale-shark tourism gives coastal towns a reason to protect them.",
     cheer: "Every whale shark's spot pattern is unique, like a fingerprint. You tagged a one-of-a-kind giant.",
@@ -607,7 +607,7 @@ const SHARKS = [
     bonus: "Silvertips are among the most assertive of the reef requiem sharks when food appears — they have been filmed charging straight through bait schools at speed while other sharks hold back. Boldness is not just a vibe here, it is a foraging strategy.",
     conservation: "Listed as Vulnerable — a coral-reef hunter hit hard by reef fisheries; remote atolls are its refuges, and Pacific shark sanctuaries keep expanding.",
     cheer: "White edges on every fin! You tagged a silvertip — look at those margins.",
-    opener: "Silvertips cruise Maldivian outer slopes like they own them. Chum in the water, fish or squid out — let's see who's bold today.",
+    opener: "A silvertip! Were those fin margins as white as they say? Bold shark, bold tag — I need the full story!",
     sketchCap: "the white-tipped fins",
     nameIdeas: ["Pearl", "Tippet", "Frost", "Margin"]
   },
@@ -625,7 +625,7 @@ const SHARKS = [
     bonus: "Spinner sharks and blacktip sharks look nearly identical where their ranges overlap, and they hybridize — spinner-blacktip hybrids have been confirmed in Florida waters. The cleanest field mark is the spinner's longer, more pointed snout.",
     conservation: "Listed as Vulnerable — the spinning hunter tangles in nets set for other fish; bycatch-reduction devices in shrimp trawls are the main hope.",
     cheer: "A spinner! Did you see it breach? Tag secure — that's the famous spin.",
-    opener: "Spinner sharks hunt bait schools right at the surface — look for birds diving and water boiling. Chum out, schooling fish ready.",
+    opener: "A spinner! Did you see the breach? The spin, the splash — I need the whole scene!",
     sketchCap: "the mid-spin breach",
     nameIdeas: ["Twirl", "Pirouette", "Corkscrew", "Top"]
   },
@@ -643,7 +643,7 @@ const SHARKS = [
     bonus: "Wobbegongs are tough customers — they can survive a spell out of water, wedged in a rock pool until the tide returns.",
     conservation: "Listed as Least Concern — the carpet shark is holding steady in Australian waters with state-level protections; its camouflage is its conservation, hard to target what you can't see.",
     cheer: "You found the carpet shark! A spotted wobbegong, tagged without stepping on it. Excellent.",
-    opener: "Wobbegongs don't chase — they wait. Chum drifting over a reef ledge, crustacean bait, and patience. Watch the bottom.",
+    opener: "A wobbegong! Did you spot the beard before you saw the shark? Details, cousin, details!",
     sketchCap: "the dermal lobes and barbels",
     nameIdeas: ["Rug", "Doormat", "Ledge", "Mosaic"]
   },
@@ -661,7 +661,7 @@ const SHARKS = [
     bonus: "Leopard sharks pose very little danger to people — divers swim through the La Jolla gatherings every summer, and the sharks barely notice. Still, give them space.",
     conservation: "Listed as Least Concern — California's estuary shark; pollution and habitat loss are the worries rather than fishing, and it's protected in state waters.",
     cheer: "Leopard shark tagged! Those saddles are unmistakable — beautiful animal.",
-    opener: "Leopard sharks love shallow bays and eelgrass — think La Jolla, Tomales Bay. Chum out, crab or fish bait, reef to surface.",
+    opener: "A leopard shark! Those saddles — did you get a good look at the pattern? Tell me all about it!",
     sketchCap: "the dark saddle markings",
     nameIdeas: ["Saddle", "Rosette", "Eelgrass", "Bay"]
   },
@@ -679,7 +679,7 @@ const SHARKS = [
     bonus: "Horn sharks hunt at night and spend days wedged in caves and crevices — a cave-dweller that comes out after dark.",
     conservation: "Listed as Least Concern — small, spiny, and unappetizing, which is honestly the best conservation strategy; California protections help too.",
     cheer: "Horn shark tagged! Spines, crushing teeth, and the weirdest eggs in the sea. What a shark.",
-    opener: "Horn sharks hide in kelp and rocky crevices by day — Catalina, La Jolla, the Channel Islands. Chum near the reef, urchin or crab bait.",
+    opener: "A horn shark! The little tank with the venomous spines! How close did you get?",
     sketchCap: "the dorsal fin spines",
     nameIdeas: ["Spike", "Corkscrew", "Urchin", "Kelp"]
   },
@@ -697,7 +697,7 @@ const SHARKS = [
     bonus: "Port Jackson sharks wear a dark harness stripe from eye to fin — the stern brow that gives them their grumpy look.",
     conservation: "Listed as Least Concern — returns to the same reefs every year like clockwork; Jervis Bay acoustic tagging proved it, and those breeding reefs are now better protected.",
     cheer: "Port Jackson tagged! Look at that brow ridge — the most judgmental shark in Australia, and we love it.",
-    opener: "Port Jacksons work the rocky reefs of eastern Australia — Sydney, Jervis Bay, down toward Tasmania in summer. Chum over the reef, urchin or crab bait.",
+    opener: "A Port Jackson! Did it give you the unimpressed look? I need every detail!",
     sketchCap: "the crested brow ridges",
     nameIdeas: ["Judge", "Brow", "Screw", "Crest"]
   },
@@ -715,7 +715,7 @@ const SHARKS = [
     bonus: "Angelsharks are now protected in several places — Wales runs an Angelshark Project, and fishers report sightings to help track the recovery.",
     conservation: "Listed as Critically Endangered — nearly wiped out by trawling; dedicated Angel Shark Projects in Wales and the Canaries are recording slowly rising sightings — a fragile, hopeful sign.",
     cheer: "AN — an angelshark! Critically Endangered, and you just tagged one! This data goes straight into the real conservation picture!",
-    opener: "The angelshark isn't hiding — it's lying in wait. Sand-colored, sand-buried, sand-patient. Shallow reef water, crabs for bait, chum to bring it in.",
+    opener: "An angelshark! You found one! Was it buried? Did you see the strike? Walk me through it!",
     sketchCap: "the flattened, ray-like ambush body",
     nameIdeas: ["Mudskip", "Burrow", "Sandtrap", "Flatty"]
   },
@@ -733,7 +733,7 @@ const SHARKS = [
     bonus: "Megamouths are slow, flabby swimmers — their soft bodies and huge mouths are built for drifting, not chasing.",
     conservation: "Listed as Least Concern — fewer than 300 ever seen, and rarity is its shield; every sighting gets reported, and the 2024 Taiwan telemetry study is finally revealing its life.",
     cheer: "MM — a MEGAMOUTH! One of the rarest sharks on Earth, and it's wearing your tag! Every megamouth sighting is a science event!",
-    opener: "You don't chase a megamouth. You drift the twilight zone where the plankton is thick and wait for a five-metre shadow with a cavernous mouth to rise up out of the dark.",
+    opener: "A megamouth! You actually tagged a megamouth! How big was that mouth? I need the whole story!",
     sketchCap: "the huge, cavernous mouth",
     nameIdeas: ["Gullet", "Caverno", "Planktivore", "Big Gulp"]
   },
@@ -751,7 +751,7 @@ const SHARKS = [
     bonus: "Common sawsharks live on deep continental shelves around southern Australia — trawl bycatch is their main threat.",
     conservation: "Listed as Least Concern — Australian trawl bycatch is managed with quotas; pop-up tags off Tasmania showed they stay surprisingly local.",
     cheer: "SA — a sawshark! Chainsaw rostrum, tagged and tracked! One of the coolest faces in the ocean, honestly!",
-    opener: "Look for the shark with a saw on its nose and two little whiskers dangling underneath. Australian reef edge, squid or crabs, chum in the water — it slashes first and asks questions never.",
+    opener: "A sawshark! The saw, the whiskers — did you see it slash? Don't skip a thing!",
     sketchCap: "the toothed rostrum saw with barbels",
     nameIdeas: ["Chainsaw", "Rasp", "Buzzy", "Hacksaw"]
   },
@@ -769,7 +769,7 @@ const SHARKS = [
     bonus: "Greenland sharks grow to seven metres — the biggest shark in Arctic waters, and one of the biggest sharks anywhere.",
     conservation: "Listed as Vulnerable — it can live 400 years, the longest-lived vertebrate known; such slow growth means even light bycatch matters, and Arctic fisheries are starting to account for them.",
     cheer: "GL — a Greenland shark! Possibly centuries old, and YOU tagged it! This data could outlive both of us, literally!",
-    opener: "Hundreds of metres down, near-freezing Arctic water, moving barely faster than the current. Oily fish or squid, heavy chum — this is the deep's slowest, oldest predator.",
+    opener: "A Greenland shark! The deep's slowest, oldest predator! How slow was it really? Give me the whole story!",
     sketchCap: "the sluggish, massive bulk",
     nameIdeas: ["Old Timer", "Glacier", "Methuselah", "Slowpoke"]
   },
@@ -787,7 +787,7 @@ const SHARKS = [
     bonus: "Cookiecutters rise hundreds of metres each night to feed near the surface, then sink back into the dark by dawn.",
     conservation: "Listed as Least Concern — too small and too deep for fisheries to bother with; its bites on submarines and undersea cables are the closest it comes to human conflict.",
     cheer: "CC — a cookiecutter! The tiniest, weirdest shark in the book, and you actually caught one alive! That's nearly unheard of!",
-    opener: "Sixty centimetres of pure audacity. It rises out of the deep at night and takes bites out of animals twenty times its size. Squid on the hook, chum in the twilight — good luck spotting it first.",
+    opener: "A cookiecutter! Sixty centimetres of pure audacity! Did you see the glow? I need details!",
     sketchCap: "the suction lips and cookie-cutter teeth",
     nameIdeas: ["Biscuit", "Plug", "Crater", "Scoop"]
   },
@@ -805,7 +805,7 @@ const SHARKS = [
     bonus: "Sixgills glow. Their eyes have a greenish fluorescence under blue light — researchers with special cameras found the deep-dark glittering back at them. Why a deep shark fluoresces is still an open question.",
     conservation: "Listed as Near Threatened — deep-water trawling reaches its habitat, and its slow, ancient life history means populations recover slowly when depleted.",
     cheer: "SX — a bluntnose sixgill! An ancient deep-water giant, and you pulled it up into the light of science!",
-    opener: "Six gill slits, not five — the mark of an ancient line. Deep water, heavy chum, squid or oily fish. Bring patience; the deep doesn't hurry for anyone.",
+    opener: "A sixgill! Six gills on an ancient line — did you count them? What was it like down there?",
     sketchCap: "the six gill slits",
     nameIdeas: ["Fossil", "Sextant", "Anchor", "Old Six"]
   },
@@ -823,7 +823,7 @@ const SHARKS = [
     bonus: "Male velvet-bellies grow denticle-covered hooks on their heads — frontal tenacula — used to grip during mating in total darkness. Nobody fully understands how deep-sea shark dating works, and the hardware is strange.",
     conservation: "Listed as Vulnerable — it glows in the dark and gets swept up in deep trawls; bycatch limits in the Northeast Atlantic are its main protection.",
     cheer: "YES! Got the little lantern! Look at that belly glow — counter-illumination in action. Textbook velvet-belly!",
-    opener: "Tonight's a deep one — lanternsharks wait past the shelf break where the light gives out. Chum's down, squid's ready. This little shark practically glows in the dark.",
+    opener: "A velvet-belly lanternshark! Did you see it glow? The deep's little lantern — tell me all about it!",
     sketchCap: "Glowing photophore-speckled belly",
     nameIdeas: ["Vesper", "Lumen", "Tinsel", "Inky"]
   },
@@ -841,7 +841,7 @@ const SHARKS = [
     bonus: "The species is named for Perry Gilbert, a famous shark researcher. It was described in 1985 from a handful of deep-trawl specimens, and decades later we still haven't pinned down basic facts like how many pups it has.",
     conservation: "Listed as Least Concern — the smallest shark in the world, palm-sized; the deep Caribbean slopes it calls home are lightly fished, which is its safety net.",
     cheer: "IT'S SO SMALL! That's a full-grown dwarf lanternshark — one of the tiniest sharks on the planet. Incredible!",
-    opener: "Deep Caribbean slope today — the dwarf lanternshark lives where the light doesn't reach, and it's about the size of the chum bucket lid. Crustaceans on the line. This one's going to be adorable.",
+    opener: "A dwarf lanternshark! The tiniest shark in the book! Was it really that small? I need every detail!",
     sketchCap: "Tiny adult beside a pencil for scale",
     nameIdeas: ["Pip", "Mote", "Flicker", "Speck"]
   },
@@ -859,7 +859,7 @@ const SHARKS = [
     bonus: "Squalene from shark livers is now mostly made synthetically or from olives, but the historical fisheries left their mark: in the north-east Atlantic, kitefin numbers fell so hard the species is treated as a cautionary tale of deep-sea overfishing.",
     conservation: "Listed as Vulnerable — deep-water fisheries prize its oily liver; Northeast Atlantic quotas now limit the take.",
     cheer: "KITEFIN! That's a heavyweight of the deep — look at those eyes. Gorgeous, ancient, and still here. What a shark!",
-    opener: "Deep open Atlantic today — kitefin territory. These slopes drop past a kilometre, so chum's doing the heavy lifting and the bait's squid and schooling fish. Kitefins arrive like weather.",
+    opener: "A kitefin! Those huge green eyes in the dark! What was it like? Don't leave anything out!",
     sketchCap: "Huge deep-water eye",
     nameIdeas: ["Umber", "Noir", "Soot", "Shadow"]
   },
@@ -877,7 +877,7 @@ const SHARKS = [
     bonus: "Those eye copepods are a sleeper-shark signature: Ommatokoita elongata anchors to the cornea and hangs there, pale and shrimp-like, for years. Some researchers think the glow of the parasite might even lure prey toward the shark's mouth in the dark.",
     conservation: "Listed as Near Threatened — a slow Arctic giant; bycatch in deep Pacific fisheries is the concern, and most of its life history is still mystery.",
     cheer: "SLEEPER! Four metres of slow-motion majesty, right on the line. Look at that barrel body — the ocean's most patient predator!",
-    opener: "Deep off Japan today — sleeper shark water. These giants drift down past the light, so squid and schooling fish on the line, chum in the current. Don't expect speed. Expect a shadow.",
+    opener: "A Pacific sleeper! The four-metre shadow! Was it as slow as they say? I want the whole story!",
     sketchCap: "Eye with its copepod passenger",
     nameIdeas: ["Hush", "Kiri", "Murk", "Drift"]
   },
@@ -895,7 +895,7 @@ const SHARKS = [
     bonus: "Dogfish schools sort themselves by sex and size — all-female schools, all-male schools, juvenile schools, all cruising separately. Nobody knows exactly how they coordinate it; they just do.",
     conservation: "Listed as Vulnerable — once the most abundant shark in the Northwest Atlantic, fished to collapse and now rebuilding under strict quotas; proof that recovery is possible.",
     cheer: "Dogfish! One spiny customer for the log. Look at those dorsal spines — admire, don't touch.",
-    opener: "Shallow water off Cornwall today — reef edge and the surface layer. Dogfish schools move through here in the thousands. Schooling-fish bait, chum in the water, eyes up.",
+    opener: "A spiny dogfish! Did you dodge the spines? Tell me about this one!",
     sketchCap: "Grooved venomous dorsal spine",
     nameIdeas: ["Spike", "Rascal", "Brine", "Quill"]
   },
@@ -913,7 +913,7 @@ const SHARKS = [
     bonus: "A catshark's skin feels like sandpaper — tiny tooth-like scales that all point tailward.",
     conservation: "Listed as Least Concern — Europe's commonest shark, abundant and resilient; a reminder that not every shark story is a tragedy.",
     cheer: "Catshark! Look at those spots — the classic little European night shark. Gentle, gorgeous, and officially tagged!",
-    opener: "Cornwall reef tonight — shallow water, kelp, and the small-spotted catshark's night shift. Crustaceans on the line, chum to coax one out of the rocks. Watch for spots.",
+    opener: "A small-spotted catshark! The Cornwall night shift delivers! Spots and all — give me every detail!",
     sketchCap: "Dark-spotted sandy flank",
     nameIdeas: ["Freckle", "Dottie", "Kelpie", "Bramble"]
   },

@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.4-beta', VERSION === 'v1.8.4-beta');
+  ok('version v1.8.5-beta', VERSION === 'v1.8.5-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -440,19 +440,22 @@ code += `
   ok('field notes are observational only, disjoint from Sarah pools',
     FIELD_RESIGHT_NOTES.length === 8 &&
     !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l)));
+  // v1.8.5-beta: five more variants added; the originals all remain.
   ok('reunion closers have original closer + all four Avery-picked Sarah lines',
-    RESIGHT_REUNION_CLOSERS.length === 5 &&
+    RESIGHT_REUNION_CLOSERS.length === 10 &&
     RESIGHT_REUNION_CLOSERS.includes("That's incredible! They came back! I'm actually emotional rn \u{1F979}") &&
     RESIGHT_REUNION_CLOSERS.includes("Oh wow, it's back! I was literally just thinking about this one.") &&
     RESIGHT_REUNION_CLOSERS.includes("Swimming the exact same route. Some sharks are creatures of habit and honestly? Same.") &&
     RESIGHT_REUNION_CLOSERS.includes("The tag's holding up great. This shark is basically wearing a Fitbit and thriving.") &&
     RESIGHT_REUNION_CLOSERS.includes("Back again! At this point I'm starting to think it likes us."));
+  // v1.8.5-beta: three more variants added; the originals all remain.
   ok('excited pool has all five Avery picks',
-    RESIGHT_NOTES_EXCITED.length === 5 &&
+    RESIGHT_NOTES_EXCITED.length === 8 &&
     RESIGHT_NOTES_EXCITED.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
     RESIGHT_NOTES_EXCITED.includes("It's back AGAIN! I think this shark has adopted us. We're its humans now."));
+  // v1.8.5-beta: three more variants added; the originals all remain.
   ok('middle pool has all five Avery picks',
-    RESIGHT_NOTES_2ND.length === 5 &&
+    RESIGHT_NOTES_2ND.length === 8 &&
     RESIGHT_NOTES_2ND.includes("It's back! I was hoping we'd see this one again.") &&
     RESIGHT_NOTES_2ND.includes("Twice now! Either it likes this spot or it likes us. Probably both."));
   // v1.7.24-beta: tiers count RE-sightings — the numbered lines say so,
@@ -1849,7 +1852,10 @@ code += `
   ok('v0.22.0: all 50 sharks have conservation notes', SHARKS.every(s => typeof s.conservation === 'string' && s.conservation.length > 40));
 
   // v0.22.0: fieldwork constants exist
-  ok('v0.22.0: sea conditions and field notes exist', SEA_CONDITIONS.length >= 4 && Object.values(FIELD_NOTES).every(arr => arr.length >= 3) && typeof pickFieldNote === 'function' && typeof regionClimate === 'function');
+  ok('v0.22.0: sea conditions and field notes exist', Object.values(SEA_CONDITIONS).every(arr => arr.length >= 4) && Object.values(FIELD_NOTES).every(arr => arr.length >= 3) && typeof pickFieldNote === 'function' && typeof regionClimate === 'function' && typeof pickSeaCondition === 'function');
+  // v1.8.5-beta: sea conditions are climate-zoned (Arctic doesn't sound like the Caribbean)
+  ok('sea conditions are climate-zoned', ["tropical","temperate","polar","generic"].every(z => Array.isArray(SEA_CONDITIONS[z]) && SEA_CONDITIONS[z].length >= 8));
+  ok('pickSeaCondition respects climate', pickSeaCondition("arctic") !== undefined && SEA_CONDITIONS.polar.includes(pickSeaCondition("arctic")) && SEA_CONDITIONS.tropical.includes(pickSeaCondition("caribbean")));
   // v0.24.0: progressive Wild Archive unlock (Mira approved)
   ok('v0.24.0: first tag triggers archive unlock logic', (() => {
     // Behavioral: simulate the unlock condition from confirmTag()
@@ -3188,15 +3194,14 @@ code += `
   })());
   ok('html has dark fallback background', cssCode.indexOf('html { background: #000; }') !== -1);
   // v1.5.25 (Mira review): togglePin refreshes Ask Sarah so it never shows a stale pin
+  // v1.8.5-beta: Ask Sarah is a single button naming the pinned shark (no dropdown)
   ok('togglePin refreshes Ask Sarah panel', (() => {
     const savePinned = state.pinned, saveOffered = state.sarahAdviceOffered;
-    const sel = document.getElementById("sarahAskSelect");
-    sel.children.length = 0;
+    const btn = document.getElementById("sarahAskBtn");
     state.sarahAdviceOffered = true;
     state.pinned = null;
     togglePin("nurse");
-    const kids = sel.children;
-    const r = kids.length > 0 && kids[kids.length - 1].value === "nurse";
+    const r = btn.textContent.indexOf("Nurse Shark") !== -1;
     state.pinned = savePinned; pinStore.save(savePinned);
     state.sarahAdviceOffered = saveOffered;
     renderSarahAsk();
@@ -3626,6 +3631,190 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   ok('WHATS_NEW has v1.8.2-beta', Array.isArray(WHATS_NEW['v1.8.2-beta']) && WHATS_NEW['v1.8.2-beta'].length === 1);
   ok('WHATS_NEW has v1.8.3-beta', Array.isArray(WHATS_NEW['v1.8.3-beta']) && WHATS_NEW['v1.8.3-beta'].length === 2);
   ok('WHATS_NEW has v1.8.4-beta', Array.isArray(WHATS_NEW['v1.8.4-beta']) && WHATS_NEW['v1.8.4-beta'].length === 1);
+  ok('WHATS_NEW has v1.8.5-beta', Array.isArray(WHATS_NEW['v1.8.5-beta']) && WHATS_NEW['v1.8.5-beta'].length === 3);
+  // v1.8.5-beta: Sarah content bundle
+  ok('context pass: greenland chat names the species', COUSIN_CHATS.greenland[0].them.indexOf('Greenland shark') !== -1);
+  ok('context pass: mako chat names the species', COUSIN_CHATS.mako[2].them.indexOf('Makos') === 0);
+  ok('context pass: cookiecutter chat names the species', COUSIN_CHATS.cookiecutter[1].them.indexOf("cookiecutter's") !== -1);
+  ok('context pass: catshark chats name the species', COUSIN_CHATS.catshark[1].them.indexOf('Small-spotted catshark') === 0 && COUSIN_CHATS.catshark[2].them.indexOf('Small-spotted catsharks') === 0);
+  ok('context pass: sixgill chats name the species', COUSIN_CHATS.sixgill[1].them.indexOf('Sixgill') === 0 && COUSIN_CHATS.sixgill[2].them.indexOf('Sixgill') === 0);
+  ok('context pass: portjackson chats name the species', COUSIN_CHATS.portjackson[0].them.indexOf("Port Jackson's") !== -1 && COUSIN_CHATS.portjackson[2].them.indexOf('Port Jacksons') === 0);
+  ok('whale hook drops polka-dotted bus', (() => {
+    const w = SHARKS.find(s => s.id === 'whale');
+    return w.hook.indexOf('polka-dotted bus') === -1 && w.hook.indexOf('plankton') !== -1 && w.hook.indexOf('largest fish') !== -1;
+  })());
+  ok('Ask Sarah button names the researched shark', (() => {
+    const savePinned = state.pinned, saveOffered = state.sarahAdviceOffered;
+    state.sarahAdviceOffered = true; state.pinned = 'mako';
+    renderSarahAsk();
+    const t = document.getElementById('sarahAskBtn').textContent;
+    state.pinned = savePinned; state.sarahAdviceOffered = saveOffered; renderSarahAsk();
+    return t.indexOf('Shortfin Mako') !== -1;
+  })());
+  ok('Ask Sarah dropdown is gone from HTML', htmlCode.indexOf('sarahAskSelect') === -1);
+  ok('sea conditions have 10 lines per zone', ['tropical','temperate','polar','generic'].every(z => SEA_CONDITIONS[z].length >= 10));
+  ok('named checkins have 8 variants', NAMED_CHECKINS.length === 8);
+  ok('checkin never repeats twice in a row', typeof lastCheckinIdx !== 'undefined');
+  ok('sizeTierFor covers all 50 species', SHARKS.every(s => ['small','medium','large','xlarge'].indexOf(sizeTierFor(s)) !== -1));
+  ok('size tiers match real sizes', sizeTierFor(SHARKS.find(s => s.id === 'whale')) === 'xlarge' && sizeTierFor(SHARKS.find(s => s.id === 'dwarflantern')) === 'small' && sizeTierFor(SHARKS.find(s => s.id === 'porbeagle')) === 'medium');
+  ok('no curly quotes around nicknames in expedition code', fileCode.indexOf(String.fromCharCode(92) + 'u201c' + String.fromCharCode(36) + '{') === -1);
+  ok('reunion closer pool has 10 with no-repeat guard', RESIGHT_REUNION_CLOSERS.length === 10 && typeof lastReunionCloserIdx !== 'undefined');
+  ok('sightings capped at 10 per page', SIGHTINGS_PAGE_SIZE === 10 && typeof sightingsShowMore === 'function');
+  ok('sightings render caps with show-more button', (() => {
+    const save = state.sightings;
+    const saveShown = sightingsShown;
+    state.sightings = Array.from({length: 25}, (_, i) => ({ speciesId: 'mako', name: 'Mako Shark', doing: 'cruising', location: 'Test', date: 'Jan 1', ts: i }));
+    sightingsShown = SIGHTINGS_PAGE_SIZE;
+    const list = document.getElementById('sightingsList');
+    list.children = []; // mock innerHTML="" does not clear children; real DOM does
+    renderSightings();
+    const entries = list.children.filter(c => c.className === 'sighting-entry').length;
+    const hasMore = list.children.some(c => String(c.className || '').indexOf('sightings-more') !== -1);
+    state.sightings = save; sightingsShown = saveShown;
+    list.children = []; renderSightings();
+    return entries === 10 && hasMore;
+  })());
+  // v1.8.5-beta fix (Mira review): logbook nickname only for the SAME tagged individual.
+  // Never label a watched wild shark with the tagged individual's nickname.
+  ok('logbook nickname identity rules', (() => {
+    const origTagged = state.tagged, origLogbook = state.logbook, origShown = logbookShown;
+    const mkTrip = (encounters) => ({
+      date: "Oct 18, 2026", region: "caribbean", depth: "surface", bait: "mackerel",
+      method: "", methodOpt: "", ts: Date.now(), encounters,
+      conditions: "", fieldNote: "", pinHint: "",
+    });
+    const listEl = document.getElementById("logbookList");
+    const renderOne = (enc) => {
+      state.logbook = [mkTrip([enc])];
+      logbookShown = LOGBOOK_PAGE_SIZE;
+      listEl.children = [];
+      renderLogbook();
+      const html = listEl.children.filter(c => c.className === "logbook-entry").map(c => c.innerHTML).join("");
+      listEl.children = [];
+      return html;
+    };
+    try {
+      state.tagged = { nurse: { name: "Helen", researchId: "NS-2026-004" } };
+      // (a) matching researchId -> nickname shown
+      const a = renderOne({ result: "tagged", name: "Nurse Shark", speciesId: "nurse", researchId: "NS-2026-004" });
+      // (b) watched wild shark, no researchId -> species only
+      const b = renderOne({ result: "watched", name: "Nurse Shark", speciesId: "nurse", researchId: null });
+      // (b2) watched, different researchId -> species only
+      const b2 = renderOne({ result: "watched", name: "Nurse Shark", speciesId: "nurse", researchId: "NS-2026-099" });
+      // (c) older tag: encounter ID differs from the current tagged record -> no nickname
+      const c = renderOne({ result: "tagged", name: "Nurse Shark", speciesId: "nurse", researchId: "NS-2026-001" });
+      return a.indexOf("Helen") !== -1 &&
+        b.indexOf("Helen") === -1 && b.indexOf("Nurse Shark") !== -1 &&
+        b2.indexOf("Helen") === -1 &&
+        c.indexOf("Helen") === -1;
+    } finally {
+      state.tagged = origTagged; state.logbook = origLogbook; logbookShown = origShown;
+      listEl.children = [];
+    }
+  })());
+  // v1.8.5-beta fix (Mira review): size tiers are scoped to the mystery silhouette;
+  // the reveal phase keeps the deliberate 108px cap so art + badge fit the 190px scene.
+  ok('size tiers apply to silhouette only, never the reveal', (() => {
+    const tiers = ["small", "medium", "large", "xlarge"];
+    const scoped = tiers.every(t =>
+      cssCode.indexOf(".dive-shark.size-" + t + " .shark-silhouette img") !== -1 &&
+      cssCode.indexOf(".dive-shark.size-" + t + " .shark-silhouette svg") !== -1);
+    const noReveal = tiers.every(t => {
+      let i = cssCode.indexOf(".dive-shark.size-" + t);
+      while (i !== -1) {
+        const end = cssCode.indexOf("}", i);
+        if (cssCode.slice(i, end).indexOf(".shark-reveal") !== -1) return false;
+        i = cssCode.indexOf(".dive-shark.size-" + t, end);
+      }
+      return true;
+    });
+    return scoped && noReveal;
+  })());
+  ok('reveal art keeps the 108px badge-safety cap', (() => {
+    const i = cssCode.indexOf(".shark-reveal img, .shark-reveal svg {");
+    if (i === -1) return false;
+    const block = cssCode.slice(i, cssCode.indexOf("}", i));
+    return block.indexOf("max-height: 108px") !== -1;
+  })());
+  // v1.8.5-beta: behavioral no-repeat guards (Mira review) — deterministic via mocked Math.random.
+  ok('checkin never deals the same template twice in a row (behavioral)', (() => {
+    const origRandom = Math.random, origTagged = state.tagged, origIdx = lastCheckinIdx;
+    const L = NAMED_CHECKINS.length;
+    try {
+      state.tagged = { mako: { name: "Finley", researchId: "SM-2026-001" } };
+      lastCheckinIdx = -1;
+      // gate open (<=0.4), pick -> the single named shark, ci = 3
+      const seq = [0.1, 0.0, 3.5 / L];
+      let i = 0;
+      Math.random = () => seq[i++ % seq.length];
+      maybeCheckinThread();
+      const first = lastCheckinIdx;
+      i = 0; // identical draws -> guard must bump 3 -> 4
+      maybeCheckinThread();
+      const second = lastCheckinIdx;
+      // wrap: last index drawn again -> 0
+      lastCheckinIdx = L - 1;
+      const seq2 = [0.1, 0.0, (L - 0.5) / L];
+      let j = 0;
+      Math.random = () => seq2[j++ % seq2.length];
+      maybeCheckinThread();
+      const wrapped = lastCheckinIdx;
+      return first === 3 && second === 4 && wrapped === 0;
+    } finally {
+      Math.random = origRandom; state.tagged = origTagged; lastCheckinIdx = origIdx;
+    }
+  })());
+  ok('reunion closer never repeats twice in a row (behavioral)', (() => {
+    const origRandom = Math.random, origReacted = state.reunionReacted, origMsgs = state.messages;
+    const origUnread = state.unread, origLastAt = state.lastSarahMsgAt, origIdx = lastReunionCloserIdx;
+    const L = RESIGHT_REUNION_CLOSERS.length;
+    try {
+      state.reunionReacted = {};
+      state.messages = [];
+      const rec = { name: "Fin", researchId: "XX-1", sex: "female" };
+      let rv = 3.5 / L;
+      Math.random = () => rv;
+      lastReunionCloserIdx = -1;
+      maybeReunionReaction(SHARKS.find(s => s.id === "mako"), rec);
+      const first = lastReunionCloserIdx;
+      // different species (reunion guard is per-species), same draw -> guard bumps 3 -> 4
+      maybeReunionReaction(SHARKS.find(s => s.id === "tiger"), rec);
+      const second = lastReunionCloserIdx;
+      // wrap: last index drawn again -> 0
+      lastReunionCloserIdx = L - 1;
+      rv = (L - 0.5) / L;
+      maybeReunionReaction(SHARKS.find(s => s.id === "lemon"), rec);
+      const wrapped = lastReunionCloserIdx;
+      return first === 3 && second === 4 && wrapped === 0;
+    } finally {
+      Math.random = origRandom; state.reunionReacted = origReacted; state.messages = origMsgs;
+      state.unread = origUnread; state.lastSarahMsgAt = origLastAt; lastReunionCloserIdx = origIdx;
+    }
+  })());
+  // v1.8.5-beta: sightings "show more" pages through the rest (mirrors #108 logbook paging tests).
+  ok('sightings show-more reveals remaining entries', (() => {
+    const save = state.sightings;
+    const saveShown = sightingsShown;
+    const list = document.getElementById('sightingsList');
+    const count = () => list.children.filter(c => c.className === 'sighting-entry').length;
+    const hasMore = () => list.children.some(c => String(c.className || '').indexOf('sightings-more') !== -1);
+    try {
+      state.sightings = Array.from({length: 25}, (_, i) => ({ speciesId: 'mako', name: 'Mako Shark', doing: 'cruising', location: 'Test', date: 'Jan 1', ts: i }));
+      sightingsShown = SIGHTINGS_PAGE_SIZE;
+      list.children = []; renderSightings();
+      const before = count(), btnBefore = hasMore();
+      sightingsShowMore(); // 20 shown; internal render appends on the mock, so re-render cleanly
+      list.children = []; renderSightings();
+      const mid = count(), btnMid = hasMore();
+      sightingsShowMore(); // 30 >= 25: all shown, button gone
+      list.children = []; renderSightings();
+      const after = count(), btnAfter = hasMore();
+      return before === 10 && btnBefore && mid === 20 && btnMid && after === 25 && !btnAfter;
+    } finally {
+      state.sightings = save; sightingsShown = saveShown;
+      list.children = []; renderSightings();
+    }
+  })());
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);

@@ -165,7 +165,7 @@ function renderArchive() {
     const media = ARCHIVE_MEDIA[s.id];
     const t = state.tagged[s.id];
     const yourShark = t.researchId
-      ? `<p class="hook">Your shark${t.name ? ` \u201c${esc(t.name)}\u201d` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
+      ? `<p class="hook">Your shark${t.name ? ` ${esc(t.name)}` : ""} ${idLine(t)}${t.date ? ` \u2014 tagged ${esc(t.date)}` : ""}${t.location ? ` at ${esc(t.location)}` : ""}</p>`
       : "";
     /* v1.5.10-beta: row head matches the Research page — common name first,
        then the color-coded abbreviated IUCN badge. No checkmark. */
