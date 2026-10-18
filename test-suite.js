@@ -1582,6 +1582,95 @@ code += `
     ok('v1.8.6: legend still lists every tagged shark', (legendHtml.match(/map-chip/g) || []).length === 2);
     state.tagged = origTagged;
   })();
+  // v1.8.6 follow-up (Mira review): every route color must meet >= 3:1
+  // WCAG contrast against the dark map fallback (#0d2f4d) — pairwise
+  // distinctness alone does not guarantee legibility of thin strokes.
+  (() => {
+    const relLum = (hex) => {
+      const c = [1, 3, 5].map(i => {
+        const v = parseInt(hex.substr(i, 2), 16) / 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    };
+    const mapBg = relLum('#0d2f4d');
+    const ratio = (hex) => {
+      const l = relLum(hex), hi = Math.max(l, mapBg), lo = Math.min(l, mapBg);
+      return (hi + 0.05) / (lo + 0.05);
+    };
+    const weak = Object.entries(SPECIES_COLORS).filter(([sid, c]) => ratio(c) < 3.0);
+    ok('v1.8.6: every SPECIES_COLORS >= 3:1 vs map background', weak.length === 0);
+  })();
+  // v1.8.6 follow-up (Mira review): track paths get a neutral halo so thin
+  // strokes stay legible on the photographic map background.
+  (() => {
+    const origTagged = state.tagged;
+    state.tagged = { nurse: { researchId: 'T-2', name: 'Halo', mapTrack: true,
+      track: { kind: 'satellite', points: [{ label: 'Caribbean Sea', day: 0 }, { label: 'Caribbean Sea', day: 6 }, { label: 'Open Atlantic', day: 12 }] } } };
+    renderMap();
+    const svg = document.getElementById('worldMapWrap').innerHTML;
+    const tracks = (svg.match(/class="map-track"/g) || []).length;
+    const halos = (svg.match(/class="map-track-halo"/g) || []).length;
+    ok('v1.8.6: every track path has a halo sibling', tracks > 0 && halos === tracks);
+    state.tagged = origTagged;
+  })();
+  // v1.8.6 follow-up (Mira review): toggling "Track this shark" refreshes
+  // the map immediately when Map is the active tab; toggle off removes the
+  // route but keeps the latest dot; the choice persists.
+  (() => {
+    const origQS = document.querySelector;
+    const origTagged = state.tagged;
+    const tabEl = (name) => ({ dataset: { tab: name } });
+    const mk = (tracked) => ({ researchId: 'T-3', name: 'Toggs', mapTrack: tracked,
+      track: { kind: 'satellite', points: [{ label: 'Caribbean Sea', day: 0 }, { label: 'Caribbean Sea', day: 6 }, { label: 'Open Atlantic', day: 12 }] } });
+    document.querySelector = (sel) => sel === '.tab.active' ? tabEl('map') : origQS(sel);
+    state.tagged = { nurse: mk(false) };
+    setMapTrack(state.tagged.nurse, true);
+    let svg = document.getElementById('worldMapWrap').innerHTML;
+    ok('v1.8.6: toggle on re-renders map immediately (route appears)', (svg.match(/class="map-track"/g) || []).length === 1);
+    ok('v1.8.6: toggle on shows tag-site pin', /\(tag site\)/.test(svg));
+    setMapTrack(state.tagged.nurse, false);
+    svg = document.getElementById('worldMapWrap').innerHTML;
+    ok('v1.8.6: toggle off removes route immediately', !/class="map-track"/.test(svg));
+    ok('v1.8.6: toggle off keeps latest dot', (svg.match(/map-marker latest/g) || []).length === 1);
+    const saved = JSON.parse(localStorage.getItem('tyi-collection') || '{}');
+    ok('v1.8.6: toggle choice persists to save', saved.nurse && saved.nurse.mapTrack === false);
+    setMapTrack(state.tagged.nurse, true);
+    const saved2 = JSON.parse(localStorage.getItem('tyi-collection') || '{}');
+    ok('v1.8.6: toggle-on persists to save', saved2.nurse && saved2.nurse.mapTrack === true);
+    // Map tab NOT active: no re-render
+    document.querySelector = (sel) => sel === '.tab.active' ? tabEl('collection') : origQS(sel);
+    document.getElementById('worldMapWrap').innerHTML = '';
+    refreshMapIfActive();
+    ok('v1.8.6: no map refresh when another tab is active', document.getElementById('worldMapWrap').innerHTML === '');
+    document.querySelector = origQS;
+    localStorage.removeItem('tyi-collection'); // don't leak the fixture into later tests
+    state.tagged = origTagged;
+  })();
+  // v1.8.6 follow-up (Mira review): explicit one-point representation —
+  // tracked: tag-site pin doubles as latest marker; untracked: latest dot.
+  (() => {
+    const origTagged = state.tagged;
+    const one = (tracked) => ({ researchId: 'T-4', name: 'Solo', mapTrack: tracked,
+      track: { kind: 'satellite', points: [{ label: 'Caribbean Sea', day: 0 }] } });
+    state.tagged = { nurse: one(true) };
+    renderMap();
+    let svg = document.getElementById('worldMapWrap').innerHTML;
+    ok('v1.8.6: one-point tracked shows tag-site pin', /\(tag site\)/.test(svg));
+    ok('v1.8.6: one-point tracked pin doubles as latest (no separate dot)', (svg.match(/map-marker latest/g) || []).length === 0);
+    state.tagged = { nurse: one(false) };
+    renderMap();
+    svg = document.getElementById('worldMapWrap').innerHTML;
+    ok('v1.8.6: one-point untracked shows latest dot', (svg.match(/map-marker latest/g) || []).length === 1);
+    ok('v1.8.6: one-point untracked shows no pin', !/\(tag site\)/.test(svg));
+    // zero valid positions: nothing drawn, no crash
+    state.tagged = { nurse: { researchId: 'T-5', name: 'Noplace', mapTrack: true,
+      track: { kind: 'satellite', points: [{ label: 'Somewhere Unknown', day: 0 }] } } };
+    renderMap();
+    svg = document.getElementById('worldMapWrap').innerHTML;
+    ok('v1.8.6: unknown-coordinate shark draws no markers', !/map-marker/.test(svg));
+    state.tagged = origTagged;
+  })();
 
   // v0.22.0: pin-gated soft hints
   // v0.22.0 Mira review: pin hints grounded in completed expeditions

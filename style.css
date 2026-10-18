@@ -1399,6 +1399,10 @@ select option:disabled { color: #7a8a9e; }
   paint-order: stroke; stroke: rgba(4,38,59,0.7); stroke-width: 3;
 }
 .map-track { fill: none; opacity: 0.55; }
+/* v1.8.6 follow-up (Mira review): neutral halo under each route so thin
+   strokes stay legible on the photographic map, not just the dark
+   fallback. Full opacity — the halo is the contrast mechanism. */
+.map-track-halo { fill: none; stroke: rgba(255,255,255,0.85); }
 .map-marker { cursor: pointer; stroke: #fff; stroke-width: 1.5; }
 .map-marker:hover { stroke-width: 3; }
 .map-marker.latest { stroke-width: 2.5; }
@@ -1426,7 +1430,10 @@ select option:disabled { color: #7a8a9e; }
   display: inline-flex; align-items: center; gap: 6px;
   cursor: pointer; /* v0.11.0: chips focus the map, like markers */
 }
-.map-chip .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.map-chip .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+  /* v1.8.6 follow-up (Mira review): neutral outline so dark route colors
+     stay legible as legend dots too. box-shadow keeps the 10px layout. */
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,0.9); }
 .map-honesty { font-size: 12px; color: var(--ink-dim); font-style: italic; margin-top: 10px; line-height: 1.6; }
 
 /* v0.7.0: discreet reset link in the footer */

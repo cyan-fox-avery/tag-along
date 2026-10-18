@@ -506,25 +506,28 @@ function hashStr(s) {
    scientific claims, and the map is labeled illustrative. */
 
 /* v1.8.6-beta: palette rebuilt for distinctness — 50 saturated colors,
-   verified min pairwise DeltaE 12.5 (well above just-noticeable) and strong
-   contrast against the dark ocean. Still one color per shark. */
+   verified min pairwise DeltaE 10.6 (well above just-noticeable) and every
+   color >= 3.5:1 WCAG contrast against the dark map fallback (#0d2f4d).
+   v1.8.6 follow-up (Mira review): the six darkest route colors were
+   brightened in-hue after five measured below 3:1. Still one color
+   per shark. */
 const SPECIES_COLORS = {
   nurse: "#48ea62", thresher: "#c377f8", whale: "#f0f631", goblin: "#74b9e9",
-  tiger: "#f0387f", sandtiger: "#81f953", galapagos: "#1f16f6",
+  tiger: "#f0387f", sandtiger: "#81f953", galapagos: "#9e9bf1",
   greatwhite: "#f5a47a", hammerhead: "#31f6cc", mako: "#e656c3",
   basking: "#91f028", epaulette: "#5d92f8", lemon: "#e98158",
-  blacktip: "#64f886", whitetip: "#ac1ff8", blue: "#dce887",
+  blacktip: "#64f886", whitetip: "#d7a8f0", blue: "#dce887",
   porbeagle: "#38daf0", silky: "#fb6ac1", oceanic: "#abd937",
-  sevengill: "#6264f3", bronze: "#f66931", frilled: "#85eab1",
+  sevengill: "#7d7ee8", bronze: "#f66931", frilled: "#85eab1",
   zebra: "#d838f0", scalloped: "#e0f85d", smooth: "#4f7af2",
   bonnethead: "#f36288", bull: "#5ce818", greyreef: "#9468ee",
   caribbean: "#f0aa38", sandbar: "#72f3d4", salmon: "#e626d6",
-  dusky: "#acf362", silvertip: "#3356fa", spinner: "#ee7268",
+  dusky: "#acf362", silvertip: "#a8b5f0", spinner: "#ee7268",
   wobbegong: "#47f751", leopard: "#c45df8", horn: "#eae23e",
   portjackson: "#62d0f3", angelshark: "#f6289c", megamouth: "#adee80",
-  sawshark: "#4e38f0", greenland: "#f89d5d", cookiecutter: "#35e4e0",
+  sawshark: "#8475f0", greenland: "#f89d5d", cookiecutter: "#35e4e0",
   sixgill: "#f362f3", velvetbelly: "#bef631", dwarflantern: "#68a0ee",
-  kitefin: "#ea4d5e", pacificsleeper: "#4cf3a3", spinydogfish: "#8c3eea",
+  kitefin: "#ea4d5e", pacificsleeper: "#4cf3a3", spinydogfish: "#bb8cf2",
   catshark: "#f3cf62"
 };
 
