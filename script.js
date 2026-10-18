@@ -21,8 +21,8 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v1.8.3-beta": [
-"💬 <strong>Sarah is less spammy.</strong> Other than special dialogue and Ask Sarah, she now sends at most one message per 5 minutes — a routine message that would fire inside the window is dropped, not queued. Special event threads and Ask Sarah always go through, and every Sarah message restarts the 5-minute window.",
-"🦈 <strong>Blue shark insight reworded.</strong> “The most beautiful shark in the Atlantic” was opinion stated as fact — it now describes the countershading instead.",
+"💬 <strong>Sarah messages at a more human pace.</strong> Other than special dialogue and Ask Sarah, she now sends at most one routine message per 5 minutes — a routine message that would fire inside the window is simply dropped, not queued. Special event threads and Ask Sarah always go through, and every Sarah message restarts the 5-minute window. Mira's review also fixed a subtle bug: a dropped routine chat could advance Sarah's chat rotation without being shown, silently skipping authored lines — the rotation now only advances for chats actually sent.",
+"🦈 <strong>Blue shark insight reworded.</strong> “The most beautiful shark in the Atlantic” was opinion stated as fact — it now notes their unusually long pectoral fins instead of restating the Research countershading description.",
   ],
   "v1.8.2-beta": [
 "🏷️ <strong>IUCN badge hugs the pin — for real this time.</strong> v1.8.1 closed the gap to the pin button's edge, but the 📌 glyph sits centered inside the 52px button, so the visual gap was still ~22px. The 6px is now measured to the glyph itself — the pin button's glyph is left-aligned with 5px of left padding. Touch target unchanged.",
@@ -1289,12 +1289,16 @@ function saveMsgs() {
    sites keep working. Every SENT thread — any kind — updates
    lastSarahMsgAt. Returns true if sent, false if dropped. */
 const SARAH_THROTTLE_MS = 5 * 60 * 1000;
+/* v1.8.3-beta Mira fix: throttle predicate shared by pushThread and the
+   ambient branch of afterExpedition — chatSeen must only advance for chats
+   actually sent, so the ambient gate runs BEFORE pickChat() selects one. */
+function routineThrottled() {
+  const last = state.lastSarahMsgAt;
+  const age = (typeof last === "number") ? Date.now() - last : Infinity;
+  return age >= 0 && age < SARAH_THROTTLE_MS;
+}
 function pushThread(msgs, kind) {
-  if (kind === "routine") {
-    const last = state.lastSarahMsgAt;
-    const age = (typeof last === "number") ? Date.now() - last : Infinity;
-    if (age >= 0 && age < SARAH_THROTTLE_MS) return false;
-  }
+  if (kind === "routine" && routineThrottled()) return false;
   state.messages.push({ ts: Date.now(), msgs });
   state.lastSarahMsgAt = Date.now();
   const phoneTab = document.querySelector('.tab[data-tab="phone"]');
@@ -3398,20 +3402,26 @@ function afterExpedition(plan) {
     threadKind = "special";
     saveMsgs(); // v0.17.1 review fix: the offer must survive a reload
   } else {
-    /* v0.8.0: sometimes she just checks in about one of your named
-       sharks — the cousin who remembers. */
-    const checkin = maybeCheckinThread();
-    if (checkin) {
-      thread = checkin;
-    } else {
-      const chat = pickChat();
-      thread = [
-        { who: "them", text: chat.them },
-        { who: "me", text: chat.me }
-      ];
+    /* v1.8.3-beta Mira fix: gate the ambient branch on the routine throttle
+       BEFORE any chat selection — pickChat() advances chatSeen as a side
+       effect, so a dropped thread must never consume a rotation entry
+       (players would skip Sarah's authored lines without ever seeing them). */
+    if (!routineThrottled()) {
+      /* v0.8.0: sometimes she just checks in about one of your named
+         sharks — the cousin who remembers. */
+      const checkin = maybeCheckinThread();
+      if (checkin) {
+        thread = checkin;
+      } else {
+        const chat = pickChat();
+        thread = [
+          { who: "them", text: chat.them },
+          { who: "me", text: chat.me }
+        ];
+      }
     }
   }
-  pushThread(thread, threadKind);
+  if (thread) pushThread(thread, threadKind);
   renderSarahAsk();
 }
 

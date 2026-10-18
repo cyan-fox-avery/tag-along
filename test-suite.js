@@ -2643,12 +2643,60 @@ code += `
     state.chatSeen = origChatSeen;
     saveMsgs();
   })();
-  // v1.8.3-beta: Blue Shark hook drops the beauty superlative — opinion
-  // stated as fact becomes a factual countershading description.
-  ok('blue hook drops the beauty superlative', (() => {
+  // v1.8.3-beta: Blue Shark hook is a distinct factual detail — the beauty
+  // superlative (opinion stated as fact) is gone, and (Mira) it no longer
+  // restates the public Research countershading description.
+  ok('blue hook is a distinct factual detail', (() => {
     const hook = sharkById('blue').hook;
-    return /countershading/.test(hook) && !/most beautiful/.test(hook);
+    return /pectoral fin/i.test(hook)
+      && !/most beautiful/.test(hook)
+      && !/countershad/i.test(hook)
+      && !/snow-white/.test(hook);
   })());
+  // v1.8.3-beta Mira fix: a dropped routine chat must not advance chatSeen —
+  // the rotation is consumed only by chats actually sent.
+  (() => {
+    const origMsgsLen = state.messages.length;
+    const origUnread = state.unread;
+    const origLast = state.lastSarahMsgAt;
+    const origFailures = state.failures;
+    const origOffered = state.sarahAdviceOffered;
+    const origFlags = [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip];
+    const origChatSeen = JSON.parse(JSON.stringify(state.chatSeen));
+    const origRandom = Math.random;
+    state.taggedThisTrip = false; state.resightedThisTrip = false; state.followedThisTrip = false;
+    state.failures = 0;
+    state.sarahAdviceOffered = true;
+    // Force the random-chat (pickChat) branch: maybeCheckinThread returns null.
+    Math.random = () => 0.99;
+    // Inside the window: the thread is dropped AND chatSeen is untouched.
+    state.lastSarahMsgAt = Date.now();
+    afterExpedition(null);
+    ok('dropped routine chat leaves messages unchanged', state.messages.length === origMsgsLen);
+    ok('dropped routine chat leaves chatSeen unchanged', JSON.stringify(state.chatSeen) === JSON.stringify(origChatSeen));
+    // Window open: the next allowed chat uses the still-unseen entry.
+    state.lastSarahMsgAt = Date.now() - 6 * 60 * 1000;
+    const chatSeenBefore = JSON.parse(JSON.stringify(state.chatSeen));
+    afterExpedition(null);
+    const advanced = Object.keys(state.chatSeen).filter(k => state.chatSeen[k] !== (chatSeenBefore[k] || 0));
+    const oneEntry = advanced.length === 1 && state.chatSeen[advanced[0]] === (chatSeenBefore[advanced[0]] || 0) + 1;
+    ok('next allowed chat advances exactly one rotation entry by one', oneEntry);
+    const sid = advanced[0];
+    const chats = COUSIN_CHATS[sid];
+    const expected = chats[(chatSeenBefore[sid] || 0) % chats.length];
+    const sent = state.messages[state.messages.length - 1].msgs;
+    ok('next allowed chat uses the still-unseen entry', sent[0].text === expected.them && sent[1].text === expected.me);
+    // restore
+    Math.random = origRandom;
+    state.messages.length = origMsgsLen;
+    state.unread = origUnread;
+    state.lastSarahMsgAt = origLast;
+    state.failures = origFailures;
+    state.sarahAdviceOffered = origOffered;
+    [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip] = origFlags;
+    state.chatSeen = origChatSeen;
+    saveMsgs();
+  })();
   // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
   // iPad layout) — brighter, wider fan, clearly visible motion
   (() => {
