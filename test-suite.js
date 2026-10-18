@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.3-beta', VERSION === 'v1.8.3-beta');
+  ok('version v1.8.4-beta', VERSION === 'v1.8.4-beta');
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -3625,6 +3625,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   ok('WHATS_NEW has v1.8.1-beta', Array.isArray(WHATS_NEW['v1.8.1-beta']) && WHATS_NEW['v1.8.1-beta'].length === 3);
   ok('WHATS_NEW has v1.8.2-beta', Array.isArray(WHATS_NEW['v1.8.2-beta']) && WHATS_NEW['v1.8.2-beta'].length === 1);
   ok('WHATS_NEW has v1.8.3-beta', Array.isArray(WHATS_NEW['v1.8.3-beta']) && WHATS_NEW['v1.8.3-beta'].length === 2);
+  ok('WHATS_NEW has v1.8.4-beta', Array.isArray(WHATS_NEW['v1.8.4-beta']) && WHATS_NEW['v1.8.4-beta'].length === 1);
 ok('WHATS_NEW has v1.7.33-beta', Array.isArray(WHATS_NEW['v1.7.33-beta']) && WHATS_NEW['v1.7.33-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.32-beta', Array.isArray(WHATS_NEW['v1.7.32-beta']) && WHATS_NEW['v1.7.32-beta'].length >= 1);
 ok('WHATS_NEW has v1.7.31-beta', Array.isArray(WHATS_NEW['v1.7.31-beta']) && WHATS_NEW['v1.7.31-beta'].length >= 1);
@@ -4347,6 +4348,99 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     }
     return found;
   })());
+
+  // v1.8.4-beta: performance — logbook pagination + no redundant renderAll in doFollowTagged.
+  // Logbook cap: 40 trips -> 30 entries + "show older" button.
+  (() => {
+    const origLogbook = state.logbook;
+    const origShown = logbookShown;
+    const mkTrip = (i) => ({
+      date: "Oct 18, 2026", region: "caribbean", depth: "surface", bait: "mackerel",
+      method: "", methodOpt: "", ts: Date.now() - i * 86400000,
+      encounters: [{ result: "tagged", name: "Lemon Shark", speciesId: "lemon", researchId: "LS-1" }],
+      conditions: "", fieldNote: "", pinHint: "",
+    });
+    state.logbook = [];
+    for (let i = 0; i < 40; i++) state.logbook.push(mkTrip(i));
+    logbookShown = LOGBOOK_PAGE_SIZE;
+    const listEl = document.getElementById("logbookList");
+    try {
+      listEl.children = []; // mock innerHTML="" does not clear children; real DOM does
+      renderLogbook();
+      const entries = listEl.children.filter(c => c.className === "logbook-entry");
+      const moreBtn = listEl.children.find(c => String(c.className || "").indexOf("logbook-more") !== -1);
+      ok("logbook renders at most 30 trips", entries.length === 30);
+      ok("logbook shows 'show older' button when capped", !!moreBtn && String(moreBtn.textContent).indexOf("10 more") !== -1);
+      // Latest trips first: the newest trip (index 0) is rendered, the 40th is not.
+      listEl.children = [];
+      logbookShowOlder();
+      const entries2 = listEl.children.filter(c => c.className === "logbook-entry");
+      const moreBtn2 = listEl.children.find(c => String(c.className || "").indexOf("logbook-more") !== -1);
+      ok("logbook 'show older' reveals all 40 trips", entries2.length === 40);
+      ok("logbook 'show older' button gone when all shown", !moreBtn2);
+      // Filters still narrow the list under the cap.
+      const t1 = mkTrip(0);
+      ok("logbook filter matches region", logbookTripMatches(t1, { outcome: "all", region: "caribbean", species: "all", dateRange: "all" }));
+      ok("logbook filter rejects other region", !logbookTripMatches(t1, { outcome: "all", region: "arctic", species: "all", dateRange: "all" }));
+      ok("logbook filter matches tagged outcome", logbookTripMatches(t1, { outcome: "tagged", region: "all", species: "all", dateRange: "all" }));
+      ok("logbook filter rejects missed outcome", !logbookTripMatches(t1, { outcome: "missed", region: "all", species: "all", dateRange: "all" }));
+      // Fewer trips than the cap: no button.
+      state.logbook = [mkTrip(0), mkTrip(1)];
+      logbookShown = LOGBOOK_PAGE_SIZE;
+      listEl.children = [];
+      renderLogbook();
+      const entries3 = listEl.children.filter(c => c.className === "logbook-entry");
+      const moreBtn3 = listEl.children.find(c => String(c.className || "").indexOf("logbook-more") !== -1);
+      ok("logbook under cap renders all trips, no button", entries3.length === 2 && !moreBtn3);
+    } finally {
+      state.logbook = origLogbook;
+      logbookShown = origShown;
+      listEl.children = [];
+    }
+  })();
+  // doFollowTagged must NOT call renderAll (closeDive re-renders after resolution),
+  // but must still resolve with tagAlong and stash the insight for the Map popup.
+  (() => {
+    const origRender = renderAll;
+    const origTagged = state.tagged;
+    const origFacts = state.unlockedFacts;
+    const origPending = state.pendingTagAlongFact;
+    const origSave = factStore.save;
+    const origTrip = logTripEncounter;
+    const origLog = logLine;
+    const origDone = state.encounterDone;
+    const origFollowed = state.followedThisTrip;
+    const origPlan = state.currentPlan;
+    let raCalls = 0;
+    renderAll = () => { raCalls++; };
+    factStore.save = () => {};
+    logTripEncounter = () => {};
+    logLine = () => {};
+    state.tagged = { nurse: { name: "", researchId: "NS-1" } };
+    state.unlockedFacts = {};
+    state.pendingTagAlongFact = null;
+    state.encounterDone = null;
+    state.followedThisTrip = false;
+    state.currentPlan = null;
+    let doneArg = null;
+    try {
+      doFollowTagged("nurse", (arg) => { doneArg = arg; });
+      ok("doFollowTagged does not call renderAll", raCalls === 0);
+      ok("doFollowTagged still resolves with tagAlong", !!doneArg && doneArg.tagAlong === "nurse");
+      ok("doFollowTagged still stashes pendingTagAlongFact", !!state.pendingTagAlongFact && state.pendingTagAlongFact.exhausted === false);
+    } finally {
+      renderAll = origRender;
+      state.tagged = origTagged;
+      state.unlockedFacts = origFacts;
+      state.pendingTagAlongFact = origPending;
+      factStore.save = origSave;
+      logTripEncounter = origTrip;
+      logLine = origLog;
+      state.encounterDone = origDone;
+      state.followedThisTrip = origFollowed;
+      state.currentPlan = origPlan;
+    }
+  })();
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

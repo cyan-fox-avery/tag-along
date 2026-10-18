@@ -1326,6 +1326,8 @@ select option:disabled { color: #7a8a9e; }
   background: rgba(79,209,197,0.12); border: 1px solid rgba(79,209,197,0.4);
   color: var(--ink);
 }
+/* v1.8.4-beta: logbook pagination — the "show older trips" button. */
+.logbook-more { display: block; width: 100%; margin-top: 8px; }
 /* v0.20.0: quick-pace toggle in the planner. */
 .pace-toggle {
   display: flex; align-items: center; gap: 10px; margin-top: 10px;
