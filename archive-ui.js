@@ -180,6 +180,7 @@ function renderArchive() {
         <span class="guide-caret" aria-hidden="true">\u25be</span>
       </button>
       <div class="guide-row-body hidden">
+        <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
         <p class="latin detail-scientific">${media.scientific}</p>
         ${yourShark}
         ${media.comingSoon
@@ -188,6 +189,12 @@ function renderArchive() {
       </div>`;
     const head = row.querySelector(".guide-row-head");
     const body = row.querySelector(".guide-row-body");
+    /* v2.0.0-beta: ✕ close button, matching the Research tab's expanded cards. */
+    const closeBtn = body.querySelector(".guide-close");
+    if (closeBtn) closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (typeof collapseGuideRow === "function") collapseGuideRow(row);
+    });
     head.addEventListener("click", () => {
       /* v1.7.22-beta: accordion — opening one entry closes any other open
          entry (shared collapseGuideRow helper from script.js). Only one
@@ -205,11 +212,14 @@ function renderArchive() {
          instead of pushing them down. Rising z-index keeps the most
          recently opened card on top. */
       row.classList.toggle("open", !isHidden);
+      /* v2.0.0-beta: the z-index goes on the dropdown body, NOT the row —
+         the row header must slide under the sticky tab bar instead of
+         painting over it (iPad clip report). */
       if (!isHidden) {
-        try { row.style.zIndex = String(++guideOverlayZ); }
-        catch (e) { row.style.zIndex = "30"; }
+        try { body.style.zIndex = String(++guideOverlayZ); }
+        catch (e) { body.style.zIndex = "30"; }
       } else {
-        row.style.zIndex = "";
+        body.style.zIndex = "";
       }
     });
     list.appendChild(row);

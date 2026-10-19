@@ -434,6 +434,59 @@ const TRACK_ENVELOPES = {
     corridor: "A coastal homebody — small hops between reef patches and kelp beds off Cornwall, sheltering deep by day and foraging shallow at night."
   },};
 
+/* v2.0.0-beta (Mira review): regional track envelopes. When a multi-region
+   species is tagged outside its primary region, the track must stay
+   geographically compatible with the actual tag site (canon: an individual's
+   displayed track must match where THAT individual was tagged) — so each
+   second region gets its own location-coherent envelope instead of reusing
+   the species default. Keys are "speciesId:regionKey". No envelope invents
+   long-distance migration to connect unrelated areas; each is a plausible
+   local scenario in the tag region. */
+TRACK_ENVELOPES["whale:maldives"] = {
+  regionKey: "maldives",
+  start: "South Ari Atoll, Maldives", // the only documented year-round whale shark aggregation on Earth (MWSRP photo-ID program, since 2006)
+  areas: ["South Ari Atoll", "Maamigili", "Dhigurah", "Ari Atoll outer reef", "Rasdhoo Atoll", "Baa Atoll (Hanifaru)", "Mal\u00e9 Atoll south"],
+  tagAnchor: "South Ari Atoll",
+  hop: [20, 150], dayStep: [7, 30], nPoints: [5, 7], kind: "satellite",
+  corridor: "resident juveniles \u2014 South Ari Atoll hosts the only documented year-round whale shark aggregation; the same individuals are re-sighted for years (photo-ID by spot patterns, Maldives Whale Shark Research Programme)"
+};
+TRACK_ENVELOPES["megamouth:philippines"] = {
+  regionKey: "philippines",
+  start: "Cagayan de Oro, Mindanao", // Philippine records are strandings/bycatch (Cagayan de Oro, Aurora/Luzon, Visayas); no tracking data exists
+  areas: ["Cagayan de Oro", "Bohol Sea", "Visayan Sea", "Luzon east coast (Aurora)", "Philippine Sea edge", "Surigao Strait north"],
+  tagAnchor: "Cagayan de Oro",
+  hop: [20, 200], dayStep: [7, 30], nPoints: [4, 6], kind: "satellite",
+  hypothetical: true, // Mira review: no tracking data exists for this route — waypoints are imagined plausible habitat movement, not measured track points
+  corridor: "sparse data \u2014 Philippine megamouth records are strandings and bycatch; no tracking data exists, so this keeps a plausible local scenario for a vertical migrator instead of inventing a migration"
+};
+TRACK_ENVELOPES["blue:cornwall"] = {
+  regionKey: "cornwall",
+  start: "Mount's Bay, Cornwall", // well-documented summer/autumn visitors; UK/Ireland tagging programs
+  areas: ["Mount's Bay", "Celtic Sea", "Scilly Isles waters", "Western Approaches", "Celtic Deep", "Southwest Approaches"],
+  tagAnchor: "Mount's Bay",
+  hop: [100, 800], dayStep: [5, 14], nPoints: [5, 7], kind: "satellite",
+  corridor: "seasonal NE Atlantic visitors \u2014 UK/Ireland tagging programs; Irish-tagged blues recaptured off West Africa (~6,840 km); movements strongly seasonal with water temperature (Atlantic tagging programs, ICCAT)"
+};
+TRACK_ENVELOPES["smooth:north-carolina"] = {
+  regionKey: "north-carolina",
+  start: "Cape Hatteras, North Carolina", // S. zygaena documented along the US east coast
+  areas: ["Cape Hatteras", "Outer Banks shelf", "Cape Lookout", "Chesapeake Bay mouth", "Mid-Atlantic Bight", "Gulf Stream edge"],
+  tagAnchor: "Cape Hatteras",
+  hop: [50, 400], dayStep: [10, 35], nPoints: [4, 6], kind: "satellite",
+  corridor: "temperate coastal-pelagic roamer \u2014 US east coast tagging shows wide-ranging movement following warm water masses and prey schools"
+};
+
+/* v2.0.0-beta (Mira review): pick the track envelope by the ACTUAL tag
+   region, not just the species. Falls back to the species envelope for
+   legacy records (no region saved) and single-region species — so existing
+   saves keep their tracks byte-for-byte. */
+function envelopeFor(speciesId, regionKey) {
+  if (regionKey && TRACK_ENVELOPES[speciesId + ":" + regionKey]) {
+    return TRACK_ENVELOPES[speciesId + ":" + regionKey];
+  }
+  return TRACK_ENVELOPES[speciesId] || TRACK_ENVELOPES.nurse;
+}
+
 /* How each track kind is framed to the player — honesty first. */
 const TRACK_KIND_NOTES = {
   satellite: "Illustrative track — inspired by satellite telemetry. Note: pop-up archival tags transmit stored data after detachment, not live pings. 🛰️",
@@ -460,7 +513,8 @@ function haversineKm(a, b) {
 }
 
 function genTrack(species, rec) {
-  const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
+  /* v2.0.0-beta (Mira review): envelope follows the actual tag region. */
+  const env = envelopeFor(species.id, rec && rec.region);
   const n = env.nPoints[0] + Math.floor(Math.random() * (env.nPoints[1] - env.nPoints[0] + 1));
   /* v0.21.0 Mira final: use species-specific tag anchor for the starting
      position, not the generic regional center. The player's record keeps
@@ -550,6 +604,23 @@ const MAP_COORDS = {
   "California Coast": [34.0, -120.0],
   "Arctic Waters": [72.0, -40.0],
   "Baja California": [28.0, -113.0],
+  "South Ari Atoll": [3.65, 72.92],
+  "Maamigili": [3.48, 72.84],
+  "Dhigurah": [3.53, 72.93],
+  "Ari Atoll outer reef": [3.9, 72.8],
+  "Baa Atoll (Hanifaru)": [5.17, 73.13],
+  "Mal\u00e9 Atoll south": [4.1, 73.55],
+  "Cagayan de Oro": [8.45, 124.6],
+  "Visayan Sea": [11.4, 123.5],
+  "Luzon east coast (Aurora)": [16.0, 122.1],
+  "Philippine Sea edge": [14.0, 124.5],
+  "Surigao Strait north": [10.2, 125.4],
+  "Scilly Isles waters": [49.95, -6.35],
+  "Celtic Deep": [51.2, -6.0],
+  "Southwest Approaches": [49.0, -11.0],
+  "Outer Banks shelf": [35.8, -75.2],
+  "Chesapeake Bay mouth": [36.95, -75.95],
+  "Mid-Atlantic Bight": [37.5, -74.0],
   "Dry Tortugas mating ground": [24.6, -82.9],
   "Marquesas Keys": [24.6, -82.1],
   "Key West reefs": [24.5, -81.8],

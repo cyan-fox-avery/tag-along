@@ -14,7 +14,7 @@ const SHARKS = [
     id: "nurse",
     name: "Nurse Shark", latin: "Ginglymostoma cirratum", status: "Vulnerable",
     code: "NS",
-    combo: { region: "caribbean", bait: ["crustaceans", "urchins"] },
+    combo: { regions: ["caribbean"], bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.0],
@@ -31,7 +31,7 @@ const SHARKS = [
     id: "thresher",
     name: "Thresher Shark", latin: "Alopias vulpinus", status: "Vulnerable",
     code: "TS",
-    combo: { region: "open-atlantic", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["open-atlantic"], bait: ["schooling-fish", "squid"] },
     depths: ["reef", "twilight"],
     methods: { attract: ["chum"] },
     sizeRange: [3.0, 4.6],
@@ -48,11 +48,11 @@ const SHARKS = [
     id: "whale",
     name: "Whale Shark", latin: "Rhincodon typus", status: "Endangered",
     code: "WS",
-    combo: { region: "philippines", bait: "plankton" },
+    combo: { regions: ["philippines", "maldives"], bait: "plankton" },
     depths: ["surface", "reef"],
     methods: { aggregation: ["boat", "plane", "network"] },
     sizeRange: [5.5, 12.0],
-    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season a large aggregation has gathered off the Philippines. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the aggregation. Researchers work the green water by boat, scan from the air with spotter planes that radio the boat onto a shark, and phone round the local network of fishermen and dive boats for sightings. Find the aggregation, and the sharks are already there.",
+    research: "The biggest fish in the ocean roams all tropical and warm-temperate seas, and this season large aggregations have gathered off the Philippines and in the Maldives. Whale sharks don't chase anything — they find seasonal blooms of plankton and swim slowly through them with their enormous mouths wide open. Each shark's spot pattern is unique, like a fingerprint. They cruise right at the surface where the water turns green, sometimes dipping a little deeper over reefs. Nobody chums for a whale shark — you find the aggregation. Researchers work the green water by boat, scan from the air with spotter planes that radio the boat onto a shark, and phone round the local network of fishermen and dive boats for sightings. Find the aggregation, and the sharks are already there.",
     hook: "The largest fish in the ocean, feeding almost entirely on plankton \u2014 some of the smallest organisms in the sea.",
     bonus: "A whale shark's mouth can stretch over a metre wide, and it sucks in water to filter out plankton — no chewing, just sieving.",
     conservation: "Listed as Endangered — ship strikes and fishing nets are the big threats, but satellite tagging in the Philippines, Mexico, and Australia is mapping their corridors, and whale-shark tourism gives coastal towns a reason to protect them.",
@@ -65,7 +65,7 @@ const SHARKS = [
     id: "goblin",
     name: "Goblin Shark", latin: "Mitsukurina owstoni", status: "Least Concern",
     code: "GS",
-    combo: { region: "japan", bait: "squid" },
+    combo: { regions: ["japan"], bait: "squid" },
     depths: ["twilight", "deep"],
     methods: { attract: ["chum"] },
     sizeRange: [2.5, 4.0],
@@ -85,7 +85,7 @@ const SHARKS = [
     /* The garbage can of the sea: bait is forgiving (any meaty bait),
        so the real puzzle is WHERE. Honesty first — some sharks are
        easier than others. */
-    combo: { region: "maldives", bait: ["schooling-fish", "squid", "crustaceans", "tuna"] },
+    combo: { regions: ["maldives"], bait: ["schooling-fish", "squid", "crustaceans", "tuna"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [3.0, 5.5],
@@ -102,7 +102,7 @@ const SHARKS = [
     id: "sandtiger",
     name: "Sand Tiger Shark", latin: "Carcharias taurus", status: "Critically Endangered",
     code: "ST",
-    combo: { region: "north-carolina", bait: ["squid", "schooling-fish", "ray"] },
+    combo: { regions: ["north-carolina"], bait: ["squid", "schooling-fish", "ray"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.2],
@@ -119,7 +119,7 @@ const SHARKS = [
     id: "galapagos",
     name: "Galápagos Shark", latin: "Carcharhinus galapagensis", status: "Least Concern",
     code: "GA",
-    combo: { region: "galapagos", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["galapagos"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.4, 3.7],
@@ -136,7 +136,7 @@ const SHARKS = [
     id: "greatwhite",
     name: "Great White Shark", latin: "Carcharodon carcharias", status: "Vulnerable",
     code: "GW",
-    combo: { region: "south-africa", bait: ["tuna", "schooling-fish"] },
+    combo: { regions: ["south-africa"], bait: ["tuna", "schooling-fish"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [3.5, 6.0],
@@ -153,7 +153,7 @@ const SHARKS = [
     id: "hammerhead",
     name: "Great Hammerhead", latin: "Sphyrna mokarran", status: "Critically Endangered",
     code: "HH",
-    combo: { region: "caribbean", bait: ["ray", "schooling-fish"] },
+    combo: { regions: ["caribbean"], bait: ["ray", "schooling-fish"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.5, 5.0],
@@ -170,7 +170,7 @@ const SHARKS = [
     id: "mako",
     name: "Shortfin Mako", latin: "Isurus oxyrinchus", status: "Endangered",
     code: "MK",
-    combo: { region: "open-atlantic", bait: ["tuna", "squid"] },
+    combo: { regions: ["open-atlantic"], bait: ["tuna", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.8],
@@ -187,7 +187,7 @@ const SHARKS = [
     id: "basking",
     name: "Basking Shark", latin: "Cetorhinus maximus", status: "Endangered",
     code: "BS",
-    combo: { region: "cornwall", bait: "plankton" },
+    combo: { regions: ["cornwall"], bait: "plankton" },
     depths: ["surface", "reef"],
     methods: { aggregation: ["boat", "network"] },
     sizeRange: [6.0, 9.0],
@@ -204,7 +204,7 @@ const SHARKS = [
     id: "epaulette",
     name: "Epaulette Shark", latin: "Hemiscyllium ocellatum", status: "Least Concern",
     code: "EP",
-    combo: { region: "papua-new-guinea", bait: ["crustaceans", "urchins"] },
+    combo: { regions: ["papua-new-guinea"], bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
     /* The honest neutral: a tiny reef worm-hunter. Scent plumes aren't
        how you'd target it, so no method boosts it — no penalty. */
@@ -226,7 +226,7 @@ const SHARKS = [
     /* The yellow nursery shark: Bimini's famous returners. Night feeder
        that hunts by electroreception — sardines (folded into
        schooling-fish) fished at night are the honest bait. */
-    combo: { region: "caribbean", bait: ["schooling-fish"] },
+    combo: { regions: ["caribbean"], bait: ["schooling-fish"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.4, 3.4],
@@ -245,7 +245,7 @@ const SHARKS = [
     code: "BR",
     /* The knee-deep shark: reef flats so shallow the dorsal breaks
        water. Timid — frightened off by swimmers, but bait excites it. */
-    combo: { region: "maldives", bait: ["schooling-fish", "crustaceans"] },
+    combo: { regions: ["maldives"], bait: ["schooling-fish", "crustaceans"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.2, 2.0],
@@ -265,7 +265,7 @@ const SHARKS = [
     /* The cave-napper: one of the few requiem sharks that can breathe while
        lying still, so by day it piles in reef caves. Hunts crevices
        by night — octopus and reef-fish scraps are the honest baits. */
-    combo: { region: "philippines", bait: ["squid", "schooling-fish"] },
+    combo: { regions: ["philippines"], bait: ["squid", "schooling-fish"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 1.6],
@@ -284,7 +284,7 @@ const SHARKS = [
     code: "BL",
     /* The indigo wanderer: countershaded, long-finned, and migratory on
        an oceanic scale. Oily schooling fish or squid under a chum slick. */
-    combo: { region: "open-atlantic", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["open-atlantic", "cornwall"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef", "twilight"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.8],
@@ -303,7 +303,7 @@ const SHARKS = [
     code: "PO",
     /* The cold-water athlete: a warm-bodied lamnid off Cornwall, ID'd by
        the white patch on the first dorsal's trailing edge. Oily fish + chum. */
-    combo: { region: "cornwall", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["cornwall"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef", "twilight"],
     methods: { attract: ["chum"] },
     sizeRange: [1.5, 3.0],
@@ -322,7 +322,7 @@ const SHARKS = [
     code: "SI",
     /* Named for its skin: denticles so fine it feels like silk. Shadows
        tuna schools in the tropical open Atlantic. Fish where the tuna are. */
-    combo: { region: "open-atlantic", bait: ["tuna", "schooling-fish", "squid"] },
+    combo: { regions: ["open-atlantic"], bait: ["tuna", "schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.3],
@@ -341,7 +341,7 @@ const SHARKS = [
     code: "OW",
     /* The open-ocean sentinel: paddle-like white-tipped fins, bold and
        curious far offshore. Critically Endangered \u2014 this tag matters. */
-    combo: { region: "open-atlantic", bait: ["tuna", "squid", "schooling-fish"] },
+    combo: { regions: ["open-atlantic"], bait: ["tuna", "squid", "schooling-fish"] },
     depths: ["surface", "reef", "twilight"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.5],
@@ -361,7 +361,7 @@ const SHARKS = [
     /* A shark out of deep time: seven gills, one far-back dorsal, Jurassic
        lineage. South African kelp forests and bays. Fish-oil chum is honest
        here \u2014 Cape fur seals are documented prey. */
-    combo: { region: "south-africa", bait: ["tuna", "schooling-fish", "squid"] },
+    combo: { regions: ["south-africa"], bait: ["tuna", "schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.2, 3.0],
@@ -380,7 +380,7 @@ const SHARKS = [
     code: "BW",
     /* The bronze star of the Sardine Run \u2014 same species as the copper
        shark, different regional name. Sardines + chum off South Africa. */
-    combo: { region: "south-africa", bait: ["schooling-fish", "squid", "tuna"] },
+    combo: { regions: ["south-africa"], bait: ["schooling-fish", "squid", "tuna"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.3],
@@ -400,7 +400,7 @@ const SHARKS = [
     /* A living fossil from the deep: eel-like, six frilly gill slits, 300
        trident teeth. Sagami Bay is one of the only places they come up
        shallow enough to meet. Squid + chum, fished deep. */
-    combo: { region: "japan", bait: ["squid"] },
+    combo: { regions: ["japan"], bait: ["squid"] },
     depths: ["twilight", "deep"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 2.0],
@@ -419,7 +419,7 @@ const SHARKS = [
     code: "ZE",
     /* Two sharks for the price of one: pups wear zebra stripes, adults
        wear leopard spots. A docile bottom-feeder of Philippine reefs. */
-    combo: { region: "philippines", bait: ["crustaceans", "urchins"] },
+    combo: { regions: ["philippines"], bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.5, 2.5],
@@ -438,7 +438,7 @@ const SHARKS = [
     id: "scalloped",
     name: "Scalloped Hammerhead", latin: "Sphyrna lewini", status: "Critically Endangered",
     code: "SH",
-    combo: { region: "galapagos", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["galapagos"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.5, 4.2],
@@ -455,7 +455,7 @@ const SHARKS = [
     id: "smooth",
     name: "Smooth Hammerhead", latin: "Sphyrna zygaena", status: "Vulnerable",
     code: "SM",
-    combo: { region: "cornwall", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["cornwall", "north-carolina"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.5, 4.0],
@@ -472,7 +472,7 @@ const SHARKS = [
     id: "bonnethead",
     name: "Bonnethead", latin: "Sphyrna tiburo", status: "Endangered",
     code: "BH",
-    combo: { region: "caribbean", bait: ["crustaceans", "urchins"] },
+    combo: { regions: ["caribbean"], bait: ["crustaceans", "urchins"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [0.8, 1.5],
@@ -489,7 +489,7 @@ const SHARKS = [
     id: "bull",
     name: "Bull Shark", latin: "Carcharhinus leucas", status: "Vulnerable",
     code: "BU",
-    combo: { region: "caribbean", bait: ["tuna", "schooling-fish"] },
+    combo: { regions: ["caribbean"], bait: ["tuna", "schooling-fish"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.2, 3.4],
@@ -506,7 +506,7 @@ const SHARKS = [
     id: "greyreef",
     name: "Grey Reef Shark", latin: "Carcharhinus amblyrhynchos", status: "Endangered",
     code: "GR",
-    combo: { region: "papua-new-guinea", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["papua-new-guinea"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.4, 2.4],
@@ -523,7 +523,7 @@ const SHARKS = [
     id: "caribbean",
     name: "Caribbean Reef Shark", latin: "Carcharhinus perezii", status: "Endangered",
     code: "CR",
-    combo: { region: "caribbean", bait: ["schooling-fish", "tuna"] },
+    combo: { regions: ["caribbean"], bait: ["schooling-fish", "tuna"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.0],
@@ -540,7 +540,7 @@ const SHARKS = [
     id: "sandbar",
     name: "Sandbar Shark", latin: "Carcharhinus plumbeus", status: "Endangered",
     code: "SB",
-    combo: { region: "north-carolina", bait: ["schooling-fish", "squid", "crustaceans"] },
+    combo: { regions: ["north-carolina"], bait: ["schooling-fish", "squid", "crustaceans"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.8, 2.5],
@@ -560,7 +560,7 @@ const SHARKS = [
     /* The Pacific's porbeagle cousin, named for what it eats. Partial
        endotherm — warm stomach, eyes and brain — so it hunts salmon in
        near-freezing water. Males west, females east. */
-    combo: { region: "japan", bait: ["tuna", "squid"] },
+    combo: { regions: ["japan"], bait: ["tuna", "squid"] },
     depths: ["surface"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.05],
@@ -580,7 +580,7 @@ const SHARKS = [
     /* The slowest-reproducing shark in the game: females mature around 20,
        gestate nearly two years, rest a year, breed every third year.
        The catalogue's best story about why sharks are vulnerable. */
-    combo: { region: "south-africa", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["south-africa"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.5, 4.0],
@@ -598,7 +598,7 @@ const SHARKS = [
     name: "Silvertip Shark", latin: "Carcharhinus albimarginatus", status: "Vulnerable",
     code: "SV",
     /* v0.21.0 sharknado wave. Reproductive cycle: gestation ~12 months; whether females pup annually or biennially is not firmly established in the li */
-    combo: { region: "maldives", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["maldives"], bait: ["schooling-fish", "squid"] },
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.6, 2.8],
@@ -616,7 +616,7 @@ const SHARKS = [
     name: "Spinner Shark", latin: "Carcharhinus brevipinna", status: "Vulnerable",
     code: "SP",
     /* v0.21.0 sharknado wave. Breeding interval generally cited as biennial; litter size 3-20. Spinner x blacktip hybridization is documented in Flori */
-    combo: { region: "caribbean", bait: ["schooling-fish"] },
+    combo: { regions: ["caribbean"], bait: ["schooling-fish"] },
     depths: ["surface"],
     methods: { attract: ["chum"] },
     sizeRange: [1.7, 2.8],
@@ -634,7 +634,7 @@ const SHARKS = [
     name: "Spotted Wobbegong", latin: "Orectolobus maculatus", status: "Least Concern",
     code: "WG",
     /* v0.21.0 sharknado wave. Litter size up to 37 pups is the recorded maximum; typical litters ~20+. Species is Orectolobus maculatus (spotted wobbe */
-    combo: { region: "east-australia", bait: ["crustaceans", "schooling-fish"] },
+    combo: { regions: ["east-australia"], bait: ["crustaceans", "schooling-fish"] },
     depths: ["reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.2, 3.2],
@@ -652,7 +652,7 @@ const SHARKS = [
     name: "Leopard Shark", latin: "Triakis semifasciata", status: "Least Concern",
     code: "LE",
     /* v0.21.0 sharknado wave. Range Oregon to Baja; in-game region is California. Gestation 10-12 months, litters 4-30, female maturity ~10 years, lif */
-    combo: { region: "california", bait: ["crustaceans", "schooling-fish"] },
+    combo: { regions: ["california"], bait: ["crustaceans", "schooling-fish"] },
     depths: ["reef", "surface"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 2.1],
@@ -670,7 +670,7 @@ const SHARKS = [
     name: "Horn Shark", latin: "Heterodontus francisci", status: "Least Concern",
     code: "HO",
     /* v0.21.0 sharknado wave. Dorsal spines described as mildly venomous in the literature (venomous spines, not dangerous to humans). Homing/displace */
-    combo: { region: "california", bait: ["urchins", "crustaceans"] },
+    combo: { regions: ["california"], bait: ["urchins", "crustaceans"] },
     depths: ["reef"],
     methods: { attract: ["chum"] },
     sizeRange: [0.5, 1.2],
@@ -688,7 +688,7 @@ const SHARKS = [
     name: "Port Jackson Shark", latin: "Heterodontus portusjacksoni", status: "Least Concern",
     code: "PJ",
     /* v0.21.0 sharknado wave. Migration: seasonal southward movement along the east Australian coast for summer egg-laying with return north is docume */
-    combo: { region: "east-australia", bait: ["urchins", "crustaceans"] },
+    combo: { regions: ["east-australia"], bait: ["urchins", "crustaceans"] },
     depths: ["reef"],
     methods: { attract: ["chum"] },
     sizeRange: [0.5, 1.65],
@@ -706,7 +706,7 @@ const SHARKS = [
     name: "Common Angelshark", latin: "Squatina squatina", status: "Critically Endangered",
     code: "AN",
     /* v0.21.0 sharknado wave. Status confirmed: Critically Endangered (IUCN). Diet/strike facts solid; Angel Shark Project (Wales/Cornwall) is the rea */
-    combo: { region: "cornwall", bait: ["crustaceans"] },
+    combo: { regions: ["cornwall"], bait: ["crustaceans"] },
     depths: ["reef"],
     methods: { attract: ["chum"] },
     sizeRange: [1.2, 2.4],
@@ -724,7 +724,7 @@ const SHARKS = [
     name: "Megamouth Shark", latin: "Megachasma pelagios", status: "Least Concern",
     code: "MM",
     /* v0.21.0 sharknado wave. Sightings count (~300) is approximate and grows; status Least Concern per IUCN (data-poor deep-water rationale). Silvery */
-    combo: { region: "japan", bait: ["plankton"] },
+    combo: { regions: ["japan", "philippines"], bait: ["plankton"] },
     depths: ["twilight"],
     methods: { aggregation: ["boat", "network"] },
     sizeRange: [3.6, 5.6],
@@ -742,7 +742,7 @@ const SHARKS = [
     name: "Common Sawshark", latin: "Pristiophorus cirratus", status: "Least Concern",
     code: "SA",
     /* v0.21.0 sharknado wave. Sawfish distinction (gill placement) is solid. Status Least Concern confirmed. Litter size ~10 and southern/eastern Aust */
-    combo: { region: "east-australia", bait: ["squid", "crustaceans"] },
+    combo: { regions: ["east-australia"], bait: ["squid", "crustaceans"] },
     depths: ["reef", "twilight"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 1.4],
@@ -760,7 +760,7 @@ const SHARKS = [
     name: "Greenland Shark", latin: "Somniosus microcephalus", status: "Vulnerable",
     code: "GL",
     /* v0.21.0 sharknado wave. IUCN: Vulnerable (2018/2019 assessment); some sources and regional lists say Near Threatened — flagged per task. Nielsen */
-    combo: { region: "arctic", bait: ["schooling-fish", "squid"] },
+    combo: { regions: ["arctic"], bait: ["schooling-fish", "squid"] },
     depths: ["deep"],
     methods: { attract: ["chum"] },
     sizeRange: [2.4, 6.4],
@@ -778,7 +778,7 @@ const SHARKS = [
     name: "Cookiecutter Shark", latin: "Isistius brasiliensis", status: "Least Concern",
     code: "CC",
     /* v0.21.0 sharknado wave. Navy submarine anecdote is real (documented by US Navy; neoprene dome damage). Counterillumination + dark-collar lure hy */
-    combo: { region: "open-atlantic", bait: ["squid"] },
+    combo: { regions: ["open-atlantic"], bait: ["squid"] },
     depths: ["twilight", "deep"],
     methods: { attract: ["chum"] },
     sizeRange: [0.3, 0.6],
@@ -796,7 +796,7 @@ const SHARKS = [
     name: "Bluntnose Sixgill Shark", latin: "Hexanchus griseus", status: "Near Threatened",
     code: "SX",
     /* v0.21.0 sharknado wave. Status Near Threatened confirmed (IUCN). Eye fluorescence is real (reported in sixgills); presented as an open question, */
-    combo: { region: "open-atlantic", bait: ["squid", "schooling-fish"] },
+    combo: { regions: ["open-atlantic"], bait: ["squid", "schooling-fish"] },
     depths: ["deep"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 4.8],
@@ -814,7 +814,7 @@ const SHARKS = [
     name: "Velvet-Belly Lanternshark", latin: "Etmopterus spinax", status: "Vulnerable",
     code: "VB",
     /* v0.21.0 sharknado wave. IUCN Least Concern per assessment; bycatch levels and population trend fine to state as non-targeted. Photophore functio */
-    combo: { region: "cornwall", bait: ["squid"] },
+    combo: { regions: ["cornwall"], bait: ["squid"] },
     depths: ["twilight", "deep"],
     methods: { attract: ["chum"] },
     sizeRange: [0.3, 0.6],
@@ -832,7 +832,7 @@ const SHARKS = [
     name: "Dwarf Lanternshark", latin: "Etmopterus perryi", status: "Least Concern",
     code: "DL",
     /* v0.21.0 sharknado wave. Diet ('small deep-sea invertebrates') and reproduction (presumed ovoviviparous, litter size unknown) are inferred from c */
-    combo: { region: "caribbean", bait: ["crustaceans"] },
+    combo: { regions: ["caribbean"], bait: ["crustaceans"] },
     depths: ["deep"],
     methods: { attract: ["chum"] },
     sizeRange: [0.15, 0.21],
@@ -850,7 +850,7 @@ const SHARKS = [
     name: "Kitefin Shark", latin: "Dalatias licha", status: "Vulnerable",
     code: "KF",
     /* v0.21.0 sharknado wave. IUCN Vulnerable globally (targeted squalene fisheries) is factual. Litter size 10-16 and pup size ~30cm at birth are pub */
-    combo: { region: "open-atlantic", bait: ["squid", "schooling-fish"] },
+    combo: { regions: ["open-atlantic"], bait: ["squid", "schooling-fish"] },
     depths: ["deep"],
     methods: { attract: ["chum"] },
     sizeRange: [1.0, 1.6],
@@ -868,7 +868,7 @@ const SHARKS = [
     name: "Pacific Sleeper Shark", latin: "Somniosus pacificus", status: "Near Threatened",
     code: "PS",
     /* v0.21.0 sharknado wave. IUCN Least Concern is per the global assessment but the species is data-poor — FLAG for Mira: status may need re-checkin */
-    combo: { region: "japan", bait: ["squid", "schooling-fish"] },
+    combo: { regions: ["japan"], bait: ["squid", "schooling-fish"] },
     depths: ["deep"],
     methods: { attract: ["chum"] },
     sizeRange: [3.0, 4.4],
@@ -886,7 +886,7 @@ const SHARKS = [
     name: "Spiny Dogfish", latin: "Squalus acanthias", status: "Vulnerable",
     code: "SD",
     /* v0.21.0 sharknado wave. IUCN Vulnerable globally per 2020 assessment is factual; NE Atlantic stock collapse and rebuilding under EU protection f */
-    combo: { region: "cornwall", bait: ["schooling-fish"] },
+    combo: { regions: ["cornwall"], bait: ["schooling-fish"] },
     depths: ["reef", "surface"],
     methods: { attract: ["chum"] },
     sizeRange: [0.6, 1.1],
@@ -904,7 +904,7 @@ const SHARKS = [
     name: "Small-Spotted Catshark", latin: "Scyliorhinus canicula", status: "Least Concern",
     code: "CS",
     /* v0.21.0 sharknado wave. IUCN Least Concern, abundant around British Isles — factual. Egg development 5-11 months and tendril anchoring factual.  */
-    combo: { region: "cornwall", bait: ["crustaceans"] },
+    combo: { regions: ["cornwall"], bait: ["crustaceans"] },
     depths: ["reef"],
     methods: { attract: ["chum"] },
     sizeRange: [0.6, 1.0],

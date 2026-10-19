@@ -1237,7 +1237,12 @@ select option:disabled { color: #7a8a9e; }
    positioning with explicit width/max-width below is sufficient to prevent
    column widening (absolute elements don't participate in grid sizing). */
 .guide-row { position: relative; min-width: 0; }
-.guide-row.open { overflow: visible; z-index: 20; }
+/* v2.0.0-beta: NO z-index on the open row itself — the row header must
+   slide UNDER the sticky tab bar like normal content (iPad clip report:
+   the elevated row painted the shark's name over the tabs). The floating
+   detail card (.guide-row-body) keeps its own z-index, now also fed by
+   the rising guideOverlayZ, so it still overlays neighboring rows. */
+.guide-row.open { overflow: visible; }
 /* v1.5.12: expanded cards show the full description — no internal scrolling,
    the card grows to fit its content. Top corners rounded to match the bottom. */
 .guide-row.open .guide-row-body {

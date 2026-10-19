@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.7-beta";
+const VERSION = "v2.0.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,13 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.0.0-beta": [
+"🎨 <strong>Four sharks redrawn.</strong> The basking shark finally looks like a basking shark — blunt rounded snout, huge open mouth, long gill slits — traced from a real photo. The great hammerhead has its right eye back, the common angelshark is in side profile facing left like the rest, and the megamouth's head is properly proportioned.",
+"🗺 <strong>Sharks roam wider waters.</strong> A shark can now be found in more than one region, wherever its real range takes it — the whale shark visits the Maldives as well as the Philippines, the megamouth also turns up in the Philippines, blue sharks cruise past Cornwall, and smooth hammerheads work the US east coast off North Carolina.",
+"🔧 <strong>Expanded cards stay below the tabs.</strong> Opening a Research or Archive entry no longer slides the shark’s name up over the tab bar — the header tucks under the tabs like normal content while the detail card floats above its neighbors.",
+"✕ <strong>Archive cards get a close button.</strong> Expanded Archive entries now have the same ✕ close button as Research cards — no more hunting for a way to dismiss them.",
+"🧭 <strong>Tracks stay true to the tag site.</strong> A shark tagged outside its home region now swims a route from where you actually tagged it — a Maldives-tagged whale shark gets a Maldivian route, not the Philippines one.",
+  ],
   "v1.8.7-beta": [
 "📍 <strong>The tracking graph shows travel only.</strong> Logging a re-sighting used to add a point to the shark's track — repeated re-sightings in the same area flattened the graph like the shark had stopped travelling. Re-sightings stay in the logbook and the Collection re-sightings list, where they belong; the track is the shark's travel. Existing tracks are cleaned up automatically.",
   ],
@@ -449,15 +456,15 @@ const WHATS_NEW = {
     "\uD83E\uDD88 <strong>Sarah's Big Day.</strong> Tag multiple new species in one expedition and Sarah celebrates the extraordinary day with one authored conversation — no more three near-identical texts. 8 variants each for 2, 3, and 4 new species, plus lemon-aware reactions when her favourite is in the mix.",
   ],
   "v1.4.18-beta": [
-    "\uD83C\uDF0A <strong>Waves stacked tight, moving in ovals.</strong> The three porthole wave layers now sit almost on top of each other with no gaps, and each traces a gentle elliptical orbit like real water \u2014 far slowest, near liveliest.",
-    "\uD83D\uDCA6 <strong>Bigger, faster splash.</strong> The on-glass splash is bigger (320px), pops in suddenly, and slides down fast \u2014 the quickest thing in the calm wave scene.",
+    "\uD83C\uDF0A <strong>Waves stacked tight, moving in ovals.</strong> The three porthole wave layers now sit almost on top of each other with no gaps, and each traces a gentle elliptical orbit like real water — far slowest, near liveliest.",
+    "\uD83D\uDCA6 <strong>Bigger, faster splash.</strong> The on-glass splash is bigger (320px), pops in suddenly, and slides down fast — the quickest thing in the calm wave scene.",
   ],
   "v1.4.17-beta": [
     "\u2600\uFE0F <strong>Sun rays fixed properly.</strong> The v1.4.16 conic-gradient fan broke the page layout, so rays are back on the safe span-based system — brighter, wider fan (12-72\u00B0), clearly visible sway and breathing, and they never fully vanish.",
     "\ud83d\udd27 <strong>Emergency layout rollback.</strong> The experimental ray rendering that broke the title and tab bar on iPad has been removed."
   ],
   "v1.4.16-beta": [
-    "\u2600\uFE0F <strong>Sun rays rebuilt.</strong> The light fan is now a true conic-gradient radiating from the sun point \u2014 it spans the whole screen by construction, with a slow visible sway and breathing pulse. No more frozen bar on the left.",
+    "\u2600\uFE0F <strong>Sun rays rebuilt.</strong> The light fan is now a true conic-gradient radiating from the sun point — it spans the whole screen by construction, with a slow visible sway and breathing pulse. No more frozen bar on the left.",
     "\ud83d\udcd0 <strong>Field-guide overlay containment.</strong> Expanded entries are hard-contained so opening one can never widen its grid column.",
     "🌊 <strong>Porthole fills the view.</strong> The far wave sits lower, the near wave is bigger — swells overlap and fill the whole porthole. Bubble columns fire in overlapping pairs with tighter trails, and splashes are quick and snappy."
   ],
@@ -1474,7 +1481,8 @@ function migrateTracks() {
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
       t.track.v = 2;
       const species = sharkById(sid);
-      const env = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id]) || null;
+      /* v2.0.0-beta (Mira review): region-aware anchor for reconstructed points. */
+      const env = (typeof envelopeFor !== "undefined" && envelopeFor(species.id, t.region)) || null;
       resightPoints.forEach((rp) => {
         const anchorLabel = (env && env.tagAnchor) || rp.label;
         const last = t.track.points[t.track.points.length - 1];
@@ -1515,6 +1523,24 @@ function migrateTravelTracks() {
     t.track.totalKm = Math.round(kept.reduce((a, p) => a + (p.km || 0), 0) * 10) / 10;
     t.track.days = kept.length ? kept[kept.length - 1].day : 0;
     changed = true;
+  });
+  if (changed) store.save(state.tagged);
+}
+
+/* v2.0.0-beta (Mira review): backfill the tag region key on pre-v2.0.0
+   records from their saved location name. Tracks are NOT regenerated —
+   existing tracks were built with the species envelope, which is exactly
+   what envelopeFor() still selects for these single-region saves, so this
+   preserves them byte-for-byte while making old records region-aware for
+   any future regeneration. */
+function migrateTagRegions() {
+  const nameToKey = {};
+  Object.keys(REGIONS).forEach(k => { nameToKey[REGIONS[k].name] = k; });
+  let changed = false;
+  Object.values(state.tagged).forEach(t => {
+    if (!t || t.region || !t.location) return;
+    const key = nameToKey[t.location];
+    if (key) { t.region = key; changed = true; }
   });
   if (changed) store.save(state.tagged);
 }
@@ -1617,6 +1643,19 @@ const guideFilters = {
 function baitList(s) {
   return Array.isArray(s.combo.bait) ? s.combo.bait : [s.combo.bait];
 }
+/* v2.0.0-beta: species can now be found in more than one region.
+   combo.regions (array) is the canonical form; combo.region (single
+   string) is the legacy form. regionList() normalizes both, mirroring
+   the baitList() pattern from v0.20.0. */
+function regionList(s) {
+  if (!s || !s.combo) return [];
+  if (Array.isArray(s.combo.regions)) return s.combo.regions;
+  if (s.combo.region) return [s.combo.region];
+  return [];
+}
+function regionNames(s) {
+  return regionList(s).map(r => (REGIONS[r] || {}).name || r);
+}
 /* v1.7.32-beta: the Research method filter works at the top-level
    method (attract / aggregation) — the same two options the Expedition
    Method dropdown offers. Sub-opts (chum / boat / plane / network)
@@ -1628,7 +1667,7 @@ function guideMatches(s) {
     const q = f.q.toLowerCase();
     if (!s.name.toLowerCase().includes(q) && !s.latin.toLowerCase().includes(q)) return false;
   }
-  if (f.region.size && !f.region.has(s.combo.region)) return false;
+  if (f.region.size && !regionList(s).some(r => f.region.has(r))) return false;
   if (f.depth.size && !(s.depths || []).some(d => f.depth.has(d))) return false;
   if (f.method.size && !Object.keys(s.methods || {}).some(m => f.method.has(m))) return false;
   if (f.bait.size && !baitList(s).some(b => f.bait.has(b))) return false;
@@ -1748,9 +1787,9 @@ function highlightClues(s) {
   // Take the first two sentences for the preview
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
   text = sentences.slice(0, 2).join(" ").trim();
-  // Bold the region name
-  const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : null;
-  if (regionName) {
+  // Bold each region name
+  for (const regionName of regionNames(s)) {
+    if (!regionName) continue;
     const re = new RegExp(`(${regionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
     text = text.replace(re, "<strong>$1</strong>");
   }
@@ -1788,7 +1827,7 @@ function renderPinnedCard(list) {
         <div>
           <span class="tag-check${done ? " is-done" : ""}" aria-hidden="true"></span><span class="sr-only">${done ? "Tagged" : "Not tagged"}</span><strong>${s.name}</strong><br>
           <span class="latin">${s.latin}</span><br>
-          <span class="latin">${REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
+          <span class="latin">${regionNames(s).join(", ")} · ${s.depths.map(d => (DEPTHS[d] || {}).name || d).join(", ")}</span>
         </div>
       </div>
       <p class="pinned-research">${researchPreview}</p>`;
@@ -1822,7 +1861,7 @@ function pinHintForTrip(trip, pinnedId) {
   if (!s || state.tagged[pinnedId]) return null;
   // Did this trip's conditions make the pinned shark's appearance possible?
   const baitOk = Array.isArray(s.combo.bait) ? s.combo.bait.includes(trip.bait) : s.combo.bait === trip.bait;
-  const possible = s.combo.region === trip.region &&
+  const possible = regionList(s).includes(trip.region) &&
     (s.depths || []).includes(trip.depth) && baitOk;
   // Did the player encounter (or tag) the pinned shark this trip?
   const encountered = (trip.encounters || []).some(e => e.speciesId === pinnedId);
@@ -1833,7 +1872,7 @@ function pinHintForTrip(trip, pinnedId) {
   if (!possible && !encountered) {
     // Which dimension was off? Observational only.
     const off = [];
-    if (s.combo.region !== trip.region) off.push("region");
+    if (!regionList(s).includes(trip.region)) off.push("region");
     if (!(s.depths || []).includes(trip.depth)) off.push("depth");
     if (!baitOk) off.push("bait");
     if (off.length === 1) {
@@ -1871,7 +1910,7 @@ function renderExpeditionPin() {
   const s = SHARKS.find(x => x.id === state.pinned);
   if (!s) { el.classList.add("hidden"); el.innerHTML = ""; return; }
   el.classList.remove("hidden");
-  const regionName = REGIONS[s.combo.region] ? REGIONS[s.combo.region].name : s.combo.region;
+  const regionName = regionNames(s).join(", ");
   /* v0.20.0: Mira review fix — filter feeders (whale, basking) store bait as a
      string, not an array. baitList() normalizes both. */
   /* v1.4.15-beta: show diet as a natural sentence, not the bait answer. */
@@ -1884,6 +1923,13 @@ function renderExpeditionPin() {
 /* v1.4.0-beta: rising z-index so a later-opened overlay always floats
    above earlier ones, regardless of DOM order. */
 let guideOverlayZ = 30;
+/* v2.0.0-beta: the rising z-index lives on the dropdown body, not the row.
+   The open row's header must slide UNDER the sticky tab bar like normal
+   content; only the floating detail card floats above its neighbors. */
+function zOfBody(row) {
+  const b = row && row.querySelector(".guide-row-body");
+  return (b && parseInt(b.style.zIndex || "0", 10)) || 0;
+}
 /* v1.5.4-beta: shared collapse for guide rows — used by the close button,
    Escape key, and outside-click dismissal. Returns focus to the row header.
    v1.6.0-beta: restoreFocus flag — the accordion passes false so closing
@@ -1898,7 +1944,7 @@ function collapseGuideRow(row, restoreFocus = true) {
     if (restoreFocus) head.focus();
   }
   row.classList.remove("open");
-  row.style.zIndex = "";
+  if (body) body.style.zIndex = "";
 }
 /* v1.5.4-beta: Escape closes the topmost open guide popup. On small screens a
    tap outside the open popup also dismisses it — the fixed modal can cover
@@ -1907,7 +1953,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   const openRows = [...document.querySelectorAll(".guide-row.open")];
   if (!openRows.length) return;
-  openRows.sort((a, b) => (parseInt(b.style.zIndex || "0", 10) || 0) - (parseInt(a.style.zIndex || "0", 10) || 0));
+  openRows.sort((a, b) => zOfBody(b) - zOfBody(a));
   collapseGuideRow(openRows[0]);
 });
 document.addEventListener("click", (e) => {
@@ -1952,7 +1998,7 @@ function renderResearch() {
   }
   ordered.forEach(s => {
     const done = !!state.tagged[s.id];
-    const regionLocked = REGIONS[s.combo.region] && REGIONS[s.combo.region].locked;
+    const regionLocked = regionList(s).length > 0 && regionList(s).every(r => REGIONS[r] && REGIONS[r].locked);
     const isPinned = state.pinned === s.id;
     const row = document.createElement("div");
     row.className = "guide-row";
@@ -1996,15 +2042,19 @@ function renderResearch() {
       head.setAttribute("aria-expanded", String(!isHidden));
       row.classList.toggle("open", !isHidden);
       /* v1.4.0-beta: overlay floats above neighbors; rising z-index keeps
-         the most recently opened entry on top. */
+         the most recently opened entry on top.
+         v2.0.0-beta: the z-index goes on the dropdown body, NOT the row —
+         the row header must slide under the sticky tab bar instead of
+         painting over it (iPad clip report). */
+      const _body = row.querySelector(".guide-row-body");
       if (!isHidden) {
         /* v1.6.0-beta: accordion — opening one entry closes the others. */
         document.querySelectorAll(".guide-row.open").forEach(other => {
           if (other !== row && other.closest("#researchList")) collapseGuideRow(other, false);
         });
-        row.style.zIndex = String(++guideOverlayZ);
+        if (_body) _body.style.zIndex = String(++guideOverlayZ);
       }
-      else row.style.zIndex = "";
+      else if (_body) _body.style.zIndex = "";
     });
     const pinBtn = row.querySelector("[data-pin]");
     if (pinBtn) pinBtn.addEventListener("click", (e) => {
@@ -2283,7 +2333,7 @@ function resolveEncounters(plan) {
     const baitOk = Array.isArray(s.combo.bait)
       ? s.combo.bait.includes(plan.bait)
       : s.combo.bait === plan.bait;
-    return s.combo.region === plan.region &&
+    return regionList(s).includes(plan.region) &&
       s.depths.includes(plan.depth) &&
       baitOk;
   });
@@ -3496,7 +3546,7 @@ function renderMessages() {
 function regionalSpecies(onlyUntagged) {
   const pool = onlyUntagged ? untagged() : SHARKS;
   if (state.lastRegion) {
-    const local = pool.filter(s => s.combo.region === state.lastRegion);
+    const local = pool.filter(s => regionList(s).includes(state.lastRegion));
     if (local.length) return local;
   }
   return pool.length ? pool : SHARKS;
@@ -3896,9 +3946,13 @@ function confirmTag(name) {
     length: s._gen.length,
     sex: s._gen.sex,
     location: regionName,
+    /* v2.0.0-beta (Mira review): persist the tag region KEY so the track
+       envelope stays geographically coherent with where THIS shark was
+       tagged, even for multi-region species. */
+    region: state.currentPlan.region,
     date: dateStr,
     taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
-    track: genTrack(s, { location: regionName, date: dateStr })
+    track: genTrack(s, { location: regionName, region: state.currentPlan.region, date: dateStr })
   };
   /* v1.4.19-beta: Big Day — determine new-species BEFORE recording the tag. */
   const wasNewSpecies = !state.tagged[s.id];
@@ -5607,6 +5661,7 @@ const preMigrationHadSave = (() => {
 migrateIds();
 migrateTracks();
 migrateTravelTracks();
+migrateTagRegions();
 migrateWinV07();
 /* v1.7.16-beta: derpy retroactive unlock runs after the win migration.
    migrateWinV07() resets state.won for partial-roster saves, and
