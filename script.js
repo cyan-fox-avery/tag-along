@@ -1890,7 +1890,7 @@ function renderExpeditionPin() {
   const s = SHARKS.find(x => x.id === state.pinned);
   if (!s) { el.classList.add("hidden"); el.innerHTML = ""; return; }
   el.classList.remove("hidden");
-  const regionName = regionNames(s).join(", ") || s.combo.region;
+  const regionName = regionNames(s).join(", ");
   /* v0.20.0: Mira review fix — filter feeders (whale, basking) store bait as a
      string, not an array. baitList() normalizes both. */
   /* v1.4.15-beta: show diet as a natural sentence, not the bait answer. */
