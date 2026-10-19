@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.4.0-beta";
+const VERSION = "v2.4.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.4.1-beta": [
+"📐 <strong>Tighter header.</strong> The shark logo now sits left of the title on all screens (not stacked on phones), with just a few pixels of breathing room top and bottom.",
+  ],
   "v2.4.0-beta": [
 "🌍 <strong>Expeditions look like where you are.</strong> Dive backgrounds are now location-specific — coral in the tropics, kelp off California, icebergs in the Arctic, a wreck off North Carolina, volcanic rock in Galápagos — and the background animals match too. No more tropical fish in polar waters.",
 "✨ <strong>Stripes removed.</strong> The old diagonal light stripes are gone from the dive scene.",
