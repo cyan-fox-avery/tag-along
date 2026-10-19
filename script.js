@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.1.4-beta": [
-"☀️ <strong>The sun rays are back!</strong> The test proved the animated light layer was what broke the game on iPad, so the rays have returned as beautiful still beams — same fan across the screen, same soft edges, but they no longer move, which keeps the game fast and responsive.",
+"☀️ <strong>The sun rays are back!</strong> Hiding them fixed the iPad, so we've brought them back as still beams — same fan across the screen, same soft edges, but they no longer move. We're testing whether the calm sunlight keeps the game fast and responsive.",
   ],
   "v2.1.3-beta": [
 "🔧 <strong>Diagnostic test.</strong> The sun rays are turned OFF completely in this version — not a fix, just a test to find out whether the light layer is what's breaking the game on iPad. If everything works now, we've found our culprit.",

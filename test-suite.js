@@ -49,15 +49,28 @@ code += `
     const rule = cssCode.slice(i, end);
     return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
   })());
-  // v2.1.4-beta: the sun-ray layer is back but STATIC. The ray-life animation
-  // (transform+opacity every frame on 8 large masked spans) killed iPad Safari.
-  // Assert no animation on the rays and no ray-life keyframes remain.
-  ok('v2.1.4: rays are static (no animation property, no ray-life keyframes)', (() => {
+  // v2.1.4-beta: the sun-ray layer is back but STATIC. With the rays hidden
+  // (v2.1.3) the iPad recovered, so the layer was implicated; restoring them
+  // without continuous animation tests whether static sunlight keeps the game
+  // fast. Assert the full contract: VISIBLE (no display:none on the parent)
+  // AND STATIC (rotate transform, no animation property, no ray-life keyframes).
+  ok('v2.1.4: rays are visible and static', (() => {
+    const pc = cssCode.indexOf('.caustics {');
+    if (pc === -1) return false;
+    const pe = cssCode.indexOf('}', pc);
+    const parent = cssCode.slice(pc, pe);
+    const pd = parent.indexOf('display:');
+    if (pd !== -1) {
+      const pv = parent.slice(pd, parent.indexOf(';', pd));
+      if (pv.indexOf('none') !== -1) return false;
+    }
     const i = cssCode.indexOf('.caustics span {');
     if (i === -1) return false;
     const end = cssCode.indexOf('}', i);
     const rule = cssCode.slice(i, end);
-    return rule.indexOf('animation:') === -1 && cssCode.indexOf('@keyframes ray-life') === -1;
+    const hasRotate = rule.indexOf('transform:') !== -1 && rule.indexOf('rotate(var(--ray-angle') !== -1;
+    const noAnim = rule.indexOf('animation:') === -1 && rule.indexOf('animation-duration') === -1;
+    return hasRotate && noAnim && cssCode.indexOf('@keyframes ray-life') === -1;
   })());
   // v2.1.3-beta DIAGNOSTIC: retired — the rays are back in v2.1.4.
   // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
