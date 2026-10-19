@@ -83,7 +83,11 @@ body::before {
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
 .caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
 .caustics span {
-  position: absolute; top: -120px; left: 2%; height: 2000px;
+  position: absolute; top: -120px; left: 2%; height: 1400px;
+  /* v2.1.1-beta: 1400px (was 2000px). The shafts still cover the whole iPad
+     viewport from the top-left pivot at every fan angle, but far less of each
+     shaft extends off-screen — smaller compositor layers, less for iOS to
+     mishandle. The gradient fade is proportional, so the look is unchanged. */
   transform-origin: 50% 0; /* pivot around the sun point at far top-left */
   /* v1.4.17: span-based rays restored (the v1.4.16 conic fan broke iPad layout).
      Wide soft DIFFUSED shafts: a vertical linear-gradient gives length falloff
