@@ -72,25 +72,23 @@ body::before {
   from { transform: translateX(-2%); opacity: 0.85; }
   to { transform: translateX(2%); opacity: 1; }
 }
-/* v1.4.16: sun-ray caustics REBUILT as a conic-gradient fan. The old 8-span
-   system pivoted each ray around one point on a 2000px stick — at wide fan
-   angles the stick bottoms landed off-screen, so only near-vertical rays ever
-   showed (reading as a bar on the far left, and too faint to see move). A
-   conic gradient centered at the sun point CANNOT miss: every wedge radiates
-   from the sun across the viewport by construction. Three layered fans with
-   different wedge patterns sway and breathe at different rates for organic,
-   clearly-alive light. v2.1.2-beta: the screen blend mode is gone (iPad GPU
-   could not afford blending 8 large animated layers every frame); rays now
-   composite normally.
-   Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
 /* v2.2.0-beta: the sun-ray background is a looping video (sunrise-loop.mp4),
-   not CSS layers. Hardware video decoding is far cheaper on iPad Safari than
-   animating 8 masked DOM spans — any continuous CSS animation on those layers
-   broke the game (v2.1.0-v2.1.5). The video holds the full underwater gradient
-   AND the animated ray fan (sun top-center, symmetric, full-frame coverage).
-   body::before's static gradient stays as a loading/failure fallback beneath.
-   Bubbles remain a separate JS-driven layer above. */
+   not CSS layers. The old 8-span caustics system is gone — any continuous CSS
+   animation on those masked layers broke iPad Safari (v2.1.0-v2.1.5). Video
+   decoding uses dedicated hardware, which should be far cheaper; the video
+   holds the full underwater gradient AND the animated ray fan (sun top-center,
+   symmetric, full-frame coverage). body::before's static gradient stays as a
+   loading/failure fallback beneath. Bubbles remain a separate JS-driven layer
+   above. This is an experiment — Avery's iPad is the real test. */
 .sun-video {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: -1; pointer-events: none;
+}
+/* v2.2.0-beta: static sun fallback — the video's first frame. Shown while the
+   video loads, if autoplay fails, and for reduced-motion users (who get
+   sunlight without movement). */
+.sun-still {
+  display: none;
   position: fixed; inset: 0; width: 100%; height: 100%;
   object-fit: cover; z-index: -1; pointer-events: none;
 }
@@ -162,8 +160,10 @@ body::before {
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
   .surface-shimmer, .bubbles span { animation: none; }
-  /* v2.2.0-beta: pause the sun video; its first frame is a beautiful still */
+  /* v2.2.0-beta: reduced-motion users get the still sunbeams (no movement),
+     not a sunless gradient. The video hides; the still image shows. */
   .sun-video { display: none; }
+  .sun-still { display: block; }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.

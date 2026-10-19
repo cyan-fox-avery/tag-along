@@ -49,13 +49,19 @@ code += `
     const hasVideo = htmlCode.indexOf('<video class="sun-video"') !== -1
       && htmlCode.indexOf('sunrise-loop.mp4') !== -1
       && htmlCode.indexOf('autoplay') !== -1
-      && htmlCode.indexOf('playsinline') !== -1;
+      && htmlCode.indexOf('muted') !== -1
+      && htmlCode.indexOf('loop') !== -1
+      && htmlCode.indexOf('playsinline') !== -1
+      && htmlCode.indexOf('poster="sunrise-still.jpg"') !== -1;
+    const hasStill = htmlCode.indexOf('class="sun-still"') !== -1
+      && htmlCode.indexOf('src="sunrise-still.jpg"') !== -1;
     const vi = cssCode.indexOf('.sun-video {');
     const ve = cssCode.indexOf('}', vi);
     const vrule = cssCode.slice(vi, ve);
     const videoCSS = vi !== -1 && vrule.indexOf('position: fixed') !== -1
-      && vrule.indexOf('object-fit: cover') !== -1;
-    return noCaustics && hasVideo && videoCSS;
+      && vrule.indexOf('object-fit: cover') !== -1
+      && vrule.indexOf('pointer-events: none') !== -1;
+    return noCaustics && hasVideo && hasStill && videoCSS;
   })());
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
