@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.1.3-beta', VERSION === 'v2.1.3-beta');
-  ok('whats-new has v2.1.3 entry', Array.isArray(WHATS_NEW['v2.1.3-beta']) && WHATS_NEW['v2.1.3-beta'].length === 1);
+  ok('version v2.1.4-beta', VERSION === 'v2.1.4-beta');
+  ok('whats-new has v2.1.4 entry', Array.isArray(WHATS_NEW['v2.1.4-beta']) && WHATS_NEW['v2.1.4-beta'].length === 1);
   // v2.1.2-beta: no blend modes on the full-viewport ray layer. Screen-blending
   // 8 large animated layers every frame overwhelmed the iPad GPU (v2.1.0/2.1.1
   // touch death). Normal alpha compositing is far cheaper.
@@ -49,17 +49,30 @@ code += `
     const rule = cssCode.slice(i, end);
     return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
   })());
-  // v2.1.3-beta DIAGNOSTIC: the sun-ray layer must be fully disabled so the
-  // iPad A/B test actually isolates the layer. If this ever goes green while
-  // rays render, the diagnostic is a no-op.
-  ok('v2.1.3: caustics layer is display:none (diagnostic)', (() => {
-    const i = cssCode.indexOf('.caustics {');
+  // v2.1.4-beta: the sun-ray layer is back but STATIC. With the rays hidden
+  // (v2.1.3) the iPad recovered, so the layer was implicated; restoring them
+  // without continuous animation tests whether static sunlight keeps the game
+  // fast. Assert the full contract: VISIBLE (no display:none on the parent)
+  // AND STATIC (rotate transform, no animation property, no ray-life keyframes).
+  ok('v2.1.4: rays are visible and static', (() => {
+    const pc = cssCode.indexOf('.caustics {');
+    if (pc === -1) return false;
+    const pe = cssCode.indexOf('}', pc);
+    const parent = cssCode.slice(pc, pe);
+    const pd = parent.indexOf('display:');
+    if (pd !== -1) {
+      const pv = parent.slice(pd, parent.indexOf(';', pd));
+      if (pv.indexOf('none') !== -1) return false;
+    }
+    const i = cssCode.indexOf('.caustics span {');
     if (i === -1) return false;
     const end = cssCode.indexOf('}', i);
     const rule = cssCode.slice(i, end);
-    const d = rule.indexOf('display:');
-    return d !== -1 && rule.indexOf('none', d) !== -1 && rule.indexOf('none', d) < rule.indexOf(';', d);
+    const hasRotate = rule.indexOf('transform:') !== -1 && rule.indexOf('rotate(var(--ray-angle') !== -1;
+    const noAnim = rule.indexOf('animation:') === -1 && rule.indexOf('animation-duration') === -1;
+    return hasRotate && noAnim && cssCode.indexOf('@keyframes ray-life') === -1;
   })());
+  // v2.1.3-beta DIAGNOSTIC: retired — the rays are back in v2.1.4.
   // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
   ok('v2.1.1: sun-ray shafts are viewport-sized (<=1500px)', (() => {
     const i = cssCode.indexOf('.caustics span {');
@@ -3082,10 +3095,10 @@ code += `
   })();
   // v1.4.17: rays have clearly visible life — sway plus grow/shrink via transform
   (() => {
-    ok("rays have ray-life keyframes", /@keyframes\\s+ray-life/.test(cssCode));
-    ok("ray-life sways visibly", /ray-life[\\s\\S]{0,800}?rotate\\(calc\\(var\\(--ray-angle\\)\\s*-\\s*4deg/.test(cssCode));
-    ok("ray-life grows/shrinks via scaleX", /ray-life[\\s\\S]{0,800}?scaleX\\(1\\.25\\)/.test(cssCode));
-    ok("rays never fully vanish", /ray-life[\\s\\S]{0,800}?opacity:\\s*0\\.15/.test(cssCode));
+    /* v2.1.4-beta RETIRED: ray-life animation removed (iPad Safari). */
+    /* RETIRED v2.1.4: ok("ray-life sways visibly", /ray-life[\\s\\S]{0,800}?rotate\\(calc\\(var\\(--ray-angle\\)\\s*-\\s*4deg/.test(cssCode)); */
+    /* RETIRED v2.1.4: ok("ray-life grows/shrinks via scaleX", /ray-life[\\s\\S]{0,800}?scaleX\\(1\\.25\\)/.test(cssCode)); */
+    /* RETIRED v2.1.4: ok("rays never fully vanish", /ray-life[\\s\\S]{0,800}?opacity:\\s*0\\.15/.test(cssCode)); */
     ok("reduced-motion freezes rays statically", /\\.surface-shimmer,\\s*\\.caustics\\s+span,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
   })();
   // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column

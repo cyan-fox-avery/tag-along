@@ -84,8 +84,11 @@ body::before {
    composite normally.
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
 .caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
-  display: none; /* v2.1.3-beta DIAGNOSTIC ONLY: rays hidden to isolate whether
-  the light layer causes the iPad failure. NOT a fix — remove after testing. */ }
+  /* v2.1.4-beta: rays RESTORED after the v2.1.3 diagnostic (rays hidden) let
+     the iPad recover — the light layer was implicated. These rays are STATIC:
+     same fan, same soft edges, no continuous animation, testing whether still
+     sunlight keeps the game fast. If iPad ever handles motion, subtle
+     animation can return. */ }
 .caustics span {
   position: absolute; top: -120px; left: 2%; height: 1400px;
   /* v2.1.1-beta: 1400px (was 2000px). The shafts still cover the whole iPad
@@ -105,33 +108,27 @@ body::before {
     transparent 88%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
   mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
-  opacity: 0.15;
-  animation: ray-life 18s ease-in-out infinite;
+  opacity: 0.45;
+  transform: rotate(var(--ray-angle, -30deg));
+  /* v2.1.4-beta: NO animation. With the rays hidden (v2.1.3) the iPad
+     recovered, implicating the light layer; the continuous ray-life motion is
+     the prime suspect, so these rays hold still. Each keeps its fan angle via
+     --ray-angle (set per nth-child below). */
 }
+
 /* Fan angles from the far-left sun point: wide spread (12-72 deg) so the fan
-   visibly sweeps the screen. Each ray pivots around the shared sun point.
-   v2.1.0-beta: angles are NEGATIVE — CSS rotate() is clockwise, so a positive
-   angle swings each shaft's free end to the bottom-LEFT (fanning off-screen,
-   the v2.0.0 bug Avery caught on iPad). Negative angles swing the free ends
-   to the bottom-RIGHT: wide-angle rays cross the viewport diagonally and exit
-   through the right edge — all visible, none wasted off-screen. */
-.caustics span:nth-child(1) { --ray-angle: -12deg; width: 120px; animation-duration: 17s; animation-delay: -5s; }
-.caustics span:nth-child(2) { --ray-angle: -20deg; width: 95px;  animation-duration: 22s; animation-delay: -14s; }
-.caustics span:nth-child(3) { --ray-angle: -28deg; width: 140px; animation-duration: 15s; animation-delay: -8s; }
-.caustics span:nth-child(4) { --ray-angle: -36deg; width: 105px; animation-duration: 20s; animation-delay: -3s; }
-.caustics span:nth-child(5) { --ray-angle: -46deg; width: 130px; animation-duration: 18s; animation-delay: -11s; }
-.caustics span:nth-child(6) { --ray-angle: -54deg; width: 100px; animation-duration: 24s; animation-delay: -17s; }
-.caustics span:nth-child(7) { --ray-angle: -63deg; width: 145px; animation-duration: 16s; animation-delay: -7s; }
-.caustics span:nth-child(8) { --ray-angle: -72deg; width: 110px; animation-duration: 21s; animation-delay: -13s; }
-@keyframes ray-life {
-  /* v1.4.17: clearly visible life — slow sway (±4 deg) plus a real grow/shrink
-     pulse (scaleX 0.7-1.25). Rays breathe but never fully vanish (min 0.15). */
-  0%   { opacity: 0.15; transform: rotate(calc(var(--ray-angle) - 4deg))   scaleX(0.7); }
-  25%  { opacity: 0.75; transform: rotate(calc(var(--ray-angle) - 1.5deg)) scaleX(1.0); }
-  50%  { opacity: 0.9;  transform: rotate(var(--ray-angle))                scaleX(1.25); }
-  75%  { opacity: 0.6;  transform: rotate(calc(var(--ray-angle) + 2deg))   scaleX(0.9); }
-  100% { opacity: 0.15; transform: rotate(calc(var(--ray-angle) + 4deg))   scaleX(0.7); }
-}
+   visibly sweeps the screen. v2.1.0-beta: angles are NEGATIVE — CSS rotate()
+   is clockwise, so negative angles swing the free ends to the bottom-RIGHT.
+   v2.1.4-beta: static — no animation-duration/delay (see above). */
+.caustics span:nth-child(1) { --ray-angle: -12deg; width: 120px; }
+.caustics span:nth-child(2) { --ray-angle: -20deg; width: 95px; }
+.caustics span:nth-child(3) { --ray-angle: -28deg; width: 140px; }
+.caustics span:nth-child(4) { --ray-angle: -36deg; width: 105px; }
+.caustics span:nth-child(5) { --ray-angle: -46deg; width: 130px; }
+.caustics span:nth-child(6) { --ray-angle: -54deg; width: 100px; }
+.caustics span:nth-child(7) { --ray-angle: -63deg; width: 145px; }
+.caustics span:nth-child(8) { --ray-angle: -72deg; width: 110px; }
+
 /* Slow rising bubbles — viewport-fixed for a little continuous life while scrolling.
    v1.7.25-beta: bubbles are driven by a tiny time-based JS loop in
    script.js (initBubbles), NOT by CSS keyframe animations. Still 8 columns, 2-5 bubbles each. The v1.7.22 CSS
