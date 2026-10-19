@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.2.1-beta";
+const VERSION = "v2.3.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.3.0-beta": [
+"🌊 <strong>New underwater background by Mira.</strong> The sunlit water is now a pair of hand-crafted looping videos — one for landscape, one separately composed for portrait — with natural upper-left light, gentle drift, and shimmering surface. The game picks the right one for your screen.",
+  ],
   "v2.2.1-beta": [
 "🔧 <strong>Sun rays, properly.</strong> The video now recreates the original animated sun rays — the asymmetric fan sweeping down from the top-left, with the same sway and breathing motion — as a 12-second seamless loop. No more searchlights.",
   ],
@@ -6114,3 +6117,29 @@ recoverPendingCelebrations();
 showPorthole(); // v1.4.2: observation window always present — porthole surface when idle
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();
+
+/* v2.3.0-beta: orientation-aware underwater background (Mira's videos).
+   Picks the landscape or portrait loop based on viewport shape; loads only
+   the selected video. Swaps on rotate/resize. Pauses when the tab is hidden. */
+(function() {
+  var video = document.getElementById('sun-video');
+  var still = document.getElementById('sun-still');
+  if (!video) return;
+  function pickBackground() {
+    var portrait = window.innerHeight > window.innerWidth;
+    var src = portrait ? 'underwater-portrait.mp4' : 'underwater-landscape.mp4';
+    var poster = portrait ? 'underwater-portrait-poster.jpg' : 'underwater-landscape-poster.jpg';
+    if (video.getAttribute('src') !== src) {
+      video.src = src;
+      video.poster = poster;
+      if (still) still.src = poster;
+    }
+  }
+  pickBackground();
+  window.addEventListener('resize', pickBackground);
+  window.addEventListener('orientationchange', pickBackground);
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) { video.pause(); }
+    else { video.play().catch(function(){}); }
+  });
+})();
