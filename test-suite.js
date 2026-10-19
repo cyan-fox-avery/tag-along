@@ -38,30 +38,32 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.2.1-beta', VERSION === 'v2.2.1-beta');
-  ok('whats-new has v2.2.1 entry', Array.isArray(WHATS_NEW['v2.2.1-beta']) && WHATS_NEW['v2.2.1-beta'].length === 1);
+  ok('version v2.3.0-beta', VERSION === 'v2.3.0-beta');
+  ok('whats-new has v2.3.0 entry', Array.isArray(WHATS_NEW['v2.3.0-beta']) && WHATS_NEW['v2.3.0-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
   // the right attributes, and its CSS makes it a fixed full-viewport cover layer.
-  ok('v2.2.0: sun rays are video, no caustics CSS', (() => {
+  // v2.3.0: Mira's orientation-aware videos (landscape/portrait picked by JS).
+  ok('v2.3.0: underwater videos, no caustics CSS', (() => {
     const noCaustics = cssCode.indexOf('.caustics') === -1;
-    const hasVideo = htmlCode.indexOf('<video class="sun-video"') !== -1
-      && htmlCode.indexOf('sunrise-loop.mp4') !== -1
+    const hasVideo = htmlCode.indexOf('<video id="sun-video"') !== -1
       && htmlCode.indexOf('autoplay') !== -1
       && htmlCode.indexOf('muted') !== -1
       && htmlCode.indexOf('loop') !== -1
-      && htmlCode.indexOf('playsinline') !== -1
-      && htmlCode.indexOf('poster="sunrise-still.jpg"') !== -1;
-    const hasStill = htmlCode.indexOf('class="sun-still"') !== -1
-      && htmlCode.indexOf('src="sunrise-still.jpg"') !== -1;
+      && htmlCode.indexOf('playsinline') !== -1;
+    const hasStill = htmlCode.indexOf('id="sun-still"') !== -1;
+    const hasPicker = code.indexOf('underwater-portrait.mp4') !== -1
+      && code.indexOf('underwater-landscape.mp4') !== -1
+      && code.indexOf('underwater-portrait-poster.jpg') !== -1
+      && code.indexOf('underwater-landscape-poster.jpg') !== -1;
     const vi = cssCode.indexOf('.sun-video {');
     const ve = cssCode.indexOf('}', vi);
     const vrule = cssCode.slice(vi, ve);
     const videoCSS = vi !== -1 && vrule.indexOf('position: fixed') !== -1
       && vrule.indexOf('object-fit: cover') !== -1
       && vrule.indexOf('pointer-events: none') !== -1;
-    return noCaustics && hasVideo && hasStill && videoCSS;
+    return noCaustics && hasVideo && hasStill && hasPicker && videoCSS;
   })());
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
@@ -3181,7 +3183,7 @@ code += `
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
   // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
-  ok('sun video in HTML', htmlCode.indexOf('<video class="sun-video"') !== -1 && htmlCode.indexOf('sunrise-loop.mp4') !== -1);
+  ok('sun video in HTML', htmlCode.indexOf('<video id="sun-video"') !== -1);
   ok('porthole has single orbit structure per layer', /class="pw-layer pw-far"><div class="pw-orbit"/.test(htmlCode) && !/class="pw-drift"/.test(htmlCode) && !/class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
   ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
@@ -3395,9 +3397,9 @@ code += `
   ok('WHATS_NEW has v1.7.15-beta', Array.isArray(WHATS_NEW['v1.7.15-beta']) && WHATS_NEW['v1.7.15-beta'].length === 1);
   ok('WHATS_NEW has v1.5.32-beta', Array.isArray(WHATS_NEW['v1.5.32-beta']) && WHATS_NEW['v1.5.32-beta'].length === 1);
   ok('WHATS_NEW has v1.5.29-beta', Array.isArray(WHATS_NEW['v1.5.29-beta']) && WHATS_NEW['v1.5.29-beta'].length === 1);
-  // v1.5.29: blue through ~90%, black only at the very bottom
-  ok('gradient stays blue until 90%', cssCode.indexOf('#020a16 90%') !== -1);
-  ok('gradient fades to black only at the very bottom', cssCode.indexOf('#000 95%') !== -1 && cssCode.indexOf('#000 100%') !== -1);
+  // v2.3.0: gradient moved into Mira's videos; body is solid #020204 (matches video bottom edge)
+  ok('body background is abyssal #020204', cssCode.indexOf('background: #020204') !== -1);
+  ok('no body::before gradient (video carries it)', cssCode.indexOf('body::before') === -1);
   // v1.5.28: background fades to pure black at the bottom — deep ocean, not blue
   ok('html background is pure black', cssCode.indexOf('html { background: #000; }') !== -1);
   // v1.5.27: body::after overlay removed; seafloor SVG itself is taller
@@ -3525,11 +3527,8 @@ code += `
     state.pinned = null; pinStore.save(null);
     return r;
   })());
-  // v1.5.25: background gradient is viewport-fixed
-  const _bbIdx = cssCode.indexOf('body::before');
-  const _bbBlock = _bbIdx === -1 ? '' : cssCode.slice(_bbIdx, cssCode.indexOf('}', _bbIdx));
-  ok('gradient lives on fixed body::before', _bbBlock.indexOf('position: fixed') !== -1 && _bbBlock.indexOf('linear-gradient') !== -1);
-  ok('body background is transparent', cssCode.indexOf('background: transparent') !== -1);
+  // v2.3.0: body::before removed; body is solid #020204, video carries the gradient
+  ok('no body::before rule', cssCode.indexOf('body::before') === -1);
   ok('body has no document gradient', (() => {
     let i = 0, clean = true;
     while (true) {
