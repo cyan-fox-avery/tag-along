@@ -25,6 +25,7 @@ const WHATS_NEW = {
 "🗺 <strong>Sharks roam wider waters.</strong> A shark can now be found in more than one region, wherever its real range takes it — the whale shark visits the Maldives as well as the Philippines, the megamouth also turns up in the Philippines, blue sharks cruise past Cornwall, and smooth hammerheads work the US east coast off North Carolina.",
 "🔧 <strong>Expanded cards stay below the tabs.</strong> Opening a Research or Archive entry no longer slides the shark’s name up over the tab bar — the header tucks under the tabs like normal content while the detail card floats above its neighbors.",
 "✕ <strong>Archive cards get a close button.</strong> Expanded Archive entries now have the same ✕ close button as Research cards — no more hunting for a way to dismiss them.",
+"🧭 <strong>Tracks stay true to the tag site.</strong> A shark tagged outside its home region now swims a route from where you actually tagged it — a Maldives-tagged whale shark gets a Maldivian route, not the Philippines one.",
   ],
   "v1.8.7-beta": [
 "📍 <strong>The tracking graph shows travel only.</strong> Logging a re-sighting used to add a point to the shark's track — repeated re-sightings in the same area flattened the graph like the shark had stopped travelling. Re-sightings stay in the logbook and the Collection re-sightings list, where they belong; the track is the shark's travel. Existing tracks are cleaned up automatically.",
@@ -1480,7 +1481,8 @@ function migrateTracks() {
       t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
       t.track.v = 2;
       const species = sharkById(sid);
-      const env = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id]) || null;
+      /* v2.0.0-beta (Mira review): region-aware anchor for reconstructed points. */
+      const env = (typeof envelopeFor !== "undefined" && envelopeFor(species.id, t.region)) || null;
       resightPoints.forEach((rp) => {
         const anchorLabel = (env && env.tagAnchor) || rp.label;
         const last = t.track.points[t.track.points.length - 1];
@@ -1521,6 +1523,24 @@ function migrateTravelTracks() {
     t.track.totalKm = Math.round(kept.reduce((a, p) => a + (p.km || 0), 0) * 10) / 10;
     t.track.days = kept.length ? kept[kept.length - 1].day : 0;
     changed = true;
+  });
+  if (changed) store.save(state.tagged);
+}
+
+/* v2.0.0-beta (Mira review): backfill the tag region key on pre-v2.0.0
+   records from their saved location name. Tracks are NOT regenerated —
+   existing tracks were built with the species envelope, which is exactly
+   what envelopeFor() still selects for these single-region saves, so this
+   preserves them byte-for-byte while making old records region-aware for
+   any future regeneration. */
+function migrateTagRegions() {
+  const nameToKey = {};
+  Object.keys(REGIONS).forEach(k => { nameToKey[REGIONS[k].name] = k; });
+  let changed = false;
+  Object.values(state.tagged).forEach(t => {
+    if (!t || t.region || !t.location) return;
+    const key = nameToKey[t.location];
+    if (key) { t.region = key; changed = true; }
   });
   if (changed) store.save(state.tagged);
 }
@@ -3926,9 +3946,13 @@ function confirmTag(name) {
     length: s._gen.length,
     sex: s._gen.sex,
     location: regionName,
+    /* v2.0.0-beta (Mira review): persist the tag region KEY so the track
+       envelope stays geographically coherent with where THIS shark was
+       tagged, even for multi-region species. */
+    region: state.currentPlan.region,
     date: dateStr,
     taggedAt: Date.now(), // v0.16.0: explicit chronology for the ending
-    track: genTrack(s, { location: regionName, date: dateStr })
+    track: genTrack(s, { location: regionName, region: state.currentPlan.region, date: dateStr })
   };
   /* v1.4.19-beta: Big Day — determine new-species BEFORE recording the tag. */
   const wasNewSpecies = !state.tagged[s.id];
@@ -5637,6 +5661,7 @@ const preMigrationHadSave = (() => {
 migrateIds();
 migrateTracks();
 migrateTravelTracks();
+migrateTagRegions();
 migrateWinV07();
 /* v1.7.16-beta: derpy retroactive unlock runs after the win migration.
    migrateWinV07() resets state.won for partial-roster saves, and

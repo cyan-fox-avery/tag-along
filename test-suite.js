@@ -39,7 +39,7 @@ code += `
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
   ok('version v2.0.0-beta', VERSION === 'v2.0.0-beta');
-  ok('whats-new has v2.0.0 entry', Array.isArray(WHATS_NEW['v2.0.0-beta']) && WHATS_NEW['v2.0.0-beta'].length === 4);
+  ok('whats-new has v2.0.0 entry', Array.isArray(WHATS_NEW['v2.0.0-beta']) && WHATS_NEW['v2.0.0-beta'].length === 5);
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1661,6 +1661,77 @@ code += `
       SHARKS.filter(guideMatches).some(s => s.id === "blue"));
     guideFilters.region = new Set();
   })();
+  // v2.0.0-beta (Mira review): region-aware track envelopes. A shark tagged
+  // in its second region must get a location-coherent track — point 0 at the
+  // regional tag site, every later point from the regional envelope, never
+  // the primary region's route.
+  (function regionalTracks() {
+    const cases = [
+      // [speciesId, regionKey, expectedPoint0, siblingEnvelopeLabels]
+      ["whale", "maldives", "South Ari Atoll",
+        ["Tubbataha Reefs Natural Park", "Sulu Sea", "Northern Palawan", "Surigao Strait", "Eastern Leyte", "Eastern Mindanao (Pacific)", "Philippines"]],
+      ["whale", "philippines", "Philippines",
+        ["South Ari Atoll", "Maamigili", "Dhigurah", "Ari Atoll outer reef", "Baa Atoll (Hanifaru)"]],
+      ["megamouth", "philippines", "Cagayan de Oro",
+        ["Izu Peninsula", "Sagami Bay", "Izu Peninsula south", "Sagami Bay offshore", "Izu Peninsula east"]],
+      ["megamouth", "japan", "Izu Peninsula",
+        ["Cagayan de Oro", "Bohol Sea", "Visayan Sea", "Luzon east coast (Aurora)", "Philippine Sea edge", "Surigao Strait north"]],
+      ["blue", "cornwall", "Mount's Bay",
+        ["Tag-site open water", "Gulf Stream meander", "Mid-Atlantic Ridge approaches", "Azores Current", "Canary Current edge", "Open Atlantic"]],
+      ["blue", "open-atlantic", "Open Atlantic",
+        ["Mount's Bay", "Scilly Isles waters", "Western Approaches", "Celtic Deep", "Southwest Approaches"]],
+      ["smooth", "north-carolina", "Cape Hatteras",
+        ["Tag-site shelf", "Shelf break", "Open Atlantic water", "Frontal zone", "Coastal bay", "Cornwall, UK"]],
+      ["smooth", "cornwall", "Cornwall, UK",
+        ["Cape Hatteras", "Outer Banks shelf", "Cape Lookout", "Chesapeake Bay mouth", "Mid-Atlantic Bight", "Gulf Stream edge"]],
+    ];
+    cases.forEach(([sid, region, p0, siblingLabels]) => {
+      const s = SHARKS.find(x => x.id === sid);
+      const tr = genTrack(s, { location: REGIONS[region].name, region });
+      const labels = tr.points.map(pt => pt.label);
+      ok('v2.0.0: ' + sid + ' tagged in ' + region + ' — point 0 is the regional tag site',
+        tr.points[0].label === p0);
+      ok('v2.0.0: ' + sid + ' tagged in ' + region + ' — no points from the sibling region route',
+        !labels.some(l => siblingLabels.includes(l)));
+      const env = envelopeFor(sid, region);
+      const allowed = new Set([...env.areas, env.tagAnchor || REGIONS[region].name]);
+      ok('v2.0.0: ' + sid + ' tagged in ' + region + ' — every point from the regional envelope',
+        labels.every(l => allowed.has(l)));
+    });
+    ok('v2.0.0: envelopeFor falls back to the species envelope for legacy/unknown regions',
+      envelopeFor("whale", undefined) === TRACK_ENVELOPES.whale &&
+      envelopeFor("whale", "atlantis") === TRACK_ENVELOPES.whale &&
+      envelopeFor("nurse", "caribbean") === TRACK_ENVELOPES.nurse &&
+      envelopeFor("nosuchshark", "maldives") === TRACK_ENVELOPES.nurse);
+    ok('v2.0.0: regional envelopes registered for all four second regions',
+      envelopeFor("whale", "maldives").regionKey === "maldives" &&
+      envelopeFor("megamouth", "philippines").regionKey === "philippines" &&
+      envelopeFor("blue", "cornwall").regionKey === "cornwall" &&
+      envelopeFor("smooth", "north-carolina").regionKey === "north-carolina");
+  })();
+  // v2.0.0-beta (Mira review): migrateTagRegions backfills the region key on
+  // pre-v2.0.0 records WITHOUT touching their tracks.
+  ok('v2.0.0: migrateTagRegions backfills region, leaves tracks byte-identical', (() => {
+    const saved = JSON.parse(JSON.stringify(state.tagged || {}));
+    const origSave = store.save; store.save = () => {};
+    try {
+      const pts = [{ label: "Philippines", day: 0, km: 0 }, { label: "Sulu Sea", day: 7, km: 120.5 }];
+      state.tagged = {
+        whale: { location: "Philippines",
+          track: { points: JSON.parse(JSON.stringify(pts)), totalKm: 120.5, days: 7, kind: "satellite", v: 2 } },
+        nurse: { location: "Caribbean Sea", region: "caribbean",
+          track: { points: [], totalKm: 0, days: 0, kind: "acoustic", v: 2 } },
+        tiger: { location: "Somewhere Else" }
+      };
+      migrateTagRegions();
+      const w = state.tagged.whale, n = state.tagged.nurse, g = state.tagged.tiger;
+      return w.region === "philippines" &&
+        JSON.stringify(w.track.points) === JSON.stringify(pts) &&
+        w.track.totalKm === 120.5 && w.track.days === 7 &&
+        n.region === "caribbean" &&
+        g.region === undefined;
+    } finally { store.save = origSave; state.tagged = saved; }
+  })());
   // Every shark's combo bait/method vocab matches planner
   ok('mira: all sharks have reachable depth+bait combos', SHARKS.every(s => {
     return s.depths && s.depths.length > 0 && s.combo.bait && s.methods;
