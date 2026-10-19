@@ -146,7 +146,7 @@ const ACHIEVEMENTS = [
       const locked = ["galapagos", "south-africa"];
       return Object.keys(st.tagged).some(id => {
         const s = SHARKS.find(x => x.id === id);
-        return s && locked.includes(s.combo.region);
+        return s && regionList(s).some(r => locked.includes(r));
       });
     }
   },

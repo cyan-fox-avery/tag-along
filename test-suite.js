@@ -39,7 +39,7 @@ code += `
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
   ok('version v2.0.0-beta', VERSION === 'v2.0.0-beta');
-  ok('whats-new has v2.0.0 entry', Array.isArray(WHATS_NEW['v2.0.0-beta']) && WHATS_NEW['v2.0.0-beta'].length === 1);
+  ok('whats-new has v2.0.0 entry', Array.isArray(WHATS_NEW['v2.0.0-beta']) && WHATS_NEW['v2.0.0-beta'].length === 4);
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
   ok('roster is 50', SHARKS.length === 50);
@@ -1224,7 +1224,7 @@ code += `
   guideFilters.region.add("caribbean");
   const carib = SHARKS.filter(guideMatches);
   ok('region filter narrows', carib.length > 0 && carib.length < SHARKS.length &&
-    carib.every(s => s.combo.region === "caribbean"));
+    carib.every(s => regionList(s).includes("caribbean")));
   guideFilters.bait.add("tuna");
   const stacked = SHARKS.filter(guideMatches);
   ok('stacked filters narrow further', stacked.length <= carib.length &&
@@ -1290,9 +1290,9 @@ code += `
   // v0.20.0: salmon + dusky wave
   const salmon = SHARKS.find(s => s.id === "salmon");
   const dusky = SHARKS.find(s => s.id === "dusky");
-  ok('salmon dossier complete', salmon && salmon.combo.region === "japan" &&
+  ok('salmon dossier complete', salmon && regionList(salmon).includes("japan") &&
     salmon.depths.includes("surface") && salmon.latin === "Lamna ditropis");
-  ok('dusky dossier complete', dusky && dusky.combo.region === "south-africa" &&
+  ok('dusky dossier complete', dusky && regionList(dusky).includes("south-africa") &&
     dusky.status === "Endangered" && dusky.latin === "Carcharhinus obscurus");
   ok('wave chats present', COUSIN_CHATS.salmon && COUSIN_CHATS.salmon.length === 3 &&
     COUSIN_CHATS.dusky && COUSIN_CHATS.dusky.length === 3);
@@ -1619,9 +1619,48 @@ code += `
   })());
   // Every shark's combo region exists in REGIONS
   ok('mira: all 50 sharks have valid combo regions', SHARKS.every(s => {
-    const region = s.combo.region;
-    return REGIONS[region] !== undefined;
+    const rs = regionList(s);
+    return rs.length > 0 && rs.every(r => REGIONS[r] !== undefined);
   }));
+  // v2.0.0-beta: multi-region species
+  (function multiRegion() {
+    const whale = SHARKS.find(s => s.id === "whale");
+    const mega = SHARKS.find(s => s.id === "megamouth");
+    const blue = SHARKS.find(s => s.id === "blue");
+    const smooth = SHARKS.find(s => s.id === "smooth");
+    ok('v2.0.0: whale shark in philippines + maldives',
+      regionList(whale).includes("philippines") && regionList(whale).includes("maldives"));
+    ok('v2.0.0: megamouth in japan + philippines',
+      regionList(mega).includes("japan") && regionList(mega).includes("philippines"));
+    ok('v2.0.0: blue shark in open-atlantic + cornwall',
+      regionList(blue).includes("open-atlantic") && regionList(blue).includes("cornwall"));
+    ok('v2.0.0: smooth hammerhead in cornwall + north-carolina',
+      regionList(smooth).includes("cornwall") && regionList(smooth).includes("north-carolina"));
+    ok('v2.0.0: single-region species unaffected',
+      regionList(SHARKS.find(s => s.id === "nurse")).join() === "caribbean");
+    ok('v2.0.0: regionList falls back to legacy single-string form',
+      regionList({ combo: { region: "maldives" } }).join() === "maldives" &&
+      regionList({ combo: {} }).length === 0);
+    ok('v2.0.0: regionNames resolves display names',
+      regionNames(whale).includes("Maldives") && regionNames(whale).includes("Philippines"));
+    // expedition encounter pools: whale shark reachable from the Maldives
+    const maldivesPlan = { region: "maldives", depth: "surface", bait: "plankton" };
+    const philPlan = { region: "philippines", depth: "surface", bait: "plankton" };
+    ok('v2.0.0: whale shark in Maldives encounter pool',
+      resolveEncounters(maldivesPlan).some(s => s.id === "whale"));
+    ok('v2.0.0: whale shark still in Philippines encounter pool',
+      resolveEncounters(philPlan).some(s => s.id === "whale"));
+    ok('v2.0.0: megamouth in Philippines encounter pool',
+      resolveEncounters({ region: "philippines", depth: "twilight", bait: "plankton" }).some(s => s.id === "megamouth"));
+    // research region filter matches multi-region species under either region
+    guideFilters.region = new Set(["maldives"]);
+    ok('v2.0.0: region filter finds whale under Maldives',
+      SHARKS.filter(guideMatches).some(s => s.id === "whale"));
+    guideFilters.region = new Set(["open-atlantic"]);
+    ok('v2.0.0: region filter finds blue under open-atlantic',
+      SHARKS.filter(guideMatches).some(s => s.id === "blue"));
+    guideFilters.region = new Set();
+  })();
   // Every shark's combo bait/method vocab matches planner
   ok('mira: all sharks have reachable depth+bait combos', SHARKS.every(s => {
     return s.depths && s.depths.length > 0 && s.combo.bait && s.methods;
@@ -2086,6 +2125,15 @@ code += `
     // renderArchive checks media.future — verify the guard exists
     const src = renderArchive.toString();
     return src.includes("media.future");
+  })());
+  // v2.0.0-beta: Archive expanded entries get the Research-style ✕ close button
+  ok('v2.0.0: archive rows render a guide-close button', (() => {
+    return archiveUiCode.includes('class="guide-close"') &&
+           archiveUiCode.includes('aria-label="Close \${s.name} details"');
+  })());
+  ok('v2.0.0: archive close button collapses the row', (() => {
+    return archiveUiCode.includes('body.querySelector(".guide-close")') &&
+           archiveUiCode.includes('collapseGuideRow(row)');
   })());
 
   // v0.26.0: art integration — WebP illustrations + silhouettes, tap-to-reveal
