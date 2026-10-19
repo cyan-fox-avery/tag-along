@@ -1708,6 +1708,17 @@ code += `
       envelopeFor("megamouth", "philippines").regionKey === "philippines" &&
       envelopeFor("blue", "cornwall").regionKey === "cornwall" &&
       envelopeFor("smooth", "north-carolina").regionKey === "north-carolina");
+    // v2.0.0-beta (Mira review): Philippine megamouth has no tracking data —
+    // its track must be labelled hypothetical, not "inspired by satellite
+    // telemetry"; other kinds keep their existing labels.
+    ok('v2.0.0: Philippine megamouth track is hypothetical, other kinds unchanged', (() => {
+      const megaPh = genTrack(sharkById("megamouth"), { location: REGIONS.philippines.name, region: "philippines" });
+      const whalePh = genTrack(sharkById("whale"), { location: REGIONS.philippines.name, region: "philippines" });
+      const megaJp = genTrack(sharkById("megamouth"), { location: REGIONS.japan.name, region: "japan" });
+      return megaPh.hypothetical === true &&
+        whalePh.hypothetical === false && whalePh.kind === "satellite" &&
+        megaJp.hypothetical === false;
+    })());
   })();
   // v2.0.0-beta (Mira review): migrateTagRegions backfills the region key on
   // pre-v2.0.0 records WITHOUT touching their tracks.

@@ -456,6 +456,7 @@ TRACK_ENVELOPES["megamouth:philippines"] = {
   areas: ["Cagayan de Oro", "Bohol Sea", "Visayan Sea", "Luzon east coast (Aurora)", "Philippine Sea edge", "Surigao Strait north"],
   tagAnchor: "Cagayan de Oro",
   hop: [20, 200], dayStep: [7, 30], nPoints: [4, 6], kind: "satellite",
+  hypothetical: true, // Mira review: no tracking data exists for this route — waypoints are imagined plausible habitat movement, not measured track points
   corridor: "sparse data \u2014 Philippine megamouth records are strandings and bycatch; no tracking data exists, so this keeps a plausible local scenario for a vertical migrator instead of inventing a migration"
 };
 TRACK_ENVELOPES["blue:cornwall"] = {
