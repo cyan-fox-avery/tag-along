@@ -623,8 +623,11 @@ const SIGHTINGS = {
     { text: "A green turtle rests on a coral bommie, tucked in like it's naptime. It probably is.", creature: "turtle", biomes: ["tropical"] },
     { text: "A school of barracuda hangs motionless in the blue, silver commas all facing the same way.", creature: "fish", biomes: ["tropical","volcanic","temperate"] },
     { text: "A reef octopus flows across the coral, colour-shifting with every metre.", creature: "fish", biomes: ["tropical","volcanic"] },
-    { text: "A seal weaves through the kelp stipes, there and gone like a rumour.", creature: "seal", biomes: ["kelp","temperate","polar"] },
-    { text: "Cold water, low light — a school of pollock holds station over the rocky reef.", creature: "fish", biomes: ["temperate","polar","kelp"] }
+    { text: "A seal weaves through the kelp stipes, there and gone like a rumour.", creature: "seal", biomes: ["kelp","temperate"] },
+    { text: "Cold water, low light — a school of small silver fish holds station over the rocky reef.", creature: "fish", biomes: ["temperate","polar","kelp"] },
+    { text: "A vast school of mackerel wheels overhead, a living cloud flashing silver.", creature: "fish", biomes: ["pelagic"] },
+    { text: "A squid pulses through the blue, arms trailing, hunting in the open water.", creature: "fish", biomes: ["pelagic"] },
+    { text: "A moon jelly drifts past in the open blue, pulsing gently.", creature: "jellyfish", biomes: ["pelagic"] }
   ],
   twilight: [
     { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },

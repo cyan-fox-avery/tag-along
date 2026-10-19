@@ -5025,6 +5025,23 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const d = buildSightingDeck("reef", "arctic");
     return d.pool.length > 0 && d.deck.length > 0;
   })());
+  // v2.4.0-beta Mira review round 2: all 13 regions x 4 depths give nonempty,
+  // biome-compatible decks (catches the open-atlantic reef pelagic gap)
+  ok('all region/depth decks are nonempty and biome-compatible', (() => {
+    const regions = ["caribbean","north-carolina","philippines","maldives","japan","open-atlantic","cornwall","papua-new-guinea","galapagos","south-africa","east-australia","california","arctic"];
+    const depths = ["surface","reef","twilight","deep"];
+    for (const r of regions) {
+      const biome = REGION_BIOME[r];
+      for (const d of depths) {
+        const deck = buildSightingDeck(d, r);
+        if (!deck.pool.length) return false;
+        for (const s of deck.pool) {
+          if (s.biomes && s.biomes.indexOf(biome) === -1) return false;
+        }
+      }
+    }
+    return true;
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
