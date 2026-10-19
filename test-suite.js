@@ -38,8 +38,9 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.6-beta', VERSION === 'v1.8.6-beta');
-  ok('whats-new has v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
+  ok('version v1.8.7-beta', VERSION === 'v1.8.7-beta');
+  ok('whats-new has v1.8.7 entry', Array.isArray(WHATS_NEW['v1.8.7-beta']) && WHATS_NEW['v1.8.7-beta'].length === 1);
+  ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
   ok('roster is 50', SHARKS.length === 50);
   const ids = SHARKS.map(s => s.id);
@@ -509,6 +510,81 @@ code += `
       else if (state.stats) delete state.stats.resights;
     }
   })();
+  // v1.8.7-beta: re-sightings stay OFF the movement track — they are the
+  // player's encounters, not tag movement. The track shows travel only.
+  (function () {
+    const nurse = SHARKS.find(s => s.id === 'nurse');
+    const origTagged = state.tagged;
+    const origSaveStats = saveStats, origCheck = checkAchievements;
+    const origRenderColl = renderCollection, origStoreSave = store.save;
+    saveStats = () => {}; checkAchievements = () => {};
+    renderCollection = () => {}; store.save = () => {};
+    const plan = { region: 'caribbean', depth: 'shallow', bait: 'chum' };
+    try {
+      state.tagged = { nurse: { name: '', researchId: 'NS-187', resightings: [],
+        track: { points: [{ label: 'Biscayne Bay', day: 0, km: 0 }, { label: 'Marquesas Keys', day: 4, km: 12.5 }], totalKm: 12.5, days: 4, kind: 'acoustic', v: 2 } } };
+      const before = state.tagged.nurse.track.points.length;
+      const entry = recordResighting(nurse, plan);
+      ok('v1.8.7: recordResighting does not add a track point', state.tagged.nurse.track.points.length === before);
+      ok('v1.8.7: recordResighting still logs the re-sighting', state.tagged.nurse.resightings.length === 1 && !!entry.date);
+      ok('v1.8.7: recordResighting leaves totalKm/days alone', state.tagged.nurse.track.totalKm === 12.5 && state.tagged.nurse.track.days === 4);
+    } catch (e) {
+      ok('v1.8.7: recordResighting track tests (threw: ' + e.message + ')', false);
+    } finally {
+      saveStats = origSaveStats; checkAchievements = origCheck;
+      renderCollection = origRenderColl; store.save = origStoreSave;
+      state.tagged = origTagged;
+    }
+  })();
+  ok('v1.8.7: migrateTravelTracks strips flagged points, recomputes stats', (() => {
+    const saved = JSON.parse(JSON.stringify(state.tagged || {}));
+    const origSave = store.save; store.save = () => {};
+    try {
+      state.tagged = {
+        nurse: { researchId: 'NS-M', track: { points: [
+          { label: 'Biscayne Bay', day: 0, km: 0 },
+          { label: 'Marquesas Keys', day: 4, km: 12.5 },
+          { label: 'Caribbean Sea', day: 9, km: 30.9, resighting: true },
+          { label: 'Caribbean Sea', day: 20, km: 0, resighting: true }
+        ], totalKm: 43.4, days: 20, kind: 'acoustic', v: 2 } },
+        lemon: { researchId: 'LS-M', track: { points: [
+          { label: 'Biscayne Bay', day: 0, km: 0 },
+          { label: 'Marquesas Keys', day: 6, km: 8 }
+        ], totalKm: 8, days: 6, kind: 'acoustic', v: 2 } }
+      };
+      migrateTravelTracks();
+      const n = state.tagged.nurse.track, l = state.tagged.lemon.track;
+      if (n.points.length !== 2) return false;
+      if (n.points.some(p => p.resighting)) return false;
+      if (n.totalKm !== 12.5) return false;
+      if (n.days !== 4) return false;
+      // Unflagged track untouched
+      if (l.points.length !== 2 || l.totalKm !== 8 || l.days !== 6) return false;
+      return true;
+    } finally { store.save = origSave; state.tagged = saved; }
+  })());
+  ok('v1.8.7: openTrack renders travel only', (() => {
+    const saved = JSON.parse(JSON.stringify(state.tagged || {}));
+    const origSave = store.save; store.save = () => {};
+    try {
+      state.tagged = { nurse: { name: 'Helen', researchId: 'NS-OT',
+        track: { points: [
+          { label: 'Biscayne Bay', day: 0, km: 0 },
+          { label: 'Marquesas Keys', day: 4, km: 12.5 },
+          { label: 'Re-sight Lagoon', day: 9, km: 3, resighting: true }
+        ], totalKm: 15.5, days: 9, kind: 'acoustic', v: 2 } } };
+      openTrack('nurse');
+      const html = document.getElementById('trackContent').innerHTML || '';
+      // Flagged point's label must not appear in the timeline
+      if (html.indexOf('Re-sight Lagoon') !== -1) return false;
+      // Locations count = travel points only
+      if (html.indexOf('<strong>2</strong><span>locations</span>') === -1) return false;
+      // Last ping = last travel point, not the re-sighting
+      if (html.indexOf('Marquesas Keys') === -1) return false;
+      return true;
+    } catch (e) { return false; }
+    finally { store.save = origSave; state.tagged = saved; }
+  })());
   // v1.7.24-beta Mira review: WHO says the dialogue — Sarah's reactions
   // live in HER bubble; the player's bubble reports the field note only.
   // Regression: the player must never speak Sarah's lines. The food
@@ -1441,7 +1517,9 @@ code += `
     }
   })());
   ok('mira: migration preserves re-sighting history', (() => {
-    // A v1 track with a re-sighting point should keep it after migration
+    // A v1 track with a re-sighting point: the re-sighting RECORD stays in
+    // the log, but the point is stripped from the movement track (v1.8.7:
+    // re-sightings are encounters, not travel).
     const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
     try {
       state.tagged['catshark'] = {
@@ -1450,12 +1528,16 @@ code += `
         resightings: [{ date: "2026-01-01", location: "Cornwall", note: "Test", ts: 1 }]
       };
       migrateTracks();
+      migrateTravelTracks();
       const t = state.tagged['catshark'];
       // Track regenerated to v2
       if (t.track.v !== 2) return false;
-      // Re-sighting point preserved
-      if (!t.track.points.some(p => p.resighting)) return false;
-      // Re-sighting record preserved
+      // Re-sighting point stripped from the movement track
+      if (t.track.points.some(p => p.resighting)) return false;
+      // totalKm recomputed from travel points only
+      const expectKm = Math.round(t.track.points.reduce((a, p) => a + (p.km || 0), 0) * 10) / 10;
+      if (t.track.totalKm !== expectKm) return false;
+      // Re-sighting record preserved in the log
       if (!t.resightings || t.resightings.length === 0) return false;
       return true;
     } finally {
@@ -1483,8 +1565,10 @@ code += `
       state.tagged = savedTagged;
     }
   })());
-  ok('mira: legacy re-sighting reconstructed from records', (() => {
-    // Genuinely pre-v0.21.0 save: no resighting flag, but has resightings records
+  ok('v1.8.7: legacy re-sighting stripped from track, records kept', (() => {
+    // Genuinely pre-v0.21.0 save: no resighting flag, but has resightings records.
+    // migrateTracks() reconstructs the flagged point; migrateTravelTracks()
+    // then strips it from the movement track (v1.8.7) while records stay.
     const savedTagged = JSON.parse(JSON.stringify(state.tagged || {}));
     try {
       state.tagged['catshark'] = {
@@ -1506,14 +1590,15 @@ code += `
         resightings: [{ date: "2026-02-01", location: "Cornwall", note: "Legacy", ts: 2 }]
       };
       migrateTracks();
+      migrateTravelTracks();
       const t = state.tagged['catshark'];
       if (t.track.v !== 2) return false;
-      // Re-sighting point should be reconstructed
-      if (!t.track.points.some(p => p.resighting)) return false;
-      // Day count should agree with final point
+      // No re-sighting points remain on the movement track
+      if (t.track.points.some(p => p.resighting)) return false;
+      // Day count agrees with the last TRAVEL point, not the stripped one
       const lastPoint = t.track.points[t.track.points.length - 1];
-      if (t.track.days < lastPoint.day) return false;
-      // Records preserved
+      if (t.track.days !== lastPoint.day) return false;
+      // Records preserved in the log
       if (!t.resightings || t.resightings.length === 0) return false;
       return true;
     } finally {
