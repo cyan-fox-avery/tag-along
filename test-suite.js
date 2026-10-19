@@ -49,6 +49,17 @@ code += `
     const rule = cssCode.slice(i, end);
     return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
   })());
+  // v2.1.3-beta DIAGNOSTIC: the sun-ray layer must be fully disabled so the
+  // iPad A/B test actually isolates the layer. If this ever goes green while
+  // rays render, the diagnostic is a no-op.
+  ok('v2.1.3: caustics layer is display:none (diagnostic)', (() => {
+    const i = cssCode.indexOf('.caustics {');
+    if (i === -1) return false;
+    const end = cssCode.indexOf('}', i);
+    const rule = cssCode.slice(i, end);
+    const d = rule.indexOf('display:');
+    return d !== -1 && rule.indexOf('none', d) !== -1 && rule.indexOf('none', d) < rule.indexOf(';', d);
+  })());
   // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
   ok('v2.1.1: sun-ray shafts are viewport-sized (<=1500px)', (() => {
     const i = cssCode.indexOf('.caustics span {');
