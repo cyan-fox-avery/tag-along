@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.1.1-beta": [
-"🔧 <strong>Emergency iPad fix.</strong> v2.1.0's corrected sun rays broke all touch on iPad — buttons dead, popup stuck. The ray shafts were far longer than the screen, leaving huge off-screen layers for iPad Safari to trip over. The shafts are now sized to the viewport instead, so there's nothing off-screen to mishandle. The rays themselves look exactly the same.",
+"🔧 <strong>Emergency iPad fix.</strong> v2.1.0's corrected sun rays broke all touch on iPad — buttons dead, popup stuck. The ray shafts are now sized to the viewport rather than extending far past it, leaving much smaller off-screen layers. The fan direction and animation are unchanged; on very wide screens the rays may fade slightly earlier than before.",
   ],
   "v2.1.0-beta": [
 "☀️ <strong>Sun rays fan the right way.</strong> The light rays were pivoting the wrong direction — fanning off the left edge of the screen instead of sweeping across it from the top-left sun. The fan now radiates down and across the whole viewport, the way sunlight should.",

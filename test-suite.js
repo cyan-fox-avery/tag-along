@@ -49,7 +49,7 @@ code += `
     const h = cssCode.indexOf('height:', i);
     const px = cssCode.indexOf('px', h);
     const val = parseInt(cssCode.slice(h + 7, px).trim(), 10);
-    return i !== -1 && val <= 1500;
+    return i !== -1 && val > 0 && val <= 1500;
   })());
   // v2.1.0-beta: sun-ray fan must use NEGATIVE angles — CSS rotate() is
   // clockwise, so positive angles swing the shafts' free ends to the
