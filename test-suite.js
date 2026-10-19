@@ -4999,6 +4999,32 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     return all.every(k => CREATURE_ART.hasOwnProperty(k));
   })());
   ok('no .rays div in dive scene HTML', htmlCode.indexOf('<div class="rays">') === -1);
+  // v2.4.0-beta Mira review fixes
+  ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
+    const d = buildSightingDeck("surface", "arctic");
+    const txt = d.pool.map(s => s.text.toLowerCase()).join(" ");
+    return txt.indexOf("turtle") === -1 && txt.indexOf("dolphin") === -1 && txt.indexOf("manta") === -1 && txt.indexOf("flying fish") === -1;
+  })());
+  ok('maldives surface deck has no seals', (() => {
+    const d = buildSightingDeck("surface", "maldives");
+    const txt = d.pool.map(s => s.text.toLowerCase()).join(" ");
+    return txt.indexOf("seal") === -1;
+  })());
+  ok('arctic reef deck has no coral/tropical animals', (() => {
+    const d = buildSightingDeck("reef", "arctic");
+    const txt = d.pool.map(s => s.text.toLowerCase()).join(" ");
+    return txt.indexOf("coral") === -1 && txt.indexOf("hawksbill") === -1 && txt.indexOf("turtle") === -1;
+  })());
+  ok('NC has wreck accent, japan does not', (() => {
+    return !!REGION_ACCENT["north-carolina"] && !REGION_ACCENT["japan"] && !REGION_ACCENT["cornwall"];
+  })());
+  ok('temperate biome has no wreck (NC-specific)', (() => {
+    return BIOME_SCENERY.temperate.indexOf("rect") === -1;
+  })());
+  ok('sighting deck never empty (fish fallback)', (() => {
+    const d = buildSightingDeck("reef", "arctic");
+    return d.pool.length > 0 && d.deck.length > 0;
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
