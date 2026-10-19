@@ -18,6 +18,16 @@
    background off the canvas so the fixed gradient layer paints cleanly. */
 html { background: #000; } /* v1.5.28-beta: pure black — no blue in overscroll */
 
+/* v2.1.1-beta: hard backstop against horizontal page widening. The sun-ray
+   shafts extend ~1900px past the right edge by design (clipped visually by
+   .caustics), but iPad Safari lets rightward overflow widen the document —
+   detaching fixed UI (tab bar, modals) from tap targets and breaking touch.
+   (Leftward overflow was harmless: browsers clamp at x=0. That's why v2.0.0
+   worked and v2.1.0 broke.) overflow-x:hidden on BOTH html and body: iOS
+   historically needs both to honor it. Nothing in the game scrolls
+   horizontally at the page level (map zoom is JS-driven), so this is safe. */
+html, body { overflow-x: hidden; }
+
 body {
   margin: 0;
   /* v1.5.8-beta: kill double-tap zoom on touch devices; pinch zoom still works. */

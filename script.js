@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.1.0-beta";
+const VERSION = "v2.1.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.1.1-beta": [
+"🔧 <strong>Emergency iPad fix.</strong> v2.1.0's corrected sun rays extended past the right edge of the screen, and iPad Safari let that widen the whole page — detaching buttons and the popup from your taps. The page can no longer widen horizontally, so touch works again. The rays themselves are unchanged.",
+  ],
   "v2.1.0-beta": [
 "☀️ <strong>Sun rays fan the right way.</strong> The light rays were pivoting the wrong direction — fanning off the left edge of the screen instead of sweeping across it from the top-left sun. The fan now radiates down and across the whole viewport, the way sunlight should.",
   ],

@@ -38,8 +38,15 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.1.0-beta', VERSION === 'v2.1.0-beta');
-  ok('whats-new has v2.1.0 entry', Array.isArray(WHATS_NEW['v2.1.0-beta']) && WHATS_NEW['v2.1.0-beta'].length === 1);
+  ok('version v2.1.1-beta', VERSION === 'v2.1.1-beta');
+  ok('whats-new has v2.1.1 entry', Array.isArray(WHATS_NEW['v2.1.1-beta']) && WHATS_NEW['v2.1.1-beta'].length === 1);
+  // v2.1.1-beta: the page must never widen horizontally — the sun-ray shafts
+  // extend ~1900px past the right edge and iPad Safari widened the document,
+  // detaching fixed UI from tap targets (v2.1.0 iPad breakage).
+  ok('v2.1.1: html+body block horizontal overflow', (() => {
+    const i = cssCode.indexOf('html, body { overflow-x: hidden; }');
+    return i !== -1;
+  })());
   // v2.1.0-beta: sun-ray fan must use NEGATIVE angles — CSS rotate() is
   // clockwise, so positive angles swing the shafts' free ends to the
   // bottom-left (fanning off-screen, the v2.0.0 iPad bug). Negative angles
