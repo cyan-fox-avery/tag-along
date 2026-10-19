@@ -72,61 +72,26 @@ body::before {
   from { transform: translateX(-2%); opacity: 0.85; }
   to { transform: translateX(2%); opacity: 1; }
 }
-/* v1.4.16: sun-ray caustics REBUILT as a conic-gradient fan. The old 8-span
-   system pivoted each ray around one point on a 2000px stick — at wide fan
-   angles the stick bottoms landed off-screen, so only near-vertical rays ever
-   showed (reading as a bar on the far left, and too faint to see move). A
-   conic gradient centered at the sun point CANNOT miss: every wedge radiates
-   from the sun across the viewport by construction. Three layered fans with
-   different wedge patterns sway and breathe at different rates for organic,
-   clearly-alive light. v2.1.2-beta: the screen blend mode is gone (iPad GPU
-   could not afford blending 8 large animated layers every frame); rays now
-   composite normally.
-   Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
-.caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
-  /* v2.1.6-beta: STATIC rays (rolled back from v2.1.5). Any continuous
-     animation on the 8 large masked spans — transform OR opacity — breaks
-     iPad Safari. Still beams only. */ }
-.caustics span {
-  position: absolute; top: -120px; left: 2%; height: 1400px;
-  /* v2.1.1-beta: 1400px (was 2000px). The shafts still cover the whole iPad
-     viewport from the top-left pivot at every fan angle, but far less of each
-     shaft extends off-screen — smaller compositor layers, less for iOS to
-     mishandle. The gradient fade is proportional, so the look is unchanged. */
-  transform-origin: 50% 0; /* pivot around the sun point at far top-left */
-  /* v1.4.17: span-based rays restored (the v1.4.16 conic fan broke iPad layout).
-     Wide soft DIFFUSED shafts: a vertical linear-gradient gives length falloff
-     (bright near the sun, dissolving with depth) while a horizontal mask
-     feathers both sides — no hard edge can ever render. Brighter than v1.4.15
-     so the fan is actually visible, and rays never fully vanish. */
-  background: linear-gradient(to bottom,
-    rgba(215,240,255,0.32) 0%,
-    rgba(205,235,255,0.18) 38%,
-    rgba(195,228,255,0.08) 62%,
-    transparent 88%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 32%, black 68%, transparent 100%);
-  opacity: 0.45;
-  transform: rotate(var(--ray-angle, -30deg));
-  /* v2.1.6-beta: ROLLED BACK to static. v2.1.5's opacity-only breathing also
-     broke the iPad — ANY continuous animation on the 8 large masked spans is
-     too much for its compositor. These rays hold still, like v2.1.4 which
-     Avery confirmed works. */
+/* v2.2.0-beta: the sun-ray background is a looping video (sunrise-loop.mp4),
+   not CSS layers. The old 8-span caustics system is gone — any continuous CSS
+   animation on those masked layers broke iPad Safari (v2.1.0-v2.1.5). Video
+   decoding uses dedicated hardware, which should be far cheaper; the video
+   holds the full underwater gradient AND the animated ray fan (sun top-center,
+   symmetric, full-frame coverage). body::before's static gradient stays as a
+   loading/failure fallback beneath. Bubbles remain a separate JS-driven layer
+   above. This is an experiment — Avery's iPad is the real test. */
+.sun-video {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: -1; pointer-events: none;
 }
-
-/* Fan angles from the far-left sun point: wide spread (12-72 deg) so the fan
-   visibly sweeps the screen. v2.1.0-beta: angles are NEGATIVE — CSS rotate()
-   is clockwise, so negative angles swing the free ends to the bottom-RIGHT.
-   v2.1.6-beta: static, like v2.1.4 — no animation (v2.1.5's opacity breathing
-   also broke the iPad). */
-.caustics span:nth-child(1) { --ray-angle: -12deg; width: 120px; }
-.caustics span:nth-child(2) { --ray-angle: -20deg; width: 95px; }
-.caustics span:nth-child(3) { --ray-angle: -28deg; width: 140px; }
-.caustics span:nth-child(4) { --ray-angle: -36deg; width: 105px; }
-.caustics span:nth-child(5) { --ray-angle: -46deg; width: 130px; }
-.caustics span:nth-child(6) { --ray-angle: -54deg; width: 100px; }
-.caustics span:nth-child(7) { --ray-angle: -63deg; width: 145px; }
-.caustics span:nth-child(8) { --ray-angle: -72deg; width: 110px; }
+/* v2.2.0-beta: static sun fallback — the video's first frame. Shown while the
+   video loads, if autoplay fails, and for reduced-motion users (who get
+   sunlight without movement). */
+.sun-still {
+  display: none;
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: -1; pointer-events: none;
+}
 
 /* Slow rising bubbles — viewport-fixed for a little continuous life while scrolling.
    v1.7.25-beta: bubbles are driven by a tiny time-based JS loop in
@@ -194,9 +159,11 @@ body::before {
 .bubbles span:nth-child(26) { left: 93.2%; bottom: -20px; --bubble-rise: -105vh; width: 6px;  height: 6px;  --bubble-delay: -13s; --bubble-duration: 26s; }
 /* Calm waters for those who need them. */
 @media (prefers-reduced-motion: reduce) {
-  .surface-shimmer, .caustics span, .bubbles span { animation: none; }
-  /* v1.4.17: static sun-ray fan for reduced motion */
-  .caustics span { opacity: 0.22; transform: rotate(var(--ray-angle)); }
+  .surface-shimmer, .bubbles span { animation: none; }
+  /* v2.2.0-beta: reduced-motion users get the still sunbeams (no movement),
+     not a sunless gradient. The video hides; the still image shows. */
+  .sun-video { display: none; }
+  .sun-still { display: block; }
   .bubbles { display: none; }
 }
 /* v0.10.4: safety net — no flex row may ever widen the page again.
