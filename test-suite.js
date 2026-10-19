@@ -38,8 +38,17 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.0.0-beta', VERSION === 'v2.0.0-beta');
-  ok('whats-new has v2.0.0 entry', Array.isArray(WHATS_NEW['v2.0.0-beta']) && WHATS_NEW['v2.0.0-beta'].length === 5);
+  ok('version v2.1.0-beta', VERSION === 'v2.1.0-beta');
+  ok('whats-new has v2.1.0 entry', Array.isArray(WHATS_NEW['v2.1.0-beta']) && WHATS_NEW['v2.1.0-beta'].length === 1);
+  // v2.1.0-beta: sun-ray fan must use NEGATIVE angles — CSS rotate() is
+  // clockwise, so positive angles swing the shafts' free ends to the
+  // bottom-left (fanning off-screen, the v2.0.0 iPad bug). Negative angles
+  // swing them bottom-right, fanning across the viewport from the top-left sun.
+  ok('v2.1.0: all sun-ray fan angles are negative', (() => {
+    const parts = cssCode.split('--ray-angle:');
+    const angles = parts.slice(1).map(p => parseInt(p.trim(), 10));
+    return angles.length === 8 && angles.every(a => a < 0);
+  })());
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
   ok('roster is 50', SHARKS.length === 50);

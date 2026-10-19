@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.0.0-beta";
+const VERSION = "v2.1.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.1.0-beta": [
+"☀️ <strong>Sun rays fan the right way.</strong> The light rays were pivoting the wrong direction — fanning off the left edge of the screen instead of sweeping across it from the top-left sun. The fan now radiates down and across the whole viewport, the way sunlight should.",
+  ],
   "v2.0.0-beta": [
 "🎨 <strong>Four sharks redrawn.</strong> The basking shark finally looks like a basking shark — blunt rounded snout, huge open mouth, long gill slits — traced from a real photo. The great hammerhead has its right eye back, the common angelshark is in side profile facing left like the rest, and the megamouth's head is properly proportioned.",
 "🗺 <strong>Sharks roam wider waters.</strong> A shark can now be found in more than one region, wherever its real range takes it — the whale shark visits the Maldives as well as the Philippines, the megamouth also turns up in the Philippines, blue sharks cruise past Cornwall, and smooth hammerheads work the US east coast off North Carolina.",
