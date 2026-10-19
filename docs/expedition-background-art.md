@@ -20,7 +20,7 @@
 | **BG-01-L** | Tropical surface | Caribbean, Philippines, Maldives, Papua New Guinea | **✅ Approved / locked** |
 | **BG-02-L** | Temperate surface | NC, Japan, Cornwall, South Africa, eastern Australia | **✅ Approved / locked** |
 | **BG-03-L** | Open Atlantic surface | Open Atlantic | **✅ Approved / locked** |
-| BG-04-L | Kelp surface | California | ⬜ Not started |
+| **BG-04-L** | Kelp surface | California | **✅ Approved / locked** |
 | BG-05-L | Volcanic surface | Galápagos | ⬜ Not started |
 | BG-06-L | Polar surface | Arctic | ⬜ Not started |
 | BG-07-L | Tropical shallows | Four tropical regions | ⬜ Not started |
@@ -66,3 +66,15 @@
 - **Integration:** Visual approval only. Do not change the expedition rendering code, sunlight animation, wildlife layers, or gameplay as part of this asset collection. Device testing and integration remain pending Avery's separate authorization.
 
 ![Approved BG-03-L Open Atlantic surface scenery](../assets/expedition-backgrounds/bg-03-open-atlantic-surface.webp)
+
+## BG-04-L: California Kelp Forest Surface — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19, after one art-direction revision.
+
+- **Browser asset:** [bg-04-kelp-surface.webp](../assets/expedition-backgrounds/bg-04-kelp-surface.webp), full size 1672 × 941, optimized WebP.
+- **Original approved image:** [bg-04-kelp-surface-original.png](../assets/expedition-backgrounds/source/bg-04-kelp-surface-original.png), original 1672 × 941 PNG. This is the exact approved second candidate; preserve this master unchanged.
+- **Art requirements confirmed:** California coastal blue-teal open-water gradient with diffuse underwater haze. **Kelp, rocky seabed, and vegetation must stay confined to the bottom 5–10% of the image.** The remaining ~90–95% is uninterrupted blue gradient water for moving animal silhouettes. No tall kelp stalks or side framing, visible surface, static sunbeams/caustics, animals, or man-made objects.
+- **Reuse:** California region at surface depth (0–30 m). Shallows will use a separately approved rocky-shallows treatment as planned.
+- **Integration:** Visual approval only. Image is stored as a standalone asset; no expedition rendering code, animated sunlight, wildlife layers, or gameplay changes are authorized by this step. Device testing remains pending.
+
+![Approved BG-04-L California kelp surface scenery](../assets/expedition-backgrounds/bg-04-kelp-surface.webp)
