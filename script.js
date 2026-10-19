@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.5-beta";
+const VERSION = "v1.8.6-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.6-beta": [
+"🗺️ <strong>Tracking map, decluttered.</strong> The map used to draw every shark's full track at once — now it shows each shark's current location, and draws the full route only for sharks you've turned “Track this shark” on for (it's a real toggle now, on the shark's card; the map refreshes the moment you flip it). The detailed track view moved to the map marker popup.",
+"🎨 <strong>Shark colors you can actually tell apart.</strong> The old marker palette had too many pale yellows and near-invisible darks — all 50 sharks now get a saturated, distinct color, every one verified legible against the dark ocean, with a soft halo behind each route on the satellite map.",
+  ],
   "v1.8.5-beta": [
 "💬 <strong>Sarah feels more like a real person.</strong> Every ambient chat now names the shark she's talking about — no more mystery facts floating without context. Her celebration openers for the later species are re-voiced as post-tag celebrations instead of reading like pre-dive briefings. Ask Sarah is a single button naming the shark you're researching (the dropdown is gone — there was only ever one shark to ask about). The named-shark check-ins have five new variants and never repeat twice in a row, and reunion reactions have eleven new lines with the same no-repeat guard.",
 "📓 <strong>Logbook and Collection polish.</strong> 40 new weather lines keyed by climate zone — the Arctic no longer sounds like the Caribbean. Logbook entries show your shark's nickname alongside the species and tag ID. The Field sightings list shows your latest 10 with a “Show more” button. Expedition log lines no longer put nicknames in quotes — it's Kitty, not “Kitty”.",
@@ -992,6 +996,30 @@ function renderCurrents(z) {
   return s;
 }
 
+/* v1.8.6-beta: the tracking map shows full track lines ONLY for sharks the
+   player explicitly enabled "Track this shark" on (t.mapTrack). Every shark
+   still gets its current-location dot; the tag-site pin and track path are
+   tracked-sharks-only, so the map stays readable. */
+function mapShowsTrack(t) { return !!(t && t.mapTrack); }
+
+/* v1.8.6 follow-up (Mira review): toggling "Track this shark" from a
+   map-opened Collection card left the map stale — the route kept its
+   previous visual state until some other redraw. Refresh the map when the
+   toggle changes while Map is the active tab. The re-render dismisses the
+   marker popup; that is the clean exit. Extracted for testability. */
+function mapTabActive() {
+  const active = document.querySelector(".tab.active");
+  return !!(active && active.dataset && active.dataset.tab === "map");
+}
+function refreshMapIfActive() {
+  if (mapTabActive()) renderMap();
+}
+function setMapTrack(t, on) {
+  t.mapTrack = !!on;
+  store.save(state.tagged);
+  refreshMapIfActive();
+}
+
 function renderMap() {
   const wrap = $("worldMapWrap");
   const pop = $("mapPopup");
@@ -1020,6 +1048,7 @@ function renderMap() {
   ids.forEach(sid => {
     const t = state.tagged[sid];
     if (!t.track) t.track = genTrack(sharkById(sid) || { id: "nurse" }, t);
+    if (!mapShowsTrack(t)) return; /* v1.8.6-beta: track lines are opt-in */
     const color = SPECIES_COLORS[sid] || "#ffffff";
     const pts = mapPoints(t);
     if (pts.length < 2) return;
@@ -1037,11 +1066,18 @@ function renderMap() {
         const xy = mapProj(c[0], c[1]);
         return (i ? "L" : "M") + xy[0].toFixed(1) + "," + xy[1].toFixed(1);
       }).join(" ");
+      /* v1.8.6 follow-up (Mira review): a neutral halo under each route so
+         thin strokes stay legible on the photographic Blue Marble
+         background, not just the dark fallback rect. Same dash pattern. */
+      const haloW = ((2 / z) + (3 / z)).toFixed(2);
+      svg += `<path class="map-track-halo" d="${d}" stroke-width="${haloW}"${dash}/>`;
       svg += `<path class="map-track" d="${d}" stroke="${color}" stroke-width="${tsw}"${dash}/>`;
     });
   });
-  /* Markers: hollow pin = tag site, filled dot = latest position.
-     Sizes are divided by zoom so they stay readable, not gigantic. */
+  /* Markers: hollow pin = tag site (tracked sharks only), filled dot =
+     latest position (every shark). Sizes are divided by zoom so they stay
+     readable, not gigantic. v1.8.6-beta: untracked sharks show ONLY their
+     current-location dot. */
   ids.forEach(sid => {
     const t = state.tagged[sid];
     const s = sharkById(sid);
@@ -1049,12 +1085,19 @@ function renderMap() {
     const pts = mapPoints(t);
     if (!pts.length) return;
     const label = esc(t.name ? `“${t.name}”` : t.researchId) + " — " + esc(s.name);
-    const tag = pts[0];
-    svg += `<g class="map-marker" data-sid="${sid}"><title>${label} (tag site)</title>`
-      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="${(6 / z).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${(2.5 / z).toFixed(2)}"/>`
-      + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="${(1.8 / z).toFixed(1)}" fill="${color}"/></g>`;
-    if (pts.length > 1) {
-      const last = pts[pts.length - 1];
+    const showTrack = mapShowsTrack(t);
+    if (showTrack) {
+      const tag = pts[0];
+      svg += `<g class="map-marker" data-sid="${sid}"><title>${label} (tag site)</title>`
+        + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="${(6 / z).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${(2.5 / z).toFixed(2)}"/>`
+        + `<circle cx="${tag.x.toFixed(1)}" cy="${tag.y.toFixed(1)}" r="${(1.8 / z).toFixed(1)}" fill="${color}"/></g>`;
+    }
+    const last = pts[pts.length - 1];
+    /* v1.8.6 follow-up (Mira review): explicit one-point rule. Exactly one
+       valid position + tracking on → the hollow tag-site pin doubles as the
+       latest-position marker (same place; a filled dot on top would hide the
+       ring). Exactly one position + tracking off → latest dot only. */
+    if (pts.length > 1 || !showTrack) {
       svg += `<g class="map-marker latest" data-sid="${sid}"><title>${label} (latest)</title>`
         + `<circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="${(8 / z).toFixed(1)}" fill="${color}" stroke="#fff" stroke-width="${(2 / z).toFixed(2)}"/></g>`;
     }
@@ -1109,9 +1152,13 @@ function showMapPopup(sid) {
     <p class="latin">${esc(s.name)} · ${esc(t.researchId)}</p>
     <p class="map-meta">📍 Tagged at ${esc(t.location)} · ${esc(t.date)}<br>📡 Latest ping: ${last ? esc(last.label) : "—"}${t.resightings && t.resightings.length ? `<br>🔁 Re-sighted ${t.resightings.length}×` : ""}</p>
     ${kindNote ? `<p class="map-kind-note">${kindNote}</p>` : ""}
-    <button class="secondary-button" type="button" id="mapCardBtn">🗂️ Open collection card</button>`;
+    <button class="secondary-button" type="button" id="mapCardBtn">🗂️ Open collection card</button>
+    <button class="secondary-button" type="button" id="mapTrackBtn">📈 View full track</button>`;
   pop.classList.remove("hidden");
   $("mapCardBtn").addEventListener("click", () => openDetail(sid));
+  /* v1.8.6-beta: the per-shark track overlay lives here now that the
+     collection "Track this shark" button is a map-track toggle. */
+  $("mapTrackBtn").addEventListener("click", () => openTrack(sid));
 }
 
 /* ---------- State ---------- */
@@ -5018,7 +5065,7 @@ function openDetail(id) {
       📍 Tagged at ${esc(t.location)}<br>
       📅 ${esc(t.date)}
     </p>
-    <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px">📍 Track this shark</button>
+    <button id="trackBtn" class="secondary-button" type="button" style="margin:4px 0 8px" aria-pressed="${t.mapTrack ? "true" : "false"}">${t.mapTrack ? "📍 Tracking on map ✓" : "📍 Track this shark"}</button>
     ${(() => {
       /* v1.7.23-beta: show only the most recent 3 re-sightings; older ones
          hide behind a "Show all" toggle. Re-sightings are stored
@@ -5067,7 +5114,15 @@ function openDetail(id) {
     </div>
   `;
   $("detailOverlay").classList.remove("hidden");
-  $("trackBtn").addEventListener("click", () => openTrack(id));
+  /* v1.8.6-beta: "Track this shark" is a real toggle — the tracking map
+     draws the full route only for sharks with mapTrack on (persisted).
+     The detailed per-shark track overlay moved to the map marker popup. */
+  $("trackBtn").addEventListener("click", () => {
+    setMapTrack(t, !t.mapTrack);
+    const btn = $("trackBtn");
+    btn.textContent = t.mapTrack ? "📍 Tracking on map ✓" : "📍 Track this shark";
+    btn.setAttribute("aria-pressed", String(!!t.mapTrack));
+  });
   /* v1.7.23-beta: re-sightings "Show all" toggle. Collapsed again on reopen
      because openDetail re-renders from scratch each time. */
   const resightMore = $("resightMore");
