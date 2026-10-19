@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.1.6-beta";
+const VERSION = "v2.2.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.2.0-beta": [
+"🎬 <strong>Living sunlight is back!</strong> The underwater background is now a looping video — the sun sits top-center with light rays fanning across the whole screen, gently swaying and breathing. Your iPad plays it with dedicated video hardware, so the game stays fast. Bubbles still drift by on their own layer.",
+  ],
   "v2.1.6-beta": [
 "🔧 <strong>Sun rays back to still beams.</strong> The gentle breathing animation also broke the iPad, so the rays are still again — same fan, same soft light, no motion. A working game comes first.",
   ],

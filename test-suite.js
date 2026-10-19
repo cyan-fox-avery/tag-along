@@ -38,58 +38,24 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.1.6-beta', VERSION === 'v2.1.6-beta');
-  ok('whats-new has v2.1.6 entry', Array.isArray(WHATS_NEW['v2.1.6-beta']) && WHATS_NEW['v2.1.6-beta'].length === 1);
-  // v2.1.2-beta: no blend modes on the full-viewport ray layer. Screen-blending
-  // 8 large animated layers every frame overwhelmed the iPad GPU (v2.1.0/2.1.1
-  // touch death). Normal alpha compositing is far cheaper.
-  ok('v2.1.2: caustics layer uses no mix-blend-mode', (() => {
-    const i = cssCode.indexOf('.caustics {');
-    const end = cssCode.indexOf('}', i);
-    const rule = cssCode.slice(i, end);
-    return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
-  })());
-  // v2.1.6-beta: ROLLED BACK to static rays. v2.1.5's opacity-only breathing
-  // also broke the iPad — ANY continuous animation on the 8 large masked
-  // spans is too much for its compositor. Assert the stable contract: parent
-  // VISIBLE (no display:none), spans STATIC (rotate transform, no animation
-  // properties, no keyframes of any kind).
-  ok('v2.1.6: rays are visible and static (rollback)', (() => {
-    const pc = cssCode.indexOf('.caustics {');
-    if (pc === -1) return false;
-    const pe = cssCode.indexOf('}', pc);
-    const parent = cssCode.slice(pc, pe);
-    const pd = parent.indexOf('display:');
-    if (pd !== -1) {
-      const pv = parent.slice(pd, parent.indexOf(';', pd));
-      if (pv.indexOf('none') !== -1) return false;
-    }
-    const si = cssCode.indexOf('.caustics span {');
-    if (si === -1) return false;
-    const se = cssCode.indexOf('}', si);
-    const spanRule = cssCode.slice(si, se);
-    const hasRotate = spanRule.indexOf('transform:') !== -1 && spanRule.indexOf('rotate(var(--ray-angle') !== -1;
-    const noAnim = spanRule.indexOf('animation:') === -1 && spanRule.indexOf('animation-duration') === -1;
-    const noKeyframes = cssCode.indexOf('@keyframes ray-breathe') === -1 && cssCode.indexOf('@keyframes ray-life') === -1;
-    return hasRotate && noAnim && noKeyframes;
-  })());
-  // v2.1.3-beta DIAGNOSTIC: retired — the rays are back in v2.1.4.
-  // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
-  ok('v2.1.1: sun-ray shafts are viewport-sized (<=1500px)', (() => {
-    const i = cssCode.indexOf('.caustics span {');
-    const h = cssCode.indexOf('height:', i);
-    const px = cssCode.indexOf('px', h);
-    const val = parseInt(cssCode.slice(h + 7, px).trim(), 10);
-    return i !== -1 && val > 0 && val <= 1500;
-  })());
-  // v2.1.0-beta: sun-ray fan must use NEGATIVE angles — CSS rotate() is
-  // clockwise, so positive angles swing the shafts' free ends to the
-  // bottom-left (fanning off-screen, the v2.0.0 iPad bug). Negative angles
-  // swing them bottom-right, fanning across the viewport from the top-left sun.
-  ok('v2.1.0: all sun-ray fan angles are negative', (() => {
-    const parts = cssCode.split('--ray-angle:');
-    const angles = parts.slice(1).map(p => parseInt(p.trim(), 10));
-    return angles.length === 8 && angles.every(a => a < 0);
+  ok('version v2.2.0-beta', VERSION === 'v2.2.0-beta');
+  ok('whats-new has v2.2.0 entry', Array.isArray(WHATS_NEW['v2.2.0-beta']) && WHATS_NEW['v2.2.0-beta'].length === 1);
+  // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
+  // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
+  // Assert: no .caustics rules remain, the video element exists in HTML with
+  // the right attributes, and its CSS makes it a fixed full-viewport cover layer.
+  ok('v2.2.0: sun rays are video, no caustics CSS', (() => {
+    const noCaustics = cssCode.indexOf('.caustics') === -1;
+    const hasVideo = htmlCode.indexOf('<video class="sun-video"') !== -1
+      && htmlCode.indexOf('sunrise-loop.mp4') !== -1
+      && htmlCode.indexOf('autoplay') !== -1
+      && htmlCode.indexOf('playsinline') !== -1;
+    const vi = cssCode.indexOf('.sun-video {');
+    const ve = cssCode.indexOf('}', vi);
+    const vrule = cssCode.slice(vi, ve);
+    const videoCSS = vi !== -1 && vrule.indexOf('position: fixed') !== -1
+      && vrule.indexOf('object-fit: cover') !== -1;
+    return noCaustics && hasVideo && videoCSS;
   })());
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
@@ -3083,16 +3049,11 @@ code += `
     state.chatSeen = origChatSeen;
     saveMsgs();
   })();
-  // v1.4.17: caustics rolled back to span-based rays (v1.4.16 conic fan broke
-  // iPad layout) — brighter, wider fan, clearly visible motion
+  // v2.2.0-beta: CSS caustics retired — sun rays are a looping video.
+  // (v1.4.17 span-based rays broke iPad Safari under any continuous animation.)
   (() => {
-    ok("caustics use span-based rays", /\\.caustics\\s+span\\s*\\{/.test(cssCode));
-    ok("no conic fan divs remain", !/\\.caustics\\s+\\.fan/.test(cssCode));
-    ok("rays have diffused soft edges (mask)", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to\\s+right/.test(cssCode));
-    ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
-    const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)/g) || []).length;
-    ok("caustics has 8 rays", rayCount === 8);
-    ok("rays never use the scale property (layout-safe)", !/scale:\\s*[\\d.]+/.test(cssCode));
+    ok("no caustics CSS remains", cssCode.indexOf('.caustics') === -1);
+    ok("no conic fan divs remain", cssCode.indexOf('.caustics .fan') === -1);
   })();
   // v1.4.17: rays have clearly visible life — sway plus grow/shrink via transform
   (() => {
@@ -3100,7 +3061,11 @@ code += `
     /* RETIRED v2.1.4: ok("ray-life sways visibly", /ray-life[\\s\\S]{0,800}?rotate\\(calc\\(var\\(--ray-angle\\)\\s*-\\s*4deg/.test(cssCode)); */
     /* RETIRED v2.1.4: ok("ray-life grows/shrinks via scaleX", /ray-life[\\s\\S]{0,800}?scaleX\\(1\\.25\\)/.test(cssCode)); */
     /* RETIRED v2.1.4: ok("rays never fully vanish", /ray-life[\\s\\S]{0,800}?opacity:\\s*0\\.15/.test(cssCode)); */
-    ok("reduced-motion freezes rays statically", /\\.surface-shimmer,\\s*\\.caustics\\s+span,\\s*\\.bubbles\\s+span\\s*\\{[^}]*animation:\\s*none/.test(cssCode));
+    ok("reduced-motion hides sun video", (() => {
+      const rm = cssCode.indexOf('prefers-reduced-motion');
+      const sv = cssCode.indexOf('.sun-video', rm);
+      return rm !== -1 && sv !== -1 && cssCode.indexOf('display: none', sv) !== -1;
+    })());
   })();
   // v1.4.16-beta: field-guide overlay is hard-contained — can never widen its column
   (() => {
@@ -3210,7 +3175,7 @@ code += `
   ok('field guide pill uses abbreviation', code.indexOf('IUCN_ABBR[s.status]') !== -1);
   // v1.4.11/v1.4.12: porthole — asset-led waves (Mira's illustrated strips)
   ok('porthole wave layers in HTML', /class="pw-layer pw-far"/.test(htmlCode) && /class="pw-layer pw-mid"/.test(htmlCode) && /class="pw-layer pw-near"/.test(htmlCode));
-  ok('caustic ray spans in HTML', /<div class=\"caustics\"><span><\\/span>/.test(htmlCode));
+  ok('sun video in HTML', htmlCode.indexOf('<video class="sun-video"') !== -1 && htmlCode.indexOf('sunrise-loop.mp4') !== -1);
   ok('porthole has single orbit structure per layer', /class="pw-layer pw-far"><div class="pw-orbit"/.test(htmlCode) && !/class="pw-drift"/.test(htmlCode) && !/class="pw-bob"/.test(htmlCode));
   ok('porthole has 6 tiles per layer', (htmlCode.match(/class="pw-tile"/g) || []).length === 18);
   ok('porthole one big splash at a time', /class="porthole-spray splash-a"/.test(htmlCode) && /class="porthole-spray splash-b"/.test(htmlCode) && !/porthole-spray ps/.test(htmlCode));
