@@ -40,12 +40,16 @@ code += `
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
   ok('version v2.1.1-beta', VERSION === 'v2.1.1-beta');
   ok('whats-new has v2.1.1 entry', Array.isArray(WHATS_NEW['v2.1.1-beta']) && WHATS_NEW['v2.1.1-beta'].length === 1);
-  // v2.1.1-beta: the page must never widen horizontally — the sun-ray shafts
-  // extend ~1900px past the right edge and iPad Safari widened the document,
-  // detaching fixed UI from tap targets (v2.1.0 iPad breakage).
-  ok('v2.1.1: html+body block horizontal overflow', (() => {
-    const i = cssCode.indexOf('html, body { overflow-x: hidden; }');
-    return i !== -1;
+  // v2.1.1-beta: sun-ray shafts must stay viewport-sized. v2.1.0's 2000px
+  // shafts left huge off-screen layers that broke touch on iPad Safari;
+  // 1400px still covers the whole iPad viewport from the top-left pivot at
+  // every fan angle (-12°..-72°), verified by geometry (see PR #114).
+  ok('v2.1.1: sun-ray shafts are viewport-sized (<=1500px)', (() => {
+    const i = cssCode.indexOf('.caustics span {');
+    const h = cssCode.indexOf('height:', i);
+    const px = cssCode.indexOf('px', h);
+    const val = parseInt(cssCode.slice(h + 7, px).trim(), 10);
+    return i !== -1 && val <= 1500;
   })());
   // v2.1.0-beta: sun-ray fan must use NEGATIVE angles — CSS rotate() is
   // clockwise, so positive angles swing the shafts' free ends to the
