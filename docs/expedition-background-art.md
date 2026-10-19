@@ -18,7 +18,7 @@
 | ID | Environment | Coverage | Status |
 | --- | --- | --- | --- |
 | **BG-01-L** | Tropical surface | Caribbean, Philippines, Maldives, Papua New Guinea | **✅ Approved / locked** |
-| BG-02-L | Temperate surface | NC, Japan, Cornwall, South Africa, eastern Australia | ⬜ Not started |
+| **BG-02-L** | Temperate surface | NC, Japan, Cornwall, South Africa, eastern Australia | **✅ Approved / locked** |
 | BG-03-L | Open Atlantic surface | Open Atlantic | ⬜ Not started |
 | BG-04-L | Kelp surface | California | ⬜ Not started |
 | BG-05-L | Volcanic surface | Galápagos | ⬜ Not started |
@@ -42,3 +42,15 @@
 - **Integration:** Art is approved; gameplay wiring, blend/layer stacking, fallback, and in-device tests are **not** approved by this asset-only step.
 
 ![Approved BG-01-L tropical surface scenery](../assets/expedition-backgrounds/bg-01-tropical-surface.webp)
+
+## BG-02-L: Temperate Surface — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19, on first visual candidate.
+
+- **Browser asset:** [bg-02-temperate-surface.webp](../assets/expedition-backgrounds/bg-02-temperate-surface.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-02-temperate-surface-original.png](../assets/expedition-backgrounds/source/bg-02-temperate-surface-original.png), original 1672 × 941 PNG. Preserve this source master.
+- **Art requirements confirmed:** Cool, subdued temperate blue water with open space for independently animated animal silhouettes. Rocky seabed and sparse short seaweed occupy the lower edge; no visible water surface, no baked-in sun rays, no animals, and no wreck.
+- **Reuse:** North Carolina, Sagami Bay/Japan, Cornwall, South Africa, and eastern Australia at surface depth. North Carolina's shipwreck will appear only in the separately approved **BG-11-L** shallow-depth (30–100 m) asset.
+- **Integration:** Visual approval only. This asset is not wired into gameplay and has not been verified for layering, colour treatment, performance, or iPad Safari rendering yet.
+
+![Approved BG-02-L temperate surface scenery](../assets/expedition-backgrounds/bg-02-temperate-surface.webp)
