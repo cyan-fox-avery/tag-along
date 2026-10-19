@@ -38,12 +38,18 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.1.1-beta', VERSION === 'v2.1.1-beta');
-  ok('whats-new has v2.1.1 entry', Array.isArray(WHATS_NEW['v2.1.1-beta']) && WHATS_NEW['v2.1.1-beta'].length === 1);
-  // v2.1.1-beta: sun-ray shafts must stay viewport-sized. v2.1.0's 2000px
-  // shafts left huge off-screen layers that broke touch on iPad Safari;
-  // 1400px still covers the whole iPad viewport from the top-left pivot at
-  // every fan angle (-12°..-72°), verified by geometry (see PR #114).
+  ok('version v2.1.2-beta', VERSION === 'v2.1.2-beta');
+  ok('whats-new has v2.1.2 entry', Array.isArray(WHATS_NEW['v2.1.2-beta']) && WHATS_NEW['v2.1.2-beta'].length === 1);
+  // v2.1.2-beta: no blend modes on the full-viewport ray layer. Screen-blending
+  // 8 large animated layers every frame overwhelmed the iPad GPU (v2.1.0/2.1.1
+  // touch death). Normal alpha compositing is far cheaper.
+  ok('v2.1.2: caustics layer uses no mix-blend-mode', (() => {
+    const i = cssCode.indexOf('.caustics {');
+    const end = cssCode.indexOf('}', i);
+    const rule = cssCode.slice(i, end);
+    return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
+  })());
+  // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
   ok('v2.1.1: sun-ray shafts are viewport-sized (<=1500px)', (() => {
     const i = cssCode.indexOf('.caustics span {');
     const h = cssCode.indexOf('height:', i);
@@ -3058,7 +3064,6 @@ code += `
     ok("caustics use span-based rays", /\\.caustics\\s+span\\s*\\{/.test(cssCode));
     ok("no conic fan divs remain", !/\\.caustics\\s+\\.fan/.test(cssCode));
     ok("rays have diffused soft edges (mask)", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to\\s+right/.test(cssCode));
-    ok("rays use screen blend for brightness cap", /\\.caustics\\s*\\{[^}]*mix-blend-mode:\\s*screen/.test(cssCode));
     ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
     const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)/g) || []).length;
     ok("caustics has 8 rays", rayCount === 8);

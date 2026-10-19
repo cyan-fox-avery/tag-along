@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.1.1-beta";
+const VERSION = "v2.1.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.1.2-beta": [
+"🔧 <strong>Sun-ray experiment.</strong> We're testing whether the rays' blending effect was what slowed iPad Safari to a crawl — they've been switched to regular compositing, which is much cheaper for the graphics chip. The light stays animated. If the game is still slow or unresponsive, tell us and we'll dig deeper.",
+  ],
   "v2.1.1-beta": [
 "🔧 <strong>Emergency iPad fix.</strong> v2.1.0's corrected sun rays broke all touch on iPad — buttons dead, popup stuck. The ray shafts are now sized to the viewport rather than extending far past it, leaving much smaller off-screen layers. The fan direction and animation are unchanged; on very wide screens the rays may fade slightly earlier than before.",
   ],
