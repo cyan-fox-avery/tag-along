@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v1.8.7-beta', VERSION === 'v1.8.7-beta');
-  ok('whats-new has v1.8.7 entry', Array.isArray(WHATS_NEW['v1.8.7-beta']) && WHATS_NEW['v1.8.7-beta'].length === 1);
+  ok('version v2.0.0-beta', VERSION === 'v2.0.0-beta');
+  ok('whats-new has v2.0.0 entry', Array.isArray(WHATS_NEW['v2.0.0-beta']) && WHATS_NEW['v2.0.0-beta'].length === 1);
   ok('whats-new keeps v1.8.6 entry', Array.isArray(WHATS_NEW['v1.8.6-beta']) && WHATS_NEW['v1.8.6-beta'].length === 2);
   // roster
   ok('roster is 50', SHARKS.length === 50);
