@@ -84,12 +84,8 @@ body::before {
    composite normally.
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
 .caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
-  /* v2.1.2-beta: the screen blend mode is GONE from this rule. Blending 8 large
-     animated layers across the full viewport every frame overwhelmed the
-     iPad GPU (5-minute loads, dead touch, starved rAF) — v2.0.0's rays were
-     bunched in one corner so the blended area was tiny. Normal alpha
-     compositing is far cheaper and looks nearly identical at these
-     opacities; overlap zones may brighten very slightly. */ }
+  display: none; /* v2.1.3-beta DIAGNOSTIC ONLY: rays hidden to isolate whether
+  the light layer causes the iPad failure. NOT a fix — remove after testing. */ }
 .caustics span {
   position: absolute; top: -120px; left: 2%; height: 1400px;
   /* v2.1.1-beta: 1400px (was 2000px). The shafts still cover the whole iPad
