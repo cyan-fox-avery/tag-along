@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v1.8.6-beta";
+const VERSION = "v1.8.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v1.8.7-beta": [
+"📍 <strong>The tracking graph shows travel only.</strong> Logging a re-sighting used to add a point to the shark's track — repeated re-sightings in the same area flattened the graph like the shark had stopped travelling. Re-sightings stay in the logbook and the Collection re-sightings list, where they belong; the track is the shark's travel. Existing tracks are cleaned up automatically.",
+  ],
   "v1.8.6-beta": [
 "🗺️ <strong>Tracking map, decluttered.</strong> The map used to draw every shark's full track at once — now it shows each shark's current location, and draws the full route only for sharks you've turned “Track this shark” on for (it's a real toggle now, on the shark's card; the map refreshes the moment you flip it). The detailed track view moved to the map marker popup.",
 "🎨 <strong>Shark colors you can actually tell apart.</strong> The old marker palette had too many pale yellows and near-invisible darks — all 50 sharks now get a saturated, distinct color, every one verified legible against the dark ocean, with a soft halo behind each route on the satellite map.",
@@ -1489,6 +1492,29 @@ function migrateTracks() {
       if (resightRecords.length) t.resightings = resightRecords;
       changed = true;
     }
+  });
+  if (changed) store.save(state.tagged);
+}
+
+/* v1.8.7-beta: re-sightings no longer pollute the movement track.
+   Strip re-sighting-flagged points from existing tracks so the graph
+   shows travel only (Avery: the flat tail made it look "like the shark
+   stopped travelling"). Re-sighting records stay in t.resightings — the
+   log is untouched. totalKm and days are recomputed from the remaining
+   travel points. Points without the flag are left alone: no invented
+   identity, no guessing. */
+function migrateTravelTracks() {
+  let changed = false;
+  Object.entries(state.tagged).forEach(([sid, t]) => {
+    if (!t.track || !Array.isArray(t.track.points)) return;
+    if (!t.track.points.some(p => p.resighting)) return;
+    const travel = t.track.points.filter(p => !p.resighting);
+    /* The tag anchor (point 0) is never a re-sighting; keep at least it. */
+    const kept = travel.length ? travel : t.track.points.slice(0, 1);
+    t.track.points = kept;
+    t.track.totalKm = Math.round(kept.reduce((a, p) => a + (p.km || 0), 0) * 10) / 10;
+    t.track.days = kept.length ? kept[kept.length - 1].day : 0;
+    changed = true;
   });
   if (changed) store.save(state.tagged);
 }
@@ -3058,28 +3084,11 @@ function recordResighting(species, plan) {
     ts: Date.now()
   };
   t.resightings.push(entry);
-  /* The tracking story grows: a new ping on the map. v0.9.0: the hop
-     distance and ping interval come from the species' real envelope,
-     not generic ranges — a re-sighted epaulette moves metres, a mako
-     moves hundreds of kilometres. */
-  if (t.track && t.track.points.length) {
-    const env = TRACK_ENVELOPES[species.id] || TRACK_ENVELOPES.nurse;
-    const last = t.track.points[t.track.points.length - 1];
-    const day = last.day + env.dayStep[0] + Math.floor(Math.random() * (env.dayStep[1] - env.dayStep[0] + 1));
-    /* v0.21.0 Mira review: compute real distance from coordinates, not random hop. */
-    const anchorLabel = (typeof TRACK_ENVELOPES !== "undefined" && TRACK_ENVELOPES[species.id] && TRACK_ENVELOPES[species.id].tagAnchor) || entry.location;
-    const lastCoord = MAP_COORDS[last.label];
-    const newCoord = MAP_COORDS[anchorLabel];
-    let km;
-    if (lastCoord && newCoord && typeof haversineKm === "function") {
-      km = Math.round(haversineKm(lastCoord, newCoord) * 10) / 10;
-    } else {
-      km = Math.round((env.hop[0] + Math.random() * (env.hop[1] - env.hop[0])) * 10) / 10;
-    }
-    t.track.points.push({ label: anchorLabel, day, km, resighting: true });
-    t.track.days = day;
-    t.track.totalKm = Math.round((t.track.totalKm + km) * 10) / 10;
-  }
+  /* v1.8.7-beta: re-sightings stay OFF the movement track. They are the
+     player's encounters, not tag movement — appending them flattened the
+     track graph ("like the shark stopped travelling"). The track shows
+     travel only; re-sightings live in the logbook and the Collection
+     re-sightings list. */
   store.save(state.tagged);
   /* v0.18.0: re-sights feed the "Old Friend" achievement. */
   state.stats.resights = (state.stats.resights || 0) + 1;
@@ -5167,9 +5176,17 @@ function openTrack(id) {
   const t = state.tagged[id];
   if (!t.track) { t.track = genTrack(s, t); store.save(state.tagged); }
   const tr = t.track;
+  /* v1.8.7-beta: the track shows travel only. Re-sighting-flagged points
+     (present on older saves until the migration runs) are excluded from
+     the graph, stats, timeline, and last ping — re-sightings live in the
+     logbook, not on the movement track. */
+  const travelPoints = tr.points.filter(p => !p.resighting);
+  const points = travelPoints.length ? travelPoints : tr.points;
+  const totalKm = Math.round(points.reduce((a, p) => a + (p.km || 0), 0) * 10) / 10;
+  const days = points.length ? points[points.length - 1].day : tr.days;
   const W = 320, H = 168, pad = 26;
-  const n = tr.points.length;
-  const pts = tr.points.map((p, i) => {
+  const n = points.length;
+  const pts = points.map((p, i) => {
     const x = pad + (n === 1 ? 0.5 : i / (n - 1)) * (W - pad * 2);
     const jitter = ((hashStr(p.label) % 100) / 100 - 0.5) * (H - pad * 2 - 30);
     const y = Math.round(H / 2 + jitter);
@@ -5181,8 +5198,8 @@ function openTrack(id) {
     return `<circle cx="${pt.x}" cy="${pt.y}" r="${last ? 6 : 4}" fill="${last ? "#ffd166" : "#4fd1c5"}" stroke="#0b2237" stroke-width="2"/>
       ${first || last ? `<text x="${pt.x}" y="${pt.y - 10}" text-anchor="middle" fill="#a9c3d6" font-size="9">${esc(first ? "tagged here" : "last ping")}</text>` : ""}`;
   }).join("");
-  const last = tr.points[tr.points.length - 1];
-  const stops = tr.points.map((p, i) =>
+  const last = points[points.length - 1];
+  const stops = points.map((p, i) =>
     `<li>${i === 0 ? "📍" : "▫️"} Day ${p.day} — ${esc(p.label)}${p.km ? ` <span class="dim">(+${p.km.toLocaleString()} km)</span>` : ""}</li>`
   ).join("");
   const title = t.name ? `“${esc(t.name)}”` : esc(t.researchId);
@@ -5195,9 +5212,9 @@ function openTrack(id) {
       ${dots}
     </svg>
     <div class="track-stats">
-      <div><strong>${tr.totalKm.toLocaleString()} km</strong><span>travelled</span></div>
-      <div><strong>${tr.days} days</strong><span>at liberty</span></div>
-      <div><strong>${tr.points.length}</strong><span>locations</span></div>
+      <div><strong>${totalKm.toLocaleString()} km</strong><span>travelled</span></div>
+      <div><strong>${days} days</strong><span>at liberty</span></div>
+      <div><strong>${points.length}</strong><span>locations</span></div>
     </div>
     <ul class="track-stops">${stops}</ul>
     <p class="track-note">Last ping: <strong>${esc(last.label)}</strong> · day ${last.day}<br>
@@ -5589,6 +5606,7 @@ const preMigrationHadSave = (() => {
 })();
 migrateIds();
 migrateTracks();
+migrateTravelTracks();
 migrateWinV07();
 /* v1.7.16-beta: derpy retroactive unlock runs after the win migration.
    migrateWinV07() resets state.won for partial-roster saves, and
