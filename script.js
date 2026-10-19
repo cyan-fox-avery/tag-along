@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.1.1-beta";
+const VERSION = "v2.1.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.1.2-beta": [
+"🔧 <strong>iPad fix, second attempt.</strong> v2.1.1 didn't cure it — the real culprit was the screen-blend effect on the rays: blending 8 large animated light layers across the whole screen every frame overwhelmed the iPad's graphics chip (slow loads, dead touch). The rays now composite normally, which is far cheaper and looks nearly identical.",
+  ],
   "v2.1.1-beta": [
 "🔧 <strong>Emergency iPad fix.</strong> v2.1.0's corrected sun rays broke all touch on iPad — buttons dead, popup stuck. The ray shafts are now sized to the viewport rather than extending far past it, leaving much smaller off-screen layers. The fan direction and animation are unchanged; on very wide screens the rays may fade slightly earlier than before.",
   ],
