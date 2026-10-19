@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.2.0-beta', VERSION === 'v2.2.0-beta');
-  ok('whats-new has v2.2.0 entry', Array.isArray(WHATS_NEW['v2.2.0-beta']) && WHATS_NEW['v2.2.0-beta'].length === 1);
+  ok('version v2.2.1-beta', VERSION === 'v2.2.1-beta');
+  ok('whats-new has v2.2.1 entry', Array.isArray(WHATS_NEW['v2.2.1-beta']) && WHATS_NEW['v2.2.1-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
