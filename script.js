@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.1.4-beta";
+const VERSION = "v2.1.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.1.5-beta": [
+"✨ <strong>The sun rays breathe again.</strong> They gently fade in and out now — opacity only, no swaying — which should be cheap enough for the iPad to handle. If the game ever slows down again, tell us.",
+  ],
   "v2.1.4-beta": [
 "☀️ <strong>The sun rays are back!</strong> Hiding them fixed the iPad, so we've brought them back as still beams — same fan across the screen, same soft edges, but they no longer move. We're testing whether the calm sunlight keeps the game fast and responsive.",
   ],

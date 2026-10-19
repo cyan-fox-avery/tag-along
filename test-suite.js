@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.1.4-beta', VERSION === 'v2.1.4-beta');
-  ok('whats-new has v2.1.4 entry', Array.isArray(WHATS_NEW['v2.1.4-beta']) && WHATS_NEW['v2.1.4-beta'].length === 1);
+  ok('version v2.1.5-beta', VERSION === 'v2.1.5-beta');
+  ok('whats-new has v2.1.5 entry', Array.isArray(WHATS_NEW['v2.1.5-beta']) && WHATS_NEW['v2.1.5-beta'].length === 1);
   // v2.1.2-beta: no blend modes on the full-viewport ray layer. Screen-blending
   // 8 large animated layers every frame overwhelmed the iPad GPU (v2.1.0/2.1.1
   // touch death). Normal alpha compositing is far cheaper.
@@ -49,12 +49,12 @@ code += `
     const rule = cssCode.slice(i, end);
     return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
   })());
-  // v2.1.4-beta: the sun-ray layer is back but STATIC. With the rays hidden
-  // (v2.1.3) the iPad recovered, so the layer was implicated; restoring them
-  // without continuous animation tests whether static sunlight keeps the game
-  // fast. Assert the full contract: VISIBLE (no display:none on the parent)
-  // AND STATIC (rotate transform, no animation property, no ray-life keyframes).
-  ok('v2.1.4: rays are visible and static', (() => {
+  // v2.1.5-beta: rays breathe via OPACITY ONLY. The v2.1.0 ray-life animation
+  // (rotate+scaleX transforms on masked layers) killed iPad Safari; opacity
+  // changes don't move the layer, so masks stay rasterized and the compositor
+  // just blends. Assert: rays visible, animated, but keyframes contain no
+  // transform — opacity is the only animated property.
+  ok('v2.1.5: rays breathe with opacity only (no transform in keyframes)', (() => {
     const pc = cssCode.indexOf('.caustics {');
     if (pc === -1) return false;
     const pe = cssCode.indexOf('}', pc);
@@ -64,13 +64,18 @@ code += `
       const pv = parent.slice(pd, parent.indexOf(';', pd));
       if (pv.indexOf('none') !== -1) return false;
     }
-    const i = cssCode.indexOf('.caustics span {');
-    if (i === -1) return false;
-    const end = cssCode.indexOf('}', i);
-    const rule = cssCode.slice(i, end);
-    const hasRotate = rule.indexOf('transform:') !== -1 && rule.indexOf('rotate(var(--ray-angle') !== -1;
-    const noAnim = rule.indexOf('animation:') === -1 && rule.indexOf('animation-duration') === -1;
-    return hasRotate && noAnim && cssCode.indexOf('@keyframes ray-life') === -1;
+    const ki = cssCode.indexOf('@keyframes ray-breathe');
+    if (ki === -1) return false;
+    let depth = 0, ke = -1;
+    for (let j = ki; j < cssCode.length; j++) {
+      if (cssCode[j] === '{') depth++;
+      else if (cssCode[j] === '}') { depth--; if (depth === 0) { ke = j; break; } }
+    }
+    if (ke === -1) return false;
+    const frames = cssCode.slice(ki, ke);
+    const noTransform = frames.indexOf('transform') === -1 && frames.indexOf('scaleX') === -1 && frames.indexOf('rotate(') === -1;
+    const hasOpacity = frames.indexOf('opacity:') !== -1;
+    return noTransform && hasOpacity;
   })());
   // v2.1.3-beta DIAGNOSTIC: retired — the rays are back in v2.1.4.
   // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
