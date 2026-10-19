@@ -21,7 +21,7 @@
 | **BG-02-L** | Temperate surface | NC, Japan, Cornwall, South Africa, eastern Australia | **✅ Approved / locked** |
 | **BG-03-L** | Open Atlantic surface | Open Atlantic | **✅ Approved / locked** |
 | **BG-04-L** | Kelp surface | California | **✅ Approved / locked** |
-| BG-05-L | Volcanic surface | Galápagos | ⬜ Not started |
+| **BG-05-L** | Volcanic surface | Galápagos | **✅ Approved / locked** |
 | BG-06-L | Polar surface | Arctic | ⬜ Not started |
 | BG-07-L | Tropical shallows | Four tropical regions | ⬜ Not started |
 | BG-08-L | Rocky shallows | Japan, Cornwall, South Africa, eastern Australia; California/Galápagos with appropriately chosen accents | ⬜ Not started |
@@ -78,3 +78,15 @@
 - **Integration:** Visual approval only. Image is stored as a standalone asset; no expedition rendering code, animated sunlight, wildlife layers, or gameplay changes are authorized by this step. Device testing remains pending.
 
 ![Approved BG-04-L California kelp surface scenery](../assets/expedition-backgrounds/bg-04-kelp-surface.webp)
+
+## BG-05-L: Galápagos Volcanic Surface — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19, on first visual candidate.
+
+- **Browser asset:** [bg-05-volcanic-surface.webp](../assets/expedition-backgrounds/bg-05-volcanic-surface.webp), full size 1672 × 941, optimized WebP.
+- **Original approved image:** [bg-05-volcanic-surface-original.png](../assets/expedition-backgrounds/source/bg-05-volcanic-surface-original.png), original 1672 × 941 PNG. Preserve this exact approved master image unchanged.
+- **Art requirements confirmed:** Calm, photo-realistic Galápagos near-surface environment with mostly uninterrupted gradient-blue open water for independently moving wildlife silhouettes. Distinctive dark, irregular angular volcanic basalt and very sparse growth are restricted to low rocky seabed scenery along the bottom edge. No tall foreground obstructions, visible water surface, baked-in sun rays or caustics, animals, coral forest, or man-made structures.
+- **Reuse:** Galápagos region at surface depth (0–30 m). At 30–100 m, use the separately approved rocky-shallows asset BG-08-L, with regional basalt treatment to be considered when that artwork is reviewed.
+- **Integration:** Art approval and storage only. No expedition rendering, sunlight animation, wildlife-layer, or gameplay changes are authorized. Device testing and integration remain pending separate approval.
+
+![Approved BG-05-L Galápagos volcanic surface scenery](../assets/expedition-backgrounds/bg-05-volcanic-surface.webp)
