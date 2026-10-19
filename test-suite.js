@@ -49,12 +49,13 @@ code += `
     const rule = cssCode.slice(i, end);
     return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
   })());
-  // v2.1.5-beta: rays breathe via OPACITY ONLY. The v2.1.0 ray-life animation
-  // (rotate+scaleX transforms on masked layers) killed iPad Safari; opacity
-  // changes don't move the layer, so masks stay rasterized and the compositor
-  // just blends. Assert: rays visible, animated, but keyframes contain no
-  // transform — opacity is the only animated property.
-  ok('v2.1.5: rays breathe with opacity only (no transform in keyframes)', (() => {
+  // v2.1.5-beta: rays breathe via OPACITY ONLY. With the rays hidden (v2.1.3)
+  // the iPad recovered, implicating the light layer; the continuous transform
+  // motion is the prime suspect, so this tests opacity-only breathing.
+  // Assert the full contract: parent VISIBLE, spans USE ray-breathe, keyframes
+  // animate opacity EXCLUSIVELY (no transform/rotate/scale/position/size),
+  // and the old ray-life keyframes stay gone.
+  ok('v2.1.5: rays breathe with opacity only', (() => {
     const pc = cssCode.indexOf('.caustics {');
     if (pc === -1) return false;
     const pe = cssCode.indexOf('}', pc);
@@ -64,6 +65,11 @@ code += `
       const pv = parent.slice(pd, parent.indexOf(';', pd));
       if (pv.indexOf('none') !== -1) return false;
     }
+    const si = cssCode.indexOf('.caustics span {');
+    if (si === -1) return false;
+    const se = cssCode.indexOf('}', si);
+    const spanRule = cssCode.slice(si, se);
+    if (spanRule.indexOf('animation:') === -1 || spanRule.indexOf('ray-breathe') === -1) return false;
     const ki = cssCode.indexOf('@keyframes ray-breathe');
     if (ki === -1) return false;
     let depth = 0, ke = -1;
@@ -73,9 +79,11 @@ code += `
     }
     if (ke === -1) return false;
     const frames = cssCode.slice(ki, ke);
-    const noTransform = frames.indexOf('transform') === -1 && frames.indexOf('scaleX') === -1 && frames.indexOf('rotate(') === -1;
-    const hasOpacity = frames.indexOf('opacity:') !== -1;
-    return noTransform && hasOpacity;
+    const badProps = ['transform', 'scaleX', 'scaleY', 'rotate(', 'translate', 'width:', 'height:', 'left:', 'top:', 'margin'];
+    for (let b = 0; b < badProps.length; b++) {
+      if (frames.indexOf(badProps[b]) !== -1) return false;
+    }
+    return frames.indexOf('opacity:') !== -1 && cssCode.indexOf('@keyframes ray-life') === -1;
   })());
   // v2.1.3-beta DIAGNOSTIC: retired — the rays are back in v2.1.4.
   // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
