@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.3.0-beta', VERSION === 'v2.3.0-beta');
-  ok('whats-new has v2.3.0 entry', Array.isArray(WHATS_NEW['v2.3.0-beta']) && WHATS_NEW['v2.3.0-beta'].length === 1);
+  ok('version v2.4.0-beta', VERSION === 'v2.4.0-beta');
+  ok('whats-new has v2.4.0 entry', Array.isArray(WHATS_NEW['v2.4.0-beta']) && WHATS_NEW['v2.4.0-beta'].length === 2);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -4979,6 +4979,26 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.currentPlan = origPlan;
     }
   })();
+
+  // v2.4.0-beta: region-specific dive backgrounds and wildlife
+  ok('REGION_BIOME covers all 13 regions', (() => {
+    const regions = ["caribbean","north-carolina","philippines","maldives","japan","open-atlantic","cornwall","papua-new-guinea","galapagos","south-africa","east-australia","california","arctic"];
+    return regions.every(r => REGION_BIOME[r] && BIOME_SCENERY[REGION_BIOME[r]] && BIOME_CREATURES[REGION_BIOME[r]]);
+  })());
+  ok('arctic gets polar biome (no tropical creatures)', (() => {
+    const c = BIOME_CREATURES[REGION_BIOME["arctic"]];
+    return c.indexOf("turtle") === -1 && c.indexOf("dolphin") === -1 && c.indexOf("seal") !== -1;
+  })());
+  ok('maldives gets tropical biome (no seals)', (() => {
+    const c = BIOME_CREATURES[REGION_BIOME["maldives"]];
+    return c.indexOf("seal") === -1 && c.indexOf("turtle") !== -1;
+  })());
+  ok('all BIOME_CREATURES keys exist in CREATURE_ART', (() => {
+    const all = [];
+    Object.values(BIOME_CREATURES).forEach(arr => arr.forEach(k => { if (all.indexOf(k) === -1) all.push(k); }));
+    return all.every(k => CREATURE_ART.hasOwnProperty(k));
+  })());
+  ok('no .rays div in dive scene HTML', htmlCode.indexOf('<div class="rays">') === -1);
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.3.0-beta";
+const VERSION = "v2.4.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.4.0-beta": [
+"🌍 <strong>Expeditions look like where you are.</strong> Dive backgrounds are now location-specific — coral in the tropics, kelp off California, icebergs in the Arctic, wrecks off North Carolina — and the background animals match too. No more tropical fish in polar waters.",
+"✨ <strong>Stripes removed.</strong> The old diagonal light stripes are gone from the dive scene.",
+  ],
   "v2.3.0-beta": [
 "🌊 <strong>New underwater background by Mira.</strong> The sunlit water is now a pair of hand-crafted looping videos — one for landscape, one separately composed for portrait — with natural upper-left light, gentle drift, and shimmering surface. The game picks the right one for your screen.",
   ],
@@ -2265,12 +2269,92 @@ const SCENERY = {
     <ellipse cx="300" cy="58" rx="34" ry="9" fill="#0a1219" opacity="0.8"/>
   </svg>`
 };
+/* v2.4.0-beta: region-specific dive backdrops — SVG overlays per biome.
+   Subtle, behind the action; the depth SVG stays as the base. */
+const BIOME_SCENERY = {
+  tropical: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.5">
+      <path d="M40,200 Q50,140 35,110 Q60,130 55,160 Q70,120 60,90 Q80,120 75,150 L85,200 Z" fill="#c4748a"/>
+      <path d="M90,200 Q100,150 85,120 Q110,140 105,170 L115,200 Z" fill="#d48aa0"/>
+      <path d="M520,200 Q510,140 525,110 Q505,130 510,160 Q495,125 505,95 Q485,125 490,155 L480,200 Z" fill="#c4748a"/>
+      <ellipse cx="150" cy="190" rx="60" ry="18" fill="#8a6a4a" opacity="0.6"/>
+      <ellipse cx="450" cy="195" rx="80" ry="15" fill="#8a6a4a" opacity="0.6"/>
+    </g></svg>`,
+  temperate: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.55">
+      <path d="M0,200 L0,150 Q80,130 140,160 Q200,120 280,150 L280,200 Z" fill="#4a5a62"/>
+      <path d="M320,200 L320,160 Q400,140 460,165 Q520,135 600,160 L600,200 Z" fill="#3d4d55"/>
+      <ellipse cx="150" cy="185" rx="90" ry="20" fill="#5a6a72" opacity="0.5"/>
+      <g opacity="0.45" transform="translate(420,175) rotate(-8)">
+        <rect x="-45" y="-12" width="90" height="24" rx="4" fill="#2e383e"/>
+        <rect x="-8" y="-28" width="16" height="18" fill="#2e383e"/>
+        <rect x="-30" y="-22" width="8" height="12" fill="#2e383e"/>
+      </g>
+    </g></svg>`,
+  kelp: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.5">
+      <path d="M100,200 Q95,120 105,60 Q98,100 110,140 Q102,80 115,40" stroke="#2d6a3d" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M180,200 Q175,110 185,50 Q178,95 190,130" stroke="#357a48" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <path d="M420,200 Q425,120 415,55 Q422,100 410,145" stroke="#2d6a3d" stroke-width="13" fill="none" stroke-linecap="round"/>
+      <path d="M500,200 Q495,130 505,70" stroke="#357a48" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <ellipse cx="105" cy="45" rx="22" ry="10" fill="#3d8a52" opacity="0.7"/>
+      <ellipse cx="415" cy="60" rx="20" ry="9" fill="#3d8a52" opacity="0.7"/>
+    </g></svg>`,
+  pelagic: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.35">
+      <ellipse cx="300" cy="100" rx="120" ry="25" fill="#1a4a6a" opacity="0.4"/>
+      <ellipse cx="310" cy="105" rx="80" ry="15" fill="#245a7a" opacity="0.3"/>
+    </g></svg>`,
+  polar: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.6">
+      <path d="M80,0 L140,0 L120,60 L100,90 L60,60 Z" fill="#cfe8f2"/>
+      <path d="M100,90 L120,60 L110,90 Z" fill="#a8d0e6"/>
+      <path d="M450,0 L520,0 L500,45 L470,70 L430,45 Z" fill="#cfe8f2"/>
+      <path d="M470,70 L500,45 L485,70 Z" fill="#a8d0e6"/>
+      <ellipse cx="300" cy="195" rx="200" ry="12" fill="#9fc0d4" opacity="0.3"/>
+    </g></svg>`,
+  volcanic: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.6">
+      <path d="M0,200 L0,140 Q60,120 100,150 Q140,110 200,140 L200,200 Z" fill="#2a2a2e"/>
+      <path d="M400,200 L400,150 Q460,130 500,155 Q540,125 600,150 L600,200 Z" fill="#232326"/>
+      <path d="M120,200 Q150,170 180,185 Q210,160 240,180 L240,200 Z" fill="#333336"/>
+    </g></svg>`
+};
 /* depth key used by the planner -> scenery key. */
 const SCENERY_FOR = { surface: "surface", reef: "reef", twilight: "twilight", deep: "deep" };
-function renderScenery(depth) {
+/* v2.4.0-beta: region -> biome for location-specific dive backgrounds and wildlife.
+   No tropical animals in the arctic, no penguins in the maldives. */
+const REGION_BIOME = {
+  "caribbean": "tropical", "philippines": "tropical", "maldives": "tropical", "papua-new-guinea": "tropical",
+  "north-carolina": "temperate", "japan": "temperate", "cornwall": "temperate",
+  "south-africa": "temperate", "east-australia": "temperate",
+  "california": "kelp",
+  "open-atlantic": "pelagic",
+  "arctic": "polar",
+  "galapagos": "volcanic"
+};
+/* Region-appropriate ambient creatures (keys into CREATURE_ART). */
+const BIOME_CREATURES = {
+  "tropical":  ["fish", "fish", "turtle", "dolphin", "ray"],
+  "temperate": ["fish", "fish", "seal", "dolphin", "jellyfish"],
+  "kelp":      ["fish", "fish", "seal", "dolphin"],
+  "pelagic":   ["fish", "dolphin", "jellyfish", "ray"],
+  "polar":     ["seal", "fish", "fish", "jellyfish"],
+  "volcanic":  ["turtle", "fish", "ray", "seal"]
+};
+function renderScenery(depth, region) {
   const el = $("diveScenery");
   if (!el) return;
   el.innerHTML = SCENERY[SCENERY_FOR[depth] || "surface"] || "";
+  /* v2.4.0-beta: region-specific backdrop overlay (biome). */
+  const biome = REGION_BIOME[region] || "temperate";
+  const overlay = BIOME_SCENERY[biome];
+  if (overlay) {
+    const d = document.createElement("div");
+    d.className = "biome-overlay biome-" + biome;
+    d.innerHTML = overlay;
+    el.appendChild(d);
+  }
   el.querySelectorAll(".snow").forEach(n => n.remove());
   /* Marine snow in the deep: slow-falling specks. */
   if (depth === "deep") {
@@ -2289,9 +2373,13 @@ function renderScenery(depth) {
 /* v0.13.0: background fish drift through between sightings so the water
    never feels empty. Small, dim, clearly behind the action. */
 let ambientTimer = null;
-function startAmbientLife(depth) {
+function startAmbientLife(depth, region) {
   stopAmbientLife();
-  const creatures = depth === "deep" ? ["fish"] : ["fish", "fish", "turtle", "dolphin"];
+  /* v2.4.0-beta: region-specific wildlife — no tropical animals in the arctic. */
+  const biome = REGION_BIOME[region] || "temperate";
+  const creatures = depth === "deep"
+    ? ["fish"]
+    : (BIOME_CREATURES[biome] || ["fish", "fish", "turtle", "dolphin"]);
   ambientTimer = setInterval(() => {
     if (document.hidden) return;
     if (Math.random() < 0.55) spawnCreature(pick(creatures), true);
@@ -2804,8 +2892,8 @@ async function runExpedition(plan) {
 
   const scene = $("diveScene");
   scene.className = "dive-scene " + DEPTHS[plan.depth].scene;
-  renderScenery(plan.depth);
-  startAmbientLife(plan.depth);
+  renderScenery(plan.depth, plan.region);
+  startAmbientLife(plan.depth, plan.region);
   const deep = plan.depth === "twilight" || plan.depth === "deep";
 
   const baitText = plan.bait === "plankton"
