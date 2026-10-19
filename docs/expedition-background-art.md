@@ -19,7 +19,7 @@
 | --- | --- | --- | --- |
 | **BG-01-L** | Tropical surface | Caribbean, Philippines, Maldives, Papua New Guinea | **✅ Approved / locked** |
 | **BG-02-L** | Temperate surface | NC, Japan, Cornwall, South Africa, eastern Australia | **✅ Approved / locked** |
-| BG-03-L | Open Atlantic surface | Open Atlantic | ⬜ Not started |
+| **BG-03-L** | Open Atlantic surface | Open Atlantic | **✅ Approved / locked** |
 | BG-04-L | Kelp surface | California | ⬜ Not started |
 | BG-05-L | Volcanic surface | Galápagos | ⬜ Not started |
 | BG-06-L | Polar surface | Arctic | ⬜ Not started |
@@ -54,3 +54,15 @@
 - **Integration:** Visual approval only. This asset is not wired into gameplay and has not been verified for layering, colour treatment, performance, or iPad Safari rendering yet.
 
 ![Approved BG-02-L temperate surface scenery](../assets/expedition-backgrounds/bg-02-temperate-surface.webp)
+
+## BG-03-L: Open Atlantic Surface — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19, on first visual candidate.
+
+- **Browser asset:** [bg-03-open-atlantic-surface.webp](../assets/expedition-backgrounds/bg-03-open-atlantic-surface.webp), full size 1672 × 941, optimized WebP.
+- **Original approved image:** [bg-03-open-atlantic-surface-original.png](../assets/expedition-backgrounds/source/bg-03-open-atlantic-surface-original.png), original 1672 × 941 PNG. Preserve the exact approved original unchanged.
+- **Art requirements confirmed:** Uninterrupted open Atlantic water across the entire frame; natural blue depth gradient (lighter upper water, deeper/darker lower water), restrained atmospheric depth haze and very subtle suspended particulate matter. **No visible surface, static light rays or caustic patterns, animals, coral, coast, seafloor, vegetation, wrecks, or other structures.** The frame stays unobstructed for separately animated wildlife silhouettes.
+- **Reuse:** Open Atlantic region at surface depth (0–30 m). A separate darker pelagic background, BG-09-L, is planned for 30–100 m.
+- **Integration:** Visual approval only. Do not change the expedition rendering code, sunlight animation, wildlife layers, or gameplay as part of this asset collection. Device testing and integration remain pending Avery's separate authorization.
+
+![Approved BG-03-L Open Atlantic surface scenery](../assets/expedition-backgrounds/bg-03-open-atlantic-surface.webp)
