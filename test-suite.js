@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.3.0-beta', VERSION === 'v2.3.0-beta');
-  ok('whats-new has v2.3.0 entry', Array.isArray(WHATS_NEW['v2.3.0-beta']) && WHATS_NEW['v2.3.0-beta'].length === 1);
+  ok('version v2.4.0-beta', VERSION === 'v2.4.0-beta');
+  ok('whats-new has v2.4.0 entry', Array.isArray(WHATS_NEW['v2.4.0-beta']) && WHATS_NEW['v2.4.0-beta'].length === 2);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -4979,6 +4979,69 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.currentPlan = origPlan;
     }
   })();
+
+  // v2.4.0-beta: region-specific dive backgrounds and wildlife
+  ok('REGION_BIOME covers all 13 regions', (() => {
+    const regions = ["caribbean","north-carolina","philippines","maldives","japan","open-atlantic","cornwall","papua-new-guinea","galapagos","south-africa","east-australia","california","arctic"];
+    return regions.every(r => REGION_BIOME[r] && BIOME_SCENERY[REGION_BIOME[r]] && BIOME_CREATURES[REGION_BIOME[r]]);
+  })());
+  ok('arctic gets polar biome (no tropical creatures)', (() => {
+    const c = BIOME_CREATURES[REGION_BIOME["arctic"]];
+    return c.indexOf("turtle") === -1 && c.indexOf("dolphin") === -1 && c.indexOf("seal") !== -1;
+  })());
+  ok('maldives gets tropical biome (no seals)', (() => {
+    const c = BIOME_CREATURES[REGION_BIOME["maldives"]];
+    return c.indexOf("seal") === -1 && c.indexOf("turtle") !== -1;
+  })());
+  ok('all BIOME_CREATURES keys exist in CREATURE_ART', (() => {
+    const all = [];
+    Object.values(BIOME_CREATURES).forEach(arr => arr.forEach(k => { if (all.indexOf(k) === -1) all.push(k); }));
+    return all.every(k => CREATURE_ART.hasOwnProperty(k));
+  })());
+  ok('no .rays div in dive scene HTML', htmlCode.indexOf('<div class="rays">') === -1);
+  // v2.4.0-beta Mira review fixes
+  ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
+    const d = buildSightingDeck("surface", "arctic");
+    const txt = d.pool.map(s => s.text.toLowerCase()).join(" ");
+    return txt.indexOf("turtle") === -1 && txt.indexOf("dolphin") === -1 && txt.indexOf("manta") === -1 && txt.indexOf("flying fish") === -1;
+  })());
+  ok('maldives surface deck has no seals', (() => {
+    const d = buildSightingDeck("surface", "maldives");
+    const txt = d.pool.map(s => s.text.toLowerCase()).join(" ");
+    return txt.indexOf("seal") === -1;
+  })());
+  ok('arctic reef deck has no coral/tropical animals', (() => {
+    const d = buildSightingDeck("reef", "arctic");
+    const txt = d.pool.map(s => s.text.toLowerCase()).join(" ");
+    return txt.indexOf("coral") === -1 && txt.indexOf("hawksbill") === -1 && txt.indexOf("turtle") === -1;
+  })());
+  ok('NC has wreck accent, japan does not', (() => {
+    return !!REGION_ACCENT["north-carolina"] && !REGION_ACCENT["japan"] && !REGION_ACCENT["cornwall"];
+  })());
+  ok('temperate biome has no wreck (NC-specific)', (() => {
+    return BIOME_SCENERY.temperate.indexOf("rect") === -1;
+  })());
+  ok('sighting deck never empty (fish fallback)', (() => {
+    const d = buildSightingDeck("reef", "arctic");
+    return d.pool.length > 0 && d.deck.length > 0;
+  })());
+  // v2.4.0-beta Mira review round 2: all 13 regions x 4 depths give nonempty,
+  // biome-compatible decks (catches the open-atlantic reef pelagic gap)
+  ok('all region/depth decks are nonempty and biome-compatible', (() => {
+    const regions = ["caribbean","north-carolina","philippines","maldives","japan","open-atlantic","cornwall","papua-new-guinea","galapagos","south-africa","east-australia","california","arctic"];
+    const depths = ["surface","reef","twilight","deep"];
+    for (const r of regions) {
+      const biome = REGION_BIOME[r];
+      for (const d of depths) {
+        const deck = buildSightingDeck(d, r);
+        if (!deck.pool.length) return false;
+        for (const s of deck.pool) {
+          if (s.biomes && s.biomes.indexOf(biome) === -1) return false;
+        }
+      }
+    }
+    return true;
+  })());
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

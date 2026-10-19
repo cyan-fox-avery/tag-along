@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.3.0-beta";
+const VERSION = "v2.4.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.4.0-beta": [
+"🌍 <strong>Expeditions look like where you are.</strong> Dive backgrounds are now location-specific — coral in the tropics, kelp off California, icebergs in the Arctic, a wreck off North Carolina, volcanic rock in Galápagos — and the background animals match too. No more tropical fish in polar waters.",
+"✨ <strong>Stripes removed.</strong> The old diagonal light stripes are gone from the dive scene.",
+  ],
   "v2.3.0-beta": [
 "🌊 <strong>New underwater background by Mira.</strong> The sunlit water is now a pair of hand-crafted looping videos — one for landscape, one separately composed for portrait — with natural upper-left light, gentle drift, and shimmering surface. The game picks the right one for your screen.",
   ],
@@ -601,36 +605,41 @@ const DEPTH_FLAVOUR = {
    turtles in one dive. */
 const SIGHTINGS = {
   surface: [
-    { text: "A sea turtle glides past, unhurried, flippers moving like slow wings.", creature: "turtle" },
-    { text: "A school of small silver fish wheels past in perfect unison.", creature: "fish" },
-    { text: "A dolphin arcs through the blue in the distance, there and gone.", creature: "dolphin" },
-    { text: "A pair of flying fish skitter across the surface, touching down and lifting off again.", creature: "fish" },
-    { text: "A seal torpedoes past, sleek and curious, then vanishes into the blue.", creature: "seal" },
-    { text: "A manta ray breaches in the distance — a slow black wingspan against the sky, then gone.", creature: "ray" },
-    { text: "A loggerhead turtle surfaces to breathe, exhales with a sound like a sigh, and dives.", creature: "turtle" },
-    { text: "A pod of spotted dolphins hunts in formation, herding a bait ball into a glittering panic.", creature: "dolphin" }
+    { text: "A sea turtle glides past, unhurried, flippers moving like slow wings.", creature: "turtle", biomes: ["tropical","temperate","volcanic","pelagic"] },
+    { text: "A school of small silver fish wheels past in perfect unison.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A dolphin arcs through the blue in the distance, there and gone.", creature: "dolphin", biomes: ["tropical","temperate","pelagic"] },
+    { text: "A pair of flying fish skitter across the surface, touching down and lifting off again.", creature: "fish", biomes: ["tropical","pelagic"] },
+    { text: "A seal torpedoes past, sleek and curious, then vanishes into the blue.", creature: "seal", biomes: ["temperate","kelp","polar","volcanic"] },
+    { text: "A manta ray breaches in the distance — a slow black wingspan against the sky, then gone.", creature: "ray", biomes: ["tropical","pelagic"] },
+    { text: "A loggerhead turtle surfaces to breathe, exhales with a sound like a sigh, and dives.", creature: "turtle", biomes: ["tropical","temperate"] },
+    { text: "A pod of spotted dolphins hunts in formation, herding a bait ball into a glittering panic.", creature: "dolphin", biomes: ["tropical","pelagic"] }
   ],
   reef: [
-    { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle" },
-    { text: "A shimmering school of fusiliers pours over the reef crest.", creature: "fish" },
-    { text: "A hawksbill turtle works a sponge off the coral head, beak crunching steadily.", creature: "turtle" },
-    { text: "A small reef shark patrols the drop-off — not your target, just a colleague passing through.", creature: "fish" },
-    { text: "A spotted eagle ray glides over the sand flat, wings rippling like slow applause.", creature: "ray" },
-    { text: "A green turtle rests on a coral bommie, tucked in like it's naptime. It probably is.", creature: "turtle" },
-    { text: "A school of barracuda hangs motionless in the blue, silver commas all facing the same way.", creature: "fish" },
-    { text: "A reef octopus flows across the coral, colour-shifting with every metre.", creature: "fish" }
+    { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle", biomes: ["tropical","volcanic"] },
+    { text: "A shimmering school of fusiliers pours over the reef crest.", creature: "fish", biomes: ["tropical","volcanic"] },
+    { text: "A hawksbill turtle works a sponge off the coral head, beak crunching steadily.", creature: "turtle", biomes: ["tropical"] },
+    { text: "A small reef shark patrols the drop-off — not your target, just a colleague passing through.", creature: "fish", biomes: ["tropical","volcanic"] },
+    { text: "A spotted eagle ray glides over the sand flat, wings rippling like slow applause.", creature: "ray", biomes: ["tropical"] },
+    { text: "A green turtle rests on a coral bommie, tucked in like it's naptime. It probably is.", creature: "turtle", biomes: ["tropical"] },
+    { text: "A school of barracuda hangs motionless in the blue, silver commas all facing the same way.", creature: "fish", biomes: ["tropical","volcanic","temperate"] },
+    { text: "A reef octopus flows across the coral, colour-shifting with every metre.", creature: "fish", biomes: ["tropical","volcanic"] },
+    { text: "A seal weaves through the kelp stipes, there and gone like a rumour.", creature: "seal", biomes: ["kelp","temperate"] },
+    { text: "Cold water, low light — a school of small silver fish holds station over the rocky reef.", creature: "fish", biomes: ["temperate","polar","kelp"] },
+    { text: "A vast school of mackerel wheels overhead, a living cloud flashing silver.", creature: "fish", biomes: ["pelagic"] },
+    { text: "A squid pulses through the blue, arms trailing, hunting in the open water.", creature: "fish", biomes: ["pelagic"] },
+    { text: "A moon jelly drifts past in the open blue, pulsing gently.", creature: "jellyfish", biomes: ["pelagic"] }
   ],
   twilight: [
-    { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish" },
-    { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish" },
-    { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish" },
-    { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish" }
+    { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ],
   deep: [
-    { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish" },
-    { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish" },
-    { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish" },
-    { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish" }
+    { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ]
 };
 
@@ -641,9 +650,17 @@ const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", 
 function buildSightingDeck(depth, region) {
   const pool = SIGHTINGS[depth] || [];
   const note = ((REGIONS[region] && REGIONS[region].note) || "").toLowerCase();
-  const filtered = pool.filter(s => !note.includes(SIGHTING_KEYWORDS[s.creature]));
-  const use = filtered.length ? filtered : pool;
-  return { deck: shuffled(use), pool: use };
+  /* v2.4.0-beta (Mira review): filter by biome compatibility too — no turtles
+     in the Arctic, no seals in the Maldives, no coral-reef animals in polar
+     waters. Falls back to a neutral fish sighting, never an empty deck. */
+  const biome = REGION_BIOME[region] || "temperate";
+  const filtered = pool.filter(s =>
+    !note.includes(SIGHTING_KEYWORDS[s.creature]) &&
+    (!s.biomes || s.biomes.indexOf(biome) !== -1)
+  );
+  const use = filtered.length ? filtered : pool.filter(s => s.creature === "fish");
+  const final = use.length ? use : pool;
+  return { deck: shuffled(final), pool: final };
 }
 
 /* Rare, quiet easter eggs in the flavour. Real phenomena, mentioned in passing.
@@ -2265,12 +2282,110 @@ const SCENERY = {
     <ellipse cx="300" cy="58" rx="34" ry="9" fill="#0a1219" opacity="0.8"/>
   </svg>`
 };
+/* v2.4.0-beta: region-specific dive backdrops — SVG overlays per biome.
+   Subtle, behind the action; the depth SVG stays as the base. */
+const BIOME_SCENERY = {
+  tropical: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.5">
+      <path d="M40,200 Q50,140 35,110 Q60,130 55,160 Q70,120 60,90 Q80,120 75,150 L85,200 Z" fill="#c4748a"/>
+      <path d="M90,200 Q100,150 85,120 Q110,140 105,170 L115,200 Z" fill="#d48aa0"/>
+      <path d="M520,200 Q510,140 525,110 Q505,130 510,160 Q495,125 505,95 Q485,125 490,155 L480,200 Z" fill="#c4748a"/>
+      <ellipse cx="150" cy="190" rx="60" ry="18" fill="#8a6a4a" opacity="0.6"/>
+      <ellipse cx="450" cy="195" rx="80" ry="15" fill="#8a6a4a" opacity="0.6"/>
+    </g></svg>`,
+  temperate: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.55">
+      <path d="M0,200 L0,150 Q80,130 140,160 Q200,120 280,150 L280,200 Z" fill="#4a5a62"/>
+      <path d="M320,200 L320,160 Q400,140 460,165 Q520,135 600,160 L600,200 Z" fill="#3d4d55"/>
+      <ellipse cx="150" cy="185" rx="90" ry="20" fill="#5a6a72" opacity="0.5"/>
+    </g></svg>`,
+  kelp: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.5">
+      <path d="M100,200 Q95,120 105,60 Q98,100 110,140 Q102,80 115,40" stroke="#2d6a3d" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M180,200 Q175,110 185,50 Q178,95 190,130" stroke="#357a48" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <path d="M420,200 Q425,120 415,55 Q422,100 410,145" stroke="#2d6a3d" stroke-width="13" fill="none" stroke-linecap="round"/>
+      <path d="M500,200 Q495,130 505,70" stroke="#357a48" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <ellipse cx="105" cy="45" rx="22" ry="10" fill="#3d8a52" opacity="0.7"/>
+      <ellipse cx="415" cy="60" rx="20" ry="9" fill="#3d8a52" opacity="0.7"/>
+    </g></svg>`,
+  pelagic: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.35">
+      <ellipse cx="300" cy="100" rx="120" ry="25" fill="#1a4a6a" opacity="0.4"/>
+      <ellipse cx="310" cy="105" rx="80" ry="15" fill="#245a7a" opacity="0.3"/>
+    </g></svg>`,
+  polar: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.6">
+      <path d="M80,0 L140,0 L120,60 L100,90 L60,60 Z" fill="#cfe8f2"/>
+      <path d="M100,90 L120,60 L110,90 Z" fill="#a8d0e6"/>
+      <path d="M450,0 L520,0 L500,45 L470,70 L430,45 Z" fill="#cfe8f2"/>
+      <path d="M470,70 L500,45 L485,70 Z" fill="#a8d0e6"/>
+      <ellipse cx="300" cy="195" rx="200" ry="12" fill="#9fc0d4" opacity="0.3"/>
+    </g></svg>`,
+  volcanic: `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.6">
+      <path d="M0,200 L0,140 Q60,120 100,150 Q140,110 200,140 L200,200 Z" fill="#2a2a2e"/>
+      <path d="M400,200 L400,150 Q460,130 500,155 Q540,125 600,150 L600,200 Z" fill="#232326"/>
+      <path d="M120,200 Q150,170 180,185 Q210,160 240,180 L240,200 Z" fill="#333336"/>
+    </g></svg>`
+};
+/* v2.4.0-beta: region-specific accents — landmarks that belong to ONE place,
+   not the whole biome. (Mira review: the NC wreck was showing in all temperate waters.) */
+const REGION_ACCENT = {
+  "north-carolina": `<svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice">
+    <g opacity="0.45" transform="translate(420,175) rotate(-8)">
+      <rect x="-45" y="-12" width="90" height="24" rx="4" fill="#2e383e"/>
+      <rect x="-8" y="-28" width="16" height="18" fill="#2e383e"/>
+      <rect x="-30" y="-22" width="8" height="12" fill="#2e383e"/>
+    </g></svg>`
+};
 /* depth key used by the planner -> scenery key. */
 const SCENERY_FOR = { surface: "surface", reef: "reef", twilight: "twilight", deep: "deep" };
-function renderScenery(depth) {
+/* v2.4.0-beta: region -> biome for location-specific dive backgrounds and wildlife.
+   No tropical animals in the arctic, no penguins in the maldives. */
+const REGION_BIOME = {
+  "caribbean": "tropical", "philippines": "tropical", "maldives": "tropical", "papua-new-guinea": "tropical",
+  "north-carolina": "temperate", "japan": "temperate", "cornwall": "temperate",
+  "south-africa": "temperate", "east-australia": "temperate",
+  "california": "kelp",
+  "open-atlantic": "pelagic",
+  "arctic": "polar",
+  "galapagos": "volcanic"
+};
+/* Region-appropriate ambient creatures (keys into CREATURE_ART). */
+const BIOME_CREATURES = {
+  "tropical":  ["fish", "fish", "turtle", "dolphin", "ray"],
+  "temperate": ["fish", "fish", "seal", "dolphin", "jellyfish"],
+  "kelp":      ["fish", "fish", "seal", "dolphin"],
+  "pelagic":   ["fish", "dolphin", "jellyfish", "ray"],
+  "polar":     ["seal", "fish", "fish", "jellyfish"],
+  "volcanic":  ["turtle", "fish", "ray", "seal"]
+};
+function renderScenery(depth, region) {
   const el = $("diveScenery");
   if (!el) return;
   el.innerHTML = SCENERY[SCENERY_FOR[depth] || "surface"] || "";
+  /* v2.4.0-beta: region-specific backdrop overlay (biome).
+     Mira review: shallow features (coral, kelp, icebergs) only at surface/reef —
+     twilight/deep get dark water, not bright reef. */
+  const biome = REGION_BIOME[region] || "temperate";
+  const shallow = depth === "surface" || depth === "reef";
+  if (shallow) {
+    const overlay = BIOME_SCENERY[biome];
+    if (overlay) {
+      const d = document.createElement("div");
+      d.className = "biome-overlay biome-" + biome;
+      d.innerHTML = overlay;
+      el.appendChild(d);
+    }
+    /* Region-specific landmark accent (e.g. NC wreck) — shallow only. */
+    const accent = REGION_ACCENT[region];
+    if (accent) {
+      const a = document.createElement("div");
+      a.className = "biome-overlay region-accent";
+      a.innerHTML = accent;
+      el.appendChild(a);
+    }
+  }
   el.querySelectorAll(".snow").forEach(n => n.remove());
   /* Marine snow in the deep: slow-falling specks. */
   if (depth === "deep") {
@@ -2289,9 +2404,17 @@ function renderScenery(depth) {
 /* v0.13.0: background fish drift through between sightings so the water
    never feels empty. Small, dim, clearly behind the action. */
 let ambientTimer = null;
-function startAmbientLife(depth) {
+function startAmbientLife(depth, region) {
   stopAmbientLife();
-  const creatures = depth === "deep" ? ["fish"] : ["fish", "fish", "turtle", "dolphin"];
+  /* v2.4.0-beta: region-specific wildlife — no tropical animals in the arctic.
+     Mira review: twilight/deep use deep-appropriate creatures, not shallow biome fauna. */
+  const biome = REGION_BIOME[region] || "temperate";
+  const shallow = depth === "surface" || depth === "reef";
+  const creatures = depth === "deep"
+    ? ["fish"]
+    : !shallow
+      ? ["fish", "jellyfish"]
+      : (BIOME_CREATURES[biome] || ["fish", "fish", "turtle", "dolphin"]);
   ambientTimer = setInterval(() => {
     if (document.hidden) return;
     if (Math.random() < 0.55) spawnCreature(pick(creatures), true);
@@ -2804,8 +2927,8 @@ async function runExpedition(plan) {
 
   const scene = $("diveScene");
   scene.className = "dive-scene " + DEPTHS[plan.depth].scene;
-  renderScenery(plan.depth);
-  startAmbientLife(plan.depth);
+  renderScenery(plan.depth, plan.region);
+  startAmbientLife(plan.depth, plan.region);
   const deep = plan.depth === "twilight" || plan.depth === "deep";
 
   const baitText = plan.bait === "plankton"
