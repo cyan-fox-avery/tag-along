@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.1.5-beta', VERSION === 'v2.1.5-beta');
-  ok('whats-new has v2.1.5 entry', Array.isArray(WHATS_NEW['v2.1.5-beta']) && WHATS_NEW['v2.1.5-beta'].length === 1);
+  ok('version v2.1.6-beta', VERSION === 'v2.1.6-beta');
+  ok('whats-new has v2.1.6 entry', Array.isArray(WHATS_NEW['v2.1.6-beta']) && WHATS_NEW['v2.1.6-beta'].length === 1);
   // v2.1.2-beta: no blend modes on the full-viewport ray layer. Screen-blending
   // 8 large animated layers every frame overwhelmed the iPad GPU (v2.1.0/2.1.1
   // touch death). Normal alpha compositing is far cheaper.
@@ -49,13 +49,12 @@ code += `
     const rule = cssCode.slice(i, end);
     return i !== -1 && rule.indexOf('mix-blend-mode') === -1;
   })());
-  // v2.1.5-beta: rays breathe via OPACITY ONLY. With the rays hidden (v2.1.3)
-  // the iPad recovered, implicating the light layer; the continuous transform
-  // motion is the prime suspect, so this tests opacity-only breathing.
-  // Assert the full contract: parent VISIBLE, spans USE ray-breathe, keyframes
-  // animate opacity EXCLUSIVELY (no transform/rotate/scale/position/size),
-  // and the old ray-life keyframes stay gone.
-  ok('v2.1.5: rays breathe with opacity only', (() => {
+  // v2.1.6-beta: ROLLED BACK to static rays. v2.1.5's opacity-only breathing
+  // also broke the iPad — ANY continuous animation on the 8 large masked
+  // spans is too much for its compositor. Assert the stable contract: parent
+  // VISIBLE (no display:none), spans STATIC (rotate transform, no animation
+  // properties, no keyframes of any kind).
+  ok('v2.1.6: rays are visible and static (rollback)', (() => {
     const pc = cssCode.indexOf('.caustics {');
     if (pc === -1) return false;
     const pe = cssCode.indexOf('}', pc);
@@ -69,21 +68,10 @@ code += `
     if (si === -1) return false;
     const se = cssCode.indexOf('}', si);
     const spanRule = cssCode.slice(si, se);
-    if (spanRule.indexOf('animation:') === -1 || spanRule.indexOf('ray-breathe') === -1) return false;
-    const ki = cssCode.indexOf('@keyframes ray-breathe');
-    if (ki === -1) return false;
-    let depth = 0, ke = -1;
-    for (let j = ki; j < cssCode.length; j++) {
-      if (cssCode[j] === '{') depth++;
-      else if (cssCode[j] === '}') { depth--; if (depth === 0) { ke = j; break; } }
-    }
-    if (ke === -1) return false;
-    const frames = cssCode.slice(ki, ke);
-    const badProps = ['transform', 'scaleX', 'scaleY', 'rotate(', 'translate', 'width:', 'height:', 'left:', 'top:', 'margin'];
-    for (let b = 0; b < badProps.length; b++) {
-      if (frames.indexOf(badProps[b]) !== -1) return false;
-    }
-    return frames.indexOf('opacity:') !== -1 && cssCode.indexOf('@keyframes ray-life') === -1;
+    const hasRotate = spanRule.indexOf('transform:') !== -1 && spanRule.indexOf('rotate(var(--ray-angle') !== -1;
+    const noAnim = spanRule.indexOf('animation:') === -1 && spanRule.indexOf('animation-duration') === -1;
+    const noKeyframes = cssCode.indexOf('@keyframes ray-breathe') === -1 && cssCode.indexOf('@keyframes ray-life') === -1;
+    return hasRotate && noAnim && noKeyframes;
   })());
   // v2.1.3-beta DIAGNOSTIC: retired — the rays are back in v2.1.4.
   // v2.1.1-beta: sun-ray shafts stay viewport-sized (kept from the rework).
