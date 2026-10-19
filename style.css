@@ -101,17 +101,20 @@ body::before {
   animation: ray-life 18s ease-in-out infinite;
 }
 /* Fan angles from the far-left sun point: wide spread (12-72 deg) so the fan
-   visibly sweeps the screen. Each ray pivots around the shared sun point;
-   wide-angle rays cross the viewport diagonally and exit through the right
-   edge — all visible, none wasted off-screen. */
-.caustics span:nth-child(1) { --ray-angle: 12deg; width: 120px; animation-duration: 17s; animation-delay: -5s; }
-.caustics span:nth-child(2) { --ray-angle: 20deg; width: 95px;  animation-duration: 22s; animation-delay: -14s; }
-.caustics span:nth-child(3) { --ray-angle: 28deg; width: 140px; animation-duration: 15s; animation-delay: -8s; }
-.caustics span:nth-child(4) { --ray-angle: 36deg; width: 105px; animation-duration: 20s; animation-delay: -3s; }
-.caustics span:nth-child(5) { --ray-angle: 46deg; width: 130px; animation-duration: 18s; animation-delay: -11s; }
-.caustics span:nth-child(6) { --ray-angle: 54deg; width: 100px; animation-duration: 24s; animation-delay: -17s; }
-.caustics span:nth-child(7) { --ray-angle: 63deg; width: 145px; animation-duration: 16s; animation-delay: -7s; }
-.caustics span:nth-child(8) { --ray-angle: 72deg; width: 110px; animation-duration: 21s; animation-delay: -13s; }
+   visibly sweeps the screen. Each ray pivots around the shared sun point.
+   v2.1.0-beta: angles are NEGATIVE — CSS rotate() is clockwise, so a positive
+   angle swings each shaft's free end to the bottom-LEFT (fanning off-screen,
+   the v2.0.0 bug Avery caught on iPad). Negative angles swing the free ends
+   to the bottom-RIGHT: wide-angle rays cross the viewport diagonally and exit
+   through the right edge — all visible, none wasted off-screen. */
+.caustics span:nth-child(1) { --ray-angle: -12deg; width: 120px; animation-duration: 17s; animation-delay: -5s; }
+.caustics span:nth-child(2) { --ray-angle: -20deg; width: 95px;  animation-duration: 22s; animation-delay: -14s; }
+.caustics span:nth-child(3) { --ray-angle: -28deg; width: 140px; animation-duration: 15s; animation-delay: -8s; }
+.caustics span:nth-child(4) { --ray-angle: -36deg; width: 105px; animation-duration: 20s; animation-delay: -3s; }
+.caustics span:nth-child(5) { --ray-angle: -46deg; width: 130px; animation-duration: 18s; animation-delay: -11s; }
+.caustics span:nth-child(6) { --ray-angle: -54deg; width: 100px; animation-duration: 24s; animation-delay: -17s; }
+.caustics span:nth-child(7) { --ray-angle: -63deg; width: 145px; animation-duration: 16s; animation-delay: -7s; }
+.caustics span:nth-child(8) { --ray-angle: -72deg; width: 110px; animation-duration: 21s; animation-delay: -13s; }
 @keyframes ray-life {
   /* v1.4.17: clearly visible life — slow sway (±4 deg) plus a real grow/shrink
      pulse (scaleX 0.7-1.25). Rays breathe but never fully vanish (min 0.15). */
