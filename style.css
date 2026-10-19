@@ -79,7 +79,9 @@ body::before {
    conic gradient centered at the sun point CANNOT miss: every wedge radiates
    from the sun across the viewport by construction. Three layered fans with
    different wedge patterns sway and breathe at different rates for organic,
-   clearly-alive light. mix-blend-mode: screen caps overlap brightness.
+   clearly-alive light. v2.1.2-beta: the screen blend mode is gone (iPad GPU
+   could not afford blending 8 large animated layers every frame); rays now
+   composite normally.
    Transform/opacity/scale only, no blur filters, for iPad-friendliness. */
 .caustics { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
   /* v2.1.2-beta: the screen blend mode is GONE from this rule. Blending 8 large

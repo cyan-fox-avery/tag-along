@@ -3064,7 +3064,6 @@ code += `
     ok("caustics use span-based rays", /\\.caustics\\s+span\\s*\\{/.test(cssCode));
     ok("no conic fan divs remain", !/\\.caustics\\s+\\.fan/.test(cssCode));
     ok("rays have diffused soft edges (mask)", /\\.caustics\\s+span\\s*\\{[^}]*mask-image:\\s*linear-gradient\\(to\\s+right/.test(cssCode));
-    ok("rays use screen blend for brightness cap", true); /* v2.1.2-beta: retired — screen blend removed (iPad GPU). See v2.1.2 no-blend test. */
     ok("caustics persist while scrolling", /\\.caustics\\s*\\{[^}]*position:\\s*fixed/.test(cssCode));
     const rayCount = (cssCode.match(/\\.caustics\\s+span:nth-child\\(\\d+\\)/g) || []).length;
     ok("caustics has 8 rays", rayCount === 8);
