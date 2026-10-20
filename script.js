@@ -4936,14 +4936,19 @@ function winStep(n) {
     box(`
       ${certFigureHTML()}
       <p class="latin" style="text-align:center; margin:6px 0 0">Write your name on the line — that's what makes it yours.</p>
+      ${certNameBoxHTML()}
       <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>
       <div class="cert-actions">
         <button id="certGrow" class="cert-action-btn" type="button" aria-pressed="false">🔍 Make it bigger</button>
         <button id="certSave" class="cert-action-btn" type="button">📥 Save / share certificate</button>
       </div>
       <button id="winNext" class="primary-button" type="button">Continue</button>`, "cert-phone");
-    const ni = wireCertName();
-    if (ni && ni.focus) ni.focus();
+    wireCertName();
+    /* Focus the name BOX, not the on-certificate field: the keyboard
+       can cover the certificate (Avery), but the box stays visible
+       while typing and the signature line fills in as they type. */
+    const nb = $("certNameBox");
+    if (nb && nb.focus) nb.focus();
     wireCertSave();
     const grow = $("certGrow");
     if (grow) grow.addEventListener("click", () => {
@@ -5505,14 +5510,32 @@ function wireCertSave() {
 
 function wireCertName() {
   const nameInput = $("certName");
+  const nameBox = $("certNameBox");
+  const sync = (from, to) => {
+    state.certName = from.value;
+    if (to) to.value = from.value;
+    try { localStorage.setItem("tyi-cert-name", state.certName); } catch {}
+  };
   if (nameInput) {
     nameInput.value = state.certName || "";
-    nameInput.addEventListener("input", () => {
-      state.certName = nameInput.value;
-      try { localStorage.setItem("tyi-cert-name", state.certName); } catch {}
-    });
+    nameInput.addEventListener("input", () => sync(nameInput, nameBox));
+  }
+  if (nameBox) {
+    nameBox.value = state.certName || "";
+    nameBox.addEventListener("input", () => sync(nameBox, nameInput));
   }
   return nameInput;
+}
+
+/* v2.5.6-beta: a plain, always-visible name box that mirrors the
+   certificate's signature line. On touch devices the keyboard can
+   cover the certificate itself while typing (Avery, 2026-10-20) —
+   the box stays in view, and the name appears on the line as typed. */
+function certNameBoxHTML() {
+  return `
+    <label class="cert-name-box">Your name
+      <input id="certNameBox" type="text" maxlength="40" autocomplete="off" placeholder="Your name">
+    </label>`;
 }
 
 function openCertificate() {
@@ -5521,8 +5544,7 @@ function openCertificate() {
      shark-detail grid — the figure and caption stack full-width. */
   c.classList.add("cert-mode");
   c.innerHTML = certFigureHTML() +
-    (state.certName ? "" : `
-    <p class="latin" style="text-align:center">Tap the line on the certificate to sign your name.</p>`) +
+    certNameBoxHTML() +
     certActionsHTML() + `
     <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>`;
   wireCertName();

@@ -4903,8 +4903,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         whtml.indexOf('id="certSave"') !== -1 &&
         whtml.indexOf('id="certGrow"') !== -1);
       ok("certificate name line is blank until the player types",
-        html.indexOf('placeholder=""') !== -1 &&
-        html.indexOf('placeholder="Your name"') === -1);
+        html.slice(0, html.indexOf("</figure>")).indexOf('placeholder=""') !== -1 &&
+        html.slice(0, html.indexOf("</figure>")).indexOf('placeholder="Your name"') === -1);
       ok("certificate export composites artwork + name + date on canvas (source)",
         fileCode.indexOf("function exportCertificate") !== -1 &&
         fileCode.indexOf('createElement("canvas")') !== -1 &&
@@ -4912,6 +4912,16 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         CERT_DRAW.nameBase < 0.549 && CERT_DRAW.dateBase < 0.804 &&
         CERT_DRAW.nameX > 0.15 && CERT_DRAW.nameX < 0.85 &&
         CERT_DRAW.dateX > 0.66 && CERT_DRAW.dateX < 0.90);
+      // Avery: the keyboard can cover the certificate — a visible
+      // name box mirrors the signature line in both places, and the
+      // ceremony focuses the box, not the on-certificate field.
+      ok("certificate has a visible name box in modal + ceremony, synced (source)",
+        html.indexOf('id="certNameBox"') !== -1 &&
+        whtml.indexOf('id="certNameBox"') !== -1 &&
+        fileCode.indexOf('const nameBox = $("certNameBox")') !== -1 &&
+        cssCode.indexOf(".cert-name-box") !== -1);
+      ok("win ceremony focuses the name box (source)",
+        fileCode.indexOf('const nb = $("certNameBox")') !== -1);
       $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);
