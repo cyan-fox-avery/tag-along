@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.0-beta', VERSION === 'v2.5.0-beta');
-  ok('whats-new has v2.5.0 entry', Array.isArray(WHATS_NEW['v2.5.0-beta']) && WHATS_NEW['v2.5.0-beta'].length === 1);
+  ok('version v2.5.1-beta', VERSION === 'v2.5.1-beta');
+  ok('whats-new has v2.5.1 entry', Array.isArray(WHATS_NEW['v2.5.1-beta']) && WHATS_NEW['v2.5.1-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -5061,6 +5061,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   })());
   ok('dive-bg CSS exists', cssCode.indexOf('.dive-scene .dive-bg') !== -1);
   ok('dive-bg anchored near bottom', cssCode.indexOf('object-position: 50% 95%') !== -1);
+  ok('twilight gets lift class', fileCode.indexOf('twilight-lift') !== -1);
+  ok('twilight-lift CSS brightens', cssCode.indexOf('.dive-bg.twilight-lift') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");

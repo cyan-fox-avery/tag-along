@@ -1732,6 +1732,8 @@ video.archive-media { max-height: 420px; }
   pointer-events: none; z-index: 0;
   user-select: none; -webkit-user-drag: none;
 }
+/* v2.5.1-beta: twilight lifted slightly (Avery) */
+.dive-scene .dive-bg.twilight-lift { filter: brightness(1.22) saturate(1.05); }
 /* v2.4.0-beta: region-specific biome overlays in the dive scene.
    (Superseded by v2.5.0 background images; rules kept for safety.) */
 .dive-scene .biome-overlay {

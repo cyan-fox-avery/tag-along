@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.0-beta";
+const VERSION = "v2.5.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.1-beta": [
+"🌅 <strong>Twilight lightened slightly</strong> and the header is tighter — shark beside the title on all screens now.",
+  ],
   "v2.5.0-beta": [
 "🎨 <strong>Hand-painted expedition backgrounds.</strong> Every dive now has a custom underwater backdrop — 13 scenes by Avery & Mira covering all 13 regions × 4 depths, from tropical coral to arctic ice to the North Carolina wreck.",
   ],
@@ -2405,9 +2408,12 @@ function bgFor(region, depth) {
 function renderScenery(depth, region) {
   const el = $("diveScenery");
   if (!el) return;
-  /* v2.5.0-beta: background image replaces the SVG scenery + biome overlays. */
+  /* v2.5.0-beta: background image replaces the SVG scenery + biome overlays.
+     v2.5.1-beta: twilight gets a slight brightening (Avery) — CSS filter only,
+     the approved master image is untouched. */
   const bg = bgFor(region, depth);
-  el.innerHTML = `<img class="dive-bg" src="assets/expedition-backgrounds/${bg}" alt="" draggable="false">`;
+  const twilightClass = depth === "twilight" ? " twilight-lift" : "";
+  el.innerHTML = `<img class="dive-bg${twilightClass}" src="assets/expedition-backgrounds/${bg}" alt="" draggable="false">`;
   el.querySelectorAll(".snow").forEach(n => n.remove());
   /* Marine snow in the deep: slow-falling specks. */
   if (depth === "deep") {
