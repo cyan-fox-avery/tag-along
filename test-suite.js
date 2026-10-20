@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.3-beta', VERSION === 'v2.5.3-beta');
-  ok('whats-new has v2.5.3 entry', Array.isArray(WHATS_NEW['v2.5.3-beta']) && WHATS_NEW['v2.5.3-beta'].length === 1);
+  ok('version v2.5.4-beta', VERSION === 'v2.5.4-beta');
+  ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -3024,6 +3024,8 @@ code += `
     const origFlags = [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip];
     const origChatSeen = JSON.parse(JSON.stringify(state.chatSeen));
     const origRandom = Math.random;
+    const origPinned = state.pinned;
+    state.pinned = 'nurse'; // v2.5.4-beta: coherence — Sarah chats about the pinned species
     state.taggedThisTrip = false; state.resightedThisTrip = false; state.followedThisTrip = false;
     state.failures = 0;
     state.sarahAdviceOffered = true;
@@ -3055,6 +3057,7 @@ code += `
     state.sarahAdviceOffered = origOffered;
     [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip] = origFlags;
     state.chatSeen = origChatSeen;
+    state.pinned = origPinned;
     saveMsgs();
   })();
   // v2.2.0-beta: CSS caustics retired — sun rays are a looping video.
@@ -4087,10 +4090,11 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   })());
   // v1.8.5-beta: behavioral no-repeat guards (Mira review) — deterministic via mocked Math.random.
   ok('checkin never deals the same template twice in a row (behavioral)', (() => {
-    const origRandom = Math.random, origTagged = state.tagged, origIdx = lastCheckinIdx;
+    const origRandom = Math.random, origTagged = state.tagged, origIdx = lastCheckinIdx, origPinned = state.pinned;
     const L = NAMED_CHECKINS.length;
     try {
       state.tagged = { mako: { name: "Finley", researchId: "SM-2026-001" } };
+      state.pinned = 'mako'; // v2.5.4-beta: coherence — check-ins need pinned/encountered species
       lastCheckinIdx = -1;
       // gate open (<=0.4), pick -> the single named shark, ci = 3
       const seq = [0.1, 0.0, 3.5 / L];
@@ -4110,7 +4114,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
       const wrapped = lastCheckinIdx;
       return first === 3 && second === 4 && wrapped === 0;
     } finally {
-      Math.random = origRandom; state.tagged = origTagged; lastCheckinIdx = origIdx;
+      Math.random = origRandom; state.tagged = origTagged; lastCheckinIdx = origIdx; state.pinned = origPinned;
     }
   })());
   ok('reunion closer never repeats twice in a row (behavioral)', (() => {
@@ -4625,9 +4629,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const origTagged = state.tagged;
     const origFacts = state.unlockedFacts;
     const origRandom = Math.random;
+    const origPinned = state.pinned;
     Math.random = () => 0; // passes the 0.4 gate; picks first named + first template
     try {
       state.tagged = { thresher: { name: "Testy", researchId: "TS-1", resightings: [] } };
+      state.pinned = 'thresher'; // v2.5.4-beta: coherence — check-ins need pinned/encountered species
       const thresherHook = SHARKS.find(function(s){ return s.id === "thresher"; }).hook;
       // Locked: hook insight (index 2) NOT unlocked -> neutral fallback.
       state.unlockedFacts = {};
@@ -4644,6 +4650,76 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       Math.random = origRandom;
       state.tagged = origTagged;
       state.unlockedFacts = origFacts;
+      state.pinned = origPinned;
+    }
+  })();
+  /* v2.5.4-beta (Mira): behavioral coherence tests — controlled state,
+     real selection paths, not string wiring. */
+  (() => {
+    const oR = Math.random, oPinned = state.pinned, oTagged = state.tagged,
+          oLog = state.logbook, oSeen = state.chatSeen, oMsgsLen = state.messages.length,
+          oUnread = state.unread, oFail = state.failures, oTag = state.taggedThisTrip,
+          oRes = state.resightedThisTrip, oFol = state.followedThisTrip,
+          oClock = state.lastSarahMsgAt, oChkIdx = lastCheckinIdx;
+    try {
+      Math.random = () => 0; // gates open, first pick
+      // (a) no pin + empty last trip + old named tags: no check-in, generic chat
+      state.pinned = null;
+      state.tagged = { galapagos: { name: "Gala", researchId: "G-1" } };
+      state.logbook = [{ encounters: [] }];
+      state.chatSeen = {};
+      ok("coherence(a): old named shark alone yields no check-in",
+        maybeCheckinThread() === null);
+      ok("coherence(a): pickChat falls back to generic",
+        GENERIC_CHATS.indexOf(pickChat()) !== -1);
+      // (a2) valid pin + unrelated historical named shark: only the valid one is chosen
+      state.pinned = 'lemon';
+      state.tagged = { lemon: { name: "Zest", researchId: "L-1" },
+                       galapagos: { name: "Gala", researchId: "G-1" } };
+      const ciThread = maybeCheckinThread();
+      const ciText = ciThread ? ciThread.map(function(m){ return m.text; }).join(' ') : '';
+      ok("coherence(a2): check-in selects only the allowed named shark",
+        !!ciThread && ciText.indexOf("Zest") !== -1 && ciText.indexOf("Gala") === -1);
+      // (b) pinned only: pool contains exactly the pinned species
+      state.pinned = 'nurse';
+      state.logbook = [];
+      const poolB = sarahSpeciesPool(COUSIN_CHATS);
+      ok("coherence(b): pinned-only pool is exactly the pinned species",
+        poolB.length === 1 && poolB[0].id === 'nurse');
+      // (c) encounters only: pool is exactly the last trip's encounters
+      state.pinned = null;
+      state.logbook = [{ encounters: [{ speciesId: 'lemon' }] }];
+      const poolC = sarahSpeciesPool(COUSIN_CHATS);
+      ok("coherence(c): encounter-only pool is exactly the encountered species",
+        poolC.length === 1 && poolC[0].id === 'lemon');
+      // (d) multiple encounters never leak a historical species
+      state.logbook = [{ encounters: [{ speciesId: 'lemon' }, { speciesId: 'tiger' }] },
+                       { encounters: [{ speciesId: 'galapagos' }] }];
+      const poolD = sarahSpeciesPool(COUSIN_CHATS);
+      ok("coherence(d): older trips never leak into the pool",
+        poolD.length === 2 && poolD.every(function(s){ return s.id === 'lemon' || s.id === 'tiger'; }));
+      // (e) five-failure nudge with no allowed species stays generic
+      state.pinned = null;
+      state.logbook = [{ encounters: [] }];
+      state.failures = 5;
+      state.taggedThisTrip = state.resightedThisTrip = state.followedThisTrip = false;
+      afterExpedition({});
+      const lastThread = state.messages[state.messages.length - 1] || {};
+      const threadTexts = (lastThread.msgs || []).map(function(m){ return m.text; });
+      ok("coherence(e): nudge with empty pool uses the generic line",
+        threadTexts.indexOf("You'll get the next one. I believe in you.") !== -1);
+    } finally {
+      Math.random = oR; state.pinned = oPinned; state.tagged = oTagged;
+      state.logbook = oLog; state.chatSeen = oSeen;
+      // v2.5.4-beta Mira fix: afterExpedition pushes a real thread —
+      // truncate the array in place (same-reference snapshot would not
+      // remove it), restore unread, and resync the mock store.
+      state.messages.length = oMsgsLen; state.unread = oUnread;
+      state.lastSarahMsgAt = oClock;
+      lastCheckinIdx = oChkIdx;
+      saveMsgs();
+      state.failures = oFail; state.taggedThisTrip = oTag;
+      state.resightedThisTrip = oRes; state.followedThisTrip = oFol;
     }
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
@@ -5077,6 +5153,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   // v2.5.3-beta: darker ambient shadows in first two layers
   ok('surface ambient dark gray', cssCode.indexOf('.depth-surface .ambient img') !== -1 && cssCode.indexOf('brightness(0.35)') !== -1);
   ok('shallow ambient almost black', cssCode.indexOf('.depth-shallow .ambient img') !== -1 && cssCode.indexOf('brightness(0.12)') !== -1);
+  // v2.5.4-beta: Sarah species coherence (pinned or just-encountered only)
+  ok('sarahSpeciesPool exists', typeof sarahSpeciesPool === 'function');
+  ok('GENERIC_CHATS exist', Array.isArray(GENERIC_CHATS) && GENERIC_CHATS.length >= 1);
+  ok('pickChat uses coherence pool', fileCode.indexOf('sarahSpeciesPool(COUSIN_CHATS)') !== -1);
+  ok('nudge uses coherence pool', fileCode.indexOf('sarahSpeciesPool(COUSIN_NUDGES)') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");
