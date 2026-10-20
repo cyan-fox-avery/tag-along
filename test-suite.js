@@ -5006,22 +5006,61 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const trule = cssCode.slice(ti, te);
     return trule.indexOf('display: flex') !== -1 && trule.indexOf('padding: 4px 8px 2px') !== -1;
   })());
-  // v2.5.0-beta: background images — all 52 combos resolve
+  // v2.5.0-beta: background images — exact expected filenames (Mira review:
+  // the bgFor fallback could mask a missing mapping, so test them all by name)
   ok('BG_IMAGE has 26 surface/reef entries', Object.keys(BG_IMAGE).length === 26);
-  ok('bgFor twilight is shared', bgFor('arctic', 'twilight') === 'bg-12-shared-twilight.webp');
-  ok('bgFor deep is shared', bgFor('caribbean', 'deep') === 'bg-13-shared-deep-dark.webp');
-  ok('bgFor arctic surface is polar', bgFor('arctic', 'surface') === 'bg-06-arctic-surface.webp');
-  ok('bgFor NC reef is wreck', bgFor('north-carolina', 'reef') === 'bg-11-north-carolina-wreck-shallows.webp');
-  ok('bgFor maldives surface is tropical', bgFor('maldives', 'surface') === 'bg-01-tropical-surface.webp');
-  ok('bgFor all 52 combos resolve', (() => {
-    const regions = Object.keys(REGION_BIOME);
-    for (const r of regions) {
-      const ds = ['surface', 'reef', 'twilight', 'deep'];
-      for (let i = 0; i < ds.length; i++) { if (!bgFor(r, ds[i])) return false; }
-    }
+  ok('bgFor exact surface mappings', (() => {
+    const expect = {
+      "caribbean": "bg-01-tropical-surface.webp",
+      "philippines": "bg-01-tropical-surface.webp",
+      "maldives": "bg-01-tropical-surface.webp",
+      "papua-new-guinea": "bg-01-tropical-surface.webp",
+      "north-carolina": "bg-02-temperate-surface.webp",
+      "japan": "bg-02-temperate-surface.webp",
+      "cornwall": "bg-02-temperate-surface.webp",
+      "south-africa": "bg-02-temperate-surface.webp",
+      "east-australia": "bg-02-temperate-surface.webp",
+      "open-atlantic": "bg-03-open-atlantic-surface.webp",
+      "california": "bg-04-kelp-surface.webp",
+      "galapagos": "bg-05-volcanic-surface.webp",
+      "arctic": "bg-06-arctic-surface.webp",
+    };
+    const keys = Object.keys(expect);
+    for (let i = 0; i < keys.length; i++) { if (bgFor(keys[i], "surface") !== expect[keys[i]]) return false; }
+    return true;
+  })());
+  ok('bgFor exact reef mappings', (() => {
+    const expect = {
+      "caribbean": "bg-07-tropical-shallows.webp",
+      "philippines": "bg-07-tropical-shallows.webp",
+      "maldives": "bg-07-tropical-shallows.webp",
+      "papua-new-guinea": "bg-07-tropical-shallows.webp",
+      "japan": "bg-08-rocky-shallows.webp",
+      "cornwall": "bg-08-rocky-shallows.webp",
+      "south-africa": "bg-08-rocky-shallows.webp",
+      "east-australia": "bg-08-rocky-shallows.webp",
+      "california": "bg-08-rocky-shallows.webp",
+      "galapagos": "bg-08-rocky-shallows.webp",
+      "open-atlantic": "bg-09-open-atlantic-shallows.webp",
+      "arctic": "bg-10-arctic-shallows.webp",
+      "north-carolina": "bg-11-north-carolina-wreck-shallows.webp",
+    };
+    const keys = Object.keys(expect);
+    for (let i = 0; i < keys.length; i++) { if (bgFor(keys[i], "reef") !== expect[keys[i]]) return false; }
+    return true;
+  })());
+  ok('bgFor twilight is shared for all regions', (() => {
+    const keys = Object.keys(REGION_BIOME);
+    for (let i = 0; i < keys.length; i++) { if (bgFor(keys[i], "twilight") !== "bg-12-shared-twilight.webp") return false; }
+    return true;
+  })());
+  ok('bgFor deep is shared for all regions', (() => {
+    const keys = Object.keys(REGION_BIOME);
+    for (let i = 0; i < keys.length; i++) { if (bgFor(keys[i], "deep") !== "bg-13-shared-deep-dark.webp") return false; }
     return true;
   })());
   ok('dive-bg CSS exists', cssCode.indexOf('.dive-scene .dive-bg') !== -1);
+  ok('dive-bg anchored near bottom', cssCode.indexOf('object-position: 50% 95%') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");

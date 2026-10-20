@@ -1723,10 +1723,13 @@ video.archive-media { max-height: 420px; }
 }
 
 /* v2.5.0-beta: hand-painted expedition background image (Avery + Mira).
-   Full-bleed cover, behind everything (ambient life z-index sits above). */
+   Full-bleed cover, behind everything (ambient life z-index sits above).
+   v2.5.1-beta: object-position 50% 95% — crop comes off the top, only ~5%
+   from the bottom, preserving the low scenery (Avery). */
 .dive-scene .dive-bg {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; pointer-events: none; z-index: 0;
+  object-fit: cover; object-position: 50% 95%;
+  pointer-events: none; z-index: 0;
   user-select: none; -webkit-user-drag: none;
 }
 /* v2.4.0-beta: region-specific biome overlays in the dive scene.
