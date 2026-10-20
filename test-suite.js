@@ -5063,6 +5063,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   ok('dive-bg anchored near bottom', cssCode.indexOf('object-position: 50% 95%') !== -1);
   ok('twilight gets lift class', fileCode.indexOf('twilight-lift') !== -1);
   ok('twilight-lift CSS brightens', cssCode.indexOf('.dive-bg.twilight-lift') !== -1);
+  ok('deep gets darken overlay', fileCode.indexOf('deep-darken') !== -1);
+  ok('deep-darken CSS is black gradient', cssCode.indexOf('.deep-darken') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");

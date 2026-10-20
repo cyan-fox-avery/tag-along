@@ -1734,6 +1734,13 @@ video.archive-media { max-height: 420px; }
 }
 /* v2.5.1-beta: twilight lifted slightly (Avery) */
 .dive-scene .dive-bg.twilight-lift { filter: brightness(1.22) saturate(1.05); }
+/* v2.5.1-beta: deep dark goes midnight black on top (Avery) — the blue at the
+   top shouldn't be there. Black gradient kills the top, faint glow at the
+   bottom (spotlights) shows through. CSS only; master image untouched. */
+.dive-scene .deep-darken {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
+}
 /* v2.4.0-beta: region-specific biome overlays in the dive scene.
    (Superseded by v2.5.0 background images; rules kept for safety.) */
 .dive-scene .biome-overlay {

@@ -2414,6 +2414,12 @@ function renderScenery(depth, region) {
   const bg = bgFor(region, depth);
   const twilightClass = depth === "twilight" ? " twilight-lift" : "";
   el.innerHTML = `<img class="dive-bg${twilightClass}" src="assets/expedition-backgrounds/${bg}" alt="" draggable="false">`;
+  /* v2.5.1-beta: deep dark — midnight black gradient on top (Avery). */
+  if (depth === "deep") {
+    const dk = document.createElement("div");
+    dk.className = "deep-darken";
+    el.appendChild(dk);
+  }
   el.querySelectorAll(".snow").forEach(n => n.remove());
   /* Marine snow in the deep: slow-falling specks. */
   if (depth === "deep") {
