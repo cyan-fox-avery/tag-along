@@ -4660,7 +4660,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
           oLog = state.logbook, oSeen = state.chatSeen, oMsgsLen = state.messages.length,
           oUnread = state.unread, oFail = state.failures, oTag = state.taggedThisTrip,
           oRes = state.resightedThisTrip, oFol = state.followedThisTrip,
-          oClock = state.lastSarahMsgAt;
+          oClock = state.lastSarahMsgAt, oChkIdx = lastCheckinIdx;
     try {
       Math.random = () => 0; // gates open, first pick
       // (a) no pin + empty last trip + old named tags: no check-in, generic chat
@@ -4715,10 +4715,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       // truncate the array in place (same-reference snapshot would not
       // remove it), restore unread, and resync the mock store.
       state.messages.length = oMsgsLen; state.unread = oUnread;
+      state.lastSarahMsgAt = oClock;
+      lastCheckinIdx = oChkIdx;
       saveMsgs();
       state.failures = oFail; state.taggedThisTrip = oTag;
       state.resightedThisTrip = oRes; state.followedThisTrip = oFol;
-      state.lastSarahMsgAt = oClock;
     }
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
