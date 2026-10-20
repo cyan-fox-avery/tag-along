@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.11-beta";
+const VERSION = "v2.6.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.6.0-beta": [
+"❓ <strong>A welcome tour for new players.</strong> On your first visit, a quick slideshow walks the tab bar — one slide per tab, docked under the tabs with its arrow pointing right at the tab being explained: what the game is, and what every tab is for (including the Archive, which unlocks with your first tag).",
+"🔁 <strong>Replay it anytime.</strong> The ❓ button in the header reopens the tour whenever you want a refresher.",
+  ],
   "v2.5.11-beta": [
 "🎬 <strong>Smoother Archive videos.</strong> While an Archive clip is playing, the background water pauses itself — the two videos were fighting over the iPad and both went choppy. The background quietly resumes when the clip pauses or ends.",
   ],
@@ -5831,7 +5835,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi", "tyi-won-at", "tyi-cert-name"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted; v2.5.6-beta: +tyi-won-at, +tyi-cert-name
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi", "tyi-won-at", "tyi-cert-name", "tyi-tour-seen"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted; v2.5.6-beta: +tyi-won-at, +tyi-cert-name; v2.6.0: +tyi-tour-seen
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {
@@ -6658,6 +6662,143 @@ function pauseVideosIn(container) {
     document.dispatchEvent(new Event('tagalong:media-teardown'));
   } catch (e) { /* no event support: native pause events still cover most paths */ }
 }
+
+/* ================= v2.6.0: the welcome tour =================
+   A quick slideshow that teaches the game: one slide per tab, the
+   card docked under the tab bar, its arrow pointing at the tab being
+   explained while that tab wears a spotlight ring (Avery's design).
+   Shows once on first visit; the ❓ button in the header replays it
+   anytime. Copy is plain and short — the tour is a map, not a manual. */
+const TOUR_SLIDES = [
+  { tab: null, icon: "🦈", title: "Welcome to Tag Along!",
+    text: "You're a shark researcher. Study real sharks, plan expeditions, tag and release every species — then follow your sharks as they travel. There are 50 species out there, and every fact in this game is real science." },
+  { tab: "research", icon: "📖", title: "Research",
+    text: "Your field guide. Each shark's notes tell you where it lives, how deep it swims, and what it eats. Research is how you aim — and this is where you pin the shark you're after." },
+  { tab: "expedition", icon: "🛥️", title: "Expedition",
+    text: "Plan the trip: choose the region, depth, bait, and method from what you've learned, then head out. Tag carefully — and always let them go." },
+  { tab: "collection", icon: "🗂️", title: "Collection",
+    text: "Your official collection book. Every species you tag earns its card here. Tag all 50 to complete the book." },
+  { tab: "map", icon: "🗺️", title: "Map",
+    text: "Your tagged sharks, out there travelling. Tap a marker to see who's who — and turn on tracking from a shark's card to draw its full route." },
+  { tab: "logbook", icon: "📓", title: "Logbook",
+    text: "Your scientist's notebook: every trip, plan, and outcome. When an expedition comes up empty, the pattern in here is the clue." },
+  { tab: "phone", icon: "📱", title: "Phone",
+    text: "Your cousin Sarah — shark superfan. She'll text you reactions and check-ins as you play, and if you're ever stuck, you can ask her about your pinned shark." },
+  { tab: "archive", icon: "📸", title: "Archive",
+    text: "Real photographs and footage of the sharks you've tagged — the actual animals, hand-picked. This tab unlocks with your first tag." },
+  { tab: "achievements", icon: "🏆", title: "Achievements",
+    text: "Milestones of the journey. Finish the collection book and you'll earn your Master Shark Tagger certificate here." },
+  { tab: null, icon: "🌊", title: "Off you go!",
+    text: "That's the whole tour. Start in Research, pin a shark, and plan your first expedition. Good luck out there!" },
+];
+let tourIdx = 0;
+let tourOpenNow = false;
+
+function tourSeen() {
+  try { return !!localStorage.getItem("tyi-tour-seen"); } catch (e) { return true; }
+}
+function markTourSeen() {
+  try { localStorage.setItem("tyi-tour-seen", "1"); } catch (e) { /* private mode: tour may re-offer next visit */ }
+}
+function openTour() {
+  tourOpenNow = true;
+  var scrim = $("tourScrim"), ov = $("tourOverlay");
+  if (scrim) scrim.classList.remove("hidden");
+  if (ov) ov.classList.remove("hidden");
+  showTourSlide(0);
+  var next = $("tourNext");
+  if (next && next.focus) next.focus();
+}
+function closeTour() {
+  tourOpenNow = false;
+  markTourSeen();
+  var scrim = $("tourScrim"), ov = $("tourOverlay");
+  if (scrim) scrim.classList.add("hidden");
+  if (ov) ov.classList.add("hidden");
+  document.querySelectorAll(".tab.tour-spot").forEach(function(b) { b.classList.remove("tour-spot"); });
+  var nav = document.querySelector(".tabs");
+  if (nav) nav.classList.remove("tour-on");
+}
+function tourAdvance() {
+  if (tourIdx >= TOUR_SLIDES.length - 1) closeTour();
+  else showTourSlide(tourIdx + 1);
+}
+function tourBack() {
+  if (tourIdx > 0) showTourSlide(tourIdx - 1);
+}
+function showTourSlide(i) {
+  tourIdx = Math.max(0, Math.min(TOUR_SLIDES.length - 1, i));
+  var s = TOUR_SLIDES[tourIdx];
+  $("tourIcon").textContent = s.icon;
+  $("tourTitle").textContent = s.title;
+  $("tourText").textContent = s.text;
+  $("tourCount").textContent = (tourIdx + 1) + " of " + TOUR_SLIDES.length;
+  $("tourBack").disabled = tourIdx === 0;
+  $("tourNext").textContent = tourIdx === TOUR_SLIDES.length - 1 ? "Start playing 🦈" : "Next →";
+  var skip = $("tourSkip");
+  if (tourIdx === TOUR_SLIDES.length - 1) skip.classList.add("hidden");
+  else skip.classList.remove("hidden");
+  var dots = $("tourDots");
+  if (dots) {
+    dots.innerHTML = "";
+    TOUR_SLIDES.forEach(function(_, di) {
+      var d = document.createElement("span");
+      d.className = "tour-dot" + (di === tourIdx ? " on" : "");
+      dots.appendChild(d);
+    });
+  }
+  document.querySelectorAll(".tab.tour-spot").forEach(function(b) { b.classList.remove("tour-spot"); });
+  var nav = document.querySelector(".tabs");
+  if (nav) nav.classList.add("tour-on");
+  if (s.tab) {
+    var btn = document.querySelector('.tab[data-tab="' + s.tab + '"]');
+    if (btn) btn.classList.add("tour-spot");
+  }
+  positionTour();
+}
+/* Place the card directly under the tab bar, centred on the explained
+   tab as far as the screen allows, with the arrow over that tab's
+   centre. Decorative precision: any failure leaves the CSS fallback. */
+function positionTour() {
+  var ov = $("tourOverlay");
+  if (!ov || !tourOpenNow) return;
+  try {
+    var nav = document.querySelector(".tabs");
+    var navRect = nav.getBoundingClientRect();
+    var s = TOUR_SLIDES[tourIdx];
+    var btn = s.tab ? document.querySelector('.tab[data-tab="' + s.tab + '"]') : null;
+    var vw = window.innerWidth || 360;
+    var width = Math.min(560, vw - 16);
+    var center = vw / 2;
+    if (btn) {
+      var br = btn.getBoundingClientRect();
+      center = br.left + br.width / 2;
+    }
+    var left = Math.max(8, Math.min(center - width / 2, vw - width - 8));
+    ov.style.top = (navRect.bottom + 12) + "px";
+    ov.style.left = left + "px";
+    ov.style.width = width + "px";
+    var arrow = $("tourArrow");
+    if (arrow) {
+      arrow.style.left = Math.max(26, Math.min(center - left, width - 26)) + "px";
+      arrow.style.opacity = s.tab ? "1" : "0";
+    }
+    var scrim = $("tourScrim");
+    if (scrim) scrim.style.top = navRect.bottom + "px";
+  } catch (e) { /* positioning is decorative; CSS defaults hold */ }
+}
+$("tourBtn").addEventListener("click", openTour);
+$("tourNext").addEventListener("click", tourAdvance);
+$("tourBack").addEventListener("click", tourBack);
+$("tourSkip").addEventListener("click", closeTour);
+window.addEventListener("resize", positionTour);
+document.addEventListener("keydown", function(e) {
+  if (!tourOpenNow) return;
+  if (e.key === "Escape") closeTour();
+  else if (e.key === "ArrowRight") tourAdvance();
+  else if (e.key === "ArrowLeft") tourBack();
+});
+if (!tourSeen()) openTour();
 
 /* v2.3.0-beta: orientation-aware underwater background (Mira's videos).
    Picks the landscape or portrait loop based on viewport shape; loads only

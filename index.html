@@ -22,6 +22,7 @@
         <h1>Tag Along</h1>
         <p class="subtitle">a shark research game</p>
       </div>
+      <button id="tourBtn" class="tour-btn" type="button" aria-label="How to play — replay the tour" title="How to play">❓</button>
     </header>
 
     <nav class="tabs" aria-label="Game sections">
@@ -34,6 +35,28 @@
       <button class="tab tab-locked" data-tab="archive" type="button" disabled aria-disabled="true"><span class="tab-stack"><span class="tab-icon">📸</span><span class="tab-label">Archive<span class="tab-badge hidden" aria-label="new photo">●</span></span></span></button>
       <button class="tab" data-tab="achievements" type="button"><span class="tab-stack"><span class="tab-icon">🏆</span><span class="tab-label">Achievements</span></span></button>
     </nav>
+
+    <!-- v2.6.0: the welcome tour. One slide per tab; the card docks
+         under the tab bar and its arrow points at the tab being
+         explained. Shows once on first visit; ❓ replays it. -->
+    <div id="tourScrim" class="tour-scrim hidden" aria-hidden="true"></div>
+    <div id="tourOverlay" class="tour-overlay hidden" role="dialog" aria-label="How to play — a quick tour">
+      <div id="tourArrow" class="tour-arrow" aria-hidden="true"></div>
+      <div class="tour-card">
+        <div class="tour-head">
+          <span id="tourIcon" class="tour-icon" aria-hidden="true"></span>
+          <h3 id="tourTitle"></h3>
+          <span id="tourCount" class="tour-count"></span>
+        </div>
+        <p id="tourText" class="tour-text"></p>
+        <div class="tour-nav">
+          <button id="tourSkip" class="tour-btn-ghost" type="button">Skip tour</button>
+          <span id="tourDots" class="tour-dots" aria-hidden="true"></span>
+          <button id="tourBack" class="tour-btn-ghost" type="button">← Back</button>
+          <button id="tourNext" class="tour-btn-main" type="button">Next →</button>
+        </div>
+      </div>
+    </div>
 
     <main>
       <!-- RESEARCH — a true field guide -->

@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.11-beta', VERSION === 'v2.5.11-beta');
+  ok('version v2.6.0-beta', VERSION === 'v2.6.0-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5059,6 +5059,49 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("background controller listens for the teardown notification (source)",
       fileCode.indexOf("addEventListener('tagalong:media-teardown', syncSunVideo)") !== -1);
   })();
+
+  /* ---------- v2.6.0: the welcome tour ---------- */
+  try {
+    ok("tour has 10 slides: welcome, one per tab in tab-bar order, closer",
+      TOUR_SLIDES.length === 10 &&
+      JSON.stringify(TOUR_SLIDES.map(function(s) { return s.tab; })) ===
+        JSON.stringify([null, "research", "expedition", "collection", "map", "logbook", "phone", "archive", "achievements", null]));
+    ok("every tour slide carries an icon, title and real copy",
+      TOUR_SLIDES.every(function(s) { return s.icon && s.title && s.text.length > 40; }));
+    ok("tour markup and styles shipped",
+      htmlCode.indexOf('id="tourOverlay"') !== -1 && htmlCode.indexOf('id="tourBtn"') !== -1 &&
+      htmlCode.indexOf('id="tourArrow"') !== -1 &&
+      cssCode.indexOf(".tour-arrow") !== -1 && cssCode.indexOf(".tab.tour-spot") !== -1);
+    // Behaviour: open on slide 1, walk to the end, close.
+    openTour();
+    ok("openTour shows the welcome slide",
+      !$("tourOverlay").classList.contains("hidden") &&
+      $("tourTitle").textContent === "Welcome to Tag Along!" &&
+      $("tourCount").textContent === "1 of 10" &&
+      $("tourBack").disabled === true);
+    tourAdvance();
+    ok("advancing lands on Research with Next offered",
+      tourIdx === 1 && $("tourTitle").textContent === "Research" &&
+      $("tourNext").textContent === "Next →" && $("tourBack").disabled === false);
+    for (let ti = 0; ti < 8; ti++) tourAdvance();
+    ok("the last slide offers Start playing and hides Skip",
+      tourIdx === 9 && $("tourNext").textContent === "Start playing 🦈" &&
+      $("tourSkip").classList.contains("hidden"));
+    tourBack();
+    ok("Back from the closer returns to Achievements",
+      tourIdx === 8 && $("tourTitle").textContent === "Achievements");
+    tourAdvance(); tourAdvance(); // closer, then Start playing = close
+    ok("finishing the tour closes it and remembers it was seen",
+      tourOpenNow === false && $("tourOverlay").classList.contains("hidden") &&
+      tourSeen() === true && localStorage.getItem("tyi-tour-seen") === "1");
+    ok("reset forgets the tour too (it replays for a fresh game)",
+      RESET_KEYS.indexOf("tyi-tour-seen") !== -1);
+    ok("tour shows only when unseen and the header button replays it (source)",
+      fileCode.indexOf("if (!tourSeen()) openTour();") !== -1 &&
+      fileCode.indexOf('$("tourBtn").addEventListener("click", openTour);') !== -1 &&
+      fileCode.indexOf("function positionTour()") !== -1 &&
+      fileCode.indexOf("getBoundingClientRect") !== -1);
+  } catch (e) { ok("v2.6.0 welcome tour block (" + e.message + ")", false); }
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */
   ok('v1.8.0 second sweep: rewritten insights present',

@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.5.11-beta** — *a shark research game*
+**v2.6.0-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,9 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v2.6.x changes — the welcome tour ❓
+- **v2.6.0** — a quick guided tour for new players: one slide per tab, the card docked under the tab bar with its arrow pointing at the tab being explained (and that tab spotlit). Shows once on first visit; the ❓ button in the header replays it anytime.
 
 ## v2.5.x changes — the certificate era 🏆
 
