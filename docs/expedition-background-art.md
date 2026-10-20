@@ -23,7 +23,7 @@
 | **BG-04-L** | Kelp surface | California | **✅ Approved / locked** |
 | **BG-05-L** | Volcanic surface | Galápagos | **✅ Approved / locked** |
 | **BG-06-L** | Polar surface | Arctic | **✅ Approved / locked** |
-| BG-07-L | Tropical shallows | Four tropical regions | ⬜ Not started |
+| **BG-07-L** | Tropical shallows | Four tropical regions | **✅ Approved / locked** |
 | BG-08-L | Rocky shallows | Japan, Cornwall, South Africa, eastern Australia; California/Galápagos with appropriately chosen accents | ⬜ Not started |
 | BG-09-L | Open Atlantic shallows | Open Atlantic | ⬜ Not started |
 | BG-10-L | Arctic shallows | Arctic | ⬜ Not started |
@@ -102,3 +102,15 @@
 - **Integration:** Visual art approval and storage only. Do not modify expedition rendering code, sunlight animations, wildlife layers, or gameplay in this asset-production step. Device testing and integration remain pending Avery's separate authorization.
 
 ![Approved BG-06-L Arctic polar surface scenery](../assets/expedition-backgrounds/bg-06-arctic-surface.webp)
+
+## BG-07-L: Tropical Shallows — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19, on first visual candidate.
+
+- **Browser asset:** [bg-07-tropical-shallows.webp](../assets/expedition-backgrounds/bg-07-tropical-shallows.webp), full size 1672 × 941, optimized WebP.
+- **Original approved image:** [bg-07-tropical-shallows-original.png](../assets/expedition-backgrounds/source/bg-07-tropical-shallows-original.png), original 1672 × 941 PNG. Preserve this exact approved master unchanged.
+- **Art requirements confirmed:** Calmer, darker tropical blue gradient than BG-01 surface water, with subtle depth haze and broad uninterrupted space for separately animated wildlife silhouettes. Low, subdued coral heads, small rocky reef details and scattered sediment remain in roughly the bottom 5–10% of the frame. No visible water surface, baked-in sunbeams or caustics, animals, tall reef formations, or man-made objects.
+- **Reuse:** Caribbean, Philippines, Maldives and Papua New Guinea at shallow depth (30–100 m). Wildlife and species selection stay controlled by game logic, not baked into this scenery.
+- **Integration:** Visual artwork approved and stored as a standalone asset only. Do not change expedition rendering, animated sunlight, wildlife layers, or gameplay at this stage. Device testing and integration remain pending separate approval.
+
+![Approved BG-07-L tropical shallows scenery](../assets/expedition-backgrounds/bg-07-tropical-shallows.webp)
