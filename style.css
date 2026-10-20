@@ -1127,6 +1127,12 @@ select option:disabled { color: #7a8a9e; }
   opacity: 0.55; pointer-events: none; z-index: 2;
   animation-name: drift; animation-timing-function: linear; animation-fill-mode: forwards;
 }
+/* v2.5.3-beta: darker ambient entity shadows in the first two layers (Avery) —
+   dark gray at surface, almost black at reef/shallows. */
+.depth-surface .ambient img { filter: brightness(0.35); }
+.depth-surface .ambient.bg-fish img { filter: brightness(0.35) blur(0.4px); }
+.depth-shallow .ambient img { filter: brightness(0.12); }
+.depth-shallow .ambient.bg-fish img { filter: brightness(0.12) blur(0.4px); }
 .ambient svg { height: 100%; width: auto; display: block; }
 /* v0.26.0: background creature WebP shadows. */
 .ambient img { height: 100%; width: auto; display: block; }
