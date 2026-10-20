@@ -4762,7 +4762,10 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const oR = Math.random, oNow = Date.now, oMentions = state.sharkMentions,
           oPinned = state.pinned, oTagged = state.tagged, oLog = state.logbook,
           oReacted = state.reunionReacted, oMsgsLen = state.messages.length,
-          oUnread = state.unread;
+          oUnread = state.unread,
+          oLastSarah = state.lastSarahMsgAt, oCloserIdx = lastReunionCloserIdx,
+          oChkIdx = lastCheckinIdx, oPendingChk = pendingCheckinSpeciesId,
+          oStoredReacted = localStorage.getItem("tyi-reunion-reacted");
     const T0 = 1760000000000;
     try {
       Date.now = () => T0;
@@ -4823,8 +4826,22 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.pinned = oPinned; state.tagged = oTagged; state.logbook = oLog;
       state.reunionReacted = oReacted;
       state.messages.length = oMsgsLen; state.unread = oUnread;
+      /* v2.5.6-beta (Mira review): restore EVERYTHING the fixture's
+         Sarah calls mutated — the persisted reunion key, the routine
+         throttle timestamp (before saveMsgs re-persists it), the two
+         no-repeat rotation indexes, and the pending check-in stash. */
+      lastReunionCloserIdx = oCloserIdx; lastCheckinIdx = oChkIdx;
+      pendingCheckinSpeciesId = oPendingChk;
+      state.lastSarahMsgAt = oLastSarah;
+      if (oStoredReacted === null) localStorage.removeItem("tyi-reunion-reacted");
+      else localStorage.setItem("tyi-reunion-reacted", oStoredReacted);
       saveMsgs();
     }
+    ok("mention fixture leaves no residue (storage, throttle clock, indexes restored)",
+      localStorage.getItem("tyi-reunion-reacted") === oStoredReacted &&
+      state.lastSarahMsgAt === oLastSarah &&
+      lastReunionCloserIdx === oCloserIdx && lastCheckinIdx === oChkIdx &&
+      pendingCheckinSpeciesId === oPendingChk);
   })();
   /* v2.5.6-beta: Master Shark Tagger certificate — Avery's artwork in
      the Achievements modal, player-written name, auto award date,
@@ -4870,6 +4887,31 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       ok("win ceremony beat 1: old text certificate is gone",
         whtml.indexOf("This certifies our conservation scientist") === -1 &&
         whtml.indexOf("cert-trophy") === -1);
+      // Mira review fixes: certificate mode leaves the 2-column grid,
+      // the ceremony beat gets the wide shell (not the 380px phone),
+      // the name line stays blank until typed, and the keepsake export
+      // composites name + date onto the artwork via canvas.
+      ok("certificate modal switches detail content to cert-mode",
+        $("detailContent").classList.contains("cert-mode") === true);
+      ok("shark detail removes cert-mode (source)",
+        fileCode.indexOf('classList.remove("cert-mode")') !== -1);
+      ok("certificate CSS: cert-mode is single-column, ceremony shell is wide",
+        cssCode.indexOf("#detailContent.cert-mode") !== -1 &&
+        cssCode.indexOf(".phone.cert-phone") !== -1);
+      ok("win ceremony beat 1 uses the wide certificate shell + actions",
+        whtml.indexOf("cert-phone") !== -1 &&
+        whtml.indexOf('id="certSave"') !== -1 &&
+        whtml.indexOf('id="certGrow"') !== -1);
+      ok("certificate name line is blank until the player types",
+        html.indexOf('placeholder=""') !== -1 &&
+        html.indexOf('placeholder="Your name"') === -1);
+      ok("certificate export composites artwork + name + date on canvas (source)",
+        fileCode.indexOf("function exportCertificate") !== -1 &&
+        fileCode.indexOf('createElement("canvas")') !== -1 &&
+        fileCode.indexOf("toBlob") !== -1 &&
+        CERT_DRAW.nameBase < 0.549 && CERT_DRAW.dateBase < 0.804 &&
+        CERT_DRAW.nameX > 0.15 && CERT_DRAW.nameX < 0.85 &&
+        CERT_DRAW.dateX > 0.66 && CERT_DRAW.dateX < 0.90);
       $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);

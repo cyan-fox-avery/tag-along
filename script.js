@@ -4927,7 +4927,7 @@ function doWin() {
 function winStep(n) {
   const ov = $("winOverlay");
   ov.classList.remove("hidden");
-  const box = (inner) => { ov.innerHTML = `<div class="phone">${inner}</div>`; };
+  const box = (inner, cls) => { ov.innerHTML = `<div class="phone${cls ? " " + cls : ""}">${inner}</div>`; };
 
   if (n === 1) {
     /* Beat 1: the certificate — this is the signing moment. The player
@@ -4937,9 +4937,21 @@ function winStep(n) {
       ${certFigureHTML()}
       <p class="latin" style="text-align:center; margin:6px 0 0">Write your name on the line — that's what makes it yours.</p>
       <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>
-      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+      <div class="cert-actions">
+        <button id="certGrow" class="cert-action-btn" type="button" aria-pressed="false">🔍 Make it bigger</button>
+        <button id="certSave" class="cert-action-btn" type="button">📥 Save / share certificate</button>
+      </div>
+      <button id="winNext" class="primary-button" type="button">Continue</button>`, "cert-phone");
     const ni = wireCertName();
     if (ni && ni.focus) ni.focus();
+    wireCertSave();
+    const grow = $("certGrow");
+    if (grow) grow.addEventListener("click", () => {
+      const shell = ov.querySelector(".cert-phone");
+      const wide = shell && shell.classList.toggle("cert-wide");
+      grow.setAttribute("aria-pressed", wide ? "true" : "false");
+      grow.textContent = wide ? "🔍 Make it smaller" : "🔍 Make it bigger";
+    });
     $("winNext").addEventListener("click", () => winStep(2));
 
   } else if (n === 2) {
@@ -5427,9 +5439,68 @@ function certFigureHTML() {
     <figure class="cert-figure">
       <img class="cert-img" src="assets/master-tagger-certificate.jpg" alt="Master Shark Tagger certificate — Tag Along Field Program">
       <input id="certName" class="cert-name" type="text" maxlength="40" autocomplete="off"
-        placeholder="Your name" aria-label="Your name on the certificate">
+        placeholder="" aria-label="Your name on the certificate">
       <span class="cert-date">${esc(certAwardDate())}</span>
     </figure>`;
+}
+
+/* v2.5.6-beta: export geometry — where the name and date are drawn on
+   the native 1125×781 artwork (measured from the printed lines: name
+   line centre x≈50.2%, baseline just above y=54.9%; date line centre
+   x≈77.9%, baseline just above y=80.4%). Font sizes scale with width. */
+const CERT_DRAW = { nameX: 0.502, nameBase: 0.543, namePx: 61, dateX: 0.779, dateBase: 0.799, datePx: 33 };
+const CERT_FONT = '"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive';
+
+/* The certificate is a keepsake: composite the artwork + the player's
+   name + the award date at native resolution and share/download it.
+   The salt caption is modal dressing and is NOT part of the export. */
+function exportCertificate() {
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement("canvas");
+    cv.width = img.naturalWidth || 1125;
+    cv.height = img.naturalHeight || 781;
+    const ctx = cv.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    ctx.fillStyle = "#2b3a55";
+    ctx.textAlign = "center";
+    const scale = cv.width / 1125;
+    if (state.certName) {
+      ctx.font = `${Math.round(CERT_DRAW.namePx * scale)}px ${CERT_FONT}`;
+      ctx.fillText(state.certName, cv.width * CERT_DRAW.nameX, cv.height * CERT_DRAW.nameBase);
+    }
+    ctx.font = `${Math.round(CERT_DRAW.datePx * scale)}px ${CERT_FONT}`;
+    ctx.fillText(certAwardDate(), cv.width * CERT_DRAW.dateX, cv.height * CERT_DRAW.dateBase);
+    cv.toBlob(async (blob) => {
+      if (!blob) return;
+      const fname = "master-shark-tagger-certificate.jpg";
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], fname, { type: "image/jpeg" });
+        if (navigator.canShare({ files: [file] })) {
+          try { await navigator.share({ files: [file], title: "Master Shark Tagger" }); return; }
+          catch (e) { if (e && e.name === "AbortError") return; }
+        }
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = fname;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }, "image/jpeg", 0.92);
+  };
+  img.src = "assets/master-tagger-certificate.jpg";
+}
+
+function certActionsHTML() {
+  return `
+    <div class="cert-actions">
+      <button id="certSave" class="cert-action-btn" type="button">📥 Save / share certificate</button>
+    </div>`;
+}
+
+function wireCertSave() {
+  const b = $("certSave");
+  if (b) b.addEventListener("click", exportCertificate);
 }
 
 function wireCertName() {
@@ -5446,9 +5517,16 @@ function wireCertName() {
 
 function openCertificate() {
   const c = $("detailContent");
-  c.innerHTML = certFigureHTML() + `
+  /* v2.5.6-beta (Mira review): certificate mode leaves the two-column
+     shark-detail grid — the figure and caption stack full-width. */
+  c.classList.add("cert-mode");
+  c.innerHTML = certFigureHTML() +
+    (state.certName ? "" : `
+    <p class="latin" style="text-align:center">Tap the line on the certificate to sign your name.</p>`) +
+    certActionsHTML() + `
     <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>`;
   wireCertName();
+  wireCertSave();
   $("detailOverlay").classList.remove("hidden");
 }
 
@@ -5456,6 +5534,7 @@ function openDetail(id) {
   const s = sharkById(id);
   const t = state.tagged[id];
   const c = $("detailContent");
+  c.classList.remove("cert-mode");
   c.innerHTML = `
     <div class="detail-art">
     <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
