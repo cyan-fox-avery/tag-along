@@ -6635,22 +6635,28 @@ function foreignVideoPlaying() {
 }
 
 /* v2.5.11-beta (Mira review): pause every playing <video> inside a
-   container (default: the Archive list) while the elements are still
-   attached, so their pause events reach the background sync. Needed
-   because a clip's view can go away without the clip stopping: a
-   closed card is only CSS-hidden (it would keep decoding invisibly
-   and hold the background paused forever), leaving the tab doesn't
-   stop it, and a re-render detaches it (a detached clip's pause may
-   never be reported). Never touches the background video itself. */
+   container (default: the Archive list), then notify the background
+   sync explicitly. The explicit notification matters: pause() flips
+   .paused synchronously but QUEUES the pause event — a caller that
+   tears down right after (renderArchive clearing its list) can
+   detach the clip before the event fires, and a detached element's
+   event never reaches the document listener, stranding the
+   background paused. The notification re-runs the sync immediately;
+   it re-checks live state, so a different clip still playing keeps
+   the background at rest. Never touches the background video. */
 function pauseVideosIn(container) {
   var root = container || document.getElementById('archiveList');
-  if (!root || !root.querySelectorAll) return;
-  var bg = document.getElementById('sun-video');
-  var vids = root.querySelectorAll('video');
-  for (var i = 0; i < vids.length; i++) {
-    var v = vids[i];
-    if (v !== bg && !v.paused && v.pause) v.pause();
+  if (root && root.querySelectorAll) {
+    var bg = document.getElementById('sun-video');
+    var vids = root.querySelectorAll('video');
+    for (var i = 0; i < vids.length; i++) {
+      var v = vids[i];
+      if (v !== bg && !v.paused && v.pause) v.pause();
+    }
   }
+  try {
+    document.dispatchEvent(new Event('tagalong:media-teardown'));
+  } catch (e) { /* no event support: native pause events still cover most paths */ }
 }
 
 /* v2.3.0-beta: orientation-aware underwater background (Mira's videos).
@@ -6692,4 +6698,7 @@ function pauseVideosIn(container) {
   document.addEventListener('play', function(e) { if (e.target !== video) syncSunVideo(); }, true);
   document.addEventListener('pause', function(e) { if (e.target !== video) syncSunVideo(); }, true);
   document.addEventListener('ended', function(e) { if (e.target !== video) syncSunVideo(); }, true);
+  /* Explicit teardown notification (pauseVideosIn): covers clips torn
+     down before their queued pause event can be delivered. */
+  document.addEventListener('tagalong:media-teardown', syncSunVideo);
 })();

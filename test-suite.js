@@ -5040,6 +5040,24 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("renderArchive pauses clips before rebuilding the list (source)",
       raBody.indexOf("pauseVideosIn(list)") !== -1 &&
       raBody.indexOf("pauseVideosIn(list)") < raBody.indexOf('list.innerHTML = "";'));
+    // The teardown race (Mira): pause() queues its event, and a
+    // rebuild detaches the clip before the event fires — the event
+    // path alone can never re-sync. The helper must notify explicitly.
+    const oDispatch = document.dispatchEvent;
+    const dispatched = [];
+    document.dispatchEvent = function(ev) { dispatched.push(ev && ev.type); return true; };
+    let racePauses = 0;
+    const raceClip = { paused: false, pause: function() { racePauses++; this.paused = true; } };
+    const raceBox = { querySelectorAll: function(sel) { return sel === 'video' ? [raceClip] : []; } };
+    try {
+      pauseVideosIn(raceBox);
+      ok("teardown race: pausing a clip explicitly notifies the background sync",
+        racePauses === 1 && dispatched.indexOf("tagalong:media-teardown") !== -1);
+    } finally {
+      document.dispatchEvent = oDispatch;
+    }
+    ok("background controller listens for the teardown notification (source)",
+      fileCode.indexOf("addEventListener('tagalong:media-teardown', syncSunVideo)") !== -1);
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */
