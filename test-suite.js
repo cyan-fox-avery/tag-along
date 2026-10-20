@@ -38,8 +38,9 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.4-beta', VERSION === 'v2.5.4-beta');
+  ok('version v2.5.5-beta', VERSION === 'v2.5.5-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
+  ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -3087,8 +3088,8 @@ code += `
   // v1.4.15-beta: IUCN badges are color-coded by threat level
   ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
   ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
-  // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
-  ok('desktop logo 190px', /\\.site-logo\\s*\\{[^}]*height:\\s*190px/.test(cssCode));
+  // v2.5.5-beta: logo PNG cropped to shark bounds; heights 53/132px preserve the visible shark scale
+  ok('desktop logo 132px', /\\.site-logo\\s*\\{[^}]*height:\\s*132px/.test(cssCode));
   // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
   ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
   // v1.4.15-beta: time-of-day progression in expedition log
@@ -3696,8 +3697,8 @@ code += `
 
   // v1.6.1-beta: layout & interaction batch
   ok('WHATS_NEW has v1.6.1-beta with 3 entries', Array.isArray(WHATS_NEW['v1.6.1-beta']) && WHATS_NEW['v1.6.1-beta'].length === 3);
-  ok('desktop logo is 190px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 190px/.test(cssCode));
-  ok('base logo is 76px', /\\.site-logo \\{[^}]*height: 76px/.test(cssCode));
+  ok('desktop logo is 132px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 132px/.test(cssCode));
+  ok('base logo is 53px', /\\.site-logo \\{[^}]*height: 53px/.test(cssCode));
   ok('desktop collection cards are horizontal', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.grid-cell \\{ display: flex/.test(cssCode));
   ok('desktop collection is 3 columns', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.collection-grid \\{ grid-template-columns: repeat\\(3, 1fr\\)/.test(cssCode));
   ok('collection cell has text wrapper', /class="grid-cell-text"/.test(fileCode));
