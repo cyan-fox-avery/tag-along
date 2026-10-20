@@ -1078,6 +1078,28 @@ select option:disabled { color: #7a8a9e; }
   font-size: 14px; line-height: 1.6; margin: 10px 0;
 }
 .cert-sig { color: var(--ink-dim); font-size: 13px; margin: 8px 0 0; }
+/* v2.5.6-beta: the Master Shark Tagger certificate — Avery's artwork
+   with the player's name and the award date set into its blank lines.
+   Positions are % of the artwork; fonts scale with the figure via
+   container units so the writing sits on the printed lines at any
+   modal width. */
+.cert-figure { position: relative; margin: 0; container-type: inline-size; }
+.cert-img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.cert-name {
+  position: absolute; left: 16%; top: 45.9%; width: 68%; height: 9%;
+  background: transparent; border: none; outline: none; border-radius: 4px;
+  text-align: center; color: #2b3a55;
+  font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+  font-size: 24px; font-size: 5.4cqw;
+}
+.cert-name::placeholder { color: rgba(43, 58, 85, 0.45); }
+.cert-name:focus { background: rgba(255, 252, 240, 0.55); }
+.cert-date {
+  position: absolute; left: 65%; top: 74.8%; width: 26%;
+  text-align: center; color: #2b3a55; pointer-events: none;
+  font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+  font-size: 13px; font-size: 2.9cqw;
+}
 .cert-cell { border: 2px solid var(--accent); }
 .cert-cell .cert-trophy { font-size: 34px; margin: 4px 0; }
 
