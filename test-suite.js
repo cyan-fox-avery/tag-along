@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.7-beta', VERSION === 'v2.5.7-beta');
+  ok('version v2.5.8-beta', VERSION === 'v2.5.8-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -4909,7 +4909,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         fileCode.indexOf("function exportCertificate") !== -1 &&
         fileCode.indexOf('createElement("canvas")') !== -1 &&
         fileCode.indexOf("toBlob") !== -1 &&
-        CERT_DRAW.nameBase < 0.549 && CERT_DRAW.dateBase < 0.804 &&
+        CERT_DRAW.nameBase > 0.53 && CERT_DRAW.nameBase < 0.56 && CERT_DRAW.dateBase < 0.804 &&
         CERT_DRAW.nameX > 0.15 && CERT_DRAW.nameX < 0.85 &&
         CERT_DRAW.dateX > 0.66 && CERT_DRAW.dateX < 0.90);
       // Avery: the keyboard can cover the certificate — a visible
