@@ -5020,6 +5020,26 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       fileCode.indexOf("addEventListener('pause', function(e) { if (e.target !== video) syncSunVideo(); }, true)") !== -1 &&
       fileCode.indexOf("addEventListener('ended', function(e) { if (e.target !== video) syncSunVideo(); }, true)") !== -1 &&
       fileCode.indexOf("document.addEventListener('visibilitychange', syncSunVideo)") !== -1);
+    // Mira: leaving a playing clip must stop it, or it decodes
+    // invisibly forever and the background never resumes.
+    let pauseCalls = 0;
+    const fakeClip = { paused: false, pause: function() { pauseCalls++; this.paused = true; } };
+    const fakePausedClip = { paused: true, pause: function() { pauseCalls++; } };
+    const fakeBox = { querySelectorAll: function(sel) {
+      return sel === 'video' ? [fakeClip, fakePausedClip, bgEl] : [];
+    } };
+    pauseVideosIn(fakeBox);
+    ok("pauseVideosIn pauses a playing clip, skips paused ones and the background",
+      pauseCalls === 1 && fakeClip.paused === true);
+    ok("leaving a clip is wired: card collapse and tab exit pause videos (source)",
+      fileCode.indexOf("pauseVideosIn(row)") !== -1 &&
+      fileCode.indexOf('if (btn.dataset.tab !== "archive") pauseVideosIn();') !== -1);
+    const archiveCode = fs.readFileSync(path.join(DIR, "archive-ui.js"), "utf8");
+    const raStart = archiveCode.indexOf("function renderArchive()");
+    const raBody = archiveCode.slice(raStart, raStart + 700);
+    ok("renderArchive pauses clips before rebuilding the list (source)",
+      raBody.indexOf("pauseVideosIn(list)") !== -1 &&
+      raBody.indexOf("pauseVideosIn(list)") < raBody.indexOf('list.innerHTML = "";'));
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */

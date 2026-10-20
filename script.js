@@ -1706,6 +1706,8 @@ const tabScroll = {};
 document.querySelectorAll(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
     if (btn.disabled) return; /* v1.5.11: locked Archive tab is unclickable */
+    /* v2.5.11-beta: leaving the Archive stops its clips (pauseVideosIn). */
+    if (btn.dataset.tab !== "archive") pauseVideosIn();
     const current = document.querySelector(".tab.active");
     if (current) tabScroll[current.dataset.tab] = window.scrollY;
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
@@ -2055,6 +2057,7 @@ function zOfBody(row) {
    other cards doesn't yank focus (and scroll) back to them. */
 function collapseGuideRow(row, restoreFocus = true) {
   if (!row || !row.classList.contains("open")) return;
+  pauseVideosIn(row); /* v2.5.11-beta: stop any clip in the closing card */
   const body = row.querySelector(".guide-row-body");
   const head = row.querySelector(".guide-row-head");
   if (body) body.classList.add("hidden");
@@ -6629,6 +6632,25 @@ function foreignVideoPlaying() {
     if (v !== bg && !v.paused && !v.ended) return true;
   }
   return false;
+}
+
+/* v2.5.11-beta (Mira review): pause every playing <video> inside a
+   container (default: the Archive list) while the elements are still
+   attached, so their pause events reach the background sync. Needed
+   because a clip's view can go away without the clip stopping: a
+   closed card is only CSS-hidden (it would keep decoding invisibly
+   and hold the background paused forever), leaving the tab doesn't
+   stop it, and a re-render detaches it (a detached clip's pause may
+   never be reported). Never touches the background video itself. */
+function pauseVideosIn(container) {
+  var root = container || document.getElementById('archiveList');
+  if (!root || !root.querySelectorAll) return;
+  var bg = document.getElementById('sun-video');
+  var vids = root.querySelectorAll('video');
+  for (var i = 0; i < vids.length; i++) {
+    var v = vids[i];
+    if (v !== bg && !v.paused && v.pause) v.pause();
+  }
 }
 
 /* v2.3.0-beta: orientation-aware underwater background (Mira's videos).
