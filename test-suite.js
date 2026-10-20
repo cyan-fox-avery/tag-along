@@ -4653,6 +4653,61 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.pinned = origPinned;
     }
   })();
+  /* v2.5.4-beta (Mira): behavioral coherence tests — controlled state,
+     real selection paths, not string wiring. */
+  (() => {
+    const oR = Math.random, oPinned = state.pinned, oTagged = state.tagged,
+          oLog = state.logbook, oSeen = state.chatSeen, oMsgs = state.messages,
+          oFail = state.failures, oTag = state.taggedThisTrip,
+          oRes = state.resightedThisTrip, oFol = state.followedThisTrip,
+          oClock = state.lastSarahMsgAt;
+    try {
+      Math.random = () => 0; // gates open, first pick
+      // (a) no pin + empty last trip + old named tags: no check-in, generic chat
+      state.pinned = null;
+      state.tagged = { galapagos: { name: "Gala", researchId: "G-1" } };
+      state.logbook = [{ encounters: [] }];
+      state.chatSeen = {};
+      ok("coherence(a): old named shark alone yields no check-in",
+        maybeCheckinThread() === null);
+      ok("coherence(a): pickChat falls back to generic",
+        GENERIC_CHATS.indexOf(pickChat()) !== -1);
+      // (b) pinned only: pool contains exactly the pinned species
+      state.pinned = 'nurse';
+      state.logbook = [];
+      const poolB = sarahSpeciesPool(COUSIN_CHATS);
+      ok("coherence(b): pinned-only pool is exactly the pinned species",
+        poolB.length === 1 && poolB[0].id === 'nurse');
+      // (c) encounters only: pool is exactly the last trip's encounters
+      state.pinned = null;
+      state.logbook = [{ encounters: [{ speciesId: 'lemon' }] }];
+      const poolC = sarahSpeciesPool(COUSIN_CHATS);
+      ok("coherence(c): encounter-only pool is exactly the encountered species",
+        poolC.length === 1 && poolC[0].id === 'lemon');
+      // (d) multiple encounters never leak a historical species
+      state.logbook = [{ encounters: [{ speciesId: 'lemon' }, { speciesId: 'tiger' }] },
+                       { encounters: [{ speciesId: 'galapagos' }] }];
+      const poolD = sarahSpeciesPool(COUSIN_CHATS);
+      ok("coherence(d): older trips never leak into the pool",
+        poolD.length === 2 && poolD.every(function(s){ return s.id === 'lemon' || s.id === 'tiger'; }));
+      // (e) five-failure nudge with no allowed species stays generic
+      state.pinned = null;
+      state.logbook = [{ encounters: [] }];
+      state.failures = 5;
+      state.taggedThisTrip = state.resightedThisTrip = state.followedThisTrip = false;
+      afterExpedition({});
+      const lastThread = state.messages[state.messages.length - 1] || {};
+      const threadTexts = (lastThread.msgs || []).map(function(m){ return m.text; });
+      ok("coherence(e): nudge with empty pool uses the generic line",
+        threadTexts.indexOf("You'll get the next one. I believe in you.") !== -1);
+    } finally {
+      Math.random = oR; state.pinned = oPinned; state.tagged = oTagged;
+      state.logbook = oLog; state.chatSeen = oSeen; state.messages = oMsgs;
+      state.failures = oFail; state.taggedThisTrip = oTag;
+      state.resightedThisTrip = oRes; state.followedThisTrip = oFol;
+      state.lastSarahMsgAt = oClock;
+    }
+  })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */
   ok('v1.8.0 second sweep: rewritten insights present',
