@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.9-beta', VERSION === 'v2.5.9-beta');
+  ok('version v2.5.10-beta', VERSION === 'v2.5.10-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -4975,6 +4975,12 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       const cnH = parseFloat(cnRule.split("height:")[1]);
       ok("signature field: approved centre kept, descender room below the line",
         Math.abs((cnTop + cnH / 2) - 51.5) < 0.3 && cnTop + cnH >= 58);
+      // v2.5.10-beta: achievement card content is vertically centred,
+      // scoped to the Achievements grid (guide rows elsewhere keep
+      // their top-aligned layout).
+      ok("achievement cards centre their content vertically (CSS)",
+        cssCode.indexOf("#achieveList .guide-row { display: flex; }") !== -1 &&
+        cssCode.indexOf("#achieveList .guide-row-head.ach-stack { flex: 1; align-items: center; }") !== -1);
       $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);

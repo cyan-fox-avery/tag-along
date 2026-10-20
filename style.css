@@ -335,6 +335,13 @@ body { overflow-x: clip; }
    a single orphan card still holds the 140px floor. */
 #achieveList { grid-auto-rows: minmax(140px, 1fr); align-items: stretch; }
 #achieveList .guide-row { min-height: 140px; }
+/* v2.5.10-beta (Avery): achievement content vertically centred in its
+   card — the icon stays at the far left but sits in the middle
+   vertically, and the name/hint stack centres with it, instead of
+   everything hugging the top of the uniform-height box. Scoped to
+   the Achievements grid; Research/Collection guide rows unaffected. */
+#achieveList .guide-row { display: flex; }
+#achieveList .guide-row-head.ach-stack { flex: 1; align-items: center; }
 .status-pill {
   display: inline-block; font-size: 11px; font-weight: 700;
   background: #2c5364; border-radius: 999px; padding: 3px 10px; margin-bottom: 8px;
