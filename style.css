@@ -1094,7 +1094,10 @@ select option:disabled { color: #7a8a9e; }
    the global input[type="text"] rule (0,1,1) outranks a lone class
    (0,1,0) and restyled this field dark/wide/full-width in v2.5.6. */
 .cert-figure input.cert-name {
-  position: absolute; left: 16%; top: 47%; width: 68%; height: 9%;
+  /* Centre stays at 51.5% (the placement Avery approved); the box is
+     tall enough that script descenders (J, y) finish below the
+     printed line instead of clipping at the field's lower edge. */
+  position: absolute; left: 16%; top: 45%; width: 68%; height: 13%;
   background: transparent; border: none; outline: none; border-radius: 4px;
   padding: 0;
   text-align: center; color: #2b3a55;

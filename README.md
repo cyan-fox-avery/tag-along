@@ -1,6 +1,6 @@
 # Tag Along
 
-**v1.7.21-beta** — *a shark research game*
+**v2.5.9-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,58 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v2.5.x changes — the certificate era 🏆
+
+- **v2.5.0 — Hand-painted expedition backgrounds.** 13 custom underwater scenes by Avery & Mira covering every region × depth — tropical coral, arctic ice, the North Carolina wreck, and everything between.
+- **v2.5.1** — Deep zones refined: twilight brightened slightly, deep water goes midnight-black on top, and sharks get a subtle glow in the two deepest zones so they stay visible.
+- **v2.5.2** — Header logo restored to full size; the tightness comes from placement, not shrinking.
+- **v2.5.3** — Ambient background creatures darkened: gray silhouettes at the surface, near-black in the shallows.
+- **v2.5.4** — Sarah stays on topic: she only brings up a species that's pinned in Research or was just encountered (achievements exempt).
+- **v2.5.5** — The logo is cropped to the shark itself — the transparent padding above and below is gone, at the same on-screen size.
+- **v2.5.6 — The real Master Shark Tagger certificate.** Avery's certificate artwork replaces the old text version: sign it with your own name during the win ceremony, find it again in Achievements, and save/share it as a finished keepsake with your name and finish date in the picture. Plus: Sarah spaces out her mentions of the same shark (15 minutes, sightings outrank check-ins), and the signature field gets a visible name box for typing on touch devices.
+- **v2.5.7** — Certificate fix: a general form style was overriding the signature field (dark bar, giant white text) — scoped out, with a regression test.
+- **v2.5.8** — Signature placement: the name sits a touch lower, resting on its line like real handwriting.
+- **v2.5.9** — Signature descenders (J, y) have room to finish beneath the line instead of clipping.
+
+## v2.4.x changes — places that look like places 🌍
+
+- **v2.4.0 — Expeditions look like where you are.** Dive scenery and ambient wildlife are biome-based: coral in the tropics, kelp off California, icebergs in the Arctic, a wreck off North Carolina, volcanic rock in Galápagos. The old diagonal light stripes are gone.
+- **v2.4.1** — Header: the shark logo sits left of the title on all screens, with a few pixels of breathing room.
+
+## v2.3.0 changes — Mira's living water 🌊
+
+- **v2.3.0** — The home background is now a pair of hand-crafted looping underwater videos by Mira — one composed for landscape, one for portrait — ending the sun-ray saga (below) with hardware-decoded video the iPad handles easily.
+
+## v2.2.x changes — sunlight on video 🎬
+
+- **v2.2.0** — First video background: looping sun rays with sway and breathing, trying video where CSS animation couldn't keep up on iPad.
+- **v2.2.1** — The video recreates the original ray design properly — asymmetric fan from the top-left, 12-second seamless loop.
+
+## v2.1.x changes — the sun-ray saga ☀️
+
+- **v2.1.0** — Sun rays re-fanned to radiate across the whole viewport from the top-left sun (they were pivoting the wrong way).
+- **v2.1.1** — Emergency iPad fix: the oversized ray layers killed all touch input; rays sized to the viewport.
+- **v2.1.2** — Experiment: rays switched to cheaper compositing to test whether their blending was the iPad slowdown.
+- **v2.1.3** — Diagnostic release: rays fully off to isolate the culprit (it was the rays).
+- **v2.1.4** — Rays return as still beams.
+- **v2.1.5** — Rays breathe again, opacity only.
+- **v2.1.6** — Still beams again — the breathing also broke the iPad. A working game comes first; the saga concludes with video in v2.3.0.
+
+## v2.0.0 changes — four sharks redrawn 🎨
+
+- **v2.0.0 — The art pass.** The basking shark is redrawn from a real photo (blunt rounded snout, huge open mouth, long gill slits), the great hammerhead has its right eye back, the common angelshark faces left in side profile like the rest, and the megamouth's head is properly proportioned. Sharks now appear in every region their real range reaches (whale shark in the Maldives too, megamouth in the Philippines, blue sharks past Cornwall, smooth hammerheads off North Carolina), and a shark's track starts from where you actually tagged it. Expanded cards stay below the tab bar, and Archive cards get a ✕ close button.
+
+## v1.8.x changes — insights everywhere 📖
+
+- **v1.8.0 — Hooks and bonuses are real insights now.** Every species' hook (💡) and bonus (✨) became unlockable tag-along insights — 201 in total (4 per species, 5 for the nurse shark) — rewritten across all 50 species to remove overlaps with the existing facts. Your existing unlocks carry over. The megamouth's White Whale achievement is renamed **Deep-Sea Unicorn** (WHAAAAAAALE keeps the whale shark). Archive is back to 3 columns with expansions spanning two, and Sarah's check-ins no longer leak a locked hook.
+- **v1.8.1** — Collection cards for 100%-complete species get a yellow border; the IUCN badge hugs the pin; the far-right bubble column rises the full height.
+- **v1.8.2** — The IUCN badge gap is now measured to the pin glyph itself — 6px visual, touch target unchanged.
+- **v1.8.3 — Sarah at a human pace.** At most one routine message per 5 minutes (a routine message inside the window is dropped, never queued; special threads and Ask Sarah always go through) — and a dropped chat no longer silently advances her rotation. Blue shark insight reworded: fact, not opinion.
+- **v1.8.4** — Faster after expeditions (one render instead of two); the logbook shows your latest 30 trips with a "Show older trips" button.
+- **v1.8.5** — Sarah names the shark in every ambient chat; five new check-in variants and eleven new reunion lines, never twice in a row. 40 weather lines keyed by climate zone, nicknames in the logbook, Field Sightings shows your latest 10, and sharks appear on expeditions in four real size tiers.
+- **v1.8.6** — Tracking map decluttered: every shark's current location, with full routes only for sharks you've toggled "Track this shark" on (a real toggle on the card now). All 50 marker colours verified legible against the dark ocean.
+- **v1.8.7** — The tracking graph shows travel only: re-sightings no longer add points to a shark's track. Existing tracks are cleaned up automatically.
 
 ## v1.7.x changes — derpy sharks 🦈
 
@@ -30,6 +82,21 @@ Built for sarah, who loves sharks. 🦈
 - **v1.7.19** — Achievement cards tidied (name above description), the Master Shark Tagger trophy moved to the Achievements tab, and the **Bukangi easter egg**: encounter a dusky shark and Sarah tells you about the real dusky captivating Busan.
 - **v1.7.20** — Derpy mystery shadows documented and regression-tested: in derpy mode the mystery silhouette is a darkened derpy shape, revealed on tap.
 - **v1.7.21** — The darkened derpy silhouette gets explicit dimensions so it actually renders (it was collapsing to zero size).
+- **v1.7.22** — Archive accordion (one entry open at a time); Follow insights live on the Map popup only; denser, more organic bubbles; the "Something in the Water" achievement retired.
+- **v1.7.23** — **WHAAAAAAALE**: new achievement for tagging a whale shark. Uniform achievement card sizes, Follow shows insight progress, the cookiecutter's Archive entry goes illustration-only, ✕ close buttons on modals, and re-sightings get less spammy (odds halved — same chance every encounter, no time gating; the card shows the latest 3 with a Show all button).
+- **v1.7.24** — Observe shows insight progress and its popup is fixed; tiered re-sighting reactions — Sarah warms up with each reunion, in her own chat bubble.
+- **v1.7.25** — Observing a species with no insights left ends the expedition properly; bubbles move to a JS loop so they can't freeze at the bottom on iOS.
+- **v1.7.26** — Thresher hook reworded: "perpetually nervous" describes the whole shark, not just its tail.
+- **v1.7.27** — Wider layouts on big screens: two-column Collection detail, Research at 2 wider columns.
+- **v1.7.28** — Two new achievements: **Dedicated** (every extra fact from following sharks) and **Certified Shark Nerd** (every other visible achievement).
+- **v1.7.29** — Seafloor removed — its kelp strands were rendering as giant blue squiggles on iPad.
+- **v1.7.30** — Research back to 3 columns; an expanded entry's info box spans two.
+- **v1.7.31** — Collection detail: big art across the top, info in two columns below.
+- **v1.7.32** — The Research Method filter matches the Expedition planner exactly; "No extra method" wording; the Tagged chip loses its ✅; Sarah uses nicknames without quotes.
+- **v1.7.33** — Collection detail art sits tighter; Re-sightings move to the left column so long entries balance.
+- **v1.7.34** — All 50 species illustrations trimmed of their transparent padding — sharks fill their image boxes.
+- **v1.7.35** — The re-trim done properly (alpha≥200 bounds) for 24 species the first pass barely touched — faint alpha noise no longer counts as shark.
+- **v1.7.36** — The last 13 species component-cropped to the shark's own connected shape (stray single-pixel specks defeated every threshold trim).
 
 ## v1.6.x changes — research and shadows 🔍
 
