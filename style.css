@@ -670,6 +670,14 @@ select option:disabled { color: #7a8a9e; }
 /* v0.26.0: generic mystery silhouette shown if a silhouette WebP fails to
    load — sized like the real silhouette, never reveals the species. */
 .dive-shark .mystery-silhouette { max-width: 100%; max-height: 130px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
+/* v2.5.1-beta: glowy outline on the shark sprite in the two deepest zones
+   (Avery) — same treatment as ambient creatures, so the shark stays visible
+   against the dark backgrounds. Keeps the base drop shadow, adds the glow. */
+.depth-midwater .dive-shark svg, .depth-deep .dive-shark svg,
+.depth-midwater .dive-shark img, .depth-deep .dive-shark img,
+.depth-midwater .dive-shark .mystery-silhouette, .depth-deep .dive-shark .mystery-silhouette {
+  filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.55)) drop-shadow(0 6px 10px rgba(0,0,0,0.4));
+}
 .shark-silhouette { position: relative; cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
 .shark-silhouette:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
