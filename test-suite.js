@@ -4657,8 +4657,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
      real selection paths, not string wiring. */
   (() => {
     const oR = Math.random, oPinned = state.pinned, oTagged = state.tagged,
-          oLog = state.logbook, oSeen = state.chatSeen, oMsgs = state.messages,
-          oFail = state.failures, oTag = state.taggedThisTrip,
+          oLog = state.logbook, oSeen = state.chatSeen, oMsgsLen = state.messages.length,
+          oUnread = state.unread, oFail = state.failures, oTag = state.taggedThisTrip,
           oRes = state.resightedThisTrip, oFol = state.followedThisTrip,
           oClock = state.lastSarahMsgAt;
     try {
@@ -4672,6 +4672,14 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         maybeCheckinThread() === null);
       ok("coherence(a): pickChat falls back to generic",
         GENERIC_CHATS.indexOf(pickChat()) !== -1);
+      // (a2) valid pin + unrelated historical named shark: only the valid one is chosen
+      state.pinned = 'lemon';
+      state.tagged = { lemon: { name: "Zest", researchId: "L-1" },
+                       galapagos: { name: "Gala", researchId: "G-1" } };
+      const ciThread = maybeCheckinThread();
+      const ciText = ciThread ? ciThread.map(function(m){ return m.text; }).join(' ') : '';
+      ok("coherence(a2): check-in selects only the allowed named shark",
+        !!ciThread && ciText.indexOf("Zest") !== -1 && ciText.indexOf("Gala") === -1);
       // (b) pinned only: pool contains exactly the pinned species
       state.pinned = 'nurse';
       state.logbook = [];
@@ -4702,7 +4710,12 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         threadTexts.indexOf("You'll get the next one. I believe in you.") !== -1);
     } finally {
       Math.random = oR; state.pinned = oPinned; state.tagged = oTagged;
-      state.logbook = oLog; state.chatSeen = oSeen; state.messages = oMsgs;
+      state.logbook = oLog; state.chatSeen = oSeen;
+      // v2.5.4-beta Mira fix: afterExpedition pushes a real thread —
+      // truncate the array in place (same-reference snapshot would not
+      // remove it), restore unread, and resync the mock store.
+      state.messages.length = oMsgsLen; state.unread = oUnread;
+      saveMsgs();
       state.failures = oFail; state.taggedThisTrip = oTag;
       state.resightedThisTrip = oRes; state.followedThisTrip = oFol;
       state.lastSarahMsgAt = oClock;
