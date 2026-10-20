@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.8-beta";
+const VERSION = "v2.5.9-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.9-beta": [
+"🏆 <strong>Certificate signature, final polish.</strong> The name keeps its perfect height — and letters like J and y now have room for their tails to finish beneath the line instead of clipping.",
+  ],
   "v2.5.8-beta": [
 "🏆 <strong>Certificate signature placement.</strong> The name now sits a touch lower on its line, like real handwriting — tails dipping just beneath the rule instead of crowding the words above.",
   ],
