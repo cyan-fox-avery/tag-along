@@ -5066,6 +5066,14 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   ok('deep gets darken overlay', fileCode.indexOf('deep-darken') !== -1);
   ok('deep-darken CSS is black gradient', cssCode.indexOf('.deep-darken') !== -1);
   ok('shark sprite glows in deep zones', cssCode.indexOf('.depth-deep .dive-shark') !== -1 && cssCode.indexOf('.depth-midwater .dive-shark') !== -1);
+  // Mira review: mystery silhouette must stay brightness(0) pre-reveal even with glow
+  ok('mystery silhouette keeps brightness(0) with glow', (() => {
+    const i = cssCode.indexOf('.shark-shadow img');
+    if (i === -1) return false;
+    const seg = cssCode.slice(i, i + 600);
+    return seg.indexOf('brightness(0)') !== -1 && seg.indexOf('drop-shadow(0 0 8px') !== -1;
+  })());
+  ok('snow above deep-darken', cssCode.indexOf('.dive-scene .snow { z-index: 2; }') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");

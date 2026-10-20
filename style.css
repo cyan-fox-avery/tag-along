@@ -672,11 +672,18 @@ select option:disabled { color: #7a8a9e; }
 .dive-shark .mystery-silhouette { max-width: 100%; max-height: 130px; width: auto; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4)); }
 /* v2.5.1-beta: glowy outline on the shark sprite in the two deepest zones
    (Avery) — same treatment as ambient creatures, so the shark stays visible
-   against the dark backgrounds. Keeps the base drop shadow, adds the glow. */
+   against the dark backgrounds. Keeps the base drop shadow, adds the glow.
+   v2.5.1-beta fix (Mira review): the mystery silhouette must stay
+   brightness(0) pre-reveal — the glow is added WITHOUT un-blacking it,
+   or the shark is revealed before the player taps. */
 .depth-midwater .dive-shark svg, .depth-deep .dive-shark svg,
 .depth-midwater .dive-shark img, .depth-deep .dive-shark img,
 .depth-midwater .dive-shark .mystery-silhouette, .depth-deep .dive-shark .mystery-silhouette {
   filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.55)) drop-shadow(0 6px 10px rgba(0,0,0,0.4));
+}
+.depth-midwater .dive-shark .shark-shadow img, .depth-deep .dive-shark .shark-shadow img,
+.depth-midwater .dive-shark .shark-shadow svg, .depth-deep .dive-shark .shark-shadow svg {
+  filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.55));
 }
 .shark-silhouette { position: relative; cursor: pointer; transition: opacity 0.35s ease, transform 0.35s ease; }
 .shark-silhouette.revealing { opacity: 0; transform: scale(0.96); }
@@ -1749,6 +1756,9 @@ video.archive-media { max-height: 420px; }
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
 }
+/* v2.5.1-beta fix (Mira review): marine snow must stay above the deep
+   darkening overlay, not hidden behind it. */
+.dive-scene .snow { z-index: 2; }
 /* v2.4.0-beta: region-specific biome overlays in the dive scene.
    (Superseded by v2.5.0 background images; rules kept for safety.) */
 .dive-scene .biome-overlay {

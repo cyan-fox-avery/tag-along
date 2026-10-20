@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.5.1-beta": [
-"🌅 <strong>Twilight lightened slightly</strong> and the header is tighter — shark beside the title on all screens now.",
+"🌊 <strong>Deep zones refined.</strong> Twilight is brightened slightly, deep water goes midnight black on top, and shark sprites get a subtle glow in the two deepest zones so they stay visible.",
   ],
   "v2.5.0-beta": [
 "🎨 <strong>Hand-painted expedition backgrounds.</strong> Every dive now has a custom underwater backdrop — 13 scenes by Avery & Mira covering all 13 regions × 4 depths, from tropical coral to arctic ice to the North Carolina wreck.",
