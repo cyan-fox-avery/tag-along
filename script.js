@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.2-beta";
+const VERSION = "v2.5.3-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.3-beta": [
+"🌑 <strong>Darker shadows up top.</strong> Background creatures now read as dark gray silhouettes at the surface and almost black in the shallows.",
+  ],
   "v2.5.2-beta": [
 "📐 <strong>Logo restored to full size.</strong> The header stays tight through placement, not shrinking.",
   ],

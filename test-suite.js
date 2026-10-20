@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.2-beta', VERSION === 'v2.5.2-beta');
-  ok('whats-new has v2.5.2 entry', Array.isArray(WHATS_NEW['v2.5.2-beta']) && WHATS_NEW['v2.5.2-beta'].length === 1);
+  ok('version v2.5.3-beta', VERSION === 'v2.5.3-beta');
+  ok('whats-new has v2.5.3 entry', Array.isArray(WHATS_NEW['v2.5.3-beta']) && WHATS_NEW['v2.5.3-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -5074,6 +5074,9 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     return seg.indexOf('brightness(0)') !== -1 && seg.indexOf('drop-shadow(0 0 8px') !== -1;
   })());
   ok('snow above deep-darken', cssCode.indexOf('.dive-scene .snow { z-index: 2; }') !== -1);
+  // v2.5.3-beta: darker ambient shadows in first two layers
+  ok('surface ambient dark gray', cssCode.indexOf('.depth-surface .ambient img') !== -1 && cssCode.indexOf('brightness(0.35)') !== -1);
+  ok('shallow ambient almost black', cssCode.indexOf('.depth-shallow .ambient img') !== -1 && cssCode.indexOf('brightness(0.12)') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");
