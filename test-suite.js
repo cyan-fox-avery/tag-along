@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.1-beta', VERSION === 'v2.5.1-beta');
-  ok('whats-new has v2.5.1 entry', Array.isArray(WHATS_NEW['v2.5.1-beta']) && WHATS_NEW['v2.5.1-beta'].length === 1);
+  ok('version v2.5.2-beta', VERSION === 'v2.5.2-beta');
+  ok('whats-new has v2.5.2 entry', Array.isArray(WHATS_NEW['v2.5.2-beta']) && WHATS_NEW['v2.5.2-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -3085,7 +3085,7 @@ code += `
   ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
   ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
   // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
-  ok('desktop logo 110px', /\\.site-logo\\s*\\{[^}]*height:\\s*110px/.test(cssCode));
+  ok('desktop logo 190px', /\\.site-logo\\s*\\{[^}]*height:\\s*190px/.test(cssCode));
   // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
   ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
   // v1.4.15-beta: time-of-day progression in expedition log
@@ -3693,8 +3693,8 @@ code += `
 
   // v1.6.1-beta: layout & interaction batch
   ok('WHATS_NEW has v1.6.1-beta with 3 entries', Array.isArray(WHATS_NEW['v1.6.1-beta']) && WHATS_NEW['v1.6.1-beta'].length === 3);
-  ok('desktop logo is 110px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 110px/.test(cssCode));
-  ok('base logo is 64px', /\\.site-logo \\{[^}]*height: 64px/.test(cssCode));
+  ok('desktop logo is 190px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 190px/.test(cssCode));
+  ok('base logo is 76px', /\\.site-logo \\{[^}]*height: 76px/.test(cssCode));
   ok('desktop collection cards are horizontal', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.grid-cell \\{ display: flex/.test(cssCode));
   ok('desktop collection is 3 columns', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.collection-grid \\{ grid-template-columns: repeat\\(3, 1fr\\)/.test(cssCode));
   ok('collection cell has text wrapper', /class="grid-cell-text"/.test(fileCode));

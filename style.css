@@ -161,7 +161,7 @@ body { overflow-x: clip; }
    mobile), just a few px between logo top and page top, shark sitting just
    above the tab bar. */
 .topbar { display: flex; align-items: center; justify-content: center; gap: 10px; text-align: left; padding: 4px 8px 2px; }
-.site-logo { display: block; height: 64px; width: auto; margin: 0; flex: none; border-radius: 8px; }
+.site-logo { display: block; height: 76px; width: auto; margin: 0; flex: none; border-radius: 8px; }
 .topbar-text { min-width: 0; }
 .topbar h1 { margin: 0 0 1px; font-size: 28px; letter-spacing: 1px; }
 .subtitle { margin: 0; color: var(--ink-dim); font-size: 13px; }
@@ -170,7 +170,8 @@ body { overflow-x: clip; }
   .topbar { gap: 12px; padding: 3px 8px 2px; }
   /* v1.4.15-beta: logo 150% bigger — it's a logo, give it presence */
   /* v1.6.1-beta: bigger still */
-  .site-logo { height: 110px; }
+  /* v2.5.2-beta: restored to original 190px (Avery) — tightness from padding, not shrinking */
+  .site-logo { height: 190px; }
   .topbar h1 { font-size: 34px; }
   .subtitle { font-size: 14px; }
 }
