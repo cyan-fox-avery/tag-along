@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.4.0-beta', VERSION === 'v2.4.0-beta');
-  ok('whats-new has v2.4.0 entry', Array.isArray(WHATS_NEW['v2.4.0-beta']) && WHATS_NEW['v2.4.0-beta'].length === 2);
+  ok('version v2.5.0-beta', VERSION === 'v2.5.0-beta');
+  ok('whats-new has v2.5.0 entry', Array.isArray(WHATS_NEW['v2.5.0-beta']) && WHATS_NEW['v2.5.0-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -3085,7 +3085,7 @@ code += `
   ok('IUCN LC is green', /\\.iucn-LC\\s*\\{[^}]*#2d7a3e/.test(cssCode));
   ok('IUCN CR is dark purple', /\\.iucn-CR\\s*\\{[^}]*#2a1a3a/.test(cssCode));
   // v1.4.15-beta: desktop logo is 150% bigger (104px -> 156px)
-  ok('desktop logo 190px', /\\.site-logo\\s*\\{[^}]*height:\\s*190px/.test(cssCode));
+  ok('desktop logo 110px', /\\.site-logo\\s*\\{[^}]*height:\\s*110px/.test(cssCode));
   // v1.4.15-beta: guide grid uses minmax so overlays can't widen columns
   ok('guide grid minmax', /\\.guide-list\\s*\\{[^}]*minmax\\(0,\\s*1fr\\)/.test(cssCode));
   // v1.4.15-beta: time-of-day progression in expedition log
@@ -3591,7 +3591,7 @@ code += `
   ok('legend has bottom margin', cssCode.includes('margin: 8px 2px 14px'));
   ok('legend styled', cssCode.includes('.iucn-legend'));
   // v1.5.1: header/phone/archive/porthole batch
-  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*8px 8px 2px/.test(cssCode));
+  ok('header is tighter', /\\.topbar\\s*\\{[^}]*padding:\\s*4px 8px 2px/.test(cssCode));
   ok('phone renders messages in one pass', /list\\.innerHTML = html;/.test(code) && /let html = "";/.test(code));
   ok('archive badge removed', !/data-tab=\\"archive\\"\\] \\.tab-badge/.test(code));
   ok('orbit has left buffer (no tile edge)', /\\.pw-orbit\\s*\\{[^}]*margin-left:\\s*-70px/.test(cssCode));
@@ -3693,8 +3693,8 @@ code += `
 
   // v1.6.1-beta: layout & interaction batch
   ok('WHATS_NEW has v1.6.1-beta with 3 entries', Array.isArray(WHATS_NEW['v1.6.1-beta']) && WHATS_NEW['v1.6.1-beta'].length === 3);
-  ok('desktop logo is 190px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 190px/.test(cssCode));
-  ok('base logo is 76px', /\\.site-logo \\{ display: block; height: 76px/.test(cssCode));
+  ok('desktop logo is 110px', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.site-logo \\{ height: 110px/.test(cssCode));
+  ok('base logo is 64px', /\\.site-logo \\{[^}]*height: 64px/.test(cssCode));
   ok('desktop collection cards are horizontal', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.grid-cell \\{ display: flex/.test(cssCode));
   ok('desktop collection is 3 columns', /@media \\(min-width: 1024px\\)[\\s\\S]*?\\.collection-grid \\{ grid-template-columns: repeat\\(3, 1fr\\)/.test(cssCode));
   ok('collection cell has text wrapper', /class="grid-cell-text"/.test(fileCode));
@@ -4999,6 +4999,29 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     return all.every(k => CREATURE_ART.hasOwnProperty(k));
   })());
   ok('no .rays div in dive scene HTML', htmlCode.indexOf('<div class="rays">') === -1);
+  // v2.4.1-beta: header is horizontal flex on all screens, tight padding
+  ok('topbar is horizontal flex', (() => {
+    const ti = cssCode.indexOf('.topbar {');
+    const te = cssCode.indexOf('}', ti);
+    const trule = cssCode.slice(ti, te);
+    return trule.indexOf('display: flex') !== -1 && trule.indexOf('padding: 4px 8px 2px') !== -1;
+  })());
+  // v2.5.0-beta: background images — all 52 combos resolve
+  ok('BG_IMAGE has 26 surface/reef entries', Object.keys(BG_IMAGE).length === 26);
+  ok('bgFor twilight is shared', bgFor('arctic', 'twilight') === 'bg-12-shared-twilight.webp');
+  ok('bgFor deep is shared', bgFor('caribbean', 'deep') === 'bg-13-shared-deep-dark.webp');
+  ok('bgFor arctic surface is polar', bgFor('arctic', 'surface') === 'bg-06-arctic-surface.webp');
+  ok('bgFor NC reef is wreck', bgFor('north-carolina', 'reef') === 'bg-11-north-carolina-wreck-shallows.webp');
+  ok('bgFor maldives surface is tropical', bgFor('maldives', 'surface') === 'bg-01-tropical-surface.webp');
+  ok('bgFor all 52 combos resolve', (() => {
+    const regions = Object.keys(REGION_BIOME);
+    for (const r of regions) {
+      const ds = ['surface', 'reef', 'twilight', 'deep'];
+      for (let i = 0; i < ds.length; i++) { if (!bgFor(r, ds[i])) return false; }
+    }
+    return true;
+  })());
+  ok('dive-bg CSS exists', cssCode.indexOf('.dive-scene .dive-bg') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");
