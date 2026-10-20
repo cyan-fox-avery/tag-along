@@ -4956,6 +4956,7 @@ function winStep(n) {
       const wide = shell && shell.classList.toggle("cert-wide");
       grow.setAttribute("aria-pressed", wide ? "true" : "false");
       grow.textContent = wide ? "🔍 Make it smaller" : "🔍 Make it bigger";
+      fitCertDisplays($("certName"));
     });
     $("winNext").addEventListener("click", () => winStep(2));
 
@@ -5546,6 +5547,19 @@ function fitCertDisplays(nameInput) {
   }
 }
 
+/* The fitted sizes are inline pixels, which override the responsive
+   cqw base — re-fit when the figure's width changes (rotation,
+   window resize). Registered once, scoped to the certificate. */
+let certResizeWired = false;
+function wireCertResize() {
+  if (certResizeWired) return;
+  certResizeWired = true;
+  window.addEventListener("resize", () => {
+    const ni = $("certName");
+    if (ni) fitCertDisplays(ni);
+  });
+}
+
 function wireCertName() {
   const nameInput = $("certName");
   const nameBox = $("certNameBox");
@@ -5563,6 +5577,7 @@ function wireCertName() {
     nameBox.value = state.certName || "";
     nameBox.addEventListener("input", () => sync(nameBox, nameInput));
   }
+  wireCertResize();
   fitCertDisplays(nameInput);
   return nameInput;
 }
@@ -5587,9 +5602,12 @@ function openCertificate() {
     certNameBoxHTML() +
     certActionsHTML() + `
     <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>`;
+  /* Unhide BEFORE wiring (Mira review): under display:none the name
+     field has zero width and the shrink-to-fit would skip, leaving a
+     persisted long name unfitted until the first keystroke. */
+  $("detailOverlay").classList.remove("hidden");
   wireCertName();
   wireCertSave();
-  $("detailOverlay").classList.remove("hidden");
 }
 
 function openDetail(id) {

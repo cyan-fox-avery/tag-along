@@ -4949,6 +4949,18 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       ok("certificate export fits name + date via fitTextPx (source)",
         fileCode.indexOf("fitTextPx(state.certName") !== -1 &&
         fileCode.indexOf("fitTextPx(dateText") !== -1);
+      // Mira regression: the Achievements modal must unhide BEFORE
+      // wiring, or the first-open fit measures a display:none
+      // (zero-width) field and a persisted long name stays unfitted.
+      const ocStart = fileCode.indexOf("function openCertificate()");
+      const ocBody = fileCode.slice(ocStart, ocStart + 1400);
+      ok("certificate modal unhides before wiring (first-open fit regression)",
+        ocBody.indexOf('classList.remove("hidden")') !== -1 &&
+        ocBody.indexOf('classList.remove("hidden")') < ocBody.indexOf("wireCertName()"));
+      ok("certificate re-fits on resize and on the grow toggle (source)",
+        fileCode.indexOf('addEventListener("resize"') !== -1 &&
+        fileCode.indexOf("certResizeWired") !== -1 &&
+        fileCode.split("fitCertDisplays(").length - 1 >= 5);
       $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);
