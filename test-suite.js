@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.10-beta', VERSION === 'v2.5.10-beta');
+  ok('version v2.5.11-beta', VERSION === 'v2.5.11-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -4989,6 +4989,75 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     } finally {
       state.wonAt = oWonAt; state.achievements = oAch; state.certName = oName;
     }
+  })();
+  /* v2.5.11-beta: while an Archive clip plays, the background video
+     rests (they share one decoder on iPad and both go choppy). */
+  (() => {
+    const oQSA = document.querySelectorAll;
+    const bgEl = document.getElementById('sun-video');
+    try {
+      document.querySelectorAll = function(sel) {
+        if (sel !== 'video') return [];
+        return [bgEl, { paused: false, ended: false }];
+      };
+      ok("foreignVideoPlaying: a playing Archive clip counts",
+        foreignVideoPlaying() === true);
+      document.querySelectorAll = function() {
+        return [bgEl, { paused: true, ended: false }];
+      };
+      ok("foreignVideoPlaying: paused clips and the background itself don't count",
+        foreignVideoPlaying() === false);
+      document.querySelectorAll = function() {
+        return [bgEl, { paused: false, ended: true }];
+      };
+      ok("foreignVideoPlaying: an ended clip doesn't count",
+        foreignVideoPlaying() === false);
+    } finally {
+      document.querySelectorAll = oQSA;
+    }
+    ok("background sync hears other videos in the capture phase (source)",
+      fileCode.indexOf("addEventListener('play', function(e) { if (e.target !== video) syncSunVideo(); }, true)") !== -1 &&
+      fileCode.indexOf("addEventListener('pause', function(e) { if (e.target !== video) syncSunVideo(); }, true)") !== -1 &&
+      fileCode.indexOf("addEventListener('ended', function(e) { if (e.target !== video) syncSunVideo(); }, true)") !== -1 &&
+      fileCode.indexOf("document.addEventListener('visibilitychange', syncSunVideo)") !== -1);
+    // Mira: leaving a playing clip must stop it, or it decodes
+    // invisibly forever and the background never resumes.
+    let pauseCalls = 0;
+    const fakeClip = { paused: false, pause: function() { pauseCalls++; this.paused = true; } };
+    const fakePausedClip = { paused: true, pause: function() { pauseCalls++; } };
+    const fakeBox = { querySelectorAll: function(sel) {
+      return sel === 'video' ? [fakeClip, fakePausedClip, bgEl] : [];
+    } };
+    pauseVideosIn(fakeBox);
+    ok("pauseVideosIn pauses a playing clip, skips paused ones and the background",
+      pauseCalls === 1 && fakeClip.paused === true);
+    ok("leaving a clip is wired: card collapse and tab exit pause videos (source)",
+      fileCode.indexOf("pauseVideosIn(row)") !== -1 &&
+      fileCode.indexOf('if (btn.dataset.tab !== "archive") pauseVideosIn();') !== -1);
+    const archiveCode = fs.readFileSync(path.join(DIR, "archive-ui.js"), "utf8");
+    const raStart = archiveCode.indexOf("function renderArchive()");
+    const raBody = archiveCode.slice(raStart, raStart + 700);
+    ok("renderArchive pauses clips before rebuilding the list (source)",
+      raBody.indexOf("pauseVideosIn(list)") !== -1 &&
+      raBody.indexOf("pauseVideosIn(list)") < raBody.indexOf('list.innerHTML = "";'));
+    // The teardown race (Mira): pause() queues its event, and a
+    // rebuild detaches the clip before the event fires — the event
+    // path alone can never re-sync. The helper must notify explicitly.
+    const oDispatch = document.dispatchEvent;
+    const dispatched = [];
+    document.dispatchEvent = function(ev) { dispatched.push(ev && ev.type); return true; };
+    let racePauses = 0;
+    const raceClip = { paused: false, pause: function() { racePauses++; this.paused = true; } };
+    const raceBox = { querySelectorAll: function(sel) { return sel === 'video' ? [raceClip] : []; } };
+    try {
+      pauseVideosIn(raceBox);
+      ok("teardown race: pausing a clip explicitly notifies the background sync",
+        racePauses === 1 && dispatched.indexOf("tagalong:media-teardown") !== -1);
+    } finally {
+      document.dispatchEvent = oDispatch;
+    }
+    ok("background controller listens for the teardown notification (source)",
+      fileCode.indexOf("addEventListener('tagalong:media-teardown', syncSunVideo)") !== -1);
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */

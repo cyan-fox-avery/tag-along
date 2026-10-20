@@ -142,6 +142,11 @@ function archiveAssetHtml(a, isPrimary) {
 function renderArchive() {
   const list = $("archiveList");
   if (!list || typeof ARCHIVE_MEDIA === "undefined") return;
+  /* v2.5.11-beta: stop any playing clip BEFORE the list is rebuilt.
+     pauseVideosIn also notifies the background sync explicitly — the
+     clip's own pause event is queued and may fire only after the
+     element is detached, when it can no longer be heard. */
+  if (typeof pauseVideosIn === "function") pauseVideosIn(list);
   list.innerHTML = "";
   /* v1.5.10-beta: the Archive shows ONLY sharks the player has tagged.
      The locked-species teaser list is gone — no tantalizing teasers.
