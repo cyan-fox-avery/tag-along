@@ -5456,6 +5456,24 @@ function certFigureHTML() {
 const CERT_DRAW = { nameX: 0.502, nameBase: 0.543, namePx: 61, dateX: 0.779, dateBase: 0.799, datePx: 33 };
 const CERT_FONT = '"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive';
 
+/* Shrink-to-fit: the largest font size (≤ basePx) at which text fits
+   maxW, measured on a canvas. A 40-character name at the full
+   signature size would draw through the certificate border in the
+   export — the on-screen input clips, the canvas does not (Mira). */
+function fitTextPx(text, basePx, maxW, family) {
+  if (!text || !(basePx > 0) || !(maxW > 0)) return basePx;
+  let ctx = null;
+  try {
+    const cv = document.createElement("canvas");
+    ctx = cv.getContext && cv.getContext("2d");
+  } catch {}
+  if (!ctx || !ctx.measureText) return basePx;
+  ctx.font = `${basePx}px ${family}`;
+  const w = ctx.measureText(text).width;
+  if (!(w > maxW)) return basePx;
+  return Math.max(10, Math.floor(basePx * maxW / w));
+}
+
 /* The certificate is a keepsake: composite the artwork + the player's
    name + the award date at native resolution and share/download it.
    The salt caption is modal dressing and is NOT part of the export. */
@@ -5471,11 +5489,14 @@ function exportCertificate() {
     ctx.textAlign = "center";
     const scale = cv.width / 1125;
     if (state.certName) {
-      ctx.font = `${Math.round(CERT_DRAW.namePx * scale)}px ${CERT_FONT}`;
+      const namePx = fitTextPx(state.certName, CERT_DRAW.namePx * scale, cv.width * 0.66, CERT_FONT);
+      ctx.font = `${Math.round(namePx)}px ${CERT_FONT}`;
       ctx.fillText(state.certName, cv.width * CERT_DRAW.nameX, cv.height * CERT_DRAW.nameBase);
     }
-    ctx.font = `${Math.round(CERT_DRAW.datePx * scale)}px ${CERT_FONT}`;
-    ctx.fillText(certAwardDate(), cv.width * CERT_DRAW.dateX, cv.height * CERT_DRAW.dateBase);
+    const dateText = certAwardDate();
+    const datePx = fitTextPx(dateText, CERT_DRAW.datePx * scale, cv.width * 0.23, CERT_FONT);
+    ctx.font = `${Math.round(datePx)}px ${CERT_FONT}`;
+    ctx.fillText(dateText, cv.width * CERT_DRAW.dateX, cv.height * CERT_DRAW.dateBase);
     cv.toBlob(async (blob) => {
       if (!blob) return;
       const fname = "master-shark-tagger-certificate.jpg";
@@ -5508,6 +5529,23 @@ function wireCertSave() {
   if (b) b.addEventListener("click", exportCertificate);
 }
 
+/* Keep the on-screen signature and date inside their printed lines,
+   mirroring the export fit: the signature field is 68% of the figure
+   wide (its base size is 5.4cqw of the figure), the date span 26%
+   (base 2.9cqw). No-op until the elements are laid out. */
+function fitCertDisplays(nameInput) {
+  if (!nameInput || !nameInput.clientWidth) return;
+  const figW = nameInput.clientWidth / 0.68;
+  nameInput.style.fontSize =
+    fitTextPx(nameInput.value, figW * 0.054, nameInput.clientWidth, CERT_FONT) + "px";
+  const fig = nameInput.closest && nameInput.closest("figure");
+  const dateEl = fig && fig.querySelector && fig.querySelector(".cert-date");
+  if (dateEl && dateEl.clientWidth) {
+    dateEl.style.fontSize =
+      fitTextPx(dateEl.textContent, figW * 0.029, dateEl.clientWidth, CERT_FONT) + "px";
+  }
+}
+
 function wireCertName() {
   const nameInput = $("certName");
   const nameBox = $("certNameBox");
@@ -5515,6 +5553,7 @@ function wireCertName() {
     state.certName = from.value;
     if (to) to.value = from.value;
     try { localStorage.setItem("tyi-cert-name", state.certName); } catch {}
+    fitCertDisplays(nameInput);
   };
   if (nameInput) {
     nameInput.value = state.certName || "";
@@ -5524,6 +5563,7 @@ function wireCertName() {
     nameBox.value = state.certName || "";
     nameBox.addEventListener("input", () => sync(nameBox, nameInput));
   }
+  fitCertDisplays(nameInput);
   return nameInput;
 }
 

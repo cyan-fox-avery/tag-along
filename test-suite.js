@@ -4922,6 +4922,33 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         cssCode.indexOf(".cert-name-box") !== -1);
       ok("win ceremony focuses the name box (source)",
         fileCode.indexOf('const nb = $("certNameBox")') !== -1);
+      // Mira: a 40-char name at the fixed export size would draw
+      // through the border. Behavioural fit check with a stubbed
+      // canvas measurer (0.6em per character).
+      const oCreateEl = document.createElement;
+      document.createElement = function(tag) {
+        if (tag === "canvas") return { getContext: function() {
+          return { font: "", measureText: function(t) {
+            const px = parseInt(this.font, 10) || 0;
+            return { width: t.length * px * 0.6 };
+          } };
+        } };
+        return oCreateEl(tag);
+      };
+      try {
+        const fittedLong = fitTextPx("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 61, 742, CERT_FONT);
+        ok("export fit: a 40-character name shrinks to fit the printed line",
+          fittedLong < 61 && fittedLong * 40 * 0.6 <= 742);
+        ok("export fit: a short name keeps the full signature size",
+          fitTextPx("Avery", 61, 742, CERT_FONT) === 61);
+        ok("export fit: a long localized date shrinks to fit its line",
+          fitTextPx("September 28, 2026", 33, 259, CERT_FONT) < 33);
+      } finally {
+        document.createElement = oCreateEl;
+      }
+      ok("certificate export fits name + date via fitTextPx (source)",
+        fileCode.indexOf("fitTextPx(state.certName") !== -1 &&
+        fileCode.indexOf("fitTextPx(dateText") !== -1);
       $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);
