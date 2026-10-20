@@ -22,7 +22,7 @@
 | **BG-03-L** | Open Atlantic surface | Open Atlantic | **✅ Approved / locked** |
 | **BG-04-L** | Kelp surface | California | **✅ Approved / locked** |
 | **BG-05-L** | Volcanic surface | Galápagos | **✅ Approved / locked** |
-| BG-06-L | Polar surface | Arctic | ⬜ Not started |
+| **BG-06-L** | Polar surface | Arctic | **✅ Approved / locked** |
 | BG-07-L | Tropical shallows | Four tropical regions | ⬜ Not started |
 | BG-08-L | Rocky shallows | Japan, Cornwall, South Africa, eastern Australia; California/Galápagos with appropriately chosen accents | ⬜ Not started |
 | BG-09-L | Open Atlantic shallows | Open Atlantic | ⬜ Not started |
@@ -90,3 +90,15 @@
 - **Integration:** Art approval and storage only. No expedition rendering, sunlight animation, wildlife-layer, or gameplay changes are authorized. Device testing and integration remain pending separate approval.
 
 ![Approved BG-05-L Galápagos volcanic surface scenery](../assets/expedition-backgrounds/bg-05-volcanic-surface.webp)
+
+## BG-06-L: Arctic Polar Surface — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19, on first visual candidate.
+
+- **Browser asset:** [bg-06-arctic-surface.webp](../assets/expedition-backgrounds/bg-06-arctic-surface.webp), full size 1672 × 941, optimized WebP.
+- **Original approved image:** [bg-06-arctic-surface-original.png](../assets/expedition-backgrounds/source/bg-06-arctic-surface-original.png), original 1672 × 941 PNG. Preserve this exact approved master unchanged.
+- **Art requirements confirmed:** Calm, photorealistic polar underwater scene with a cold, pale cyan to deep steel-blue gradient, diffused ambient light, subtle suspended particulates, and expansive unobstructed water for animated animal silhouettes. Low pale ice-like formations, rocky seabed, and subdued icy accents remain near the bottom edge rather than hanging down from above. No visible surface boundary, pronounced static sunbeams or caustics, animals, kelp, coral, wrecks, or man-made objects.
+- **Reuse:** Arctic region at surface depth (0–30 m). Arctic shallows (30–100 m) will use a separately approved BG-10-L image.
+- **Integration:** Visual art approval and storage only. Do not modify expedition rendering code, sunlight animations, wildlife layers, or gameplay in this asset-production step. Device testing and integration remain pending Avery's separate authorization.
+
+![Approved BG-06-L Arctic polar surface scenery](../assets/expedition-backgrounds/bg-06-arctic-surface.webp)
