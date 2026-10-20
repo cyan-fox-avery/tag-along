@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.5.6-beta": [
-"🏆 <strong>Your Master Shark Tagger certificate.</strong> The real certificate now hangs in Achievements — write your name on it; the date you finished is already there.",
+"🏆 <strong>Your Master Shark Tagger certificate.</strong> Finishing the survey now presents the real certificate — sign your name on it right there. It hangs in Achievements after, with your finish date already on it.",
 "💬 <strong>Sarah spaces out her shark stories.</strong> She won't mention the same shark twice in fifteen minutes — unless you've just seen them again, which is bigger news.",
   ],
   "v2.5.5-beta": [
@@ -4930,15 +4930,16 @@ function winStep(n) {
   const box = (inner) => { ov.innerHTML = `<div class="phone">${inner}</div>`; };
 
   if (n === 1) {
-    /* Beat 1: institute recognition — the formal part. */
+    /* Beat 1: the certificate — this is the signing moment. The player
+       writes their name on the real certificate (Avery's artwork, the
+       same figure that hangs in Achievements afterwards). */
     box(`
-      <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
-      <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
-      <p class="latin" style="text-align:center">Global survey complete — all ${SHARKS.length} species tagged.</p>
-      <div class="cert-body">
-        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
-      </div>
+      ${certFigureHTML()}
+      <p class="latin" style="text-align:center; margin:6px 0 0">Write your name on the line — that's what makes it yours.</p>
+      <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>
       <button id="winNext" class="primary-button" type="button">Continue</button>`);
+    const ni = wireCertName();
+    if (ni && ni.focus) ni.focus();
     $("winNext").addEventListener("click", () => winStep(2));
 
   } else if (n === 2) {
@@ -5417,16 +5418,21 @@ function certAwardDate() {
     { year: "numeric", month: "long", day: "numeric" });
 }
 
-function openCertificate() {
-  const c = $("detailContent");
-  c.innerHTML = `
+/* v2.5.6-beta: the certificate figure — Avery's artwork with the
+   player's name on the printed line and the award date filled in.
+   Shared by the Achievements modal and the win ceremony (beat 1),
+   where signing it is the moment. */
+function certFigureHTML() {
+  return `
     <figure class="cert-figure">
       <img class="cert-img" src="assets/master-tagger-certificate.jpg" alt="Master Shark Tagger certificate — Tag Along Field Program">
       <input id="certName" class="cert-name" type="text" maxlength="40" autocomplete="off"
         placeholder="Your name" aria-label="Your name on the certificate">
       <span class="cert-date">${esc(certAwardDate())}</span>
-    </figure>
-    <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>`;
+    </figure>`;
+}
+
+function wireCertName() {
   const nameInput = $("certName");
   if (nameInput) {
     nameInput.value = state.certName || "";
@@ -5435,6 +5441,14 @@ function openCertificate() {
       try { localStorage.setItem("tyi-cert-name", state.certName); } catch {}
     });
   }
+  return nameInput;
+}
+
+function openCertificate() {
+  const c = $("detailContent");
+  c.innerHTML = certFigureHTML() + `
+    <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>`;
+  wireCertName();
   $("detailOverlay").classList.remove("hidden");
 }
 

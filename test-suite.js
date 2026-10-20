@@ -4857,6 +4857,20 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         html.indexOf("This certifies our conservation scientist") === -1);
       ok("certificate name field is prefilled from state",
         $("certName").value === "Avery");
+      // the win ceremony's first beat IS the certificate — the signing
+      // moment (Avery, 2026-10-20): same figure, same name field.
+      state.wonAt = ts1; state.achievements = { finished: ts1 };
+      winStep(1);
+      const whtml = $("winOverlay").innerHTML;
+      ok("win ceremony beat 1 presents the real certificate",
+        whtml.indexOf("assets/master-tagger-certificate.jpg") !== -1 &&
+        whtml.indexOf('id="certName"') !== -1 &&
+        whtml.indexOf("cert-date") !== -1 &&
+        whtml.indexOf("Write your name on the line") !== -1);
+      ok("win ceremony beat 1: old text certificate is gone",
+        whtml.indexOf("This certifies our conservation scientist") === -1 &&
+        whtml.indexOf("cert-trophy") === -1);
+      $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);
       ok("doWin stamps the win date (source)",
