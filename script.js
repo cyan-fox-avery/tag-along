@@ -3463,7 +3463,16 @@ const NAMED_CHECKINS = [
    a reload just resets the guard, it never breaks content. */
 let lastCheckinIdx = -1;
 function maybeCheckinThread() {
-  const named = SHARKS.filter(s => state.tagged[s.id] && state.tagged[s.id].name);
+  /* v2.5.4-beta fix (Mira review): check-ins must respect the species
+     coherence rule — only named individuals of the pinned or
+     just-encountered species, not any old tagged shark. */
+  const allowedIds = new Set();
+  if (state.pinned) allowedIds.add(state.pinned);
+  const lastTrip = (state.logbook || [])[0];
+  if (lastTrip && lastTrip.encounters) {
+    for (const e of lastTrip.encounters) if (e.speciesId) allowedIds.add(e.speciesId);
+  }
+  const named = SHARKS.filter(s => state.tagged[s.id] && state.tagged[s.id].name && allowedIds.has(s.id));
   if (!named.length || Math.random() > 0.4) return null;
   const s = pick(named);
   const rec = state.tagged[s.id];

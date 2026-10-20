@@ -4090,10 +4090,11 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   })());
   // v1.8.5-beta: behavioral no-repeat guards (Mira review) — deterministic via mocked Math.random.
   ok('checkin never deals the same template twice in a row (behavioral)', (() => {
-    const origRandom = Math.random, origTagged = state.tagged, origIdx = lastCheckinIdx;
+    const origRandom = Math.random, origTagged = state.tagged, origIdx = lastCheckinIdx, origPinned = state.pinned;
     const L = NAMED_CHECKINS.length;
     try {
       state.tagged = { mako: { name: "Finley", researchId: "SM-2026-001" } };
+      state.pinned = 'mako'; // v2.5.4-beta: coherence — check-ins need pinned/encountered species
       lastCheckinIdx = -1;
       // gate open (<=0.4), pick -> the single named shark, ci = 3
       const seq = [0.1, 0.0, 3.5 / L];
@@ -4113,7 +4114,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
       const wrapped = lastCheckinIdx;
       return first === 3 && second === 4 && wrapped === 0;
     } finally {
-      Math.random = origRandom; state.tagged = origTagged; lastCheckinIdx = origIdx;
+      Math.random = origRandom; state.tagged = origTagged; lastCheckinIdx = origIdx; state.pinned = origPinned;
     }
   })());
   ok('reunion closer never repeats twice in a row (behavioral)', (() => {
@@ -4628,9 +4629,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const origTagged = state.tagged;
     const origFacts = state.unlockedFacts;
     const origRandom = Math.random;
+    const origPinned = state.pinned;
     Math.random = () => 0; // passes the 0.4 gate; picks first named + first template
     try {
       state.tagged = { thresher: { name: "Testy", researchId: "TS-1", resightings: [] } };
+      state.pinned = 'thresher'; // v2.5.4-beta: coherence — check-ins need pinned/encountered species
       const thresherHook = SHARKS.find(function(s){ return s.id === "thresher"; }).hook;
       // Locked: hook insight (index 2) NOT unlocked -> neutral fallback.
       state.unlockedFacts = {};
@@ -4647,6 +4650,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       Math.random = origRandom;
       state.tagged = origTagged;
       state.unlockedFacts = origFacts;
+      state.pinned = origPinned;
     }
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
