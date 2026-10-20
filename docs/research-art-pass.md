@@ -31,10 +31,10 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 
 ## Research study checklist — canonical 50-shark roster
 
-These are initial proposed **features**, not final verified anatomy; unchecked means the individual image has not yet been fully approved for game integration, even if its *style* is approved.
+These are initial proposed **features**, not final verified anatomy. **[x] means Avery has approved the illustration visually**; biological verification, file commit, and game integration are tracked separately. Unchecked entries have not yet received individual visual approval.
 
 - [ ] **01. Nurse Shark** (`nurse`) — Close-up of paired sensory barbels beneath the snout
-- [ ] **02. Thresher Shark** (`thresher`) — Isolated elongated upper tail lobe, showing the caudal-fin base and tip
+- [x] ✅ **02. Thresher Shark** (`thresher`) — Isolated elongated upper tail lobe, showing the caudal-fin base and tip. **Visual approved**; anatomy verification and PNG asset commit pending.
 - [ ] **03. Whale Shark** (`whale`) — Close crop of flank spots and pale stripes; no body outline
 - [ ] **04. Goblin Shark** (`goblin`) — Cropped rostrum and protrusible jaws in a two-state detail
 - [ ] **05. Tiger Shark** (`tiger`) — Flank stripe-pattern crop; optional juvenile/adult skin swatches
