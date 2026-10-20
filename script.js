@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.4-beta";
+const VERSION = "v2.5.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.5-beta": [
+"🦈 <strong>Tighter header.</strong> The logo's empty margins are trimmed — the shark now fills its frame.",
+  ],
   "v2.5.4-beta": [
 "💬 <strong>Sarah stays on topic.</strong> She now only brings up a shark species when it's pinned in Research or just encountered — no more random species drops. (Achievements are exempt.)",
   ],
