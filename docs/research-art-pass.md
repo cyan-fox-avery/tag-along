@@ -16,7 +16,7 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 ## Visual art contract — approved
 
 - **Field-notebook look**, like a marine naturalist's quick yet accurate drawing: loose/confident graphite or ink strokes, **minimal shading or hatching**, no polished engravings or photographic texture.
-- **No text inside images**: no labels, scientific names, captions, headings, or leader lines. EN/FR captions and scientific explanations live in the app, not the art.
+- **Text inside images:** only the Latin scientific name, discreetly in the bottom-right corner, as Avery approved for the thresher and nurse studies. No English/French common names, explanatory captions, headings, or leader lines. EN/FR educational explanations stay in the app.
 - **Landscape aspect ratio at least 2:1** (width ≥ twice height); prefer 2.5:1–3:1, or wider if anatomy suits. A common ~1600×640 working export is fine, not mandatory.
 - Bright plain background, clear figure, breathing room, legible on iPhone/iPad. Preserve realistic morphology and feature counts even when rendering simply.
 - Consistency of **style**, not identical detail; each of the 50 studies must be distinct and scientifically reviewed.
@@ -33,7 +33,7 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 
 These are initial proposed **features**, not final verified anatomy. **[x] means Avery has approved the illustration visually**; biological verification, file commit, and game integration are tracked separately. Unchecked entries have not yet received individual visual approval.
 
-- [ ] **01. Nurse Shark** (`nurse`) — Close-up of paired sensory barbels beneath the snout
+- [x] ✅ **01. Nurse Shark** (`nurse`) — Close-up of paired sensory barbels beneath the snout. **Visual approved**; monochrome graphite field sketch, 3:1 close crop, with `Ginglymostoma cirratum` at bottom right. Anatomy verification and PNG asset commit pending.
 - [x] ✅ **02. Thresher Shark** (`thresher`) — Isolated elongated upper tail lobe, showing the caudal-fin base and tip. **Visual approved**; anatomy verification and PNG asset commit pending.
 - [ ] **03. Whale Shark** (`whale`) — Close crop of flank spots and pale stripes; no body outline
 - [ ] **04. Goblin Shark** (`goblin`) — Cropped rostrum and protrusible jaws in a two-state detail
