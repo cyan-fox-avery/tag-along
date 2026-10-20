@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.7-beta";
+const VERSION = "v2.5.8-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.8-beta": [
+"🏆 <strong>Certificate signature placement.</strong> The name now sits a touch lower on its line, like real handwriting — tails dipping just beneath the rule instead of crowding the words above.",
+  ],
   "v2.5.7-beta": [
 "🏆 <strong>Certificate name fix.</strong> Your name now sits on the certificate's line in its proper script — in v2.5.6 a general form style muscled in and blew it up across the parchment.",
   ],
@@ -5455,9 +5458,10 @@ function certFigureHTML() {
 
 /* v2.5.6-beta: export geometry — where the name and date are drawn on
    the native 1125×781 artwork (measured from the printed lines: name
-   line centre x≈50.2%, baseline just above y=54.9%; date line centre
+   line centre x≈50.2%, baseline on the line y≈55.0% so descenders
+   dip beneath it like handwriting; date line centre
    x≈77.9%, baseline just above y=80.4%). Font sizes scale with width. */
-const CERT_DRAW = { nameX: 0.502, nameBase: 0.543, namePx: 61, dateX: 0.779, dateBase: 0.799, datePx: 33 };
+const CERT_DRAW = { nameX: 0.502, nameBase: 0.550, namePx: 61, dateX: 0.779, dateBase: 0.799, datePx: 33 };
 const CERT_FONT = '"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive';
 
 /* Shrink-to-fit: the largest font size (≤ basePx) at which text fits
