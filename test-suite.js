@@ -38,8 +38,8 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.3-beta', VERSION === 'v2.5.3-beta');
-  ok('whats-new has v2.5.3 entry', Array.isArray(WHATS_NEW['v2.5.3-beta']) && WHATS_NEW['v2.5.3-beta'].length === 1);
+  ok('version v2.5.4-beta', VERSION === 'v2.5.4-beta');
+  ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
   // Assert: no .caustics rules remain, the video element exists in HTML with
@@ -3024,6 +3024,8 @@ code += `
     const origFlags = [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip];
     const origChatSeen = JSON.parse(JSON.stringify(state.chatSeen));
     const origRandom = Math.random;
+    const origPinned = state.pinned;
+    state.pinned = 'nurse'; // v2.5.4-beta: coherence — Sarah chats about the pinned species
     state.taggedThisTrip = false; state.resightedThisTrip = false; state.followedThisTrip = false;
     state.failures = 0;
     state.sarahAdviceOffered = true;
@@ -3055,6 +3057,7 @@ code += `
     state.sarahAdviceOffered = origOffered;
     [state.taggedThisTrip, state.resightedThisTrip, state.followedThisTrip] = origFlags;
     state.chatSeen = origChatSeen;
+    state.pinned = origPinned;
     saveMsgs();
   })();
   // v2.2.0-beta: CSS caustics retired — sun rays are a looping video.
@@ -5077,6 +5080,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   // v2.5.3-beta: darker ambient shadows in first two layers
   ok('surface ambient dark gray', cssCode.indexOf('.depth-surface .ambient img') !== -1 && cssCode.indexOf('brightness(0.35)') !== -1);
   ok('shallow ambient almost black', cssCode.indexOf('.depth-shallow .ambient img') !== -1 && cssCode.indexOf('brightness(0.12)') !== -1);
+  // v2.5.4-beta: Sarah species coherence (pinned or just-encountered only)
+  ok('sarahSpeciesPool exists', typeof sarahSpeciesPool === 'function');
+  ok('GENERIC_CHATS exist', Array.isArray(GENERIC_CHATS) && GENERIC_CHATS.length >= 1);
+  ok('pickChat uses coherence pool', fileCode.indexOf('sarahSpeciesPool(COUSIN_CHATS)') !== -1);
+  ok('nudge uses coherence pool', fileCode.indexOf('sarahSpeciesPool(COUSIN_NUDGES)') !== -1);
   // v2.4.0-beta Mira review fixes
   ok('arctic surface deck has no turtles/dolphins/mantas', (() => {
     const d = buildSightingDeck("surface", "arctic");

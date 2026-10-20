@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.3-beta";
+const VERSION = "v2.5.4-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.4-beta": [
+"💬 <strong>Sarah stays on topic.</strong> She now only brings up a shark species when it's pinned in Research or just encountered — no more random species drops. (Achievements are exempt.)",
+  ],
   "v2.5.3-beta": [
 "🌑 <strong>Darker shadows up top.</strong> Background creatures now read as dark gray silhouettes at the surface and almost black in the shallows.",
   ],
@@ -3745,13 +3748,39 @@ function regionalSpecies(onlyUntagged) {
   return pool.length ? pool : SHARKS;
 }
 function pickChat() {
-  const pool = regionalSpecies(false).filter(s => COUSIN_CHATS[s.id]);
-  const s = pick(pool.length ? pool : SHARKS.filter(x => COUSIN_CHATS[x.id]));
+  const pool = sarahSpeciesPool(COUSIN_CHATS);
+  if (!pool.length) {
+    /* No pinned/encountered species with chats — generic, no species named. */
+    return pick(GENERIC_CHATS);
+  }
+  const s = pick(pool);
   const chats = COUSIN_CHATS[s.id];
   const seen = state.chatSeen[s.id] || 0;
   state.chatSeen[s.id] = seen + 1;
   return chats[seen % chats.length];
 }
+/* v2.5.4-beta: Sarah's species coherence (Avery) — she only names a
+   particular shark species when it's (1) the pinned species on the
+   research tab, or (2) just encountered in the most recent expedition.
+   Achievement texts are exempt from this rule. */
+function sarahSpeciesPool(chatsObj) {
+  const allowed = new Set();
+  if (state.pinned && chatsObj[state.pinned]) allowed.add(state.pinned);
+  const lastTrip = (state.logbook || [])[0];
+  if (lastTrip && lastTrip.encounters) {
+    for (const e of lastTrip.encounters) {
+      if (e.speciesId && chatsObj[e.speciesId]) allowed.add(e.speciesId);
+    }
+  }
+  return [...allowed].map(id => SHARKS.find(s => s.id === id)).filter(Boolean);
+}
+/* Generic Sarah chats — no species named, for when there's no pinned or
+   recently-encountered species with authored chats. */
+const GENERIC_CHATS = [
+  { them: "Flat water today. Good day to just be out there, honestly.", me: "The ocean doesn't always have to produce." },
+  { them: "I was reading about deep-sea gigantism again. Everything's bigger down there. Everything.", me: "The abyss supersizes." },
+  { them: "Do you ever just watch the water and not think about sharks at all? ...No? Me neither.", me: "Sharks are always on the brain." },
+];
 /* ---------- Sarah's Big Day (v1.4.19-beta) ----------
    When an expedition tags multiple first-time species, ONE authored Big Day
    conversation replaces the routine per-species celebrations. Design: PR #44.
@@ -3859,11 +3888,14 @@ function afterExpedition(plan) {
     // gentle nudge, genuine-conversation style — about YOUR waters.
     // v0.17.1: Sarah only butts in on her own after five; before that,
     // asking is the player's call (see the Ask Sarah panel).
-    const s = pick(regionalSpecies(true));
+    // v2.5.4-beta: nudge follows the species coherence rule (Avery) —
+    // only the pinned or just-encountered species, never a random one.
+    const pool = sarahSpeciesPool(COUSIN_NUDGES);
+    const s = pool.length ? pick(pool) : null;
     thread = [
       { who: "them", text: "How's the shark hunting going?" },
       { who: "me", text: "Honestly? Struck out a few times. The water's been empty." },
-      { who: "them", text: COUSIN_NUDGES[s.id] || "You'll get the next one. I believe in you." },
+      { who: "them", text: s ? (COUSIN_NUDGES[s.id] || "You'll get the next one. I believe in you.") : "You'll get the next one. I believe in you." },
       { who: "me", text: "Huh. Okay, that's actually really helpful. Thanks." }
     ];
     threadKind = "special";
