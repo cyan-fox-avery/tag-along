@@ -35,7 +35,7 @@ These are initial proposed **features**, not final verified anatomy. **[x] means
 
 - [x] ✅ **01. Nurse Shark** (`nurse`) — Close-up of paired sensory barbels beneath the snout. **Visual approved**; monochrome graphite field sketch, 3:1 close crop, with `Ginglymostoma cirratum` at bottom right. Anatomy verification and PNG asset commit pending.
 - [x] ✅ **02. Thresher Shark** (`thresher`) — Isolated elongated upper tail lobe, showing the caudal-fin base and tip. **Visual approved**; anatomy verification and PNG asset commit pending.
-- [ ] **03. Whale Shark** (`whale`) — Close crop of flank spots and pale stripes; no body outline
+- [x] ✅ **03. Whale Shark** (`whale`) — Close crop of upper-flank pale spots and stripes from a slightly oblique overhead view, with no full body outline. **Visually approved**; monochrome graphite field sketch, 3:1 (2172 × 724), `Rhincodon typus` at bottom right. Scientific verification and PNG asset commit pending.
 - [ ] **04. Goblin Shark** (`goblin`) — Cropped rostrum and protrusible jaws in a two-state detail
 - [ ] **05. Tiger Shark** (`tiger`) — Flank stripe-pattern crop; optional juvenile/adult skin swatches
 - [ ] **06. Sand Tiger Shark** (`sandtiger`) — Partially open mouth showing protruding narrow teeth
