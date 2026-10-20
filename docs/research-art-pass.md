@@ -8,7 +8,7 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 
 **Research teaches clues; tagging earns the full shark reveal.**
 
-- Each species gets its own **isolated, partial anatomical feature study**. No entire shark, full silhouette, head-to-tail profile, or almost-complete crop.
+- Each species **selected for an illustration** gets its own **isolated, partial anatomical feature study**. No entire shark, full silhouette, head-to-tail profile, or almost-complete crop. Other species may use text-only Research entries; an illustration is not mandatory.
 - The artwork must **not** reveal the whole shark through connected or multiple adjacent fragments.
 - Encounter and Collection retain the complete illustrated animal; Wild Archive retains real wildlife imagery.
 - Species-specific identifying features are educational clues, **not always uniquely diagnostic**.
@@ -19,7 +19,7 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 - **Text inside images:** only the Latin scientific name, discreetly in the bottom-right corner, as Avery approved for the thresher and nurse studies. No English/French common names, explanatory captions, headings, or leader lines. EN/FR educational explanations stay in the app.
 - **Landscape aspect ratio at least 2:1** (width ≥ twice height); prefer 2.5:1–3:1, or wider if anatomy suits. A common ~1600×640 working export is fine, not mandatory.
 - Bright plain background, clear figure, breathing room, legible on iPhone/iPad. Preserve realistic morphology and feature counts even when rendering simply.
-- Consistency of **style**, not identical detail; each of the 50 studies must be distinct and scientifically reviewed.
+- Consistency of **style**, not identical detail; every illustration we choose to keep must be distinct and scientifically reviewed. Do not manufacture 50 pictures merely to fill a quota.
 
 ## First style prototype: common thresher — VISUALLY APPROVED
 
@@ -31,13 +31,13 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 
 ## Research study checklist — canonical 50-shark roster
 
-These are initial proposed **features**, not final verified anatomy. **[x] means Avery has approved the illustration visually**; biological verification, file commit, and game integration are tracked separately. Unchecked entries have not yet received individual visual approval.
+These are initial proposed **features**, not final verified anatomy. **[x] means Avery has approved the illustration visually**; biological verification, file commit, and game integration are tracked separately. Unchecked entries have not yet received individual visual approval. **⏸️ Deferred** means an illustration is postponed or may be omitted entirely, without affecting the Research entry.
 
 - [x] ✅ **01. Nurse Shark** (`nurse`) — Close-up of paired sensory barbels beneath the snout. **Visual approved**; monochrome graphite field sketch, 3:1 close crop, with `Ginglymostoma cirratum` at bottom right. Anatomy verification and PNG asset commit pending.
 - [x] ✅ **02. Thresher Shark** (`thresher`) — Isolated elongated upper tail lobe, showing the caudal-fin base and tip. **Visual approved**; anatomy verification and PNG asset commit pending.
 - [x] ✅ **03. Whale Shark** (`whale`) — Close crop of upper-flank pale spots and stripes from a slightly oblique overhead view, with no full body outline. **Visually approved**; monochrome graphite field sketch, 3:1 (2172 × 724), `Rhincodon typus` at bottom right. Scientific verification and PNG asset commit pending.
-- [ ] **04. Goblin Shark** (`goblin`) — Cropped rostrum and protrusible jaws in a two-state detail
-- [ ] **05. Tiger Shark** (`tiger`) — Flank stripe-pattern crop; optional juvenile/adult skin swatches
+- [ ] ⏸️ **04. Goblin Shark** (`goblin`) — **Deferred / optional.** Two attempts at projected-jaw close-ups were rejected for anatomical exaggeration (fantasy-like teeth/jaw mechanics). Keep its Research information without forcing new artwork. Possible future isolated tooth or jaw study only if Avery wants to revisit.
+- [x] ✅ **05. Tiger Shark** (`tiger`) — Close crop of irregular dark flank stripes and blotches on lighter skin, suggesting body curvature without revealing the shark. **Visually approved**; monochrome graphite field sketch, 3:1 (2172 × 724), `Galeocerdo cuvier` at bottom right. Scientific verification and PNG asset commit pending.
 - [ ] **06. Sand Tiger Shark** (`sandtiger`) — Partially open mouth showing protruding narrow teeth
 - [ ] **07. Galápagos Shark** (`galapagos`) — First-dorsal-fin profile and rear edge crop **[confirm distinguishing value against dusky]**
 - [ ] **08. Great White Shark** (`greatwhite`) — Close-up of broad, triangular serrated teeth
@@ -91,6 +91,6 @@ These are initial proposed **features**, not final verified anatomy. **[x] means
 3. Check especially close lookalikes: hammerhead head shapes, sixgill/sevengill gill sections, shark fin-tip variants, and white-shark/mako tooth differences. Galápagos, Caribbean reef and Pacific sleeper features remain tentative.
 4. A separate basking-shark full plate remains in PR #90 as an *older linework reference only*; it violates the no-full-shark rule for direct Research use.
 5. Six old minimalist SVGs in repo-relative `sketches/` are incomplete placeholder starts, not approved finished anatomy studies.
-6. Only integrate once anatomy and visuals are approved; require all 50 IDs to resolve to unique real assets with accessible localized UI descriptions. Do not merge automatically.
+6. Only integrate illustrations once anatomy and visuals are approved. **Illustrations are optional per species:** every Research entry must remain accessible and informative in EN/FR even when no bespoke artwork is provided; no forced 50-image completion requirement. Do not merge automatically.
 
 — Mira 🩵🦈
