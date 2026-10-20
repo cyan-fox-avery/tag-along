@@ -38,8 +38,9 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.5-beta', VERSION === 'v2.5.5-beta');
+  ok('version v2.5.6-beta', VERSION === 'v2.5.6-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
+  ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
   // v2.2.0-beta: sun rays are a looping video, not CSS layers. Any continuous
   // CSS animation on the 8 masked caustics spans broke iPad Safari (v2.1.0-v2.1.5).
@@ -704,7 +705,9 @@ code += `
     // tyi-messages blob — snapshot both so later tests don't inherit
     // synthetic Phone notifications (Mira's PR #91 hygiene note).
     const savedUnread = state.unread;
+    const savedMentions = state.sharkMentions;
     state.reunionReacted = {};
+    state.sharkMentions = {};
     const species = SHARKS.find(s => s.id === 'mako');
     const rec = { name: '', researchId: 'MK-2026-019', sex: 'female', resightings: [] };
     try {
@@ -721,6 +724,7 @@ code += `
       state.messages.length = savedMsgCount;
       state.reunionReacted = savedReacted;
       state.unread = savedUnread;
+      state.sharkMentions = savedMentions;
       // Re-persist the restored state so the tyi-messages blob matches,
       // and refresh the badge from the restored unread count.
       saveMsgs();
@@ -735,7 +739,9 @@ code += `
     const beforeUnread = state.unread;
     const beforeCount = state.messages.length;
     const savedReacted = state.reunionReacted;
+    const savedMentionsB = state.sharkMentions;
     state.reunionReacted = {};
+    state.sharkMentions = {};
     try {
       maybeReunionReaction(SHARKS.find(s => s.id === 'mako'),
         { name: '', researchId: 'MK-2026-019', sex: 'female', resightings: [] });
@@ -743,6 +749,7 @@ code += `
       state.messages.length = beforeCount;
       state.reunionReacted = savedReacted;
       state.unread = beforeUnread;
+      state.sharkMentions = savedMentionsB;
       saveMsgs();
       updateMsgBadge();
       let blob = null;
@@ -754,6 +761,7 @@ code += `
       state.messages.length = beforeCount;
       state.reunionReacted = savedReacted;
       state.unread = beforeUnread;
+      state.sharkMentions = savedMentionsB;
       return false;
     }
   })());
@@ -776,7 +784,9 @@ code += `
     const savedReacted = state.reunionReacted;
     const savedMsgCount = state.messages.length;
     const savedUnread = state.unread;
+    const savedMentions2 = state.sharkMentions;
     state.reunionReacted = {};
+    state.sharkMentions = {};
     try {
       const fired = maybeReunionReaction(nurse, { name: 'Helen', researchId: 'NS-1', sex: 'female', resightings: [] });
       const thread = state.messages[state.messages.length - 1].msgs;
@@ -790,6 +800,7 @@ code += `
       state.messages.length = savedMsgCount;
       state.reunionReacted = savedReacted;
       state.unread = savedUnread;
+      state.sharkMentions = savedMentions2;
       saveMsgs();
       updateMsgBadge();
       try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
@@ -805,7 +816,9 @@ code += `
     const savedReacted = state.reunionReacted;
     const savedMsgCount = state.messages.length;
     const savedUnread = state.unread;
+    const savedMentions3 = state.sharkMentions;
     state.reunionReacted = {};
+    state.sharkMentions = {};
     try {
       const fired = maybeReunionReaction(nurse, { name: 'Fin & <Tonic>', researchId: 'NS-1', sex: 'female', resightings: [] });
       const thread = state.messages[state.messages.length - 1].msgs;
@@ -823,6 +836,7 @@ code += `
       state.messages.length = savedMsgCount;
       state.reunionReacted = savedReacted;
       state.unread = savedUnread;
+      state.sharkMentions = savedMentions3;
       saveMsgs();
       updateMsgBadge();
       renderMessages();
@@ -4092,10 +4106,12 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
   // v1.8.5-beta: behavioral no-repeat guards (Mira review) — deterministic via mocked Math.random.
   ok('checkin never deals the same template twice in a row (behavioral)', (() => {
     const origRandom = Math.random, origTagged = state.tagged, origIdx = lastCheckinIdx, origPinned = state.pinned;
+    const origMentionsC = state.sharkMentions;
     const L = NAMED_CHECKINS.length;
     try {
       state.tagged = { mako: { name: "Finley", researchId: "SM-2026-001" } };
       state.pinned = 'mako'; // v2.5.4-beta: coherence — check-ins need pinned/encountered species
+      state.sharkMentions = {}; // v2.5.6-beta: mention cooldown must not block the fixture
       lastCheckinIdx = -1;
       // gate open (<=0.4), pick -> the single named shark, ci = 3
       const seq = [0.1, 0.0, 3.5 / L];
@@ -4116,14 +4132,17 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
       return first === 3 && second === 4 && wrapped === 0;
     } finally {
       Math.random = origRandom; state.tagged = origTagged; lastCheckinIdx = origIdx; state.pinned = origPinned;
+      state.sharkMentions = origMentionsC;
     }
   })());
   ok('reunion closer never repeats twice in a row (behavioral)', (() => {
     const origRandom = Math.random, origReacted = state.reunionReacted, origMsgs = state.messages;
     const origUnread = state.unread, origLastAt = state.lastSarahMsgAt, origIdx = lastReunionCloserIdx;
+    const origMentions = state.sharkMentions;
     const L = RESIGHT_REUNION_CLOSERS.length;
     try {
       state.reunionReacted = {};
+      state.sharkMentions = {};
       state.messages = [];
       const rec = { name: "Fin", researchId: "XX-1", sex: "female" };
       let rv = 3.5 / L;
@@ -4143,6 +4162,7 @@ ok('WHATS_NEW has v1.7.35-beta', Array.isArray(WHATS_NEW['v1.7.35-beta']) && WHA
     } finally {
       Math.random = origRandom; state.reunionReacted = origReacted; state.messages = origMsgs;
       state.unread = origUnread; state.lastSarahMsgAt = origLastAt; lastReunionCloserIdx = origIdx;
+      state.sharkMentions = origMentions;
     }
   })());
   // v1.8.5-beta: sightings "show more" pages through the rest (mirrors #108 logbook paging tests).
@@ -4442,7 +4462,9 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const savedMsgCount = state.messages.length;
     // v1.7.28-beta: same unread/blob hygiene as the delivery fixture above.
     const savedUnread = state.unread;
+    const savedMentionsR = state.sharkMentions;
     state.reunionReacted = {};
+    state.sharkMentions = {};
     const species = SHARKS.find(s => s.id === 'mako');
     const rec = { name: '', researchId: 'MK-2026-019', resightings: [] };
     try {
@@ -4453,12 +4475,13 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.messages.length = savedMsgCount;
       state.reunionReacted = savedReacted;
       state.unread = savedUnread;
+      state.sharkMentions = savedMentionsR;
       saveMsgs();
       updateMsgBadge();
       try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(savedReacted || {})); } catch {}
     }
   })());
-  ok('resight button skips resightThread when reunion reaction fired', /if\\s*\\(!reunionReactedThisEncounter\\)\\s*pushThread\\(resightThread/.test(fileCode));
+  ok('resight button skips resightThread when reunion reaction fired', /if\\s*\\(!reunionReactedThisEncounter\\)\\s*\\{[\\s\\S]*?pushThread\\(resightThread\\(species, rec\\)\\)/.test(fileCode));
   ok('reunion call site captures return value', /const reunionReactedThisEncounter = maybeReunionReaction\\(species, rec\\)/.test(fileCode));
 
   // v1.7.8-beta: species insight ends the expedition
@@ -4609,7 +4632,9 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     fileCode.includes('bukangiEgg') &&
     fileCode.includes('tyi-bukangi'));
   ok('v1.7.19 tyi-bukangi in RESET_KEYS',
-    fileCode.includes('"tyi-bukangi"]'));
+    RESET_KEYS.includes('tyi-bukangi'));
+  ok('v2.5.6 certificate keys in RESET_KEYS',
+    RESET_KEYS.includes('tyi-won-at') && RESET_KEYS.includes('tyi-cert-name'));
   ok('v1.7.19 dusky encounter hook present',
     fileCode.includes('maybeBukangiEgg(species)') &&
     fileCode.includes('function maybeBukangiEgg') &&
@@ -4631,10 +4656,12 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     const origFacts = state.unlockedFacts;
     const origRandom = Math.random;
     const origPinned = state.pinned;
+    const origMentionsH = state.sharkMentions;
     Math.random = () => 0; // passes the 0.4 gate; picks first named + first template
     try {
       state.tagged = { thresher: { name: "Testy", researchId: "TS-1", resightings: [] } };
       state.pinned = 'thresher'; // v2.5.4-beta: coherence — check-ins need pinned/encountered species
+      state.sharkMentions = {}; // v2.5.6-beta: mention cooldown must not block the fixture
       const thresherHook = SHARKS.find(function(s){ return s.id === "thresher"; }).hook;
       // Locked: hook insight (index 2) NOT unlocked -> neutral fallback.
       state.unlockedFacts = {};
@@ -4652,6 +4679,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.tagged = origTagged;
       state.unlockedFacts = origFacts;
       state.pinned = origPinned;
+      state.sharkMentions = origMentionsH;
     }
   })();
   /* v2.5.4-beta (Mira): behavioral coherence tests — controlled state,
@@ -4661,9 +4689,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
           oLog = state.logbook, oSeen = state.chatSeen, oMsgsLen = state.messages.length,
           oUnread = state.unread, oFail = state.failures, oTag = state.taggedThisTrip,
           oRes = state.resightedThisTrip, oFol = state.followedThisTrip,
-          oClock = state.lastSarahMsgAt, oChkIdx = lastCheckinIdx;
+          oClock = state.lastSarahMsgAt, oChkIdx = lastCheckinIdx,
+          oMentions = state.sharkMentions;
     try {
       Math.random = () => 0; // gates open, first pick
+      state.sharkMentions = {}; // v2.5.6-beta: start from a clean mention clock
       // (a) no pin + empty last trip + old named tags: no check-in, generic chat
       state.pinned = null;
       state.tagged = { galapagos: { name: "Gala", researchId: "G-1" } };
@@ -4718,9 +4748,226 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       state.messages.length = oMsgsLen; state.unread = oUnread;
       state.lastSarahMsgAt = oClock;
       lastCheckinIdx = oChkIdx;
+      state.sharkMentions = oMentions;
       saveMsgs();
       state.failures = oFail; state.taggedThisTrip = oTag;
       state.resightedThisTrip = oRes; state.followedThisTrip = oFol;
+    }
+  })();
+  /* v2.5.6-beta: per-individual mention cooldown (Avery) — 15 minutes
+     between Sarah's mentions of the same individual shark; a heavier
+     mention supersedes a lighter one (sighting weight = sighting
+     count, check-in = 0); check-in picks are weighted by sightings. */
+  (() => {
+    const oR = Math.random, oNow = Date.now, oMentions = state.sharkMentions,
+          oPinned = state.pinned, oTagged = state.tagged, oLog = state.logbook,
+          oReacted = state.reunionReacted, oMsgsLen = state.messages.length,
+          oUnread = state.unread,
+          oLastSarah = state.lastSarahMsgAt, oCloserIdx = lastReunionCloserIdx,
+          oChkIdx = lastCheckinIdx, oPendingChk = pendingCheckinSpeciesId,
+          oStoredReacted = localStorage.getItem("tyi-reunion-reacted");
+    const T0 = 1760000000000;
+    try {
+      Date.now = () => T0;
+      Math.random = () => 0;
+      state.sharkMentions = {};
+      // gate unit behavior
+      ok("mention gate: no record never blocks",
+        sharkMentionBlocked('nurse', 0) === false);
+      noteSharkMention('nurse', 1);
+      ok("mention gate: fresh sighting (w1) blocks check-in (w0) and equal w1",
+        sharkMentionBlocked('nurse', 0) === true && sharkMentionBlocked('nurse', 1) === true);
+      ok("mention gate: a heavier sighting (w2) supersedes",
+        sharkMentionBlocked('nurse', 2) === false);
+      Date.now = () => T0 + 16 * 60 * 1000;
+      ok("mention gate: 15 minutes later nothing is blocked",
+        sharkMentionBlocked('nurse', 0) === false);
+      Date.now = () => T0;
+      // check-in yields: the only allowed named shark was just mentioned
+      state.pinned = 'lemon';
+      state.logbook = [];
+      state.tagged = { lemon: { name: "Zest", researchId: "L-1", resightings: [] } };
+      noteSharkMention('lemon', 1);
+      ok("mention cooldown: check-in skips a just-mentioned individual",
+        maybeCheckinThread() === null);
+      // a real sighting supersedes a recent check-in (the Donny case)
+      state.sharkMentions = {};
+      noteSharkMention('nurse', 0);
+      state.reunionReacted = {};
+      const nurseSp = SHARKS.find(function(s){ return s.id === 'nurse'; });
+      ok("mention cooldown: first reunion supersedes a recent check-in",
+        maybeReunionReaction(nurseSp, { name: "Helen", researchId: "NS-1", resightings: [] }) === true);
+      // ...but an equal-weight recent mention holds the one-time reaction
+      state.sharkMentions = {};
+      noteSharkMention('nurse', 1);
+      state.reunionReacted = {};
+      ok("mention cooldown: equal-weight mention holds the reunion reaction, flag unburned",
+        maybeReunionReaction(nurseSp, { name: "Helen", researchId: "NS-1", resightings: [] }) === false &&
+        state.reunionReacted['nurse'] !== true);
+      // weighted check-in pick: more sightings = more weight
+      state.sharkMentions = {};
+      state.pinned = null;
+      state.logbook = [{ encounters: [{ speciesId: 'lemon' }, { speciesId: 'tiger' }] }];
+      state.tagged = {
+        lemon: { name: "Zest", researchId: "L-1", resightings: [] },
+        tiger: { name: "Stripes", researchId: "T-1", resightings: [{}, {}, {}] }
+      };
+      // weights: lemon 1, tiger 4 (total 5). Draw 0.5 -> r=2.5: passes
+      // lemon (r=1.5), lands on tiger.
+      const seq = [0, 0.5, 0];
+      let si = 0;
+      Math.random = () => seq[si++ % seq.length];
+      const wt = maybeCheckinThread();
+      const wtText = wt ? wt.map(function(m){ return m.text; }).join(' ') : '';
+      ok("mention weighting: check-in favours the more-sighted individual",
+        wtText.indexOf("Stripes") !== -1);
+    } finally {
+      Math.random = oR; Date.now = oNow; state.sharkMentions = oMentions;
+      state.pinned = oPinned; state.tagged = oTagged; state.logbook = oLog;
+      state.reunionReacted = oReacted;
+      state.messages.length = oMsgsLen; state.unread = oUnread;
+      /* v2.5.6-beta (Mira review): restore EVERYTHING the fixture's
+         Sarah calls mutated — the persisted reunion key, the routine
+         throttle timestamp (before saveMsgs re-persists it), the two
+         no-repeat rotation indexes, and the pending check-in stash. */
+      lastReunionCloserIdx = oCloserIdx; lastCheckinIdx = oChkIdx;
+      pendingCheckinSpeciesId = oPendingChk;
+      state.lastSarahMsgAt = oLastSarah;
+      if (oStoredReacted === null) localStorage.removeItem("tyi-reunion-reacted");
+      else localStorage.setItem("tyi-reunion-reacted", oStoredReacted);
+      saveMsgs();
+    }
+    ok("mention fixture leaves no residue (storage, throttle clock, indexes restored)",
+      localStorage.getItem("tyi-reunion-reacted") === oStoredReacted &&
+      state.lastSarahMsgAt === oLastSarah &&
+      lastReunionCloserIdx === oCloserIdx && lastCheckinIdx === oChkIdx &&
+      pendingCheckinSpeciesId === oPendingChk);
+  })();
+  /* v2.5.6-beta: Master Shark Tagger certificate — Avery's artwork in
+     the Achievements modal, player-written name, auto award date,
+     "Awarded with salt on it" kept as the caption. */
+  (() => {
+    const oWonAt = state.wonAt, oAch = state.achievements, oName = state.certName;
+    try {
+      ok("certificate artwork ships in assets/",
+        fs.existsSync(path.join(DIR, "assets", "master-tagger-certificate.jpg")));
+      // date source order: recorded win date wins
+      const ts1 = new Date(2026, 9, 19).getTime();
+      state.wonAt = ts1; state.achievements = {};
+      ok("certificate date: recorded win date is used",
+        certAwardDate() === new Date(ts1).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
+      // fallback: Fin-ished achievement timestamp
+      const ts2 = new Date(2026, 8, 28).getTime();
+      state.wonAt = null; state.achievements = { finished: ts2 };
+      ok("certificate date: falls back to the Fin-ished unlock time",
+        certAwardDate() === new Date(ts2).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
+      // modal content
+      state.certName = "Avery";
+      openCertificate();
+      const html = $("detailContent").innerHTML;
+      ok("certificate modal shows the artwork with name field + date",
+        html.indexOf("assets/master-tagger-certificate.jpg") !== -1 &&
+        html.indexOf('id="certName"') !== -1 &&
+        html.indexOf("cert-date") !== -1);
+      ok("certificate modal keeps the salt line, old text gone",
+        html.indexOf("Awarded with salt on it") !== -1 &&
+        html.indexOf("This certifies our conservation scientist") === -1);
+      ok("certificate name field is prefilled from state",
+        $("certName").value === "Avery");
+      // the win ceremony's first beat IS the certificate — the signing
+      // moment (Avery, 2026-10-20): same figure, same name field.
+      state.wonAt = ts1; state.achievements = { finished: ts1 };
+      winStep(1);
+      const whtml = $("winOverlay").innerHTML;
+      ok("win ceremony beat 1 presents the real certificate",
+        whtml.indexOf("assets/master-tagger-certificate.jpg") !== -1 &&
+        whtml.indexOf('id="certName"') !== -1 &&
+        whtml.indexOf("cert-date") !== -1 &&
+        whtml.indexOf("Write your name on the line") !== -1);
+      ok("win ceremony beat 1: old text certificate is gone",
+        whtml.indexOf("This certifies our conservation scientist") === -1 &&
+        whtml.indexOf("cert-trophy") === -1);
+      // Mira review fixes: certificate mode leaves the 2-column grid,
+      // the ceremony beat gets the wide shell (not the 380px phone),
+      // the name line stays blank until typed, and the keepsake export
+      // composites name + date onto the artwork via canvas.
+      ok("certificate modal switches detail content to cert-mode",
+        $("detailContent").classList.contains("cert-mode") === true);
+      ok("shark detail removes cert-mode (source)",
+        fileCode.indexOf('classList.remove("cert-mode")') !== -1);
+      ok("certificate CSS: cert-mode is single-column, ceremony shell is wide",
+        cssCode.indexOf("#detailContent.cert-mode") !== -1 &&
+        cssCode.indexOf(".phone.cert-phone") !== -1);
+      ok("win ceremony beat 1 uses the wide certificate shell + actions",
+        whtml.indexOf("cert-phone") !== -1 &&
+        whtml.indexOf('id="certSave"') !== -1 &&
+        whtml.indexOf('id="certGrow"') !== -1);
+      ok("certificate name line is blank until the player types",
+        html.slice(0, html.indexOf("</figure>")).indexOf('placeholder=""') !== -1 &&
+        html.slice(0, html.indexOf("</figure>")).indexOf('placeholder="Your name"') === -1);
+      ok("certificate export composites artwork + name + date on canvas (source)",
+        fileCode.indexOf("function exportCertificate") !== -1 &&
+        fileCode.indexOf('createElement("canvas")') !== -1 &&
+        fileCode.indexOf("toBlob") !== -1 &&
+        CERT_DRAW.nameBase < 0.549 && CERT_DRAW.dateBase < 0.804 &&
+        CERT_DRAW.nameX > 0.15 && CERT_DRAW.nameX < 0.85 &&
+        CERT_DRAW.dateX > 0.66 && CERT_DRAW.dateX < 0.90);
+      // Avery: the keyboard can cover the certificate — a visible
+      // name box mirrors the signature line in both places, and the
+      // ceremony focuses the box, not the on-certificate field.
+      ok("certificate has a visible name box in modal + ceremony, synced (source)",
+        html.indexOf('id="certNameBox"') !== -1 &&
+        whtml.indexOf('id="certNameBox"') !== -1 &&
+        fileCode.indexOf('const nameBox = $("certNameBox")') !== -1 &&
+        cssCode.indexOf(".cert-name-box") !== -1);
+      ok("win ceremony focuses the name box (source)",
+        fileCode.indexOf('const nb = $("certNameBox")') !== -1);
+      // Mira: a 40-char name at the fixed export size would draw
+      // through the border. Behavioural fit check with a stubbed
+      // canvas measurer (0.6em per character).
+      const oCreateEl = document.createElement;
+      document.createElement = function(tag) {
+        if (tag === "canvas") return { getContext: function() {
+          return { font: "", measureText: function(t) {
+            const px = parseInt(this.font, 10) || 0;
+            return { width: t.length * px * 0.6 };
+          } };
+        } };
+        return oCreateEl(tag);
+      };
+      try {
+        const fittedLong = fitTextPx("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 61, 742, CERT_FONT);
+        ok("export fit: a 40-character name shrinks to fit the printed line",
+          fittedLong < 61 && fittedLong * 40 * 0.6 <= 742);
+        ok("export fit: a short name keeps the full signature size",
+          fitTextPx("Avery", 61, 742, CERT_FONT) === 61);
+        ok("export fit: a long localized date shrinks to fit its line",
+          fitTextPx("September 28, 2026", 33, 259, CERT_FONT) < 33);
+      } finally {
+        document.createElement = oCreateEl;
+      }
+      ok("certificate export fits name + date via fitTextPx (source)",
+        fileCode.indexOf("fitTextPx(state.certName") !== -1 &&
+        fileCode.indexOf("fitTextPx(dateText") !== -1);
+      // Mira regression: the Achievements modal must unhide BEFORE
+      // wiring, or the first-open fit measures a display:none
+      // (zero-width) field and a persisted long name stays unfitted.
+      const ocStart = fileCode.indexOf("function openCertificate()");
+      const ocBody = fileCode.slice(ocStart, ocStart + 1400);
+      ok("certificate modal unhides before wiring (first-open fit regression)",
+        ocBody.indexOf('classList.remove("hidden")') !== -1 &&
+        ocBody.indexOf('classList.remove("hidden")') < ocBody.indexOf("wireCertName()"));
+      ok("certificate re-fits on resize and on the grow toggle (source)",
+        fileCode.indexOf('addEventListener("resize"') !== -1 &&
+        fileCode.indexOf("certResizeWired") !== -1 &&
+        fileCode.split("fitCertDisplays(").length - 1 >= 5);
+      $("winOverlay").classList.add("hidden");
+      ok("certificate name persists on input (source)",
+        fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);
+      ok("doWin stamps the win date (source)",
+        fileCode.indexOf('localStorage.setItem("tyi-won-at"') !== -1);
+    } finally {
+      state.wonAt = oWonAt; state.achievements = oAch; state.certName = oName;
     }
   })();
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.5-beta";
+const VERSION = "v2.5.6-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.6-beta": [
+"🏆 <strong>Your Master Shark Tagger certificate.</strong> Finishing the survey now presents the real certificate — sign your name on it right there. It hangs in Achievements after, with your finish date already on it.",
+"💬 <strong>Sarah spaces out her shark stories.</strong> She won't mention the same shark twice in fifteen minutes — unless you've just seen them again, which is bigger news.",
+  ],
   "v2.5.5-beta": [
 "🦈 <strong>Tighter header.</strong> The logo's empty margins are trimmed — the shark now fills its frame.",
   ],
@@ -1385,6 +1389,12 @@ const state = {
      message sent, any kind. Routine messages within 5 min of it are
      dropped, not queued. Persists so a reload doesn't reset the window. */
   lastSarahMsgAt: (typeof _savedMsgs.lastSarahMsgAt === "number") ? _savedMsgs.lastSarahMsgAt : null,
+  /* v2.5.6-beta: per-individual mention clock — { speciesId: {at, w} }.
+     Sarah spaces mentions of the SAME individual shark at least 15
+     minutes apart; w is the mention's weight (check-in 0, re-sighting
+     = that shark's sighting count). A heavier mention supersedes a
+     lighter one inside the window. */
+  sharkMentions: _savedMsgs.sharkMentions || {},
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
@@ -1394,6 +1404,12 @@ const state = {
   achievements: achieveStore.load(), // id -> timestamp
   bruceChainComplete: false, // v0.18.0: the Bruce chain isn't built yet
   won: (() => { try { return localStorage.getItem("tyi-won") === "1"; } catch { return false; } })(),
+  /* v2.5.6-beta: win date for the Master Shark Tagger certificate.
+     Recorded in doWin(); older saves fall back to the Fin-ished
+     achievement timestamp, then to first certificate view. */
+  wonAt: (() => { try { return parseInt(localStorage.getItem("tyi-won-at") || "0", 10) || null; } catch { return null; } })(),
+  /* v2.5.6-beta: the name the player writes on their certificate. */
+  certName: (() => { try { return localStorage.getItem("tyi-cert-name") || ""; } catch { return ""; } })(),
   archiveUnlocked: (() => { try { return localStorage.getItem("tyi-archive") === "1"; } catch { return false; } })(),
   pinned: pinStore.load(), // v0.20.0: "currently researching" shark id, or null
   hasPinnedBefore: pinHistoryStore.load(), // v1.0.3-beta: player has pinned at least once
@@ -1458,6 +1474,7 @@ function saveMsgs() {
     sarahAdviceOffered: state.sarahAdviceOffered,
     bigDayBags: state.bigDayBags,
     lastSarahMsgAt: state.lastSarahMsgAt,
+    sharkMentions: state.sharkMentions,
     lastSingleCheerExp: state.lastSingleCheerExp });
 }
 /* Every new thread gets a timestamp for the Phone tab.
@@ -1472,6 +1489,25 @@ function saveMsgs() {
    sites keep working. Every SENT thread — any kind — updates
    lastSarahMsgAt. Returns true if sent, false if dropped. */
 const SARAH_THROTTLE_MS = 5 * 60 * 1000;
+/* v2.5.6-beta (Avery): per-individual mention cooldown. Sarah never
+   mentions the same individual shark twice inside 15 minutes — unless
+   the new mention outweighs the last one. Weights: a check-in (Sarah
+   "just thinking about" a shark) is 0 and always yields; an actual
+   re-sighting weighs its sighting count, so a 2nd sighting supersedes
+   a 1st, a 3rd supersedes a 2nd, and any real sighting supersedes a
+   check-in. */
+const SHARK_MENTION_MS = 15 * 60 * 1000;
+function sharkMentionBlocked(speciesId, weight) {
+  const m = (state.sharkMentions || {})[speciesId];
+  if (!m) return false;
+  const age = Date.now() - m.at;
+  return age >= 0 && age < SHARK_MENTION_MS && weight <= m.w;
+}
+function noteSharkMention(speciesId, weight) {
+  state.sharkMentions = state.sharkMentions || {};
+  state.sharkMentions[speciesId] = { at: Date.now(), w: weight };
+  saveMsgs();
+}
 /* v1.8.3-beta Mira fix: throttle predicate shared by pushThread and the
    ambient branch of afterExpedition — chatSeen must only advance for chats
    actually sent, so the ambient gate runs BEFORE pickChat() selects one. */
@@ -2829,7 +2865,16 @@ function doEncounter(species, plan) {
         /* v1.6.7-beta: one resighting = one Sarah thread. The first-ever reunion
            already got the special "WAIT... again?!?" reaction above; only later
            resightings use the routine resightThread. */
-        if (!reunionReactedThisEncounter) pushThread(resightThread(species, rec));
+        /* v2.5.6-beta: per-individual mention cooldown — the sighting
+           weighs its sighting count, so a fresh sighting supersedes a
+           recent check-in, but Sarah won't repeat herself about the
+           same shark inside 15 minutes at equal-or-lesser weight. */
+        if (!reunionReactedThisEncounter) {
+          const sightW = (rec.resightings || []).length;
+          if (!sharkMentionBlocked(species.id, sightW)) {
+            if (pushThread(resightThread(species, rec))) noteSharkMention(species.id, sightW);
+          }
+        }
         state.resightedThisTrip = true;
         finish();
       });
@@ -3405,6 +3450,12 @@ function maybeReunionReaction(species, rec) {
   /* v1.6.7-beta: returns whether the thread fired, so the resight button
      can skip its own thread when the reunion reaction already spoke. */
   if (state.reunionReacted[species.id]) return false;
+  /* v2.5.6-beta: per-individual mention cooldown — this sighting weighs
+     one more than the shark's recorded sightings. If a mention of equal
+     or greater weight landed inside 15 minutes, hold the one-time
+     reaction (flag unburned) for a later reunion instead. */
+  const sightW = ((rec && rec.resightings) || []).length + 1;
+  if (sharkMentionBlocked(species.id, sightW)) return false;
   state.reunionReacted[species.id] = true;
   try { localStorage.setItem("tyi-reunion-reacted", JSON.stringify(state.reunionReacted)); } catch {}
   /* v1.5.8-beta: unnamed sharks are called by research tag ID, not species name.
@@ -3418,7 +3469,9 @@ function maybeReunionReaction(species, rec) {
   let ci = Math.floor(Math.random() * RESIGHT_REUNION_CLOSERS.length);
   if (RESIGHT_REUNION_CLOSERS.length > 1 && ci === lastReunionCloserIdx) ci = (ci + 1) % RESIGHT_REUNION_CLOSERS.length;
   lastReunionCloserIdx = ci;
-  pushThread(reunionReactionThread(name, RESIGHT_REUNION_CLOSERS[ci], rec));
+  if (pushThread(reunionReactionThread(name, RESIGHT_REUNION_CLOSERS[ci], rec))) {
+    noteSharkMention(species.id, sightW);
+  }
   return true;
 }
 
@@ -3465,7 +3518,11 @@ const NAMED_CHECKINS = [
    never repeats a template twice in a row. Module-level (not persisted);
    a reload just resets the guard, it never breaks content. */
 let lastCheckinIdx = -1;
+/* v2.5.6-beta: species of the check-in built by maybeCheckinThread(),
+   so afterExpedition can log the mention only if the thread is sent. */
+let pendingCheckinSpeciesId = null;
 function maybeCheckinThread() {
+  pendingCheckinSpeciesId = null;
   /* v2.5.4-beta fix (Mira review): check-ins must respect the species
      coherence rule — only named individuals of the pinned or
      just-encountered species, not any old tagged shark. */
@@ -3475,9 +3532,21 @@ function maybeCheckinThread() {
   if (lastTrip && lastTrip.encounters) {
     for (const e of lastTrip.encounters) if (e.speciesId) allowedIds.add(e.speciesId);
   }
-  const named = SHARKS.filter(s => state.tagged[s.id] && state.tagged[s.id].name && allowedIds.has(s.id));
+  /* v2.5.6-beta: and never about an individual Sarah mentioned in the
+     last 15 minutes (per-individual cooldown; a check-in weighs 0, so
+     any recent mention blocks it). */
+  const named = SHARKS.filter(s => state.tagged[s.id] && state.tagged[s.id].name && allowedIds.has(s.id)
+    && !sharkMentionBlocked(s.id, 0));
   if (!named.length || Math.random() > 0.4) return null;
-  const s = pick(named);
+  /* v2.5.6-beta: weighted pick — each recorded sighting adds weight,
+     so the individuals she knows best come up most often. One RNG draw,
+     same as pick(). */
+  let totalW = 0;
+  const weights = named.map(s => { const w = 1 + ((state.tagged[s.id].resightings || []).length); totalW += w; return w; });
+  let r = Math.random() * totalW;
+  let s = named[named.length - 1];
+  for (let i = 0; i < named.length; i++) { r -= weights[i]; if (r < 0) { s = named[i]; break; } }
+  pendingCheckinSpeciesId = s.id;
   const rec = state.tagged[s.id];
   /* v1.8.5-beta: never deal the same check-in twice in a row — with a
      small pool, repeats read as Sarah having only one thing to say. */
@@ -3944,7 +4013,13 @@ function afterExpedition(plan) {
       }
     }
   }
-  if (thread) pushThread(thread, threadKind);
+  if (thread) {
+    const sent = pushThread(thread, threadKind);
+    /* v2.5.6-beta: a sent check-in starts that individual's 15-minute
+       mention clock (weight 0). */
+    if (sent && pendingCheckinSpeciesId) noteSharkMention(pendingCheckinSpeciesId, 0);
+  }
+  pendingCheckinSpeciesId = null;
   renderSarahAsk();
 }
 
@@ -4834,6 +4909,11 @@ function doWin() {
     localStorage.setItem("tyi-archive", "1");
     localStorage.setItem("tyi-derpy-unlocked", "1");
   } catch {}
+  /* v2.5.6-beta: stamp the win date for the certificate. */
+  if (!state.wonAt) {
+    state.wonAt = Date.now();
+    try { localStorage.setItem("tyi-won-at", String(state.wonAt)); } catch {}
+  }
   renderCollection();
   renderResearch();
   renderSightings();
@@ -4847,18 +4927,37 @@ function doWin() {
 function winStep(n) {
   const ov = $("winOverlay");
   ov.classList.remove("hidden");
-  const box = (inner) => { ov.innerHTML = `<div class="phone">${inner}</div>`; };
+  const box = (inner, cls) => { ov.innerHTML = `<div class="phone${cls ? " " + cls : ""}">${inner}</div>`; };
 
   if (n === 1) {
-    /* Beat 1: institute recognition — the formal part. */
+    /* Beat 1: the certificate — this is the signing moment. The player
+       writes their name on the real certificate (Avery's artwork, the
+       same figure that hangs in Achievements afterwards). */
     box(`
-      <div class="cert-trophy" style="font-size:52px; text-align:center">🏆</div>
-      <h2 style="text-align:center; margin:8px 0 2px">Master Shark Tagger</h2>
-      <p class="latin" style="text-align:center">Global survey complete — all ${SHARKS.length} species tagged.</p>
-      <div class="cert-body">
-        <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
+      ${certFigureHTML()}
+      <p class="latin" style="text-align:center; margin:6px 0 0">Write your name on the line — that's what makes it yours.</p>
+      ${certNameBoxHTML()}
+      <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>
+      <div class="cert-actions">
+        <button id="certGrow" class="cert-action-btn" type="button" aria-pressed="false">🔍 Make it bigger</button>
+        <button id="certSave" class="cert-action-btn" type="button">📥 Save / share certificate</button>
       </div>
-      <button id="winNext" class="primary-button" type="button">Continue</button>`);
+      <button id="winNext" class="primary-button" type="button">Continue</button>`, "cert-phone");
+    wireCertName();
+    /* Focus the name BOX, not the on-certificate field: the keyboard
+       can cover the certificate (Avery), but the box stays visible
+       while typing and the signature line fills in as they type. */
+    const nb = $("certNameBox");
+    if (nb && nb.focus) nb.focus();
+    wireCertSave();
+    const grow = $("certGrow");
+    if (grow) grow.addEventListener("click", () => {
+      const shell = ov.querySelector(".cert-phone");
+      const wide = shell && shell.classList.toggle("cert-wide");
+      grow.setAttribute("aria-pressed", wide ? "true" : "false");
+      grow.textContent = wide ? "🔍 Make it smaller" : "🔍 Make it bigger";
+      fitCertDisplays($("certName"));
+    });
     $("winNext").addEventListener("click", () => winStep(2));
 
   } else if (n === 2) {
@@ -5323,23 +5422,199 @@ function renderCollection() {
   });
 }
 
+/* v2.5.6-beta: the completion date printed on the certificate —
+   the recorded win date, else the Fin-ished achievement's unlock
+   timestamp, else today (stamped so it never drifts afterwards). */
+function certAwardDate() {
+  let ts = state.wonAt || state.achievements["finished"] || null;
+  if (!ts) {
+    ts = Date.now();
+    state.wonAt = ts;
+    try { localStorage.setItem("tyi-won-at", String(ts)); } catch {}
+  }
+  return new Date(ts).toLocaleDateString(undefined,
+    { year: "numeric", month: "long", day: "numeric" });
+}
+
+/* v2.5.6-beta: the certificate figure — Avery's artwork with the
+   player's name on the printed line and the award date filled in.
+   Shared by the Achievements modal and the win ceremony (beat 1),
+   where signing it is the moment. */
+function certFigureHTML() {
+  return `
+    <figure class="cert-figure">
+      <img class="cert-img" src="assets/master-tagger-certificate.jpg" alt="Master Shark Tagger certificate — Tag Along Field Program">
+      <input id="certName" class="cert-name" type="text" maxlength="40" autocomplete="off"
+        placeholder="" aria-label="Your name on the certificate">
+      <span class="cert-date">${esc(certAwardDate())}</span>
+    </figure>`;
+}
+
+/* v2.5.6-beta: export geometry — where the name and date are drawn on
+   the native 1125×781 artwork (measured from the printed lines: name
+   line centre x≈50.2%, baseline just above y=54.9%; date line centre
+   x≈77.9%, baseline just above y=80.4%). Font sizes scale with width. */
+const CERT_DRAW = { nameX: 0.502, nameBase: 0.543, namePx: 61, dateX: 0.779, dateBase: 0.799, datePx: 33 };
+const CERT_FONT = '"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive';
+
+/* Shrink-to-fit: the largest font size (≤ basePx) at which text fits
+   maxW, measured on a canvas. A 40-character name at the full
+   signature size would draw through the certificate border in the
+   export — the on-screen input clips, the canvas does not (Mira). */
+function fitTextPx(text, basePx, maxW, family) {
+  if (!text || !(basePx > 0) || !(maxW > 0)) return basePx;
+  let ctx = null;
+  try {
+    const cv = document.createElement("canvas");
+    ctx = cv.getContext && cv.getContext("2d");
+  } catch {}
+  if (!ctx || !ctx.measureText) return basePx;
+  ctx.font = `${basePx}px ${family}`;
+  const w = ctx.measureText(text).width;
+  if (!(w > maxW)) return basePx;
+  return Math.max(10, Math.floor(basePx * maxW / w));
+}
+
+/* The certificate is a keepsake: composite the artwork + the player's
+   name + the award date at native resolution and share/download it.
+   The salt caption is modal dressing and is NOT part of the export. */
+function exportCertificate() {
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement("canvas");
+    cv.width = img.naturalWidth || 1125;
+    cv.height = img.naturalHeight || 781;
+    const ctx = cv.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    ctx.fillStyle = "#2b3a55";
+    ctx.textAlign = "center";
+    const scale = cv.width / 1125;
+    if (state.certName) {
+      const namePx = fitTextPx(state.certName, CERT_DRAW.namePx * scale, cv.width * 0.66, CERT_FONT);
+      ctx.font = `${Math.round(namePx)}px ${CERT_FONT}`;
+      ctx.fillText(state.certName, cv.width * CERT_DRAW.nameX, cv.height * CERT_DRAW.nameBase);
+    }
+    const dateText = certAwardDate();
+    const datePx = fitTextPx(dateText, CERT_DRAW.datePx * scale, cv.width * 0.23, CERT_FONT);
+    ctx.font = `${Math.round(datePx)}px ${CERT_FONT}`;
+    ctx.fillText(dateText, cv.width * CERT_DRAW.dateX, cv.height * CERT_DRAW.dateBase);
+    cv.toBlob(async (blob) => {
+      if (!blob) return;
+      const fname = "master-shark-tagger-certificate.jpg";
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], fname, { type: "image/jpeg" });
+        if (navigator.canShare({ files: [file] })) {
+          try { await navigator.share({ files: [file], title: "Master Shark Tagger" }); return; }
+          catch (e) { if (e && e.name === "AbortError") return; }
+        }
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = fname;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }, "image/jpeg", 0.92);
+  };
+  img.src = "assets/master-tagger-certificate.jpg";
+}
+
+function certActionsHTML() {
+  return `
+    <div class="cert-actions">
+      <button id="certSave" class="cert-action-btn" type="button">📥 Save / share certificate</button>
+    </div>`;
+}
+
+function wireCertSave() {
+  const b = $("certSave");
+  if (b) b.addEventListener("click", exportCertificate);
+}
+
+/* Keep the on-screen signature and date inside their printed lines,
+   mirroring the export fit: the signature field is 68% of the figure
+   wide (its base size is 5.4cqw of the figure), the date span 26%
+   (base 2.9cqw). No-op until the elements are laid out. */
+function fitCertDisplays(nameInput) {
+  if (!nameInput || !nameInput.clientWidth) return;
+  const figW = nameInput.clientWidth / 0.68;
+  nameInput.style.fontSize =
+    fitTextPx(nameInput.value, figW * 0.054, nameInput.clientWidth, CERT_FONT) + "px";
+  const fig = nameInput.closest && nameInput.closest("figure");
+  const dateEl = fig && fig.querySelector && fig.querySelector(".cert-date");
+  if (dateEl && dateEl.clientWidth) {
+    dateEl.style.fontSize =
+      fitTextPx(dateEl.textContent, figW * 0.029, dateEl.clientWidth, CERT_FONT) + "px";
+  }
+}
+
+/* The fitted sizes are inline pixels, which override the responsive
+   cqw base — re-fit when the figure's width changes (rotation,
+   window resize). Registered once, scoped to the certificate. */
+let certResizeWired = false;
+function wireCertResize() {
+  if (certResizeWired) return;
+  certResizeWired = true;
+  window.addEventListener("resize", () => {
+    const ni = $("certName");
+    if (ni) fitCertDisplays(ni);
+  });
+}
+
+function wireCertName() {
+  const nameInput = $("certName");
+  const nameBox = $("certNameBox");
+  const sync = (from, to) => {
+    state.certName = from.value;
+    if (to) to.value = from.value;
+    try { localStorage.setItem("tyi-cert-name", state.certName); } catch {}
+    fitCertDisplays(nameInput);
+  };
+  if (nameInput) {
+    nameInput.value = state.certName || "";
+    nameInput.addEventListener("input", () => sync(nameInput, nameBox));
+  }
+  if (nameBox) {
+    nameBox.value = state.certName || "";
+    nameBox.addEventListener("input", () => sync(nameBox, nameInput));
+  }
+  wireCertResize();
+  fitCertDisplays(nameInput);
+  return nameInput;
+}
+
+/* v2.5.6-beta: a plain, always-visible name box that mirrors the
+   certificate's signature line. On touch devices the keyboard can
+   cover the certificate itself while typing (Avery, 2026-10-20) —
+   the box stays in view, and the name appears on the line as typed. */
+function certNameBoxHTML() {
+  return `
+    <label class="cert-name-box">Your name
+      <input id="certNameBox" type="text" maxlength="40" autocomplete="off" placeholder="Your name">
+    </label>`;
+}
+
 function openCertificate() {
   const c = $("detailContent");
-  c.innerHTML = `
-    <div class="cert-trophy" style="font-size:44px">🏆</div>
-    <h3 style="margin:6px 0 0">Master Shark Tagger</h3>
-    <p class="latin">Tag Along — field program</p>
-    <div class="cert-body">
-      <p>This certifies our conservation scientist as a <strong>Master Shark Tagger</strong>, in recognition of ${SHARKS.length} successful tags and ${SHARKS.length} healthy releases.</p>
-      <p class="cert-sig">Awarded with salt on it. 🦈</p>
-    </div>`;
+  /* v2.5.6-beta (Mira review): certificate mode leaves the two-column
+     shark-detail grid — the figure and caption stack full-width. */
+  c.classList.add("cert-mode");
+  c.innerHTML = certFigureHTML() +
+    certNameBoxHTML() +
+    certActionsHTML() + `
+    <p class="cert-sig" style="text-align:center">Awarded with salt on it. 🦈</p>`;
+  /* Unhide BEFORE wiring (Mira review): under display:none the name
+     field has zero width and the shrink-to-fit would skip, leaving a
+     persisted long name unfitted until the first keystroke. */
   $("detailOverlay").classList.remove("hidden");
+  wireCertName();
+  wireCertSave();
 }
 
 function openDetail(id) {
   const s = sharkById(id);
   const t = state.tagged[id];
   const c = $("detailContent");
+  c.classList.remove("cert-mode");
   c.innerHTML = `
     <div class="detail-art">
     <div class="shark-art">${sharkArtImg(s.id, "illustration", s.name)}</div>
@@ -5537,7 +5812,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi", "tyi-won-at", "tyi-cert-name"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted; v2.5.6-beta: +tyi-won-at, +tyi-cert-name
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {

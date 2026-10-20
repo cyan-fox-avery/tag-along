@@ -990,6 +990,11 @@ select option:disabled { color: #7a8a9e; }
   background: var(--bg-panel); border-radius: 22px; padding: 16px;
   width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
+/* v2.5.6-beta (Mira review): the win ceremony's certificate beat is the
+   hero, not a phone thread — it gets a wide shell. Other beats keep the
+   380px phone. The player can widen it further to read the small print. */
+.phone.cert-phone { max-width: min(680px, 94vw); }
+.phone.cert-phone.cert-wide { max-width: min(940px, 97vw); }
 /* v1.7.23-beta: top-right ✕ on long-content modals (Collection detail,
    Tracking, What's New). The bottom Close button sits below the fold on
    mobile, so the exit must be visible the moment the modal opens.
@@ -1078,6 +1083,43 @@ select option:disabled { color: #7a8a9e; }
   font-size: 14px; line-height: 1.6; margin: 10px 0;
 }
 .cert-sig { color: var(--ink-dim); font-size: 13px; margin: 8px 0 0; }
+/* v2.5.6-beta: the Master Shark Tagger certificate — Avery's artwork
+   with the player's name and the award date set into its blank lines.
+   Positions are % of the artwork; fonts scale with the figure via
+   container units so the writing sits on the printed lines at any
+   modal width. */
+.cert-figure { position: relative; margin: 0; container-type: inline-size; }
+.cert-img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.cert-name {
+  position: absolute; left: 16%; top: 45.9%; width: 68%; height: 9%;
+  background: transparent; border: none; outline: none; border-radius: 4px;
+  text-align: center; color: #2b3a55;
+  font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+  font-size: 24px; font-size: 5.4cqw;
+}
+.cert-name:focus { background: rgba(255, 252, 240, 0.55); }
+.cert-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.cert-name-box {
+  display: block; margin: 10px auto 0; max-width: 420px;
+  font-size: 14px; color: var(--ink-dim); text-align: left;
+}
+.cert-name-box input {
+  display: block; width: 100%; box-sizing: border-box; margin-top: 4px;
+  min-height: 44px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--accent); background: #0d2f4d; color: var(--ink);
+  font-size: 17px;
+}
+.cert-action-btn {
+  min-height: 44px; padding: 10px 18px; border-radius: 999px; cursor: pointer;
+  background: #14486e; color: var(--ink); border: 1px solid var(--accent);
+  font-size: 15px;
+}
+.cert-date {
+  position: absolute; left: 65%; top: 74.8%; width: 26%;
+  text-align: center; color: #2b3a55; pointer-events: none;
+  font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+  font-size: 13px; font-size: 2.9cqw;
+}
 .cert-cell { border: 2px solid var(--accent); }
 .cert-cell .cert-trophy { font-size: 34px; margin: 4px 0; }
 
@@ -1646,6 +1688,10 @@ video.archive-media { max-height: 420px; }
   #detailOverlay #detailContent > .detail-art .shark-art svg { max-width: 600px; }
   #detailOverlay #detailContent > .detail-identity { grid-column: 1; min-width: 0; }
   #detailOverlay #detailContent > .detail-record { grid-column: 2; min-width: 0; }
+  /* v2.5.6-beta (Mira review): certificate mode is single-column — the
+     figure and its caption must not be split across the grid columns. */
+  #detailOverlay #detailContent.cert-mode { display: block; }
+  #detailOverlay #detailContent.cert-mode .cert-figure { max-width: 700px; margin: 0 auto; }
 
   /* Logbook: 2 columns */
   .logbook-list { grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
