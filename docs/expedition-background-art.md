@@ -24,12 +24,12 @@
 | **BG-05-L** | Volcanic surface | Galápagos | **✅ Approved / locked** |
 | **BG-06-L** | Polar surface | Arctic | **✅ Approved / locked** |
 | **BG-07-L** | Tropical shallows | Four tropical regions | **✅ Approved / locked** |
-| BG-08-L | Rocky shallows | Japan, Cornwall, South Africa, eastern Australia; California/Galápagos with appropriately chosen accents | ⬜ Not started |
-| BG-09-L | Open Atlantic shallows | Open Atlantic | ⬜ Not started |
-| BG-10-L | Arctic shallows | Arctic | ⬜ Not started |
-| BG-11-L | North Carolina wreck shallows | NC only, 30–100 m | ⬜ Not started |
-| BG-12-L | Shared twilight | All 13 regions, 100–400 m | ⬜ Not started |
-| BG-13-L | Shared deep dark | All 13 regions, 400–1000 m | ⬜ Not started |
+| **BG-08-L** | Rocky shallows | Japan, Cornwall, South Africa, eastern Australia, California, Galápagos | **✅ Approved / locked** |
+| **BG-09-L** | Open Atlantic shallows | Open Atlantic | **✅ Approved / locked** |
+| **BG-10-L** | Arctic shallows | Arctic | **✅ Approved / locked** |
+| **BG-11-L** | North Carolina wreck shallows | NC only, 30–100 m | **✅ Approved / locked** |
+| **BG-12-L** | Shared twilight | All 13 regions, 100–400 m | **✅ Approved / locked** |
+| **BG-13-L** | Shared deep dark | All 13 regions, 400–1000 m | **✅ Approved / locked** |
 
 ## BG-01-L: Tropical Surface — APPROVED ✅
 
@@ -114,3 +114,75 @@
 - **Integration:** Visual artwork approved and stored as a standalone asset only. Do not change expedition rendering, animated sunlight, wildlife layers, or gameplay at this stage. Device testing and integration remain pending separate approval.
 
 ![Approved BG-07-L tropical shallows scenery](../assets/expedition-backgrounds/bg-07-tropical-shallows.webp)
+
+## BG-08-L: Rocky Shallows — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19.
+
+- **Browser asset:** [bg-08-rocky-shallows.webp](../assets/expedition-backgrounds/bg-08-rocky-shallows.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-08-rocky-shallows-original.png](../assets/expedition-backgrounds/source/bg-08-rocky-shallows-original.png). Keep this master source unchanged.
+- **Art requirements confirmed:** Temperate rocky reef shallows with low rock formations and sparse algae along the bottom edge. Open blue water above for animal silhouettes. No visible surface, no baked-in light rays.
+- **Reuse:** Japan, Cornwall, South Africa, eastern Australia, California, Galápagos at reef/shallows depth (30–100 m).
+- **Integration:** Art is approved; gameplay wiring and device tests are **not** approved by this asset-only step.
+
+![Approved BG-08-L rocky shallows scenery](../assets/expedition-backgrounds/bg-08-rocky-shallows.webp)
+
+## BG-09-L: Open Atlantic Shallows — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19.
+
+- **Browser asset:** [bg-09-open-atlantic-shallows.webp](../assets/expedition-backgrounds/bg-09-open-atlantic-shallows.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-09-open-atlantic-shallows-original.png](../assets/expedition-backgrounds/source/bg-09-open-atlantic-shallows-original.png). Keep this master source unchanged.
+- **Art requirements confirmed:** Open Atlantic water at shallows depth — darker blue gradient than surface, subtle particulate, unobstructed frame for wildlife silhouettes. No seafloor, no structures.
+- **Reuse:** Open Atlantic region at reef/shallows depth (30–100 m).
+- **Integration:** Art is approved; gameplay wiring and device tests are **not** approved by this asset-only step.
+
+![Approved BG-09-L Open Atlantic shallows scenery](../assets/expedition-backgrounds/bg-09-open-atlantic-shallows.webp)
+
+## BG-10-L: Arctic Shallows — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19.
+
+- **Browser asset:** [bg-10-arctic-shallows.webp](../assets/expedition-backgrounds/bg-10-arctic-shallows.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-10-arctic-shallows-original.png](../assets/expedition-backgrounds/source/bg-10-arctic-shallows-original.png). Keep this master source unchanged.
+- **Art requirements confirmed:** Cold polar shallows with low ice/rock formations along the bottom edge. Pale cyan to steel-blue gradient, open water for animal silhouettes. No visible surface, no baked-in light rays.
+- **Reuse:** Arctic region at reef/shallows depth (30–100 m).
+- **Integration:** Art is approved; gameplay wiring and device tests are **not** approved by this asset-only step.
+
+![Approved BG-10-L Arctic shallows scenery](../assets/expedition-backgrounds/bg-10-arctic-shallows.webp)
+
+## BG-11-L: North Carolina Wreck Shallows — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19.
+
+- **Browser asset:** [bg-11-north-carolina-wreck-shallows.webp](../assets/expedition-backgrounds/bg-11-north-carolina-wreck-shallows.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-11-north-carolina-wreck-shallows-original.png](../assets/expedition-backgrounds/source/bg-11-north-carolina-wreck-shallows-original.png). Keep this master source unchanged.
+- **Art requirements confirmed:** Distant shipwreck silhouette on a rocky seabed (Graveyard of the Atlantic). Wreck is background atmosphere, not a focal point. Open water above for animal silhouettes. **Wreck appears ONLY at shallows depth (30–100 m); NC surface uses BG-02 with no wreck.**
+- **Reuse:** North Carolina region ONLY, at reef/shallows depth (30–100 m).
+- **Integration:** Art is approved; gameplay wiring and device tests are **not** approved by this asset-only step.
+
+![Approved BG-11-L North Carolina wreck shallows scenery](../assets/expedition-backgrounds/bg-11-north-carolina-wreck-shallows.webp)
+
+## BG-12-L: Shared Twilight — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19.
+
+- **Browser asset:** [bg-12-shared-twilight.webp](../assets/expedition-backgrounds/bg-12-shared-twilight.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-12-shared-twilight-original.png](../assets/expedition-backgrounds/source/bg-12-shared-twilight-original.png). Keep this master source unchanged.
+- **Art requirements confirmed:** Deep twilight-zone water — very dark blue gradient with faint ambient glow. Minimal seabed detail. Unobstructed for deep-water animal silhouettes and marine snow.
+- **Reuse:** ALL 13 regions at twilight depth (100–400 m).
+- **Integration:** Art is approved; gameplay wiring and device tests are **not** approved by this asset-only step.
+
+![Approved BG-12-L shared twilight scenery](../assets/expedition-backgrounds/bg-12-shared-twilight.webp)
+
+## BG-13-L: Shared Deep Dark — APPROVED ✅
+
+**Approved by Avery:** 2026-10-19.
+
+- **Browser asset:** [bg-13-shared-deep-dark.webp](../assets/expedition-backgrounds/bg-13-shared-deep-dark.webp), full size 1672 × 941, high-quality WebP.
+- **Original approved image:** [bg-13-shared-deep-dark-original.png](../assets/expedition-backgrounds/source/bg-13-shared-deep-dark-original.png). Keep this master source unchanged.
+- **Art requirements confirmed:** Near-black deep water with the faintest blue gradient. No visible seabed or structures. Backdrop for deep-water silhouettes and marine snow.
+- **Reuse:** ALL 13 regions at deep depth (400–1000 m).
+- **Integration:** Art is approved; gameplay wiring and device tests are **not** approved by this asset-only step.
+
+![Approved BG-13-L shared deep dark scenery](../assets/expedition-backgrounds/bg-13-shared-deep-dark.webp)
