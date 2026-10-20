@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.10-beta";
+const VERSION = "v2.5.11-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.11-beta": [
+"🎬 <strong>Smoother Archive videos.</strong> While an Archive clip is playing, the background water pauses itself — the two videos were fighting over the iPad and both went choppy. The background quietly resumes when the clip pauses or ends.",
+  ],
   "v2.5.10-beta": [
 "🏅 <strong>Achievement cards, centered.</strong> The icon and text in each achievement box now sit in the vertical middle — no more empty space pooled at the bottom of the taller boxes.",
   ],
@@ -6613,6 +6616,21 @@ showPorthole(); // v1.4.2: observation window always present — porthole surfac
 /* v0.18.0 review: one achievement check at boot so migrated saves backfill. */
 checkAchievements();
 
+/* v2.5.11-beta: is any video OTHER than the background currently
+   playing (e.g. an Archive clip)? Archive videos and the background
+   video fight over the iPad's video decoder — both go slow and
+   choppy when they play at once (Avery) — so while a real clip
+   plays, the ambient background rests. */
+function foreignVideoPlaying() {
+  var bg = document.getElementById('sun-video');
+  var vids = document.querySelectorAll('video');
+  for (var i = 0; i < vids.length; i++) {
+    var v = vids[i];
+    if (v !== bg && !v.paused && !v.ended) return true;
+  }
+  return false;
+}
+
 /* v2.3.0-beta: orientation-aware underwater background (Mira's videos).
    Picks the landscape or portrait loop based on viewport shape; loads only
    the selected video. Swaps on rotate/resize. Pauses when the tab is hidden. */
@@ -6620,6 +6638,17 @@ checkAchievements();
   var video = document.getElementById('sun-video');
   var still = document.getElementById('sun-still');
   if (!video) return;
+  /* The background may play only when the tab is visible AND no other
+     video is playing. Every trigger (visibility, media events, source
+     swaps) funnels through here. */
+  function syncSunVideo() {
+    if (document.hidden || foreignVideoPlaying()) {
+      if (video.pause) video.pause();
+    } else if (video.play) {
+      var p = video.play();
+      if (p && p.catch) p.catch(function(){});
+    }
+  }
   function pickBackground() {
     var portrait = window.innerHeight > window.innerWidth;
     var src = portrait ? 'underwater-portrait.mp4' : 'underwater-landscape.mp4';
@@ -6629,12 +6658,16 @@ checkAchievements();
       video.poster = poster;
       if (still) still.src = poster;
     }
+    syncSunVideo();
   }
   pickBackground();
   window.addEventListener('resize', pickBackground);
   window.addEventListener('orientationchange', pickBackground);
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) { video.pause(); }
-    else { video.play().catch(function(){}); }
-  });
+  document.addEventListener('visibilitychange', syncSunVideo);
+  /* Media events don't bubble, but they do pass through ancestors in
+     the capture phase — one document-level listener hears every
+     Archive video, including ones rendered later. */
+  document.addEventListener('play', function(e) { if (e.target !== video) syncSunVideo(); }, true);
+  document.addEventListener('pause', function(e) { if (e.target !== video) syncSunVideo(); }, true);
+  document.addEventListener('ended', function(e) { if (e.target !== video) syncSunVideo(); }, true);
 })();

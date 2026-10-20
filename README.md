@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.5.10-beta** — *a shark research game*
+**v2.5.11-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -24,6 +24,7 @@ Built for sarah, who loves sharks. 🦈
 - **v2.5.8** — Signature placement: the name sits a touch lower, resting on its line like real handwriting.
 - **v2.5.9** — Signature descenders (J, y) have room to finish beneath the line instead of clipping.
 - **v2.5.10** — Achievement card content is vertically centred in each box — icon at the far left, in the middle vertically.
+- **v2.5.11** — Archive videos pause the background video while they play (both went choppy competing for the iPad's decoder); the background resumes on its own when the clip pauses or ends.
 
 ## v2.4.x changes — places that look like places 🌍
 
