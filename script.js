@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.5.6-beta";
+const VERSION = "v2.5.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.7-beta": [
+"🏆 <strong>Certificate name fix.</strong> Your name now sits on the certificate's line in its proper script — in v2.5.6 a general form style muscled in and blew it up across the parchment.",
+  ],
   "v2.5.6-beta": [
 "🏆 <strong>Your Master Shark Tagger certificate.</strong> Finishing the survey now presents the real certificate — sign your name on it right there. It hangs in Achievements after, with your finish date already on it.",
 "💬 <strong>Sarah spaces out her shark stories.</strong> She won't mention the same shark twice in fifteen minutes — unless you've just seen them again, which is bigger news.",

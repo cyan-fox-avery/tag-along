@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.6-beta', VERSION === 'v2.5.6-beta');
+  ok('version v2.5.7-beta', VERSION === 'v2.5.7-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -4961,6 +4961,12 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         fileCode.indexOf('addEventListener("resize"') !== -1 &&
         fileCode.indexOf("certResizeWired") !== -1 &&
         fileCode.split("fitCertDisplays(").length - 1 >= 5);
+      // v2.5.7-beta regression (Avery's iPad): the global
+      // input[type="text"] rule outranked .cert-name and restyled the
+      // signature field dark + full-width. The scoped selector must
+      // outrank it (element + two classes).
+      ok("certificate signature style outranks the global text-input rule",
+        cssCode.indexOf(".cert-figure input.cert-name") !== -1);
       $("winOverlay").classList.add("hidden");
       ok("certificate name persists on input (source)",
         fileCode.indexOf('localStorage.setItem("tyi-cert-name"') !== -1);

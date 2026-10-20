@@ -1090,14 +1090,18 @@ select option:disabled { color: #7a8a9e; }
    modal width. */
 .cert-figure { position: relative; margin: 0; container-type: inline-size; }
 .cert-img { display: block; width: 100%; height: auto; border-radius: 6px; }
-.cert-name {
+/* Scoped under the figure with an element+class selector on purpose:
+   the global input[type="text"] rule (0,1,1) outranks a lone class
+   (0,1,0) and restyled this field dark/wide/full-width in v2.5.6. */
+.cert-figure input.cert-name {
   position: absolute; left: 16%; top: 45.9%; width: 68%; height: 9%;
   background: transparent; border: none; outline: none; border-radius: 4px;
+  padding: 0;
   text-align: center; color: #2b3a55;
   font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
   font-size: 24px; font-size: 5.4cqw;
 }
-.cert-name:focus { background: rgba(255, 252, 240, 0.55); }
+.cert-figure input.cert-name:focus { background: rgba(255, 252, 240, 0.55); }
 .cert-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
 .cert-name-box {
   display: block; margin: 10px auto 0; max-width: 420px;
