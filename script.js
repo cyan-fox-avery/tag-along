@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.4.0-beta";
+const VERSION = "v2.5.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,15 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.5.1-beta": [
+"🌊 <strong>Deep zones refined.</strong> Twilight is brightened slightly, deep water goes midnight black on top, and shark sprites get a subtle glow in the two deepest zones so they stay visible.",
+  ],
+  "v2.5.0-beta": [
+"🎨 <strong>Hand-painted expedition backgrounds.</strong> Every dive now has a custom underwater backdrop — 13 scenes by Avery & Mira covering all 13 regions × 4 depths, from tropical coral to arctic ice to the North Carolina wreck.",
+  ],
+  "v2.4.1-beta": [
+"📐 <strong>Tighter header.</strong> The shark logo now sits left of the title on all screens (not stacked on phones), with just a few pixels of breathing room top and bottom.",
+  ],
   "v2.4.0-beta": [
 "🌍 <strong>Expeditions look like where you are.</strong> Dive backgrounds are now location-specific — coral in the tropics, kelp off California, icebergs in the Arctic, a wreck off North Carolina, volcanic rock in Galápagos — and the background animals match too. No more tropical fish in polar waters.",
 "✨ <strong>Stripes removed.</strong> The old diagonal light stripes are gone from the dive scene.",
@@ -2360,31 +2369,56 @@ const BIOME_CREATURES = {
   "polar":     ["seal", "fish", "fish", "jellyfish"],
   "volcanic":  ["turtle", "fish", "ray", "seal"]
 };
+/* v2.5.0-beta: hand-painted expedition backgrounds (Avery + Mira).
+   13 images covering all 52 region×depth combinations. Surface uses BG-01..06,
+   reef/shallows uses BG-07..11, twilight and deep share BG-12/BG-13. */
+const BG_IMAGE = {
+  "caribbean|surface": "bg-01-tropical-surface.webp",
+  "philippines|surface": "bg-01-tropical-surface.webp",
+  "maldives|surface": "bg-01-tropical-surface.webp",
+  "papua-new-guinea|surface": "bg-01-tropical-surface.webp",
+  "north-carolina|surface": "bg-02-temperate-surface.webp",
+  "japan|surface": "bg-02-temperate-surface.webp",
+  "cornwall|surface": "bg-02-temperate-surface.webp",
+  "south-africa|surface": "bg-02-temperate-surface.webp",
+  "east-australia|surface": "bg-02-temperate-surface.webp",
+  "open-atlantic|surface": "bg-03-open-atlantic-surface.webp",
+  "california|surface": "bg-04-kelp-surface.webp",
+  "galapagos|surface": "bg-05-volcanic-surface.webp",
+  "arctic|surface": "bg-06-arctic-surface.webp",
+  "caribbean|reef": "bg-07-tropical-shallows.webp",
+  "philippines|reef": "bg-07-tropical-shallows.webp",
+  "maldives|reef": "bg-07-tropical-shallows.webp",
+  "papua-new-guinea|reef": "bg-07-tropical-shallows.webp",
+  "japan|reef": "bg-08-rocky-shallows.webp",
+  "cornwall|reef": "bg-08-rocky-shallows.webp",
+  "south-africa|reef": "bg-08-rocky-shallows.webp",
+  "east-australia|reef": "bg-08-rocky-shallows.webp",
+  "california|reef": "bg-08-rocky-shallows.webp",
+  "galapagos|reef": "bg-08-rocky-shallows.webp",
+  "open-atlantic|reef": "bg-09-open-atlantic-shallows.webp",
+  "arctic|reef": "bg-10-arctic-shallows.webp",
+  "north-carolina|reef": "bg-11-north-carolina-wreck-shallows.webp",
+};
+function bgFor(region, depth) {
+  if (depth === "twilight") return "bg-12-shared-twilight.webp";
+  if (depth === "deep") return "bg-13-shared-deep-dark.webp";
+  return BG_IMAGE[region + "|" + depth] || "bg-02-temperate-surface.webp";
+}
 function renderScenery(depth, region) {
   const el = $("diveScenery");
   if (!el) return;
-  el.innerHTML = SCENERY[SCENERY_FOR[depth] || "surface"] || "";
-  /* v2.4.0-beta: region-specific backdrop overlay (biome).
-     Mira review: shallow features (coral, kelp, icebergs) only at surface/reef —
-     twilight/deep get dark water, not bright reef. */
-  const biome = REGION_BIOME[region] || "temperate";
-  const shallow = depth === "surface" || depth === "reef";
-  if (shallow) {
-    const overlay = BIOME_SCENERY[biome];
-    if (overlay) {
-      const d = document.createElement("div");
-      d.className = "biome-overlay biome-" + biome;
-      d.innerHTML = overlay;
-      el.appendChild(d);
-    }
-    /* Region-specific landmark accent (e.g. NC wreck) — shallow only. */
-    const accent = REGION_ACCENT[region];
-    if (accent) {
-      const a = document.createElement("div");
-      a.className = "biome-overlay region-accent";
-      a.innerHTML = accent;
-      el.appendChild(a);
-    }
+  /* v2.5.0-beta: background image replaces the SVG scenery + biome overlays.
+     v2.5.1-beta: twilight gets a slight brightening (Avery) — CSS filter only,
+     the approved master image is untouched. */
+  const bg = bgFor(region, depth);
+  const twilightClass = depth === "twilight" ? " twilight-lift" : "";
+  el.innerHTML = `<img class="dive-bg${twilightClass}" src="assets/expedition-backgrounds/${bg}" alt="" draggable="false">`;
+  /* v2.5.1-beta: deep dark — midnight black gradient on top (Avery). */
+  if (depth === "deep") {
+    const dk = document.createElement("div");
+    dk.className = "deep-darken";
+    el.appendChild(dk);
   }
   el.querySelectorAll(".snow").forEach(n => n.remove());
   /* Marine snow in the deep: slow-falling specks. */
