@@ -1710,6 +1710,9 @@ const tabScroll = {};
 document.querySelectorAll(".tab").forEach(btn => {
   btn.addEventListener("click", () => {
     if (btn.disabled) return; /* v1.5.11: locked Archive tab is unclickable */
+    /* v2.6.0: the tour spotlights tabs as scenery, not controls —
+       taps on the bar while the tour is open must not navigate. */
+    if (tourOpenNow) return;
     /* v2.5.11-beta: leaving the Archive stops its clips (pauseVideosIn). */
     if (btn.dataset.tab !== "archive") pauseVideosIn();
     const current = document.querySelector(".tab.active");
@@ -6671,7 +6674,7 @@ function pauseVideosIn(container) {
    anytime. Copy is plain and short — the tour is a map, not a manual. */
 const TOUR_SLIDES = [
   { tab: null, icon: "🦈", title: "Welcome to Tag Along!",
-    text: "You're a shark researcher. Study real sharks, plan expeditions, tag and release every species — then follow your sharks as they travel. There are 50 species out there, and every fact in this game is real science." },
+    text: "You're a shark researcher. Study real sharks, plan expeditions, tag and release every species — then follow your sharks as they travel. Inspired by real shark biology and conservation research; your expeditions and tracking journeys are part of the game." },
   { tab: "research", icon: "📖", title: "Research",
     text: "Your field guide. Each shark's notes tell you where it lives, how deep it swims, and what it eats. Research is how you aim — and this is where you pin the shark you're after." },
   { tab: "expedition", icon: "🛥️", title: "Expedition",
@@ -6693,6 +6696,7 @@ const TOUR_SLIDES = [
 ];
 let tourIdx = 0;
 let tourOpenNow = false;
+let tourReturnFocus = null;
 
 function tourSeen() {
   try { return !!localStorage.getItem("tyi-tour-seen"); } catch (e) { return true; }
@@ -6700,8 +6704,28 @@ function tourSeen() {
 function markTourSeen() {
   try { localStorage.setItem("tyi-tour-seen", "1"); } catch (e) { /* private mode: tour may re-offer next visit */ }
 }
+/* v2.6.0 (Mira review): the tour is a NEW-player welcome. Returning
+   players never see it unprompted — their tyi-tour-seen flag didn't
+   exist before v2.6.0, so a bare !tourSeen() check would have toured
+   every upgrader. The gate uses the pre-migration save snapshot
+   (preMigrationHadSave, captured before migrations write keys even
+   for new players), the same one What's New uses — so the two
+   dialogs can never stack from auto-open: a new player gets the tour
+   and no What's New; a returning player gets What's New, never the
+   tour. Replay from ❓ works for everyone regardless. */
+function tourShouldAutoOpen(hadSave) {
+  var saved = (typeof hadSave !== "undefined") ? hadSave : preMigrationHadSave;
+  return !tourSeen() && !saved;
+}
 function openTour() {
   tourOpenNow = true;
+  /* Remember what had focus so closing returns it (replay: the ❓
+     button; first run: the active element, usually body — closeTour
+     then falls back to the Research tab as a clear game target). */
+  try {
+    var ae = document.activeElement;
+    tourReturnFocus = (ae && ae.focus && ae !== document.body) ? ae : null;
+  } catch (e) { tourReturnFocus = null; }
   var scrim = $("tourScrim"), ov = $("tourOverlay");
   if (scrim) scrim.classList.remove("hidden");
   if (ov) ov.classList.remove("hidden");
@@ -6718,6 +6742,31 @@ function closeTour() {
   document.querySelectorAll(".tab.tour-spot").forEach(function(b) { b.classList.remove("tour-spot"); });
   var nav = document.querySelector(".tabs");
   if (nav) nav.classList.remove("tour-on");
+  /* Focus returns to the opener, or to the Research tab on first run
+     — never left on a button the tour just hid. */
+  try {
+    if (tourReturnFocus && tourReturnFocus.focus) tourReturnFocus.focus();
+    else {
+      var research = document.querySelector('.tab[data-tab="research"]');
+      if (research && research.focus) research.focus();
+    }
+  } catch (e) { /* focus restore is a nicety, never a blocker */ }
+  tourReturnFocus = null;
+}
+/* Keep Tab inside the tour while it's open: the scrim covers the
+   page, but the tab bar itself sits above it, so without a trap a
+   keyboard user could Tab onto a spotlighted tab and navigate away
+   mid-dialog. */
+function tourTrapFocus(e) {
+  if (!tourOpenNow || e.key !== "Tab") return;
+  var btns = [$("tourSkip"), $("tourBack"), $("tourNext")].filter(function(b) {
+    return b && !b.disabled && !b.classList.contains("hidden");
+  });
+  if (!btns.length) return;
+  var first = btns[0], last = btns[btns.length - 1];
+  var active = document.activeElement;
+  if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
 }
 function tourAdvance() {
   if (tourIdx >= TOUR_SLIDES.length - 1) closeTour();
@@ -6778,6 +6827,11 @@ function positionTour() {
     ov.style.top = (navRect.bottom + 12) + "px";
     ov.style.left = left + "px";
     ov.style.width = width + "px";
+    /* v2.6.0 (Mira review): cap the card to the exact space below
+       the tab bar so the nav row stays reachable on short screens. */
+    if (window.innerHeight) {
+      ov.style.maxHeight = Math.max(120, window.innerHeight - navRect.bottom - 24) + "px";
+    }
     var arrow = $("tourArrow");
     if (arrow) {
       arrow.style.left = Math.max(26, Math.min(center - left, width - 26)) + "px";
@@ -6797,8 +6851,9 @@ document.addEventListener("keydown", function(e) {
   if (e.key === "Escape") closeTour();
   else if (e.key === "ArrowRight") tourAdvance();
   else if (e.key === "ArrowLeft") tourBack();
+  else tourTrapFocus(e);
 });
-if (!tourSeen()) openTour();
+if (tourShouldAutoOpen()) openTour();
 
 /* v2.3.0-beta: orientation-aware underwater background (Mira's videos).
    Picks the landscape or portrait loop based on viewport shape; loads only

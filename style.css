@@ -1857,6 +1857,12 @@ video.archive-media { max-height: 420px; }
 .tour-overlay {
   position: fixed; z-index: 61; top: 150px; left: 8px;
   width: min(560px, 94vw);
+  /* v2.6.0 (Mira review): the card must stay reachable on short
+     landscape viewports — scroll inside it rather than spilling the
+     Back/Skip/Next row off-screen. JS tightens this to the exact
+     space below the tab bar; this is the pre-JS fallback. */
+  max-height: calc(100dvh - 12px - env(safe-area-inset-bottom));
+  overflow-y: auto;
 }
 .tour-arrow {
   position: absolute; top: -10px; left: 40px; width: 20px; height: 20px;
@@ -1865,7 +1871,7 @@ video.archive-media { max-height: 420px; }
   transition: left .25s ease, opacity .2s ease; z-index: 1;
 }
 .tour-card {
-  position: relative;
+  position: relative; box-sizing: border-box;
   background: #0d2f4d; color: var(--ink);
   border: 2px solid var(--accent); border-radius: 14px;
   padding: 16px 18px 14px;
@@ -1898,4 +1904,12 @@ video.archive-media { max-height: 420px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tour-arrow { transition: none; }
+}
+/* v2.6.0 (Mira review): on narrow phones the nav row holds three
+   buttons AND ten dots — hide the dots and slim the buttons so
+   nothing wraps or overflows. The "n of 10" count stays visible. */
+@media (max-width: 480px) {
+  .tour-dots { display: none; }
+  .tour-nav button { padding: 8px 10px; font-size: 15px; }
+  .tour-text { font-size: 16px; }
 }
