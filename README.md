@@ -391,7 +391,7 @@ Small fixes and polish from Avery's post-release playthrough:
 - The tracking map now sits on NASA's Blue Marble Next Generation —
   real satellite imagery instead of the stylized continents. (The old
   LAND_PATHS shapes are retired.) Map imagery: NASA Blue Marble Next
-  Generation (CC BY-SA 3.0).
+  Generation ([CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)).
 - Zoom: +/− buttons, mouse-wheel zoom centered on the pointer, and a
   reset-view button. Tracks, pins, and popups all keep working zoomed in;
   markers stay readable at any level.
