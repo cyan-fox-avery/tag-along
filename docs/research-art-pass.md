@@ -27,7 +27,7 @@ Avery + Mira — art direction and species-specific anatomy-study checklist.
 - **Approved sketch:** second generated iteration, **1983×793 (~2.5:1)**, text-free, white background and restrained sketch lines. Avery's verdict: **"I think this is the one."**
 - **Status:** **approved visual style reference**. The source image was generated in the ChatGPT conversation as `a_wide_minimalist_high_resolution_pencil_graphit.png`. **Binary artwork is not yet committed in this PR; its asset path remains pending.** Do not substitute or regenerate it without Avery's request.
 - **Scientific verification still needed:** compare caudal-lobe shape and small fin-like protrusions near the tail base against real common-thresher specimens. A long upper tail is shared by all thresher species, not uniquely definitive for `Alopias vulpinus`.
-- No further image generation until Avery explicitly resumes it.
+- All future image generation remains subject to Avery's explicit go-ahead for each attempt; the thresher, nurse, whale and tiger studies have since been individually approved visually.
 
 ## Research study checklist — canonical 50-shark roster
 
@@ -38,8 +38,8 @@ These are initial proposed **features**, not final verified anatomy. **[x] means
 - [x] ✅ **03. Whale Shark** (`whale`) — Close crop of upper-flank pale spots and stripes from a slightly oblique overhead view, with no full body outline. **Visually approved**; monochrome graphite field sketch, 3:1 (2172 × 724), `Rhincodon typus` at bottom right. Scientific verification and PNG asset commit pending.
 - [ ] ⏸️ **04. Goblin Shark** (`goblin`) — **Deferred / optional.** Two attempts at projected-jaw close-ups were rejected for anatomical exaggeration (fantasy-like teeth/jaw mechanics). Keep its Research information without forcing new artwork. Possible future isolated tooth or jaw study only if Avery wants to revisit.
 - [x] ✅ **05. Tiger Shark** (`tiger`) — Close crop of irregular dark flank stripes and blotches on lighter skin, suggesting body curvature without revealing the shark. **Visually approved**; monochrome graphite field sketch, 3:1 (2172 × 724), `Galeocerdo cuvier` at bottom right. Scientific verification and PNG asset commit pending.
-- [ ] **06. Sand Tiger Shark** (`sandtiger`) — Partially open mouth showing protruding narrow teeth
-- [ ] **07. Galápagos Shark** (`galapagos`) — First-dorsal-fin profile and rear edge crop **[confirm distinguishing value against dusky]**
+- [ ] ⏸️ **06. Sand Tiger Shark** (`sandtiger`) — **Deferred / optional.** Two AI sketch attempts exaggerated tooth size and failed to depict convincing tooth-replacement anatomy; do not treat as an accurate dentition study. Research text may remain without bespoke art.
+- [ ] ⏸️ **07. Galápagos Shark** (`galapagos`) — **Deferred / optional.** The proposed dorsal/pectoral fin-position sketch felt anatomically off and the subtle distinction from dusky was not clear enough to merit standalone illustration. No approved art.
 - [ ] **08. Great White Shark** (`greatwhite`) — Close-up of broad, triangular serrated teeth
 - [ ] **09. Great Hammerhead** (`hammerhead`) — Overhead crop of the near-straight cephalofoil leading edge
 - [ ] **10. Shortfin Mako** (`mako`) — Narrow, smooth-edged teeth and a small jaw segment
@@ -64,7 +64,7 @@ These are initial proposed **features**, not final verified anatomy. **[x] means
 - [ ] **29. Caribbean Reef Shark** (`caribbean`) — Small second-dorsal / interdorsal-area study **[research reliability before locking]**
 - [ ] **30. Sandbar Shark** (`sandbar`) — Exceptionally tall first dorsal fin with a small base segment
 - [ ] **31. Salmon Shark** (`salmon`) — Pale underside with characteristic dark mottling, close crop
-- [ ] **32. Dusky Shark** (`dusky`) — First-dorsal-fin shape and insertion crop **[compare directly with Galápagos]**
+- [ ] ⏸️ **32. Dusky Shark** (`dusky`) — **Provisionally deferred / optional.** Shared, subtle first-dorsal-fin differences with Galápagos do not yet offer a compelling standalone close-up. Revisit only if credible research identifies a stronger visual feature.
 - [ ] **33. Silvertip Shark** (`silvertip`) — Silver-white margins on two isolated fin-tip close-ups
 - [ ] **34. Spinner Shark** (`spinner`) — Dark-tipped anal fin of an adult, with only minimal adjoining tissue
 - [ ] **35. Spotted Wobbegong** (`wobbegong`) — Fringed oral dermal lobes/barbels and neighbouring skin markings
@@ -88,7 +88,7 @@ These are initial proposed **features**, not final verified anatomy. **[x] means
 
 1. Review a small batch of **4–6** cropped studies at the **actual Research tab display size**, with real-specimen references.
 2. Track `id | feature | crop/view | scientific references | file path | visual approval | anatomy verification | EN/FR UI notes`.
-3. Check especially close lookalikes: hammerhead head shapes, sixgill/sevengill gill sections, shark fin-tip variants, and white-shark/mako tooth differences. Galápagos, Caribbean reef and Pacific sleeper features remain tentative.
+3. Check especially close lookalikes: hammerhead head shapes, sixgill/sevengill gill sections, shark fin-tip variants, and white-shark/mako tooth differences. Galápagos and dusky have been deferred; Caribbean reef and Pacific sleeper features remain tentative.
 4. A separate basking-shark full plate remains in PR #90 as an *older linework reference only*; it violates the no-full-shark rule for direct Research use.
 5. Six old minimalist SVGs in repo-relative `sketches/` are incomplete placeholder starts, not approved finished anatomy studies.
 6. Only integrate illustrations once anatomy and visuals are approved. **Illustrations are optional per species:** every Research entry must remain accessible and informative in EN/FR even when no bespoke artwork is provided; no forced 50-image completion requirement. Do not merge automatically.
