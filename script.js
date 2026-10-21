@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.1-beta";
+const VERSION = "v2.7.2-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,10 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.2-beta": [
+"🗺️ <strong>The welcome tour stays put.</strong> The tour card now parks in one fixed spot for all ten slides instead of jumping to each tab — and a yellow arrow below the tab bar points at the tab each slide explains. The Back, Skip, and Next buttons stay in the same place throughout, and the card itself is a little bigger.",
+"🔁 <strong>The replay button moved.</strong> The ? button that reopens the tour now lives at the bottom of the page, beside Export and Import save — and the ? sits properly centred in its circle.",
+  ],
   "v2.7.1-beta": [
 "🦈💙 <strong>Bukangi made it out of the canal!</strong> The dusky shark from Busan North Port made it out of the canal — the third guide-back worked, and officials are watching and hoping she reaches open water safely. Sarah's dusky story is updated, and if you already heard the old version, she'll share the good news the next time you meet a dusky.",
   ],
@@ -6718,10 +6722,12 @@ function pauseVideosIn(container) {
 
 /* ================= v2.6.0: the welcome tour =================
    A quick slideshow that teaches the game: one slide per tab, the
-   card docked under the tab bar, its arrow pointing at the tab being
-   explained while that tab wears a spotlight ring (Avery's design).
-   Shows once on first visit; the ❓ button in the header replays it
-   anytime. Copy is plain and short — the tour is a map, not a manual. */
+   card parked in one spot under the tab bar (v2.7.2), a yellow arrow
+   pointing at the tab being explained while that tab wears a
+   spotlight ring (Avery's design).
+   Shows once on first visit; the ? button by the save controls
+   replays it anytime. Copy is plain and short — the tour is a map,
+   not a manual. */
 const TOUR_SLIDES = [
   { tab: null, icon: "🦈", title: "Welcome to Tag Along!",
     text: "You're a shark researcher. Study real sharks, plan expeditions, tag and release every species — then follow your sharks as they travel. Inspired by real shark biology and conservation research; your expeditions and tracking journeys are part of the game." },
@@ -6746,6 +6752,7 @@ const TOUR_SLIDES = [
 ];
 let tourIdx = 0;
 let tourOpenNow = false;
+let tourPrevBodyOverflow = "";
 let tourReturnFocus = null;
 
 function tourSeen() {
@@ -6762,14 +6769,14 @@ function markTourSeen() {
    for new players), the same one What's New uses — so the two
    dialogs can never stack from auto-open: a new player gets the tour
    and no What's New; a returning player gets What's New, never the
-   tour. Replay from ❓ works for everyone regardless. */
+   tour. Replay from ? works for everyone regardless. */
 function tourShouldAutoOpen(hadSave) {
   var saved = (typeof hadSave !== "undefined") ? hadSave : preMigrationHadSave;
   return !tourSeen() && !saved;
 }
 function openTour() {
   tourOpenNow = true;
-  /* Remember what had focus so closing returns it (replay: the ❓
+  /* Remember what had focus so closing returns it (replay: the ?
      button; first run: the active element, usually body — closeTour
      then falls back to the Research tab as a clear game target). */
   try {
@@ -6779,6 +6786,14 @@ function openTour() {
   var scrim = $("tourScrim"), ov = $("tourOverlay");
   if (scrim) scrim.classList.remove("hidden");
   if (ov) ov.classList.remove("hidden");
+  /* v2.7.2 (Mira review): lock background scrolling while the modal
+     tour is open, so the sticky tab bar — and the tab arrow measured
+     from it — can't drift away from the spotlighted tab. Restored in
+     closeTour; guarded, since the test harness has no body. */
+  try {
+    tourPrevBodyOverflow = (document.body && document.body.style) ? document.body.style.overflow : "";
+    if (document.body && document.body.style) document.body.style.overflow = "hidden";
+  } catch (e) { /* scroll lock is a nicety, never a blocker */ }
   showTourSlide(0);
   var next = $("tourNext");
   if (next && next.focus) next.focus();
@@ -6789,6 +6804,10 @@ function closeTour() {
   var scrim = $("tourScrim"), ov = $("tourOverlay");
   if (scrim) scrim.classList.add("hidden");
   if (ov) ov.classList.add("hidden");
+  var arrow = $("tourTabArrow");
+  if (arrow) arrow.style.opacity = "0";
+  try { if (document.body && document.body.style) document.body.style.overflow = tourPrevBodyOverflow; } catch (e) {}
+  tourPrevBodyOverflow = "";
   document.querySelectorAll(".tab.tour-spot").forEach(function(b) { b.classList.remove("tour-spot"); });
   var nav = document.querySelector(".tabs");
   if (nav) nav.classList.remove("tour-on");
@@ -6855,9 +6874,17 @@ function showTourSlide(i) {
   }
   positionTour();
 }
-/* Place the card directly under the tab bar, centred on the explained
-   tab as far as the screen allows, with the arrow over that tab's
-   centre. Decorative precision: any failure leaves the CSS fallback. */
+/* Place the card in one fixed spot under the tab bar — centred, the
+   same place on every slide — and point the yellow tab arrow at the
+   tab the current slide explains. The card's height is fixed to a
+   comfortable reading size on roomy screens (320px) and shrunk to
+   exactly the space below the tab bar on short ones — never taller
+   than the viewport, so the nav row stays visible; the text scrolls
+   inside the card. Exceptional case: when the space below the tab bar
+   drops under 160px, even the card's own chrome (header + 46px nav)
+   would clip, so the overlay itself scrolls instead — the nav row
+   stays reachable by scrolling, never clipped. Decorative precision:
+   any failure leaves the CSS fallback. */
 function positionTour() {
   var ov = $("tourOverlay");
   if (!ov || !tourOpenNow) return;
@@ -6865,26 +6892,34 @@ function positionTour() {
     var nav = document.querySelector(".tabs");
     var navRect = nav.getBoundingClientRect();
     var s = TOUR_SLIDES[tourIdx];
-    var btn = s.tab ? document.querySelector('.tab[data-tab="' + s.tab + '"]') : null;
     var vw = window.innerWidth || 360;
-    var width = Math.min(560, vw - 16);
-    var center = vw / 2;
-    if (btn) {
-      var br = btn.getBoundingClientRect();
-      center = br.left + br.width / 2;
-    }
-    var left = Math.max(8, Math.min(center - width / 2, vw - width - 8));
+    var width = Math.min(680, vw - 16);
+    var left = Math.max(8, (vw - width) / 2);
     ov.style.top = (navRect.bottom + 12) + "px";
     ov.style.left = left + "px";
     ov.style.width = width + "px";
-    /* v2.6.0 (Mira review): cap the card to the exact space below
-       the tab bar so the nav row stays reachable on short screens. */
     if (window.innerHeight) {
-      ov.style.maxHeight = Math.max(120, window.innerHeight - navRect.bottom - 24) + "px";
+      var avail = window.innerHeight - navRect.bottom - 24;
+      if (avail >= 160) {
+        ov.style.height = Math.min(320, avail) + "px";
+        ov.style.maxHeight = "none";
+        ov.style.overflowY = "visible";
+      } else {
+        ov.style.height = "auto";
+        ov.style.maxHeight = Math.max(0, window.innerHeight - navRect.bottom - 12) + "px";
+        ov.style.overflowY = "auto";
+      }
     }
-    var arrow = $("tourArrow");
+    var arrow = $("tourTabArrow");
     if (arrow) {
-      arrow.style.left = Math.max(26, Math.min(center - left, width - 26)) + "px";
+      var btn = s.tab ? document.querySelector('.tab[data-tab="' + s.tab + '"]') : null;
+      var center = vw / 2;
+      if (btn) {
+        var br = btn.getBoundingClientRect();
+        center = br.left + br.width / 2;
+      }
+      arrow.style.top = (navRect.bottom + 2) + "px";
+      arrow.style.left = Math.max(2, Math.min(center - 14, vw - 30)) + "px";
       arrow.style.opacity = s.tab ? "1" : "0";
     }
     var scrim = $("tourScrim");
@@ -6896,6 +6931,9 @@ $("tourNext").addEventListener("click", tourAdvance);
 $("tourBack").addEventListener("click", tourBack);
 $("tourSkip").addEventListener("click", closeTour);
 window.addEventListener("resize", positionTour);
+/* Reposition the tab arrow if the page scrolls under the open tour
+   (belt and braces beside the body scroll lock). */
+window.addEventListener("scroll", positionTour);
 document.addEventListener("keydown", function(e) {
   if (!tourOpenNow) return;
   if (e.key === "Escape") closeTour();

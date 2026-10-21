@@ -22,7 +22,6 @@
         <h1>Tag Along</h1>
         <p class="subtitle">a shark research game</p>
       </div>
-      <button id="tourBtn" class="tour-btn" type="button" aria-label="How to play — replay the tour" title="How to play">❓</button>
     </header>
 
     <nav class="tabs" aria-label="Game sections">
@@ -36,12 +35,12 @@
       <button class="tab" data-tab="achievements" type="button"><span class="tab-stack"><span class="tab-icon">🏆</span><span class="tab-label">Achievements</span></span></button>
     </nav>
 
-    <!-- v2.6.0: the welcome tour. One slide per tab; the card docks
-         under the tab bar and its arrow points at the tab being
-         explained. Shows once on first visit; ❓ replays it. -->
+    <!-- v2.7.2: the welcome tour. The card parks in one fixed spot
+         under the tab bar for all ten slides; a yellow arrow below
+         the tab bar points at the tab being explained. Shows once on
+         first visit; the ? button by the save controls replays it. -->
     <div id="tourScrim" class="tour-scrim hidden" aria-hidden="true"></div>
     <div id="tourOverlay" class="tour-overlay hidden" role="dialog" aria-modal="true" aria-label="How to play — a quick tour">
-      <div id="tourArrow" class="tour-arrow" aria-hidden="true"></div>
       <div class="tour-card">
         <div class="tour-head">
           <span id="tourIcon" class="tour-icon" aria-hidden="true"></span>
@@ -57,6 +56,7 @@
         </div>
       </div>
     </div>
+    <div id="tourTabArrow" class="tour-tab-arrow" aria-hidden="true"></div>
 
     <main>
       <!-- RESEARCH — a true field guide -->
@@ -303,7 +303,8 @@
       <p><button id="resetBtn" class="link-button" type="button">Reset all progress</button></p>
       <p class="latin">
         <button id="exportBtn" class="link-button" type="button">💾 Export save</button> ·
-        <button id="importBtn" class="link-button" type="button">📂 Import save</button>
+        <button id="importBtn" class="link-button" type="button">📂 Import save</button> ·
+        <button id="tourBtn" class="tour-btn" type="button" aria-label="How to play — replay the tour" title="How to play">?</button>
         <input id="importFile" type="file" accept=".json,application/json" class="hidden" />
       </p>
     </footer>
