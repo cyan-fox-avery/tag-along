@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.0-beta** — *a shark research game*
+**v2.7.1-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -12,6 +12,7 @@ science.
 Built for sarah, who loves sharks. 🦈
 
 ## v2.7.x changes
+- **v2.7.1** — the Bukangi easter egg updated: she made it out of the canal (Oct 21 2026 — the third guide-back worked, 1+ km past the waterway; officials watching for her to reach open water). First-time dusky encounters now get the success story; players who already saw the old version get Sarah's good-news follow-up on their next dusky encounter.
 - **v2.7.0** — research text, batch 1 of the giveaway pass: 10 entries (nurse, thresher, tiger, greatwhite, spinner, silvertip, wobbegong, horn, cookiecutter, sixgill) no longer end by stating the expedition answer. Clues now live inside the natural history — habitat, diet, depth, senses — so the combination stays deducible without ever being prescribed. Full audit in docs/research-text-pass-audit.md; 24 entries remain for later batches.
 
 ## v2.6.x changes — the welcome tour ❓

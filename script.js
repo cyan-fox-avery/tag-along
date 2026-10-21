@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.0-beta";
+const VERSION = "v2.7.1-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.1-beta": [
+"🦈💙 <strong>Bukangi made it out of the canal!</strong> The dusky shark from Busan North Port made it out of the canal — the third guide-back worked, and officials are watching and hoping she reaches open water safely. Sarah's dusky story is updated, and if you already heard the old version, she'll share the good news the next time you meet a dusky.",
+  ],
   "v2.7.0-beta": [
 "📖 <strong>Research text, first pass.</strong> Ten field-guide entries no longer end by giving the answer away — the 'Game plan' lines and closing instruction sentences are gone, and the clues now live inside the natural history itself: habitat, diet, depth and senses. The game stays solvable: every combination can still be worked out from what the entry actually says. More entries follow in later batches.",
   ],
@@ -1443,6 +1446,7 @@ const state = {
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
   /* v1.7.19-beta: Bukangi easter egg — one-time flag for the first dusky encounter. */
   bukangiEgg: (() => { try { return localStorage.getItem("tyi-bukangi") === "1"; } catch { return false; } })(),
+  bukangiUpdate: (() => { try { return localStorage.getItem("tyi-bukangi-update") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
   deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
   /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
@@ -2736,6 +2740,7 @@ function doEncounter(species, plan) {
         /* v1.7.19-beta: Bukangi easter egg — first dusky encounter, one-time.
            Defensive guards like the naming eggs: this must never crash the
            encounter, even if thread data or pushThread is unavailable. */
+        maybeBukangiUpdate(species);
         maybeBukangiEgg(species);
         showEncounterActions();
       };
@@ -5285,6 +5290,48 @@ function maybeBukangiEgg(species) {
   }
 }
 
+/* v2.7.1-beta: Bukangi good-news follow-up — one-time, for players who
+   already saw the pre-rescue egg. Mirrors maybeBukangiEgg's durable-delivery
+   discipline: the flag is set only after the thread is durable, so an
+   interrupted save retries instead of silently consuming the update. */
+function bukangiUpdatePersisted() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("tyi-messages") || "{}");
+    const threads = saved.messages || [];
+    return threads.some(thread =>
+      (thread.msgs || []).some(m => (m.text || "").includes("REMEMBER BUKANGI")));
+  } catch { return false; }
+}
+function maybeBukangiUpdate(species) {
+  try {
+    if (!species || species.id !== "dusky") return false;
+    if (!state.bukangiEgg) return false; /* only players who saw the old egg */
+    if (state.bukangiUpdate) return false;
+    if (typeof pushThread !== "function") return false;
+    if (typeof BUKANGI_UPDATE_THREAD === "undefined" || !Array.isArray(BUKANGI_UPDATE_THREAD)) return false;
+    if (bukangiUpdatePersisted()) {
+      state.bukangiUpdate = true;
+      try { localStorage.setItem("tyi-bukangi-update", "1"); } catch {}
+      return true;
+    }
+    const _msgLen = state.messages.length;
+    const _unread = state.unread;
+    try {
+      pushThread(BUKANGI_UPDATE_THREAD.map(m => ({ ...m })));
+    } catch (pushErr) {
+      try { state.messages.length = _msgLen; state.unread = _unread; } catch {}
+      throw pushErr;
+    }
+    if (!bukangiUpdatePersisted()) return false;
+    state.bukangiUpdate = true;
+    try { localStorage.setItem("tyi-bukangi-update", "1"); } catch {}
+    return true;
+  } catch (e) {
+    if (typeof console !== "undefined" && console.warn) console.warn("maybeBukangiUpdate:", e);
+    return false;
+  }
+}
+
 /* v0.23.0: advance the Bruce chain. Called on expedition completion and game
    load. Stages are spaced: at least 2 expeditions OR 12 hours between stages,
    so it unfolds slowly over multiple sessions. */
@@ -5841,7 +5888,7 @@ $("detailOverlay").addEventListener("click", (e) => {
    v0.7.0: a full wipe for replay and testing — not prestige, no bonuses,
    just a clean restart. Two explicit steps so it can't be hit by accident. */
 /* v0.20.0 Mira review fix: tyi-pinned and tyi-pace belong to full reset. */
-const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi", "tyi-won-at", "tyi-cert-name", "tyi-tour-seen"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted; v2.5.6-beta: +tyi-won-at, +tyi-cert-name; v2.6.0: +tyi-tour-seen
+const RESET_KEYS = ["tyi-collection", "tyi-messages", "tyi-won", "tyi-archive", "tyi-idseq", "tyi-sightings", "tyi-regions", "tyi-logbook", "tyi-stats", "tyi-achievements", "tyi-pinned", "tyi-pace", "tyi-last-seen-version", "tyi-bruce", "tyi-bruce-done", "tyi-facts", "tyi-pending-celebrations", "tyi-reunion-reacted", "tyi-derpy-unlocked", "tyi-derpy-mode", "tyi-bukangi", "tyi-bukangi-update", "tyi-won-at", "tyi-cert-name", "tyi-tour-seen"]; // v1.4.0-beta: +tyi-facts; v1.5.3-beta: +tyi-pending-celebrations, +tyi-reunion-reacted; v2.5.6-beta: +tyi-won-at, +tyi-cert-name; v2.6.0: +tyi-tour-seen
 
 /* v0.23.0: save export/import for the public beta. */
 function exportSave() {

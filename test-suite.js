@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.0-beta', VERSION === 'v2.7.0-beta');
+  ok('version v2.7.1-beta', VERSION === 'v2.7.1-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5675,6 +5675,96 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("v2.7.0 Mira review: batch-1 clue matrix fully covered", missing.length === 0);
     if (missing.length) console.log("matrix gaps: " + missing.join(", "));
   } catch (e) { ok("v2.7.0 clue matrix block (" + e.message + ")", false); }
+/* ---------- v2.7.1: Bukangi made it out ---------- */
+  try {
+    ok("v2.7.1 BUKANGI_THREAD updated to the success story",
+      BUKANGI_THREAD.length === 4 &&
+      BUKANGI_THREAD.every(function(m){ return m.who === 'them'; }) &&
+      BUKANGI_THREAD.some(function(m){ return m.text.indexOf('Busan') !== -1; }) &&
+      BUKANGI_THREAD.some(function(m){ return m.text.indexOf('ambassador') !== -1; }) &&
+      BUKANGI_THREAD.some(function(m){ return m.text.indexOf('MADE IT OUT') !== -1; }));
+    ok("v2.7.1 BUKANGI_UPDATE_THREAD defined with 3 messages",
+      typeof BUKANGI_UPDATE_THREAD !== 'undefined' && Array.isArray(BUKANGI_UPDATE_THREAD) &&
+      BUKANGI_UPDATE_THREAD.length === 3 &&
+      BUKANGI_UPDATE_THREAD.every(function(m){ return m.who === 'them'; }));
+    ok("v2.7.1 tyi-bukangi-update in RESET_KEYS",
+      RESET_KEYS.includes('tyi-bukangi-update'));
+    ok("v2.7.1 update hook runs before the egg hook (source)",
+      fileCode.indexOf('maybeBukangiUpdate(species);') !== -1 &&
+      fileCode.indexOf('maybeBukangiUpdate(species);') < fileCode.indexOf('maybeBukangiEgg(species);'));
+    (function(){
+      var _egg = state.bukangiEgg, _upd = state.bukangiUpdate;
+      var _len = state.messages.length, _unread = state.unread;
+      var _msgsLS = null, _updLS = null;
+      try { _msgsLS = localStorage.getItem('tyi-messages'); } catch {}
+      try { _updLS = localStorage.getItem('tyi-bukangi-update'); } catch {}
+      state.bukangiEgg = false; state.bukangiUpdate = false;
+      var r0 = maybeBukangiUpdate({ id: 'dusky' });
+      ok("v2.7.1 Bukangi update needs the old egg first",
+        r0 === false && state.messages.length === _len);
+      state.bukangiEgg = true; state.bukangiUpdate = false;
+      var r1 = maybeBukangiUpdate({ id: 'dusky' });
+      ok("v2.7.1 Bukangi update delivers once for old-egg players",
+        r1 === true && state.messages.length === _len + 1 && state.bukangiUpdate === true);
+      var r2 = maybeBukangiUpdate({ id: 'dusky' });
+      ok("v2.7.1 Bukangi update never repeats",
+        r2 === false && state.messages.length === _len + 1);
+      state.bukangiUpdate = false;
+      var r3 = maybeBukangiUpdate({ id: 'nurse' });
+      ok("v2.7.1 Bukangi update only on dusky",
+        r3 === false && state.messages.length === _len + 1);
+      state.bukangiEgg = _egg; state.bukangiUpdate = _upd;
+      state.messages.length = _len; state.unread = _unread;
+      try {
+        if (_msgsLS === null) localStorage.removeItem('tyi-messages'); else localStorage.setItem('tyi-messages', _msgsLS);
+        if (_updLS === null) localStorage.removeItem('tyi-bukangi-update'); else localStorage.setItem('tyi-bukangi-update', _updLS);
+      } catch {}
+    })();
+  } catch (e) { ok("v2.7.1 Bukangi update block (" + e.message + ")", false); }
+
+/* ---------- v2.7.1 Mira review: imported-save integration ---------- */
+  try {
+    (function(){
+      var _egg = state.bukangiEgg, _upd = state.bukangiUpdate;
+      var _len = state.messages.length, _unread = state.unread;
+      var _msgsLS = null, _updLS = null, _eggLS = null;
+      try { _msgsLS = localStorage.getItem('tyi-messages'); } catch {}
+      try { _updLS = localStorage.getItem('tyi-bukangi-update'); } catch {}
+      try { _eggLS = localStorage.getItem('tyi-bukangi'); } catch {}
+      function cleanMsgs() {
+        try { localStorage.setItem('tyi-messages', '{"messages":[],"unread":0,"chatIdx":0}'); } catch {}
+      }
+      function restoreMsgs() {
+        state.messages.length = _len; state.unread = _unread;
+        try {
+          if (_msgsLS === null) localStorage.removeItem('tyi-messages'); else localStorage.setItem('tyi-messages', _msgsLS);
+        } catch {}
+      }
+      // brand-new save: revised primary egg only, no follow-up
+      state.bukangiEgg = false; state.bukangiUpdate = false; cleanMsgs();
+      try { localStorage.removeItem('tyi-bukangi'); localStorage.removeItem('tyi-bukangi-update'); } catch {}
+      var u0 = maybeBukangiUpdate({ id: 'dusky' });
+      var e0 = maybeBukangiEgg({ id: 'dusky' });
+      var freshOk = u0 === false && e0 === true && state.messages.length === _len + 1;
+      restoreMsgs();
+      // imported pre-rescue save: flag set, no update flag; two encounters = one follow-up only
+      state.bukangiEgg = true; state.bukangiUpdate = false; cleanMsgs();
+      try { localStorage.setItem('tyi-bukangi', '1'); localStorage.removeItem('tyi-bukangi-update'); } catch {}
+      var u1 = maybeBukangiUpdate({ id: 'dusky' });
+      var e1 = maybeBukangiEgg({ id: 'dusky' });
+      var u2 = maybeBukangiUpdate({ id: 'dusky' });
+      var e2 = maybeBukangiEgg({ id: 'dusky' });
+      var importOk = u1 === true && e1 === false && u2 === false && e2 === false && state.messages.length === _len + 1;
+      ok("v2.7.1 Mira review: new save gets revised egg, no follow-up", freshOk);
+      ok("v2.7.1 Mira review: pre-rescue save gets exactly one follow-up over two encounters", importOk);
+      state.bukangiEgg = _egg; state.bukangiUpdate = _upd;
+      restoreMsgs();
+      try {
+        if (_updLS === null) localStorage.removeItem('tyi-bukangi-update'); else localStorage.setItem('tyi-bukangi-update', _updLS);
+        if (_eggLS === null) localStorage.removeItem('tyi-bukangi'); else localStorage.setItem('tyi-bukangi', _eggLS);
+      } catch {}
+    })();
+  } catch (e) { ok("v2.7.1 imported-save integration block (" + e.message + ")", false); }
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');

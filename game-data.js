@@ -147,22 +147,34 @@ const NICOLE_THREAD = [
   { who: "me",   text: "But it wasn't?" },
   { who: "them", text: "SHE CAME BACK. August 2004, back in Gansbaai. Over 20,000 km round trip. They published it in Science — it proved white sharks cross entire ocean basins. Before Nicole, nobody knew they did that. Your Nicole's got explorer genes. 🗺️🦈" }
 ];
-/* v1.7.19-beta: Bukangi easter egg — DRAFT dialogue, placeholder for Avery's
-   revision. Trigger: first dusky shark encounter (maybeBukangiEgg in
-   script.js). v1.7.19-beta Mira review: welfare-first framing — Bukangi is a
-   real ~3m female dusky (IUCN Endangered) stuck in the narrow Busan North
-   Port canal since Sept 18 2026. Two guide-back-to-sea attempts failed; Busan
-   named her honorary ambassador; 1.3M+ park visits reported by Oct 11 (people
-   visiting *hoping* to see her). Researchers found scrapes on her snout —
-   they think she may have hit a wall after being startled — and they monitor
-   her health while asking people to stop shining lights at her and not
-   disturb her. Her staying in the canal is NOT evidence she is happy —
-   never imply it. */
+/* v2.7.1-beta: Bukangi easter egg UPDATED — she made it out of the canal.
+   Trigger: first dusky shark encounter (maybeBukangiEgg in script.js).
+   v1.7.19-beta Mira review: welfare-first framing. Bukangi is a real ~3m
+   female dusky (IUCN Endangered) who spent 33–34 days stuck in the narrow
+   Busan North Port canal (from Sept 18 2026); Busan named her honorary
+   ambassador; 1.3M+ park visits reported by Oct 11 (people visiting
+   *hoping* to see her). Two guide-back-to-sea attempts failed. The THIRD
+   attempt succeeded Oct 21 2026: divers and nets on floating pontoons
+   guided her 1+ km past the waterway, with drones keeping watch from
+   above; she was sighted outside the canal near Pier 1 and officials
+   continue monitoring whether she reaches open water. The thread tells
+   the out-of-the-canal story, past tense for the canal stay, and keeps
+   the welfare ask: watch quietly, give space. */
 const BUKANGI_THREAD = [
   { who: "them", text: "WAIT wait wait. A DUSKY?! \uD83E\uDD88" },
-  { who: "them", text: "okay you need to know about Bukangi. she's a real dusky shark — about 3 metres, female (duskies are endangered, by the way) — and she's been stuck in a narrow canal at Busan North Port since september. more than a million people have visited the waterfront park hoping to see her" },
-  { who: "them", text: "they tried to guide her back out to sea twice and it didn't work, so the city made her an honorary ambassador. but she's not thriving in there — researchers found scrapes on her snout. they think she might have hit a wall after getting startled, and they're asking people to stop shining lights at her" },
-  { who: "them", text: "they're monitoring her health and asking people not to disturb her. her staying in the canal doesn't mean she's happy — it means she's stuck. if you ever go see a wild animal, watch quietly and give them space. that's how you actually help \uD83D\uDC99" }
+  { who: "them", text: "okay you need to know about Bukangi. she's a real dusky shark — about 3 metres, female (duskies are endangered, by the way) — and she spent over a month stuck in a narrow canal at Busan North Port. more than a million people visited the waterfront park hoping to see her, and the city even made her an honorary ambassador. her staying in there doesn't mean she's happy — it means she was stuck. she even picked up scrapes on her snout in there — they think she might have hit a wall after getting startled" },
+  { who: "them", text: "they tried to guide her back out to sea twice and it didn't work. but the third try did!! divers and nets on floating pontoons guided her more than a kilometre, with drones keeping watch from above — and SHE MADE IT OUT OF THE CANAL!" },
+  { who: "them", text: "she's past the waterway now and officials are watching and hoping she reaches open water safely \uD83D\uDC99 if you ever go see a wild animal, watch quietly and give them space — stop shining lights at them and try not to disturb them. that's how you actually help" }
+];
+
+/* v2.7.1-beta: Bukangi good-news follow-up — for players who already saw
+   the pre-rescue egg. One-time, delivered by maybeBukangiUpdate on a later
+   dusky encounter (called before maybeBukangiEgg so first-timers never get
+   both threads). */
+const BUKANGI_UPDATE_THREAD = [
+  { who: "them", text: "REMEMBER BUKANGI?!?! \uD83E\uDD88\uD83D\uDC99" },
+  { who: "them", text: "the dusky who was stuck in the canal at busan?? SHE MADE IT OUT OF THE CANAL! the third guide-back worked — divers and nets on floating pontoons walked her more than a kilometre, with drones keeping watch from above, and she got past the waterway" },
+  { who: "them", text: "she's out of the canal now and officials are watching and hoping she reaches open water safely. i was worried about her for weeks and now she's on her way. best news ever. okay that's all, i just had to tell someone \uD83D\uDC99" },
 ];
 
 /* v0.23.0: BRUCE easter egg chain — LOCKED DESIGN (2026-10-06).
