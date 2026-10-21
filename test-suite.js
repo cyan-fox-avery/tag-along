@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.6.0-beta', VERSION === 'v2.6.0-beta');
+  ok('version v2.7.0-beta', VERSION === 'v2.7.0-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5630,6 +5630,51 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     return true;
   })());
 
+/* ---------- v2.7.0: research-text pass, batch 1 ---------- */
+  try {
+    const batch1 = ["nurse", "thresher", "tiger", "greatwhite", "spinner", "silvertip", "wobbegong", "horn", "cookiecutter", "sixgill"];
+    ok("research pass batch 1: no giveaway endings remain",
+      batch1.every(function(id) {
+        const s = SHARKS.find(function(x) { return x.id === id; });
+        return s && s.research.indexOf("Game plan:") === -1 && s.research.indexOf("Plan:") === -1 &&
+          s.research.indexOf("chum") === -1;
+      }));
+    ok("research pass batch 1: key clues still deducible from the prose",
+      SHARKS.find(s => s.id === "cookiecutter").research.indexOf("open Atlantic") !== -1 &&
+      SHARKS.find(s => s.id === "tiger").research.indexOf("Maldives") !== -1 &&
+      SHARKS.find(s => s.id === "horn").research.indexOf("sea urchins") !== -1 &&
+      SHARKS.find(s => s.id === "sixgill").research.indexOf("below 200 metres") !== -1);
+  } catch (e) { ok("v2.7.0 research pass batch 1 block (" + e.message + ")", false); }
+
+/* ---------- v2.7.0 Mira review: clue-coverage matrix, batch 1 ----------
+     Every accepted region, bait option and depth zone must have a
+     discoverable phrase in the final prose. Depth phrases are zone evidence
+     (a stated range or habitat zone), not per-tier labels. */
+  try {
+    const matrix = [
+      { id: "nurse", regions: ["Caribbean"], baits: ["crabs", "sea urchins"], depths: ["shallower than about 75 metres", "reef ledges"] },
+      { id: "thresher", regions: ["open Atlantic"], baits: ["anchovies", "squid"], depths: ["30 and 550 metres", "mid-water"] },
+      { id: "tiger", regions: ["Maldives"], baits: ["schooling fish", "squid", "crabs", "tuna"], depths: ["surface down through the reefs"] },
+      { id: "greatwhite", regions: ["South Africa"], baits: ["tuna", "schooling fish"], depths: ["surface waters and reef edges"] },
+      { id: "spinner", regions: ["Caribbean"], baits: ["schooling fish"], depths: ["near the surface"] },
+      { id: "silvertip", regions: ["Maldivian"], baits: ["schooling reef fish", "cephalopods"], depths: ["shallow outer slopes"] },
+      { id: "wobbegong", regions: ["eastern Australia"], baits: ["crustaceans", "fish"], depths: ["patch of reef"] },
+      { id: "horn", regions: ["California"], baits: ["sea urchins", "crabs"], depths: ["kelp and rocky reefs"] },
+      { id: "cookiecutter", regions: ["open Atlantic"], baits: ["squid"], depths: ["twilight zone", "deep tropical"] },
+      { id: "sixgill", regions: ["open Atlantic"], baits: ["squid", "schooling fish"], depths: ["below 200 metres"] },
+    ];
+    const missing = [];
+    matrix.forEach(function(row) {
+      const s = SHARKS.find(function(x) { return x.id === row.id; });
+      ["regions", "baits", "depths"].forEach(function(dim) {
+        row[dim].forEach(function(phrase) {
+          if (!s || s.research.indexOf(phrase) === -1) missing.push(row.id + ":" + dim + ":" + phrase);
+        });
+      });
+    });
+    ok("v2.7.0 Mira review: batch-1 clue matrix fully covered", missing.length === 0);
+    if (missing.length) console.log("matrix gaps: " + missing.join(", "));
+  } catch (e) { ok("v2.7.0 clue matrix block (" + e.message + ")", false); }
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');

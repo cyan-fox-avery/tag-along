@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.6.0-beta";
+const VERSION = "v2.7.0-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.0-beta": [
+"📖 <strong>Research text, first pass.</strong> Ten field-guide entries no longer end by giving the answer away — the 'Game plan' lines and closing instruction sentences are gone, and the clues now live inside the natural history itself: habitat, diet, depth and senses. The game stays solvable: every combination can still be worked out from what the entry actually says. More entries follow in later batches.",
+  ],
   "v2.6.0-beta": [
 "❓ <strong>A welcome tour for new players.</strong> On your first visit, a quick slideshow walks the tab bar — one slide per tab, docked under the tabs with its arrow pointing right at the tab being explained: what the game is, and what every tab is for (including the Archive, which unlocks with your first tag).",
 "🔁 <strong>Replay it anytime.</strong> The ❓ button in the header reopens the tour whenever you want a refresher.",

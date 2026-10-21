@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.6.0-beta** — *a shark research game*
+**v2.7.0-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -10,6 +10,9 @@ species for your official collection book. Less *Jaws*, more careful field
 science.
 
 Built for sarah, who loves sharks. 🦈
+
+## v2.7.x changes
+- **v2.7.0** — research text, batch 1 of the giveaway pass: 10 entries (nurse, thresher, tiger, greatwhite, spinner, silvertip, wobbegong, horn, cookiecutter, sixgill) no longer end by stating the expedition answer. Clues now live inside the natural history — habitat, diet, depth, senses — so the combination stays deducible without ever being prescribed. Full audit in docs/research-text-pass-audit.md; 24 entries remain for later batches.
 
 ## v2.6.x changes — the welcome tour ❓
 - **v2.6.0** — a quick guided tour for new players: one slide per tab, the card docked under the tab bar with its arrow pointing at the tab being explained (and that tab spotlit). Shows once on first visit; the ❓ button in the header replays it anytime.
