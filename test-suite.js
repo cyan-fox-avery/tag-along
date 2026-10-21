@@ -5835,8 +5835,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       !hasCreature(buildSightingDeck("surface", "north-carolina").pool, "penguin") &&
       !hasCreature(buildSightingDeck("surface", "arctic").pool, "penguin") &&
       !hasCreature(buildSightingDeck("surface", "maldives").pool, "penguin"));
-    ok("anglerfish in twilight + deep decks, mola + shark silhouettes at warm surfaces",
-      hasCreature(buildSightingDeck("twilight", "open-atlantic").pool, "anglerfish") &&
+    ok("anglerfish in the deep deck only (never twilight), mola + shark silhouettes at warm surfaces",
+      !hasCreature(buildSightingDeck("twilight", "open-atlantic").pool, "anglerfish") &&
       hasCreature(buildSightingDeck("deep", "arctic").pool, "anglerfish") &&
       hasCreature(buildSightingDeck("surface", "caribbean").pool, "mola") &&
       hasCreature(buildSightingDeck("surface", "caribbean").pool, "shark:hammerhead") &&

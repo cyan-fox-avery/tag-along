@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.4-beta": [
-"🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the twilight and deep, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
+"🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
   ],
   "v2.7.2-beta": [
 "🗺️ <strong>The welcome tour stays put.</strong> The tour card now parks in one fixed spot for all ten slides instead of jumping to each tab — and a yellow arrow below the tab bar points at the tab each slide explains. The Back, Skip, and Next buttons stay in the same place throughout, and the card itself is a little bigger.",
@@ -703,14 +703,13 @@ const SIGHTINGS = {
     { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
-    { text: "A small anglerfish hangs motionless in the dark, its lure glowing faintly like a dropped star.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ],
   deep: [
     { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
-    { text: "An anglerfish drifts through the edge of the lights, lure swaying ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
+    { text: "An anglerfish drifts through the edge of the lights, its lure glowing faintly ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ]
 };
 
@@ -2570,7 +2569,7 @@ function startAmbientLife(depth, region) {
   const shallow = depth === "surface" || depth === "reef";
   let creatures;
   if (depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish"];
-  else if (!shallow) creatures = ["fish", "fish", "jellyfish", "anglerfish"];
+  else if (!shallow) creatures = ["fish", "fish", "jellyfish"];
   else creatures = (BIOME_CREATURES[biome] || ["fish", "fish", "fish", "turtle", "dolphin"]).slice();
   /* v2.7.4-beta: penguins drift only where they live — South Africa and
      the Galápagos — never in the Arctic or other temperate waters. */
