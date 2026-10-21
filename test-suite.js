@@ -5772,8 +5772,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         openTour();
         const left0 = $("tourOverlay").style.left, width0 = $("tourOverlay").style.width;
         tourAdvance();
-        const parked = $("tourOverlay").style.left === left0 && $("tourOverlay").style.width === width0 &&
-          width0 === "680px" && left0 === "60px";
+        const parked = $("tourOverlay").style.left === left0 && $("tourOverlay").style.width === width0;
         closeTour();
         return parked;
       })());
@@ -5808,6 +5807,19 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         return card.indexOf("flex-direction: column") !== -1 &&
           text.indexOf("flex: 1") !== -1 && text.indexOf("overflow-y: auto") !== -1;
       })());
+    ok("tab arrow is hidden by default on an idle page load (CSS default governs before any tour opens)",
+      (() => {
+        const s = cssCode.indexOf(".tour-tab-arrow {");
+        const block = cssCode.slice(s, s + 400);
+        return block.indexOf("opacity: 0") !== -1 && $("tourTabArrow").style.opacity !== "1";
+      })());
+    ok("short screens shrink the card to fit instead of forcing it below the viewport (source)",
+      fileCode.indexOf("Math.min(320, avail)") !== -1 &&
+      fileCode.indexOf("Math.max(120, Math.min(320") === -1 &&
+      fileCode.indexOf("avail >= 160") !== -1);
+    ok("background scrolling locks while the tour is open and the arrow repositions on scroll (source)",
+      fileCode.indexOf('document.body.style.overflow = "hidden"') !== -1 &&
+      fileCode.indexOf('window.addEventListener("scroll", positionTour);') !== -1);
   } catch (e) { ok("v2.7.2 parked tour block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));

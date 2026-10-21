@@ -1866,7 +1866,7 @@ video.archive-media { max-height: 420px; }
   overflow-y: auto;
 }
 .tour-tab-arrow {
-  position: fixed; z-index: 62; top: 0; left: 0;
+  position: fixed; z-index: 62; top: 0; left: 0; opacity: 0;
   width: 0; height: 0; pointer-events: none;
   border-left: 14px solid transparent; border-right: 14px solid transparent;
   border-bottom: 18px solid var(--accent);

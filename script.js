@@ -6752,6 +6752,7 @@ const TOUR_SLIDES = [
 ];
 let tourIdx = 0;
 let tourOpenNow = false;
+let tourPrevBodyOverflow = "";
 let tourReturnFocus = null;
 
 function tourSeen() {
@@ -6785,6 +6786,14 @@ function openTour() {
   var scrim = $("tourScrim"), ov = $("tourOverlay");
   if (scrim) scrim.classList.remove("hidden");
   if (ov) ov.classList.remove("hidden");
+  /* v2.7.2 (Mira review): lock background scrolling while the modal
+     tour is open, so the sticky tab bar — and the tab arrow measured
+     from it — can't drift away from the spotlighted tab. Restored in
+     closeTour; guarded, since the test harness has no body. */
+  try {
+    tourPrevBodyOverflow = (document.body && document.body.style) ? document.body.style.overflow : "";
+    if (document.body && document.body.style) document.body.style.overflow = "hidden";
+  } catch (e) { /* scroll lock is a nicety, never a blocker */ }
   showTourSlide(0);
   var next = $("tourNext");
   if (next && next.focus) next.focus();
@@ -6797,6 +6806,8 @@ function closeTour() {
   if (ov) ov.classList.add("hidden");
   var arrow = $("tourTabArrow");
   if (arrow) arrow.style.opacity = "0";
+  try { if (document.body && document.body.style) document.body.style.overflow = tourPrevBodyOverflow; } catch (e) {}
+  tourPrevBodyOverflow = "";
   document.querySelectorAll(".tab.tour-spot").forEach(function(b) { b.classList.remove("tour-spot"); });
   var nav = document.querySelector(".tabs");
   if (nav) nav.classList.remove("tour-on");
@@ -6866,10 +6877,14 @@ function showTourSlide(i) {
 /* Place the card in one fixed spot under the tab bar — centred, the
    same place on every slide — and point the yellow tab arrow at the
    tab the current slide explains. The card's height is fixed to a
-   comfortable reading size (shrinking only on short screens), and
-   the text scrolls inside it, so the Back/Skip/Next row never moves
-   between slides. Decorative precision: any failure leaves the CSS
-   fallback. */
+   comfortable reading size on roomy screens (320px) and shrunk to
+   exactly the space below the tab bar on short ones — never taller
+   than the viewport, so the nav row stays visible; the text scrolls
+   inside the card. Exceptional case: when the space below the tab bar
+   drops under 160px, even the card's own chrome (header + 46px nav)
+   would clip, so the overlay itself scrolls instead — the nav row
+   stays reachable by scrolling, never clipped. Decorative precision:
+   any failure leaves the CSS fallback. */
 function positionTour() {
   var ov = $("tourOverlay");
   if (!ov || !tourOpenNow) return;
@@ -6883,10 +6898,17 @@ function positionTour() {
     ov.style.top = (navRect.bottom + 12) + "px";
     ov.style.left = left + "px";
     ov.style.width = width + "px";
-    /* Fixed card height: roomy on tall screens, shrunk to fit on
-       short landscape ones — the text scrolls, the nav row stays. */
     if (window.innerHeight) {
-      ov.style.height = Math.max(120, Math.min(320, window.innerHeight - navRect.bottom - 24)) + "px";
+      var avail = window.innerHeight - navRect.bottom - 24;
+      if (avail >= 160) {
+        ov.style.height = Math.min(320, avail) + "px";
+        ov.style.maxHeight = "none";
+        ov.style.overflowY = "visible";
+      } else {
+        ov.style.height = "auto";
+        ov.style.maxHeight = Math.max(0, window.innerHeight - navRect.bottom - 12) + "px";
+        ov.style.overflowY = "auto";
+      }
     }
     var arrow = $("tourTabArrow");
     if (arrow) {
@@ -6909,6 +6931,9 @@ $("tourNext").addEventListener("click", tourAdvance);
 $("tourBack").addEventListener("click", tourBack);
 $("tourSkip").addEventListener("click", closeTour);
 window.addEventListener("resize", positionTour);
+/* Reposition the tab arrow if the page scrolls under the open tour
+   (belt and braces beside the body scroll lock). */
+window.addEventListener("scroll", positionTour);
 document.addEventListener("keydown", function(e) {
   if (!tourOpenNow) return;
   if (e.key === "Escape") closeTour();
