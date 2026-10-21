@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.4-beta', VERSION === 'v2.7.4-beta');
+  ok('version v2.7.5-beta', VERSION === 'v2.7.5-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5868,6 +5868,49 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       fileCode.indexOf('scaleX(-1)') !== -1 && fileCode.indexOf('swim-left') !== -1 &&
       cssCode.indexOf('.dive-scene .ambient .shark-shadow img') !== -1);
   } catch (e) { ok("v2.7.4 ambient batch block (" + e.message + ")", false); }
+
+  /* ---------- v2.7.5: ambient batch 2 — 27 sprites, region gating, shark silhouettes ---------- */
+  try {
+    const b2keys = ["moray","seahorse","clownfish","parrotfish","pufferfish","lionfish","clam","nudibranch","hatchetfish","gulper","vampire","siphonophore","krill","viperfish","tripod","isopod","yeti","snailfish","cusk","cucumber","otter","narwhal","beluga","snake","manatee","tuna","gannet"];
+    const b2files = { moray: "bg-moray", seahorse: "bg-seahorse", clownfish: "bg-clownfish", parrotfish: "bg-parrotfish", pufferfish: "bg-pufferfish", lionfish: "bg-lionfish", clam: "bg-giant-clam", nudibranch: "bg-nudibranch", hatchetfish: "bg-hatchetfish", gulper: "bg-gulper", vampire: "bg-vampire-squid", siphonophore: "bg-siphonophore", krill: "bg-krill", viperfish: "bg-viperfish", tripod: "bg-tripod-fish", isopod: "bg-giant-isopod", yeti: "bg-yeti-crab", snailfish: "bg-snailfish", cusk: "bg-cusk-eel", cucumber: "bg-sea-cucumber", otter: "bg-sea-otter", narwhal: "bg-narwhal", beluga: "bg-beluga", snake: "bg-sea-snake", manatee: "bg-manatee", tuna: "bg-tuna", gannet: "bg-gannet" };
+    ok("batch-2 ambient sprites registered (27 keys)",
+      b2keys.every(function(k) { return typeof CREATURE_ART[k] === "string" && CREATURE_ART[k].indexOf(b2files[k]) !== -1; }));
+    const hasC = function(pool, c) { return pool.some(function(s) { return s.creature === c; }); };
+    const reefCar = buildSightingDeck("reef", "caribbean").pool;
+    ok("reef batch in a Caribbean reef deck",
+      ["moray","seahorse","clownfish","parrotfish","pufferfish","lionfish","clam","nudibranch"].every(function(c) { return hasC(reefCar, c); }));
+    const twiAtl = buildSightingDeck("twilight", "open-atlantic").pool;
+    ok("twilight batch in an open-Atlantic twilight deck",
+      ["hatchetfish","gulper","vampire","siphonophore","krill","viperfish"].every(function(c) { return hasC(twiAtl, c); }));
+    const deepArc = buildSightingDeck("deep", "arctic").pool;
+    ok("deep batch + goblin silhouette in an Arctic deep deck",
+      ["tripod","isopod","yeti","snailfish","cusk","cucumber","shark:goblin"].every(function(c) { return hasC(deepArc, c); }));
+    ok("surface visitors gated to their waters",
+      hasC(buildSightingDeck("surface", "california").pool, "otter") &&
+      !hasC(buildSightingDeck("surface", "north-carolina").pool, "otter") &&
+      hasC(buildSightingDeck("surface", "arctic").pool, "narwhal") &&
+      hasC(buildSightingDeck("surface", "arctic").pool, "beluga") &&
+      hasC(buildSightingDeck("surface", "philippines").pool, "snake") &&
+      hasC(buildSightingDeck("surface", "maldives").pool, "snake") &&
+      !hasC(buildSightingDeck("surface", "caribbean").pool, "snake") &&
+      hasC(buildSightingDeck("surface", "caribbean").pool, "manatee") &&
+      !hasC(buildSightingDeck("surface", "philippines").pool, "manatee") &&
+      hasC(buildSightingDeck("surface", "open-atlantic").pool, "tuna") &&
+      hasC(buildSightingDeck("surface", "north-carolina").pool, "gannet") &&
+      hasC(buildSightingDeck("surface", "east-australia").pool, "gannet") &&
+      hasC(buildSightingDeck("surface", "cornwall").pool, "gannet") &&
+      !hasC(buildSightingDeck("surface", "japan").pool, "gannet"));
+    ok("batch-2 shark silhouettes at warm surfaces, never on reefs",
+      hasC(buildSightingDeck("surface", "caribbean").pool, "shark:greatwhite") &&
+      hasC(buildSightingDeck("surface", "caribbean").pool, "shark:mako") &&
+      hasC(buildSightingDeck("surface", "caribbean").pool, "shark:thresher") &&
+      !hasC(buildSightingDeck("reef", "caribbean").pool, "shark:greatwhite"));
+    const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
+    ok("drift weighting holds: fish still tripled in every biome list",
+      fishN(BIOME_CREATURES.tropical) === 3 && fishN(BIOME_CREATURES.temperate) === 3 &&
+      fishN(BIOME_CREATURES.kelp) === 3 && fishN(BIOME_CREATURES.pelagic) === 3 &&
+      fishN(BIOME_CREATURES.polar) === 3 && fishN(BIOME_CREATURES.volcanic) === 3);
+  } catch (e) { ok("v2.7.5 ambient batch 2 block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;

@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.4-beta";
+const VERSION = "v2.7.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.5-beta": [
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, clownfish, parrotfish, pufferfish, lionfish, giant clam, nudibranch), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (tripod fish, giant isopod, yeti crab, snailfish, cusk eel, sea cucumber), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, gannets in the North Atlantic and Australia. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep.",
+  ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
   ],
@@ -609,7 +612,34 @@ const CREATURE_ART = {
   jellyfish: null,
   anglerfish: null,
   penguin: null,
-  mola: null
+  mola: null,
+  moray: null,
+  seahorse: null,
+  clownfish: null,
+  parrotfish: null,
+  pufferfish: null,
+  lionfish: null,
+  clam: null,
+  nudibranch: null,
+  hatchetfish: null,
+  gulper: null,
+  vampire: null,
+  siphonophore: null,
+  krill: null,
+  viperfish: null,
+  tripod: null,
+  isopod: null,
+  yeti: null,
+  snailfish: null,
+  cusk: null,
+  cucumber: null,
+  otter: null,
+  narwhal: null,
+  beluga: null,
+  snake: null,
+  manatee: null,
+  tuna: null,
+  gannet: null
 };
 /* Filled in at load: art-loader.js must be loaded before script.js. */
 function initCreatureArt() {
@@ -622,6 +652,33 @@ function initCreatureArt() {
   CREATURE_ART.anglerfish = bgCreatureImg("bg-anglerfish", "Anglerfish");
   CREATURE_ART.penguin = bgCreatureImg("bg-penguin", "Penguin");
   CREATURE_ART.mola = bgCreatureImg("bg-mola", "Sunfish");
+  CREATURE_ART.moray = bgCreatureImg("bg-moray", "Moray eel");
+  CREATURE_ART.seahorse = bgCreatureImg("bg-seahorse", "Seahorse");
+  CREATURE_ART.clownfish = bgCreatureImg("bg-clownfish", "Clownfish");
+  CREATURE_ART.parrotfish = bgCreatureImg("bg-parrotfish", "Parrotfish");
+  CREATURE_ART.pufferfish = bgCreatureImg("bg-pufferfish", "Pufferfish");
+  CREATURE_ART.lionfish = bgCreatureImg("bg-lionfish", "Lionfish");
+  CREATURE_ART.clam = bgCreatureImg("bg-giant-clam", "Giant clam");
+  CREATURE_ART.nudibranch = bgCreatureImg("bg-nudibranch", "Nudibranch");
+  CREATURE_ART.hatchetfish = bgCreatureImg("bg-hatchetfish", "Hatchetfish");
+  CREATURE_ART.gulper = bgCreatureImg("bg-gulper", "Gulper eel");
+  CREATURE_ART.vampire = bgCreatureImg("bg-vampire-squid", "Vampire squid");
+  CREATURE_ART.siphonophore = bgCreatureImg("bg-siphonophore", "Siphonophore");
+  CREATURE_ART.krill = bgCreatureImg("bg-krill", "Krill swarm");
+  CREATURE_ART.viperfish = bgCreatureImg("bg-viperfish", "Viperfish");
+  CREATURE_ART.tripod = bgCreatureImg("bg-tripod-fish", "Tripod fish");
+  CREATURE_ART.isopod = bgCreatureImg("bg-giant-isopod", "Giant isopod");
+  CREATURE_ART.yeti = bgCreatureImg("bg-yeti-crab", "Yeti crab");
+  CREATURE_ART.snailfish = bgCreatureImg("bg-snailfish", "Snailfish");
+  CREATURE_ART.cusk = bgCreatureImg("bg-cusk-eel", "Cusk eel");
+  CREATURE_ART.cucumber = bgCreatureImg("bg-sea-cucumber", "Sea cucumber");
+  CREATURE_ART.otter = bgCreatureImg("bg-sea-otter", "Sea otter");
+  CREATURE_ART.narwhal = bgCreatureImg("bg-narwhal", "Narwhal");
+  CREATURE_ART.beluga = bgCreatureImg("bg-beluga", "Beluga");
+  CREATURE_ART.snake = bgCreatureImg("bg-sea-snake", "Sea snake");
+  CREATURE_ART.manatee = bgCreatureImg("bg-manatee", "Manatee");
+  CREATURE_ART.tuna = bgCreatureImg("bg-tuna", "Tuna school");
+  CREATURE_ART.gannet = bgCreatureImg("bg-gannet", "Gannet");
 }
 
 /* Flavour: the dive log describes the place, not just the mechanics.
@@ -680,7 +737,17 @@ const SIGHTINGS = {
     { text: "An African penguin torpedoes past in a burst of bubbles, impossibly fast for a bird.", creature: "penguin", regions: ["south-africa"] },
     { text: "A Galápagos penguin darts past, tiny and quick, gone before you can point.", creature: "penguin", regions: ["galapagos"] },
     { text: "A hammerhead's silhouette sweeps past in the distance, its wide head unmistakable even this far off.", creature: "shark:hammerhead", biomes: ["tropical","pelagic"] },
-    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and vast, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] }
+    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and vast, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] },
+    { text: "A sea otter rolls past on its back, paws tucked, utterly at home in the kelp.", creature: "otter", biomes: ["kelp"] },
+    { text: "A narwhal glides through the cold green water, its long tusk leading the way.", creature: "narwhal", biomes: ["polar"] },
+    { text: "A beluga drifts past, pale and slow, with no dorsal fin to break its outline.", creature: "beluga", biomes: ["polar"] },
+    { text: "A banded sea snake ripples past, flat tail paddling, paying you no mind.", creature: "snake", regions: ["philippines","papua-new-guinea","maldives"] },
+    { text: "A manatee lumbers past, slow and whiskered, grazing as it goes.", creature: "manatee", regions: ["caribbean"] },
+    { text: "A school of tuna powers past, silver and fast, gone in a heartbeat.", creature: "tuna", biomes: ["pelagic"] },
+    { text: "A gannet arrow-dives past, wings folded, a white flash heading down.", creature: "gannet", regions: ["north-carolina","cornwall","open-atlantic","east-australia"] },
+    { text: "A great white's silhouette passes far off, huge and unhurried, too distant to follow.", creature: "shark:greatwhite", biomes: ["tropical","temperate","pelagic"] },
+    { text: "A mako's silhouette streaks past in the distance, too fast and too far to follow.", creature: "shark:mako", biomes: ["tropical","temperate","pelagic"] },
+    { text: "A thresher's silhouette sweeps by far off, its long tail trailing behind it, too distant to follow.", creature: "shark:thresher", biomes: ["tropical","temperate","pelagic"] }
   ],
   reef: [
     { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle", biomes: ["tropical","volcanic"] },
@@ -696,27 +763,48 @@ const SIGHTINGS = {
     { text: "A vast school of mackerel wheels overhead, a living cloud flashing silver.", creature: "fish", biomes: ["pelagic"] },
     { text: "A squid pulses through the blue, arms trailing, hunting in the open water.", creature: "fish", biomes: ["pelagic"] },
     { text: "A moon jelly drifts past in the open blue, pulsing gently.", creature: "jellyfish", biomes: ["pelagic"] },
-    { text: "A tiger shark's silhouette crosses the drop-off far below, too distant to follow.", creature: "shark:tiger", biomes: ["tropical"] }
+    { text: "A tiger shark's silhouette crosses the drop-off far below, too distant to follow.", creature: "shark:tiger", biomes: ["tropical"] },
+    { text: "A moray eel peers from a coral crack, mouth opening and closing, then slides back in.", creature: "moray", biomes: ["tropical"] },
+    { text: "A seahorse clings to a coral branch, tail curled tight, swaying with the water.", creature: "seahorse", biomes: ["tropical","temperate"] },
+    { text: "A clownfish darts among the anemone tentacles, orange bars flashing, then ducks back in.", creature: "clownfish", biomes: ["tropical"] },
+    { text: "A parrotfish crunches coral with its beak mouth, trailing a puff of sand behind it.", creature: "parrotfish", biomes: ["tropical"] },
+    { text: "A pufferfish hovers over the reef, round and spiky, fins fluttering to hold still.", creature: "pufferfish", biomes: ["tropical","temperate"] },
+    { text: "A lionfish hovers over the reef, fins flared wide — beautiful, and a long way from home.", creature: "lionfish", biomes: ["tropical","temperate"] },
+    { text: "A giant clam gapes on the reef floor, its rippled mantle edged in colour.", creature: "clam", biomes: ["tropical"] },
+    { text: "A nudibranch crawls across the reef, bright gills waving like a tiny flag.", creature: "nudibranch", biomes: ["tropical","temperate","kelp","polar"] }
   ],
   twilight: [
     { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A hatchetfish flickers past, deep-bodied and silver, its belly lights blinking.", creature: "hatchetfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A gulper eel drifts by, huge mouth first, its long tail trailing into the dark.", creature: "gulper", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A vampire squid pulses past, dark cape of webbed arms trailing behind it.", creature: "vampire", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A siphonophore drifts past, a long chain of bells and threads, longer than you are.", creature: "siphonophore", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A cloud of krill swarms past, thousands of tiny bodies moving as one.", creature: "krill", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A viperfish hangs in the dark, fangs bared, its lure swaying ahead of it.", creature: "viperfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ],
   deep: [
     { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
-    { text: "An anglerfish drifts through the edge of the lights, its lure glowing faintly ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
+    { text: "An anglerfish drifts through the edge of the lights, its lure glowing faintly ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A tripod fish stands on the mud on three long fins, still as a statue.", creature: "tripod", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A giant isopod lumbers across the seafloor, armoured and unhurried.", creature: "isopod", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A yeti crab picks at the mud, its hairy arms waving, pale in the lights.", creature: "yeti", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A snailfish drifts past, soft and tadpole-shaped, unbothered by the dark.", creature: "snailfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A cusk eel slides through the mud, long and plain, tail tapering away.", creature: "cusk", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A sea cucumber inches across the seafloor, feeding tentacles waving.", creature: "cucumber", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A goblin shark's silhouette drifts through the dark below, too deep and too far to follow.", creature: "shark:goblin", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ]
 };
 
 /* v0.13.0: the sighting deck is filtered against the region note so the
    trip doesn't echo it — the Caribbean note already mentions a green sea
    turtle, Japan's a lanternfish, the Maldives' dolphins. */
-const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly", penguin: "penguin", anglerfish: "angler", mola: "mola" };
+const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly", penguin: "penguin", anglerfish: "angler", mola: "mola", moray: "moray", seahorse: "seahorse", clownfish: "clownfish", parrotfish: "parrotfish", pufferfish: "pufferfish", lionfish: "lionfish", clam: "clam", nudibranch: "nudibranch", hatchetfish: "hatchetfish", gulper: "gulper", vampire: "vampire", siphonophore: "siphonophore", krill: "krill", viperfish: "viperfish", tripod: "tripod", isopod: "isopod", yeti: "yeti", snailfish: "snailfish", cusk: "cusk", cucumber: "cucumber", otter: "otter", narwhal: "narwhal", beluga: "beluga", snake: "snake", manatee: "manatee", tuna: "tuna" };
 /* v2.7.4-beta: sighting-deck weighting — fish sightings surface most
    often, dolphins and turtles a bit less, everything else rarer. The deck
    still deals each sighting at most once per trip; weighting only orders
@@ -2484,12 +2572,16 @@ const REGION_BIOME = {
    common), mola rare in warm and open water. Penguins are NOT here: they
    are region-specific (South Africa + Galápagos only) and join the drift
    via the region override in startAmbientLife. */
+/* v2.7.5-beta: batch-2 drift additions — reef/twilight/deep creatures join
+   their biome lists; surface visitors join theirs (otter to kelp =
+   California only; narwhal/beluga to polar = Arctic only; tuna to
+   pelagic). Fish stays tripled everywhere, still the most common. */
 const BIOME_CREATURES = {
-  "tropical":  ["fish", "fish", "fish", "turtle", "dolphin", "ray", "mola"],
-  "temperate": ["fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola"],
-  "kelp":      ["fish", "fish", "fish", "seal", "dolphin"],
-  "pelagic":   ["fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola"],
-  "polar":     ["fish", "fish", "fish", "seal", "jellyfish"],
+  "tropical":  ["fish", "fish", "fish", "turtle", "dolphin", "ray", "mola", "moray", "clownfish", "parrotfish", "pufferfish", "lionfish", "clam", "nudibranch"],
+  "temperate": ["fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola", "seahorse", "pufferfish", "lionfish", "nudibranch"],
+  "kelp":      ["fish", "fish", "fish", "seal", "dolphin", "otter", "nudibranch"],
+  "pelagic":   ["fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola", "tuna"],
+  "polar":     ["fish", "fish", "fish", "seal", "jellyfish", "narwhal", "beluga", "nudibranch"],
   "volcanic":  ["fish", "fish", "fish", "turtle", "ray", "seal"]
 };
 /* v2.5.0-beta: hand-painted expedition backgrounds (Avery + Mira).
@@ -2568,8 +2660,8 @@ function startAmbientLife(depth, region) {
   const biome = REGION_BIOME[region] || "temperate";
   const shallow = depth === "surface" || depth === "reef";
   let creatures;
-  if (depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish"];
-  else if (!shallow) creatures = ["fish", "fish", "jellyfish"];
+  if (depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish", "tripod", "isopod", "yeti", "snailfish", "cusk", "cucumber"];
+  else if (!shallow) creatures = ["fish", "fish", "jellyfish", "hatchetfish", "gulper", "vampire", "siphonophore", "krill", "viperfish"];
   else creatures = (BIOME_CREATURES[biome] || ["fish", "fish", "fish", "turtle", "dolphin"]).slice();
   /* v2.7.4-beta: penguins drift only where they live — South Africa and
      the Galápagos — never in the Arctic or other temperate waters. */
