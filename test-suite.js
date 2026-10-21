@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.1-beta', VERSION === 'v2.7.1-beta');
+  ok('version v2.7.2-beta', VERSION === 'v2.7.2-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5070,8 +5070,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       TOUR_SLIDES.every(function(s) { return s.icon && s.title && s.text.length > 40; }));
     ok("tour markup and styles shipped",
       htmlCode.indexOf('id="tourOverlay"') !== -1 && htmlCode.indexOf('id="tourBtn"') !== -1 &&
-      htmlCode.indexOf('id="tourArrow"') !== -1 &&
-      cssCode.indexOf(".tour-arrow") !== -1 && cssCode.indexOf(".tab.tour-spot") !== -1);
+      htmlCode.indexOf('id="tourTabArrow"') !== -1 &&
+      cssCode.indexOf(".tour-tab-arrow") !== -1 && cssCode.indexOf(".tab.tour-spot") !== -1);
     // Behaviour: open on slide 1, walk to the end, close.
     openTour();
     ok("openTour shows the welcome slide",
@@ -5096,7 +5096,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       tourSeen() === true && localStorage.getItem("tyi-tour-seen") === "1");
     ok("reset forgets the tour too (it replays for a fresh game)",
       RESET_KEYS.indexOf("tyi-tour-seen") !== -1);
-    ok("tour shows only when unseen and the header button replays it (source)",
+    ok("tour shows only when unseen and the footer ? button replays it (source)",
       fileCode.indexOf("if (tourShouldAutoOpen()) openTour();") !== -1 &&
       fileCode.indexOf('$("tourBtn").addEventListener("click", openTour);') !== -1 &&
       fileCode.indexOf("function positionTour()") !== -1 &&
@@ -5765,6 +5765,51 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       } catch {}
     })();
   } catch (e) { ok("v2.7.1 imported-save integration block (" + e.message + ")", false); }
+  /* ---------- v2.7.2: parked tour card, tab arrow, ? button moved ---------- */
+  try {
+    ok("tour card parks: same left and width on the welcome slide and the Research slide",
+      (() => {
+        openTour();
+        const left0 = $("tourOverlay").style.left, width0 = $("tourOverlay").style.width;
+        tourAdvance();
+        const parked = $("tourOverlay").style.left === left0 && $("tourOverlay").style.width === width0 &&
+          width0 === "680px" && left0 === "60px";
+        closeTour();
+        return parked;
+      })());
+    ok("yellow tab arrow hides on tab-less slides and shows on tab slides",
+      (() => {
+        openTour();
+        const hidden0 = $("tourTabArrow").style.opacity === "0";
+        tourAdvance();
+        const shown1 = $("tourTabArrow").style.opacity === "1";
+        closeTour();
+        const hiddenAfter = $("tourTabArrow").style.opacity === "0";
+        return hidden0 && shown1 && hiddenAfter;
+      })());
+    ok("in-card arrow is gone; the standalone tab arrow is a yellow triangle",
+      htmlCode.indexOf('id="tourTabArrow"') !== -1 && htmlCode.indexOf('id="tourArrow"') === -1 &&
+      cssCode.indexOf(".tour-tab-arrow") !== -1 &&
+      cssCode.indexOf("border-bottom: 18px solid var(--accent)") !== -1);
+    ok("? button lives in the footer by the save controls with a plain centred glyph",
+      htmlCode.indexOf('id="tourBtn"') > htmlCode.indexOf('id="exportBtn"') &&
+      htmlCode.indexOf('title="How to play">?</button>') !== -1 &&
+      (() => {
+        const s = cssCode.indexOf(".tour-btn {");
+        const block = cssCode.slice(s, s + 400);
+        return block.indexOf("display: inline-flex") !== -1 && block.indexOf("justify-content: center") !== -1;
+      })());
+    ok("nav row is pinned: card is a flex column, text scrolls inside it",
+      (() => {
+        const c = cssCode.indexOf(".tour-card {");
+        const card = cssCode.slice(c, c + 300);
+        const t = cssCode.indexOf(".tour-text {");
+        const text = cssCode.slice(t, t + 200);
+        return card.indexOf("flex-direction: column") !== -1 &&
+          text.indexOf("flex: 1") !== -1 && text.indexOf("overflow-y: auto") !== -1;
+      })());
+  } catch (e) { ok("v2.7.2 parked tour block (" + e.message + ")", false); }
+
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
   console.log(fails ? fails + ' FAILURES' : 'ALL TESTS PASS');

@@ -1835,20 +1835,24 @@ video.archive-media { max-height: 420px; }
   position: absolute; bottom: 0; left: 0; width: 100%; height: 60%;
 }
 
-/* ================= v2.6.0: the welcome tour =================
-   The card docks under the tab bar (JS positions it precisely; the
-   values here are pre-JS fallbacks). Its arrow is a rotated square
-   in the card's own colours, slid sideways to point at the tab the
-   current slide explains. The scrim starts below the tab bar so the
-   tabs stay bright; the explained tab gets the spotlight ring while
-   its neighbours dim. */
-.topbar { position: relative; }
+/* ================= v2.7.2: the welcome tour, parked =================
+   The card parks in one fixed spot under the tab bar for all ten
+   slides — same place, same size — so nothing jumps between slides.
+   A yellow triangle below the tab bar points at the tab the current
+   slide explains, and the explained tab keeps its spotlight ring
+   while its neighbours dim. The card is a fixed-height flex column:
+   the text scrolls inside it, so the Back/Skip/Next row sits in the
+   same place on every slide, even on short landscape screens. The
+   replay ? button lives in the footer by the save controls; it uses
+   a plain ? glyph (the ❓ emoji rendered small, red, and off-centre
+   in its circle) centred with flex. */
 .tour-btn {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  vertical-align: middle;
   width: 46px; height: 46px; border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, .35);
   background: rgba(10, 42, 67, .55); color: var(--ink);
-  font-size: 20px; line-height: 1; cursor: pointer;
+  font-size: 22px; font-weight: 700; line-height: 1; cursor: pointer;
 }
 .tour-scrim {
   position: fixed; left: 0; right: 0; bottom: 0; top: 140px;
@@ -1856,22 +1860,21 @@ video.archive-media { max-height: 420px; }
 }
 .tour-overlay {
   position: fixed; z-index: 61; top: 150px; left: 8px;
-  width: min(560px, 94vw);
-  /* v2.6.0 (Mira review): the card must stay reachable on short
-     landscape viewports — scroll inside it rather than spilling the
-     Back/Skip/Next row off-screen. JS tightens this to the exact
-     space below the tab bar; this is the pre-JS fallback. */
+  width: min(680px, 94vw);
+  /* Pre-JS fallback: JS sizes the card precisely on open. */
   max-height: calc(100dvh - 12px - env(safe-area-inset-bottom));
   overflow-y: auto;
 }
-.tour-arrow {
-  position: absolute; top: -10px; left: 40px; width: 20px; height: 20px;
-  background: #0d2f4d; transform: rotate(45deg);
-  border-left: 2px solid var(--accent); border-top: 2px solid var(--accent);
-  transition: left .25s ease, opacity .2s ease; z-index: 1;
+.tour-tab-arrow {
+  position: fixed; z-index: 62; top: 0; left: 0;
+  width: 0; height: 0; pointer-events: none;
+  border-left: 14px solid transparent; border-right: 14px solid transparent;
+  border-bottom: 18px solid var(--accent);
+  transition: left .25s ease, opacity .2s ease;
 }
 .tour-card {
   position: relative; box-sizing: border-box;
+  display: flex; flex-direction: column; height: 100%;
   background: #0d2f4d; color: var(--ink);
   border: 2px solid var(--accent); border-radius: 14px;
   padding: 16px 18px 14px;
@@ -1881,8 +1884,8 @@ video.archive-media { max-height: 420px; }
 .tour-icon { font-size: 26px; }
 .tour-head h3 { margin: 0; font-size: 21px; flex: 1; }
 .tour-count { font-size: 13px; opacity: .75; white-space: nowrap; }
-.tour-text { margin: 8px 0 14px; font-size: 16.5px; line-height: 1.45; }
-.tour-nav { display: flex; align-items: center; gap: 10px; }
+.tour-text { margin: 8px 0 14px; font-size: 16.5px; line-height: 1.45; flex: 1; min-height: 0; overflow-y: auto; }
+.tour-nav { display: flex; align-items: center; gap: 10px; flex: none; }
 .tour-dots { flex: 1; text-align: center; }
 .tour-dot {
   display: inline-block; width: 8px; height: 8px; border-radius: 50%;
@@ -1903,7 +1906,7 @@ video.archive-media { max-height: 420px; }
   box-shadow: 0 0 18px rgba(255, 209, 102, .55);
 }
 @media (prefers-reduced-motion: reduce) {
-  .tour-arrow { transition: none; }
+  .tour-tab-arrow { transition: none; }
 }
 /* v2.6.0 (Mira review): on narrow phones the nav row holds three
    buttons AND ten dots — hide the dots and slim the buttons so
