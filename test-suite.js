@@ -5858,10 +5858,10 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("weighted shuffle is a permutation (no entry lost or duplicated)",
       wsOut.length === 3 && wsOut.slice().sort(function(a, b) { return a.creature < b.creature ? -1 : 1; }).map(function(s) { return s.creature; }).join(",") === "fish,mola,turtle");
     const fishCount = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
-    ok("drift weighting: fish tripled in every biome list",
-      fishCount(BIOME_CREATURES.tropical) === 3 && fishCount(BIOME_CREATURES.temperate) === 3 &&
-      fishCount(BIOME_CREATURES.kelp) === 3 && fishCount(BIOME_CREATURES.pelagic) === 3 &&
-      fishCount(BIOME_CREATURES.polar) === 3 && fishCount(BIOME_CREATURES.volcanic) === 3);
+    ok("drift weighting: fish fivefold in every biome list",
+      fishCount(BIOME_CREATURES.tropical) === 5 && fishCount(BIOME_CREATURES.temperate) === 5 &&
+      fishCount(BIOME_CREATURES.kelp) === 5 && fishCount(BIOME_CREATURES.pelagic) === 5 &&
+      fishCount(BIOME_CREATURES.polar) === 5 && fishCount(BIOME_CREATURES.volcanic) === 5);
     ok("ambient spawns handle shark silhouettes + travel both ways (source)",
       fileCode.indexOf('type.indexOf("shark:")') !== -1 &&
       fileCode.indexOf('class="shark-shadow"') !== -1 &&
@@ -5906,10 +5906,10 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       hasC(buildSightingDeck("surface", "caribbean").pool, "shark:thresher") &&
       !hasC(buildSightingDeck("reef", "caribbean").pool, "shark:greatwhite"));
     const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
-    ok("drift weighting holds: fish still tripled in every biome list",
-      fishN(BIOME_CREATURES.tropical) === 3 && fishN(BIOME_CREATURES.temperate) === 3 &&
-      fishN(BIOME_CREATURES.kelp) === 3 && fishN(BIOME_CREATURES.pelagic) === 3 &&
-      fishN(BIOME_CREATURES.polar) === 3 && fishN(BIOME_CREATURES.volcanic) === 3);
+    ok("drift weighting holds: fish boosted to five in every biome list",
+      fishN(BIOME_CREATURES.tropical) === 5 && fishN(BIOME_CREATURES.temperate) === 5 &&
+      fishN(BIOME_CREATURES.kelp) === 5 && fishN(BIOME_CREATURES.pelagic) === 5 &&
+      fishN(BIOME_CREATURES.polar) === 5 && fishN(BIOME_CREATURES.volcanic) === 5);
   } catch (e) { ok("v2.7.5 ambient batch 2 block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));

@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.5-beta": [
-"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, clownfish, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, gannets in the North Atlantic and Australia. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep.",
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, clownfish, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, gannets in the North Atlantic and Australia. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters.",
   ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
@@ -2549,7 +2549,7 @@ const REGION_BIOME = {
   "galapagos": "volcanic"
 };
 /* Region-appropriate ambient creatures (keys into CREATURE_ART). */
-/* v2.7.4-beta: drift weighting by duplication — fish tripled everywhere
+/* v2.7.4-beta: drift weighting by duplication — fish fivefold in shallow lists (bumped from tripled in v2.7.5, Avery)
    (most common in most places), dolphins/turtles single (a bit less
    common), mola rare in warm and open water. Penguins are NOT here: they
    are region-specific (South Africa + Galápagos only) and join the drift
@@ -2558,14 +2558,14 @@ const REGION_BIOME = {
    v2.7.5-beta: batch-2 drift additions — reef/twilight/deep creatures join
    their biome lists; surface visitors join theirs (otter to kelp =
    California only; narwhal/beluga to polar = Arctic only; tuna to
-   pelagic). Fish stays tripled everywhere, still the most common. */
+   pelagic). Fish boosted to five in every shallow list (v2.7.5, Avery), still the most common. */
 const BIOME_CREATURES = {
-  "tropical":  ["fish", "fish", "fish", "turtle", "dolphin", "ray", "mola", "moray", "clownfish", "parrotfish", "pufferfish", "lionfish"],
-  "temperate": ["fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola", "seahorse", "pufferfish", "lionfish"],
-  "kelp":      ["fish", "fish", "fish", "seal", "dolphin", "otter"],
-  "pelagic":   ["fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola", "tuna"],
-  "polar":     ["fish", "fish", "fish", "seal", "jellyfish", "narwhal", "beluga"],
-  "volcanic":  ["fish", "fish", "fish", "turtle", "ray", "seal"]
+  "tropical":  ["fish", "fish", "fish", "fish", "fish", "turtle", "dolphin", "ray", "mola", "moray", "clownfish", "parrotfish", "pufferfish", "lionfish"],
+  "temperate": ["fish", "fish", "fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola", "seahorse", "pufferfish", "lionfish"],
+  "kelp":      ["fish", "fish", "fish", "fish", "fish", "seal", "dolphin", "otter"],
+  "pelagic":   ["fish", "fish", "fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola", "tuna"],
+  "polar":     ["fish", "fish", "fish", "fish", "fish", "seal", "jellyfish", "narwhal", "beluga"],
+  "volcanic":  ["fish", "fish", "fish", "fish", "fish", "turtle", "ray", "seal"]
 };
 /* v2.5.0-beta: hand-painted expedition backgrounds (Avery + Mira).
    13 images covering all 52 region×depth combinations. Surface uses BG-01..06,
