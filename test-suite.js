@@ -5845,6 +5845,14 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("sighting weights: fish 3, dolphin + turtle 2, everything else 1",
       CREATURE_WEIGHT.fish === 3 && CREATURE_WEIGHT.dolphin === 2 && CREATURE_WEIGHT.turtle === 2 &&
       sightingWeight({ creature: "shark:hammerhead" }) === 1 && sightingWeight({ creature: "penguin" }) === 1);
+    const realRandom = Math.random;
+    try {
+      const seq = [0.99, 0.01, 0.5]; let ri = 0;
+      Math.random = function() { return seq[ri++ % seq.length]; };
+      const firstDealt = weightedSightingShuffle([{ creature: "fish" }, { creature: "turtle" }, { creature: "mola" }]).pop();
+      ok("weighted deck deals the fish-biased entry first (stubbed random, pop consumption)",
+        firstDealt && firstDealt.creature === "fish");
+    } finally { Math.random = realRandom; }
     const wsIn = [{ creature: "fish" }, { creature: "turtle" }, { creature: "mola" }];
     const wsOut = weightedSightingShuffle(wsIn);
     ok("weighted shuffle is a permutation (no entry lost or duplicated)",
@@ -5858,7 +5866,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       fileCode.indexOf('type.indexOf("shark:")') !== -1 &&
       fileCode.indexOf('class="shark-shadow"') !== -1 &&
       fileCode.indexOf('scaleX(-1)') !== -1 && fileCode.indexOf('swim-left') !== -1 &&
-      cssCode.indexOf('.ambient .shark-shadow') !== -1);
+      cssCode.indexOf('.dive-scene .ambient .shark-shadow img') !== -1);
   } catch (e) { ok("v2.7.4 ambient batch block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));

@@ -1198,6 +1198,13 @@ select option:disabled { color: #7a8a9e; }
    darkened art sizes like the WebP sprites (the .shark-shadow SVG's fixed
    220x110 would otherwise fight the slot height). */
 .ambient .shark-shadow { height: 100%; }
+/* v2.7.4-fix (Mira review): the plain .shark-shadow filter lost to the
+   depth rules (.depth-surface/.depth-shallow .ambient img and
+   .depth-midwater/.depth-deep .ambient svg), leaving dimmed full-colour
+   art in the shallows instead of a true silhouette. This
+   higher-specificity rule restores the uniformly dark shadow on every
+   depth, for the WebP img and the fallback SVG alike. */
+.dive-scene .ambient .shark-shadow img, .dive-scene .ambient .shark-shadow svg { filter: brightness(0); }
 /* v0.26.1: ambient creatures swim both ways — .swim-left reverses the drift
    so creatures can travel right-to-left, facing their direction of travel. */
 .ambient.swim-left { animation-name: driftLeft; }

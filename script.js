@@ -680,7 +680,7 @@ const SIGHTINGS = {
     { text: "An African penguin torpedoes past in a burst of bubbles, impossibly fast for a bird.", creature: "penguin", regions: ["south-africa"] },
     { text: "A Galápagos penguin darts past, tiny and quick, gone before you can point.", creature: "penguin", regions: ["galapagos"] },
     { text: "A hammerhead's silhouette sweeps past in the distance, its wide head unmistakable even this far off.", creature: "shark:hammerhead", biomes: ["tropical","pelagic"] },
-    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and spotted, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] }
+    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and vast, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] }
   ],
   reef: [
     { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle", biomes: ["tropical","volcanic"] },
@@ -722,7 +722,10 @@ const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", 
    often, dolphins and turtles a bit less, everything else rarer. The deck
    still deals each sighting at most once per trip; weighting only orders
    the shuffle, so common creatures land earlier in the trip. Shark
-   silhouettes ("shark:<id>") weigh 1, like all other rarities. */
+   silhouettes ("shark:<id>") weigh 1, like all other rarities.
+   v2.7.4-fix (Mira review): the deck is consumed with pop(), so the sort
+   MUST be ascending — descending put the highest-weight-biased keys first
+   in the array, which pop() deals LAST, so rares were dealt first. */
 const CREATURE_WEIGHT = { fish: 3, dolphin: 2, turtle: 2 };
 function sightingWeight(entry) {
   const key = (entry.creature || "").split(":")[0];
@@ -730,7 +733,7 @@ function sightingWeight(entry) {
 }
 function weightedSightingShuffle(arr) {
   return arr.map(s => ({ s, k: Math.pow(Math.random(), 1 / sightingWeight(s)) }))
-    .sort((a, b) => b.k - a.k).map(o => o.s);
+    .sort((a, b) => a.k - b.k).map(o => o.s);
 }
 function buildSightingDeck(depth, region) {
   const pool = SIGHTINGS[depth] || [];
