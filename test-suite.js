@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.5.11-beta', VERSION === 'v2.5.11-beta');
+  ok('version v2.6.0-beta', VERSION === 'v2.6.0-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5059,6 +5059,97 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("background controller listens for the teardown notification (source)",
       fileCode.indexOf("addEventListener('tagalong:media-teardown', syncSunVideo)") !== -1);
   })();
+
+  /* ---------- v2.6.0: the welcome tour ---------- */
+  try {
+    ok("tour has 10 slides: welcome, one per tab in tab-bar order, closer",
+      TOUR_SLIDES.length === 10 &&
+      JSON.stringify(TOUR_SLIDES.map(function(s) { return s.tab; })) ===
+        JSON.stringify([null, "research", "expedition", "collection", "map", "logbook", "phone", "archive", "achievements", null]));
+    ok("every tour slide carries an icon, title and real copy",
+      TOUR_SLIDES.every(function(s) { return s.icon && s.title && s.text.length > 40; }));
+    ok("tour markup and styles shipped",
+      htmlCode.indexOf('id="tourOverlay"') !== -1 && htmlCode.indexOf('id="tourBtn"') !== -1 &&
+      htmlCode.indexOf('id="tourArrow"') !== -1 &&
+      cssCode.indexOf(".tour-arrow") !== -1 && cssCode.indexOf(".tab.tour-spot") !== -1);
+    // Behaviour: open on slide 1, walk to the end, close.
+    openTour();
+    ok("openTour shows the welcome slide",
+      !$("tourOverlay").classList.contains("hidden") &&
+      $("tourTitle").textContent === "Welcome to Tag Along!" &&
+      $("tourCount").textContent === "1 of 10" &&
+      $("tourBack").disabled === true);
+    tourAdvance();
+    ok("advancing lands on Research with Next offered",
+      tourIdx === 1 && $("tourTitle").textContent === "Research" &&
+      $("tourNext").textContent === "Next →" && $("tourBack").disabled === false);
+    for (let ti = 0; ti < 8; ti++) tourAdvance();
+    ok("the last slide offers Start playing and hides Skip",
+      tourIdx === 9 && $("tourNext").textContent === "Start playing 🦈" &&
+      $("tourSkip").classList.contains("hidden"));
+    tourBack();
+    ok("Back from the closer returns to Achievements",
+      tourIdx === 8 && $("tourTitle").textContent === "Achievements");
+    tourAdvance(); tourAdvance(); // closer, then Start playing = close
+    ok("finishing the tour closes it and remembers it was seen",
+      tourOpenNow === false && $("tourOverlay").classList.contains("hidden") &&
+      tourSeen() === true && localStorage.getItem("tyi-tour-seen") === "1");
+    ok("reset forgets the tour too (it replays for a fresh game)",
+      RESET_KEYS.indexOf("tyi-tour-seen") !== -1);
+    ok("tour shows only when unseen and the header button replays it (source)",
+      fileCode.indexOf("if (tourShouldAutoOpen()) openTour();") !== -1 &&
+      fileCode.indexOf('$("tourBtn").addEventListener("click", openTour);') !== -1 &&
+      fileCode.indexOf("function positionTour()") !== -1 &&
+      fileCode.indexOf("getBoundingClientRect") !== -1);
+  } catch (e) { ok("v2.6.0 welcome tour block (" + e.message + ")", false); }
+
+  /* ---------- v2.6.0: Mira review fixes ---------- */
+  try {
+    ok("welcome copy no longer overpromises; it names the real science precisely",
+      TOUR_SLIDES[0].text.indexOf("every fact in this game is real science") === -1 &&
+      TOUR_SLIDES[0].text.indexOf("Inspired by real shark biology and conservation research") !== -1);
+    // The gate: new profiles tour, returning profiles never do — and a
+    // seen tour never re-offers, whatever the save state.
+    localStorage.removeItem("tyi-tour-seen");
+    ok("auto-tour gate: new profile tours, existing profile does not",
+      tourShouldAutoOpen(false) === true && tourShouldAutoOpen(true) === false);
+    markTourSeen();
+    ok("auto-tour gate: a seen tour never re-offers",
+      tourShouldAutoOpen(false) === false);
+    ok("tour dialog is truly modal in markup",
+      htmlCode.indexOf('id="tourOverlay" class="tour-overlay hidden" role="dialog" aria-modal="true"') !== -1);
+    const tourCssStart = cssCode.indexOf(".tour-overlay {");
+    const tourCss = cssCode.slice(tourCssStart, tourCssStart + 500);
+    ok("tour card scrolls inside short viewports instead of spilling controls off-screen",
+      tourCss.indexOf("overflow-y: auto") !== -1 && tourCss.indexOf("max-height") !== -1);
+    ok("narrow phones keep the nav row usable: dots hide, the count stays",
+      cssCode.indexOf("@media (max-width: 480px)") !== -1 &&
+      cssCode.indexOf(".tour-dots { display: none; }") !== -1);
+    ok("spotlighted tabs can't navigate while the tour is open (source)",
+      fileCode.indexOf("if (tourOpenNow) return;") !== -1);
+    // Focus trap + restore, with stubbed focus targets.
+    const oAE = document.activeElement;
+    let prevented = 0;
+    const tabEv = function(shift) { return { key: "Tab", shiftKey: shift, preventDefault: function() { prevented++; } }; };
+    openTour();
+    const skipBtn = $("tourSkip"), nextBtn = $("tourNext");
+    let skipFocused = 0, nextFocused = 0;
+    const oSkipFocus = skipBtn.focus, oNextFocus = nextBtn.focus;
+    skipBtn.focus = function() { skipFocused++; };
+    nextBtn.focus = function() { nextFocused++; };
+    document.activeElement = nextBtn;
+    tourTrapFocus(tabEv(false));
+    ok("focus trap: Tab from the last tour button cycles to the first",
+      prevented === 1 && skipFocused === 1);
+    document.activeElement = skipBtn;
+    tourTrapFocus(tabEv(true));
+    ok("focus trap: Shift+Tab from the first cycles to the last",
+      prevented === 2 && nextFocused === 1);
+    document.activeElement = oAE;
+    skipBtn.focus = oSkipFocus; nextBtn.focus = oNextFocus;
+    closeTour();
+    ok("tour closed cleanly after focus tests", tourOpenNow === false);
+  } catch (e) { ok("v2.6.0 Mira review fixes block (" + e.message + ")", false); }
   /* v1.8.0-beta: second semantic sweep — rewrites for repeats the
      word-overlap check missed. Guards the specific fixes. */
   ok('v1.8.0 second sweep: rewritten insights present',
