@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.2-beta";
+const VERSION = "v2.7.4-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.4-beta": [
+"🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the twilight and deep, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
+  ],
   "v2.7.2-beta": [
 "🗺️ <strong>The welcome tour stays put.</strong> The tour card now parks in one fixed spot for all ten slides instead of jumping to each tab — and a yellow arrow below the tab bar points at the tab each slide explains. The Back, Skip, and Next buttons stay in the same place throughout, and the card itself is a little bigger.",
 "🔁 <strong>The replay button moved.</strong> The ? button that reopens the tour now lives at the bottom of the page, beside Export and Import save — and the ? sits properly centred in its circle.",
@@ -603,7 +606,10 @@ const CREATURE_ART = {
   dolphin: null,
   ray: null,
   seal: null,
-  jellyfish: null
+  jellyfish: null,
+  anglerfish: null,
+  penguin: null,
+  mola: null
 };
 /* Filled in at load: art-loader.js must be loaded before script.js. */
 function initCreatureArt() {
@@ -613,6 +619,9 @@ function initCreatureArt() {
   CREATURE_ART.ray = bgCreatureImg("bg-ray", "Ray");
   CREATURE_ART.seal = bgCreatureImg("bg-seal", "Seal");
   CREATURE_ART.jellyfish = bgCreatureImg("bg-jellyfish", "Jellyfish");
+  CREATURE_ART.anglerfish = bgCreatureImg("bg-anglerfish", "Anglerfish");
+  CREATURE_ART.penguin = bgCreatureImg("bg-penguin", "Penguin");
+  CREATURE_ART.mola = bgCreatureImg("bg-mola", "Sunfish");
 }
 
 /* Flavour: the dive log describes the place, not just the mechanics.
@@ -666,7 +675,12 @@ const SIGHTINGS = {
     { text: "A seal torpedoes past, sleek and curious, then vanishes into the blue.", creature: "seal", biomes: ["temperate","kelp","polar","volcanic"] },
     { text: "A manta ray breaches in the distance — a slow black wingspan against the sky, then gone.", creature: "ray", biomes: ["tropical","pelagic"] },
     { text: "A loggerhead turtle surfaces to breathe, exhales with a sound like a sigh, and dives.", creature: "turtle", biomes: ["tropical","temperate"] },
-    { text: "A pod of spotted dolphins hunts in formation, herding a bait ball into a glittering panic.", creature: "dolphin", biomes: ["tropical","pelagic"] }
+    { text: "A pod of spotted dolphins hunts in formation, herding a bait ball into a glittering panic.", creature: "dolphin", biomes: ["tropical","pelagic"] },
+    { text: "A sunfish the size of a door basks at the surface, tilting slowly in the sun.", creature: "mola", biomes: ["tropical","temperate","pelagic"] },
+    { text: "An African penguin torpedoes past in a burst of bubbles, impossibly fast for a bird.", creature: "penguin", regions: ["south-africa"] },
+    { text: "A Galápagos penguin darts past, tiny and quick, gone before you can point.", creature: "penguin", regions: ["galapagos"] },
+    { text: "A hammerhead's silhouette sweeps past in the distance, its wide head unmistakable even this far off.", creature: "shark:hammerhead", biomes: ["tropical","pelagic"] },
+    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and spotted, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] }
   ],
   reef: [
     { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle", biomes: ["tropical","volcanic"] },
@@ -681,26 +695,43 @@ const SIGHTINGS = {
     { text: "Cold water, low light — a school of small silver fish holds station over the rocky reef.", creature: "fish", biomes: ["temperate","polar","kelp"] },
     { text: "A vast school of mackerel wheels overhead, a living cloud flashing silver.", creature: "fish", biomes: ["pelagic"] },
     { text: "A squid pulses through the blue, arms trailing, hunting in the open water.", creature: "fish", biomes: ["pelagic"] },
-    { text: "A moon jelly drifts past in the open blue, pulsing gently.", creature: "jellyfish", biomes: ["pelagic"] }
+    { text: "A moon jelly drifts past in the open blue, pulsing gently.", creature: "jellyfish", biomes: ["pelagic"] },
+    { text: "A tiger shark's silhouette crosses the drop-off far below, too distant to follow.", creature: "shark:tiger", biomes: ["tropical"] }
   ],
   twilight: [
     { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
-    { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
+    { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A small anglerfish hangs motionless in the dark, its lure glowing faintly like a dropped star.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ],
   deep: [
     { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
-    { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
+    { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "An anglerfish drifts through the edge of the lights, lure swaying ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ]
 };
 
 /* v0.13.0: the sighting deck is filtered against the region note so the
    trip doesn't echo it — the Caribbean note already mentions a green sea
    turtle, Japan's a lanternfish, the Maldives' dolphins. */
-const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly" };
+const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly", penguin: "penguin", anglerfish: "angler", mola: "mola" };
+/* v2.7.4-beta: sighting-deck weighting — fish sightings surface most
+   often, dolphins and turtles a bit less, everything else rarer. The deck
+   still deals each sighting at most once per trip; weighting only orders
+   the shuffle, so common creatures land earlier in the trip. Shark
+   silhouettes ("shark:<id>") weigh 1, like all other rarities. */
+const CREATURE_WEIGHT = { fish: 3, dolphin: 2, turtle: 2 };
+function sightingWeight(entry) {
+  const key = (entry.creature || "").split(":")[0];
+  return CREATURE_WEIGHT[key] || 1;
+}
+function weightedSightingShuffle(arr) {
+  return arr.map(s => ({ s, k: Math.pow(Math.random(), 1 / sightingWeight(s)) }))
+    .sort((a, b) => b.k - a.k).map(o => o.s);
+}
 function buildSightingDeck(depth, region) {
   const pool = SIGHTINGS[depth] || [];
   const note = ((REGIONS[region] && REGIONS[region].note) || "").toLowerCase();
@@ -710,11 +741,12 @@ function buildSightingDeck(depth, region) {
   const biome = REGION_BIOME[region] || "temperate";
   const filtered = pool.filter(s =>
     !note.includes(SIGHTING_KEYWORDS[s.creature]) &&
-    (!s.biomes || s.biomes.indexOf(biome) !== -1)
+    (!s.biomes || s.biomes.indexOf(biome) !== -1) &&
+    (!s.regions || s.regions.indexOf(region) !== -1)
   );
   const use = filtered.length ? filtered : pool.filter(s => s.creature === "fish");
   const final = use.length ? use : pool;
-  return { deck: shuffled(final), pool: final };
+  return { deck: weightedSightingShuffle(final), pool: final };
 }
 
 /* Rare, quiet easter eggs in the flavour. Real phenomena, mentioned in passing.
@@ -2445,13 +2477,18 @@ const REGION_BIOME = {
   "galapagos": "volcanic"
 };
 /* Region-appropriate ambient creatures (keys into CREATURE_ART). */
+/* v2.7.4-beta: drift weighting by duplication — fish tripled everywhere
+   (most common in most places), dolphins/turtles single (a bit less
+   common), mola rare in warm and open water. Penguins are NOT here: they
+   are region-specific (South Africa + Galápagos only) and join the drift
+   via the region override in startAmbientLife. */
 const BIOME_CREATURES = {
-  "tropical":  ["fish", "fish", "turtle", "dolphin", "ray"],
-  "temperate": ["fish", "fish", "seal", "dolphin", "jellyfish"],
-  "kelp":      ["fish", "fish", "seal", "dolphin"],
-  "pelagic":   ["fish", "dolphin", "jellyfish", "ray"],
-  "polar":     ["seal", "fish", "fish", "jellyfish"],
-  "volcanic":  ["turtle", "fish", "ray", "seal"]
+  "tropical":  ["fish", "fish", "fish", "turtle", "dolphin", "ray", "mola"],
+  "temperate": ["fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola"],
+  "kelp":      ["fish", "fish", "fish", "seal", "dolphin"],
+  "pelagic":   ["fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola"],
+  "polar":     ["fish", "fish", "fish", "seal", "jellyfish"],
+  "volcanic":  ["fish", "fish", "fish", "turtle", "ray", "seal"]
 };
 /* v2.5.0-beta: hand-painted expedition backgrounds (Avery + Mira).
    13 images covering all 52 region×depth combinations. Surface uses BG-01..06,
@@ -2528,11 +2565,13 @@ function startAmbientLife(depth, region) {
      Mira review: twilight/deep use deep-appropriate creatures, not shallow biome fauna. */
   const biome = REGION_BIOME[region] || "temperate";
   const shallow = depth === "surface" || depth === "reef";
-  const creatures = depth === "deep"
-    ? ["fish"]
-    : !shallow
-      ? ["fish", "jellyfish"]
-      : (BIOME_CREATURES[biome] || ["fish", "fish", "turtle", "dolphin"]);
+  let creatures;
+  if (depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish"];
+  else if (!shallow) creatures = ["fish", "fish", "jellyfish", "anglerfish"];
+  else creatures = (BIOME_CREATURES[biome] || ["fish", "fish", "fish", "turtle", "dolphin"]).slice();
+  /* v2.7.4-beta: penguins drift only where they live — South Africa and
+     the Galápagos — never in the Arctic or other temperate waters. */
+  if (shallow && (region === "south-africa" || region === "galapagos")) creatures.push("penguin");
   ambientTimer = setInterval(() => {
     if (document.hidden) return;
     if (Math.random() < 0.55) spawnCreature(pick(creatures), true);
@@ -2545,7 +2584,15 @@ function stopAmbientLife() {
 /* Ambient sea life + quiet easter-egg flavour during the dive. */
 function spawnCreature(type, background) {
   const scene = $("diveScene");
-  const art = CREATURE_ART[type];
+  let art = CREATURE_ART[type];
+  /* v2.7.4-beta: ambient shark silhouettes — existing shark art, darkened
+     with the same .shark-shadow treatment as the mystery silhouette, so
+     the shape always matches the species named in the sighting line.
+     They drift by uncatchably: the sighting text says distant/too far,
+     and nothing here creates an encounter. */
+  if (!art && typeof type === "string" && type.indexOf("shark:") === 0 && typeof sharkArtImg === "function") {
+    art = '<div class="shark-shadow">' + sharkArtImg(type.slice(6), "illustration", "Distant shark silhouette") + '</div>';
+  }
   if (!art) return;
   const el = document.createElement("div");
   el.className = "ambient" + (background ? " bg-fish" : "");

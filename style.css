@@ -1194,6 +1194,10 @@ select option:disabled { color: #7a8a9e; }
 .ambient img { height: 100%; width: auto; display: block; }
 .bg-creature-img { height: 100%; width: auto; }
 @keyframes drift { from { left: -30%; } to { left: 112%; } }
+/* v2.7.4-beta: ambient shark silhouettes fill the ambient slot, so the
+   darkened art sizes like the WebP sprites (the .shark-shadow SVG's fixed
+   220x110 would otherwise fight the slot height). */
+.ambient .shark-shadow { height: 100%; }
 /* v0.26.1: ambient creatures swim both ways — .swim-left reverses the drift
    so creatures can travel right-to-left, facing their direction of travel. */
 .ambient.swim-left { animation-name: driftLeft; }
