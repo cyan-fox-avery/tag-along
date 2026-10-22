@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.5-beta": [
-"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk.",
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed.",
   ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
@@ -753,7 +753,7 @@ const SIGHTINGS = {
     { text: "A moray eel slides past, long and sinuous, mouth opening and closing as it goes.", creature: "moray", biomes: ["tropical"] },
     { text: "A seahorse drifts past upright, tail curled tight, swaying with the water.", creature: "seahorse", biomes: ["tropical","temperate"] },
     { text: "A parrotfish crunches coral with its beak mouth, trailing a puff of sand behind it.", creature: "parrotfish", biomes: ["tropical"] },
-    { text: "A pufferfish hovers over the reef, round and spiky, fins fluttering to hold still.", creature: "pufferfish", biomes: ["tropical","temperate"] },
+    { text: "A pufferfish hovers over the reef, smooth and unhurried, fins fluttering to hold still.", creature: "pufferfish", biomes: ["tropical","temperate"] },
     { text: "A lionfish hovers over the reef, fins flared wide, beautiful and unbothered.", creature: "lionfish", biomes: ["tropical","temperate"] },
   ],
   twilight: [
@@ -2673,6 +2673,9 @@ function stopAmbientLife() {
 }
 
 /* Ambient sea life + quiet easter-egg flavour during the dive. */
+/* v2.7.5-fix (Avery): these shadows move at half speed — drifters and
+   loungers, not cruisers. Everything else keeps the usual 9-17s crossing. */
+const SLOW_CREATURES = ["jellyfish", "mola", "seahorse", "manatee", "snailfish", "siphonophore", "krill", "anglerfish"];
 function spawnCreature(type, background) {
   const scene = $("diveScene");
   let art = CREATURE_ART[type];
@@ -2689,7 +2692,11 @@ function spawnCreature(type, background) {
   el.className = "ambient" + (background ? " bg-fish" : "");
   el.innerHTML = art;
   el.style.top = (8 + Math.random() * 55) + "%";
-  el.style.animationDuration = (9 + Math.random() * 8).toFixed(1) + "s";
+  /* v2.7.5-fix (Avery): famously slow creatures cross at half speed —
+     their shadows linger instead of hurrying past like a fish. */
+  const slow = SLOW_CREATURES.indexOf(type) !== -1;
+  const dur = (9 + Math.random() * 8) * (slow ? 2 : 1);
+  el.style.animationDuration = dur.toFixed(1) + "s";
   el.style.height = background
     ? Math.round(10 + Math.random() * 8) + "px"
     : Math.round(24 + Math.random() * 26) + "px";
@@ -2704,7 +2711,7 @@ function spawnCreature(type, background) {
   }
   el.addEventListener("animationend", () => el.remove());
   scene.appendChild(el);
-  setTimeout(() => el.remove(), 25000); // safety net
+  setTimeout(() => el.remove(), slow ? 45000 : 25000); // safety net (slow crossings run 18-34s)
 }
 
 /* Guaranteed ambient life before the shark reveal: the scene must feel

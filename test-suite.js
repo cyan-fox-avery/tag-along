@@ -5926,6 +5926,24 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       surfaceDriftList("kelp").indexOf("otter") !== -1 &&
       surfaceDriftList("pelagic").indexOf("tuna") !== -1 &&
       surfaceDriftList("tropical").filter(function(c) { return c === "fish"; }).length === 5);
+    ok("slow shadows list covers the drifters and loungers, not the cruisers",
+      ["jellyfish","mola","seahorse","manatee","snailfish","siphonophore","krill","anglerfish"].every(function(c) { return SLOW_CREATURES.indexOf(c) !== -1; }) &&
+      ["fish","dolphin","turtle","tuna","shark:greatwhite"].every(function(c) { return SLOW_CREATURES.indexOf(c) === -1; }));
+    (function() {
+      const _ce = document.createElement;
+      const _st = setTimeout;
+      let lastEl = null, lastDelay = 0;
+      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+      setTimeout = function(fn, ms) { lastDelay = ms; return 0; };
+      spawnCreature("jellyfish", true);
+      const jDur = parseFloat(lastEl.style.animationDuration), jDelay = lastDelay;
+      spawnCreature("fish", true);
+      const fDur = parseFloat(lastEl.style.animationDuration), fDelay = lastDelay;
+      document.createElement = _ce;
+      setTimeout = _st;
+      ok("slow shadows cross at half speed (jellyfish 18-34s + 45s net, fish 9-17s + 25s net)",
+        jDur >= 18 && jDur <= 34 && jDelay === 45000 && fDur >= 9 && fDur <= 17 && fDelay === 25000);
+    })();
     const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
     ok("drift weighting holds: fish boosted to five in every biome list",
       fishN(BIOME_CREATURES.tropical) === 5 && fishN(BIOME_CREATURES.temperate) === 5 &&
