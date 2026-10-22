@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.5-beta": [
-"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed.",
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too.",
   ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
@@ -2697,8 +2697,10 @@ function spawnCreature(type, background) {
   const slow = SLOW_CREATURES.indexOf(type) !== -1;
   const dur = (9 + Math.random() * 8) * (slow ? 2 : 1);
   el.style.animationDuration = dur.toFixed(1) + "s";
+  /* v2.7.5-fix (Avery): background animals stay relatively close — at
+     10-18px they read as fast-moving distant blobs, not creatures. */
   el.style.height = background
-    ? Math.round(10 + Math.random() * 8) + "px"
+    ? Math.round(18 + Math.random() * 12) + "px"
     : Math.round(24 + Math.random() * 26) + "px";
   /* v0.26.1: ambient creatures swim both ways — 50/50 per spawn. The art
      faces left by default, so leftward swimmers need no flip; rightward

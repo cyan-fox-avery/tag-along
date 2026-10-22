@@ -5944,6 +5944,23 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       ok("slow shadows cross at half speed (jellyfish 18-34s + 45s net, fish 9-17s + 25s net)",
         jDur >= 18 && jDur <= 34 && jDelay === 45000 && fDur >= 9 && fDur <= 17 && fDelay === 25000);
     })();
+    ok("deep drift matches sighting opacity + halo; deep sharks keep black fill with halo (source)",
+      cssCode.indexOf(".dive-scene.depth-deep .ambient.bg-fish { opacity: 0.8") !== -1 &&
+      cssCode.indexOf(".dive-scene.depth-deep .ambient.bg-fish img { filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.7)") !== -1 &&
+      cssCode.indexOf("brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)") !== -1 &&
+      cssCode.indexOf(".dive-scene .ambient.bg-fish { opacity: 0.45") !== -1);
+    (function() {
+      const _ce = document.createElement;
+      let lastEl = null;
+      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+      spawnCreature("fish", true);
+      const bgH = parseInt(lastEl.style.height, 10);
+      spawnCreature("fish", false);
+      const fgH = parseInt(lastEl.style.height, 10);
+      document.createElement = _ce;
+      ok("background animals stay relatively close (drift 18-30px, sightings 24-50px)",
+        bgH >= 18 && bgH <= 30 && fgH >= 24 && fgH <= 50);
+    })();
     const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
     ok("drift weighting holds: fish boosted to five in every biome list",
       fishN(BIOME_CREATURES.tropical) === 5 && fishN(BIOME_CREATURES.temperate) === 5 &&

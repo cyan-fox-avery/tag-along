@@ -1205,6 +1205,15 @@ select option:disabled { color: #7a8a9e; }
    higher-specificity rule restores the uniformly dark shadow on every
    depth, for the WebP img and the fallback SVG alike. */
 .dive-scene .ambient .shark-shadow img, .dive-scene .ambient .shark-shadow svg { filter: brightness(0); }
+/* v2.7.5-fix (Avery): deep drift was invisible — the drift 0.45 opacity
+   outranked the deep 0.8 rule, and small dark shapes vanish on the black
+   top of the deep scene. Deep drift matches sighting opacity, with a
+   stronger halo; deep/midwater shark silhouettes keep their black fill
+   but gain the halo too (brightness first, glow after). */
+.dive-scene.depth-deep .ambient.bg-fish { opacity: 0.8; }
+.dive-scene.depth-deep .ambient.bg-fish img { filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.7)); }
+.dive-scene.depth-midwater .ambient .shark-shadow img,
+.dive-scene.depth-deep .ambient .shark-shadow img { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)); }
 /* v0.26.1: ambient creatures swim both ways — .swim-left reverses the drift
    so creatures can travel right-to-left, facing their direction of travel. */
 .ambient.swim-left { animation-name: driftLeft; }
