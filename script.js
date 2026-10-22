@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.2-beta";
+const VERSION = "v2.7.3-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.3-beta": [
+"🔤 <strong>Logbook species filter, A to Z.</strong> The Species dropdown in the Expedition logbook now lists sharks alphabetically instead of in roster order, so finding one in the big list is faster. 'All species' stays first, and nothing else about the logbook changed.",
+  ],
   "v2.7.2-beta": [
 "🗺️ <strong>The welcome tour stays put.</strong> The tour card now parks in one fixed spot for all ten slides instead of jumping to each tab — and a yellow arrow below the tab bar points at the tab each slide explains. The Back, Skip, and Next buttons stay in the same place throughout, and the card itself is a little bigger.",
 "🔁 <strong>The replay button moved.</strong> The ? button that reopens the tour now lives at the bottom of the page, beside Export and Import save — and the ? sits properly centred in its circle.",
@@ -3652,6 +3655,15 @@ function logbookTripMatches(t, f) {
   return true;
 }
 
+/* Pure: logbook species options in alphabetical order. The dropdown is
+   a 50-entry list to scan, so A–Z beats roster order for finding one.
+   Returns a sorted copy — the SHARKS roster order itself (research tab
+   untagged-first, expedition lists) is untouched. "All species" stays
+   first because it is static markup in index.html, not built here. */
+function logbookSpeciesOptions() {
+  return [...SHARKS].sort((a, b) => a.name.localeCompare(b.name));
+}
+
 function buildLogbookFilters() {
   const rs = $("logFilterRegion"), ss = $("logFilterSpecies");
   if (rs && rs.options && rs.options.length <= 1) {
@@ -3662,7 +3674,7 @@ function buildLogbookFilters() {
     });
   }
   if (ss && ss.options && ss.options.length <= 1) {
-    SHARKS.forEach(s => {
+    logbookSpeciesOptions().forEach(s => {
       const o = document.createElement("option");
       o.value = s.id; o.textContent = s.name;
       ss.appendChild(o);

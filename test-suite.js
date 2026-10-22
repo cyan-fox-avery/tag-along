@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.2-beta', VERSION === 'v2.7.2-beta');
+  ok('version v2.7.3-beta', VERSION === 'v2.7.3-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5821,6 +5821,18 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       fileCode.indexOf('document.body.style.overflow = "hidden"') !== -1 &&
       fileCode.indexOf('window.addEventListener("scroll", positionTour);') !== -1);
   } catch (e) { ok("v2.7.2 parked tour block (" + e.message + ")", false); }
+
+  /* ---------- v2.7.3: logbook species filter, alphabetical ---------- */
+  try {
+    const lbNames = logbookSpeciesOptions().map(function(s) { return s.name; });
+    const lbSorted = lbNames.slice().sort(function(a, b) { return a.localeCompare(b); });
+    ok("logbook species options are alphabetical across all 50",
+      lbNames.length === 50 && JSON.stringify(lbNames) === JSON.stringify(lbSorted));
+    ok("alphabetical helper returns a copy: roster order itself is untouched",
+      SHARKS[0].id === "nurse" && SHARKS[1].id === "thresher" && SHARKS[2].id === "whale");
+    ok("logbook filter builder uses the alphabetical options (source)",
+      fileCode.indexOf("logbookSpeciesOptions().forEach") !== -1);
+  } catch (e) { ok("v2.7.3 logbook alpha block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
