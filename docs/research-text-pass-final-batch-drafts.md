@@ -22,6 +22,16 @@ its unsubstantiated squid bait (crustaceans only), and the salmon
 "Tuna / large oily fish". Combo changes land at implementation, not in
 this doc — the doc records what the text must then clue.
 
+**Revision 2026-10-22 (Mira review round 2):** major round-1 corrections
+accepted; three items resolved here — dwarf lanternshark depth
+(deep-only was a mislabel; planned depths become twilight+deep),
+dwarf lanternshark diet (uncertainty language + crustaceans flagged as
+an informed gameplay simplification for Avery to accept), greenland
+scent sentence (cautious wording, no sense-vs-sense comparison) — plus
+stale section headers corrected to the approved planned combos and a
+mako speed polish note. The rest proceeds to Avery's voice-shaping
+review, per his order (Mira first, then him).
+
 **Verification first (2026-10-22, against live main):** the list matches the
 audit exactly — 50 species, Batch 1's 10 entries clean, and these 24 still
 carrying giveaways. One precision note: Tier 2 is 8 labeled answer lines
@@ -87,7 +97,13 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   open ocean, where the light is good and the prey is quick, though
   tracking shows they sometimes dive far deeper." Then delete the chum
   sentence. Entry ends: "If something out here is moving at 70
-  kilometres an hour, it's a mako."
+  kilometres an hour, it's a mako." POLISH at implementation (Mira
+  round 2, nonblocking): 70 km/h is a widely quoted estimated maximum,
+  not a routine cruising speed — logger data on two individuals
+  topped out around 18 km/h, which doesn't rule out faster unobserved
+  bursts. Frame it as a reported/estimated potential burst (e.g. "at a
+  reported 70 kilometres an hour") when the final paragraph is set;
+  exact wording is Avery's voice call.
 - Combo check: open Atlantic ✓, upper 100 m (signals the game's curated
   surface + shallows encounter choices honestly, without claiming a
   biological limit) ✓, mackerel and tuna, squid ✓. No "reef edge" for
@@ -172,15 +188,17 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   mackerel)" in the text is an honest clue to that option, not a tuna
   claim.
 
-### 13. greenland — Arctic / deep / schooling-fish, squid / chum
+### 13. greenland — Arctic / deep / squid (planned at implementation) / chum
 - Current ending: "Oily fish or squid on chum, deep and cold."
 - Change (revised per Mira): do NOT firm to "schooling fish" — stomach
   studies emphasize squid in smaller sharks and demersal/benthic fish
   (cod, halibut, skates, wolffish) plus mammals in larger ones, not a
   defining habit of hunting fish schools. Keep "feeding on fish, squid,
   and even seals and whale carcasses", and replace the scent clause
-  with a truthful chemical-cues sentence: "and in water that dark,
-  chemical cues carry further than sight." Delete the combo line.
+  with a truthful chemical-cues sentence: "In the darkness, chemical
+  senses can help them locate food." (Round 2: "chemical cues carry
+  further than sight" was still an unsupported sense-vs-sense
+  comparison.) Delete the combo line.
   Entry ends on the bycatch sentence.
 - Combo check: Arctic ✓, hundreds of metres down (deep) ✓, squid ✓.
   RESOLVED per Avery's accuracy ruling: schooling-fish is removed from
@@ -236,7 +254,7 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   "rare records" phrasing matches occasional southern/western British
   Isles observations. The stronghold claim stays out.
 
-### 18. sawshark — East Australia / reef+twilight / squid, crustaceans / chum
+### 18. sawshark — East Australia / reef+twilight / crustaceans (planned at implementation) / chum
 - Current ending (bare combo): "Squid or crustaceans on chum, reef edge
   into the twilight zone."
 - Change (revised per Mira — correcting an inherited factual error):
@@ -274,17 +292,32 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   around the British Isles) ✓, 200–500 m slopes (twilight+deep) ✓,
   squid (firmed from cephalopods) ✓.
 
-### 20. dwarflantern — Caribbean / deep / crustaceans / chum
+### 20. dwarflantern — Caribbean / twilight+deep (planned at implementation) / crustaceans / chum
 - Current answer line: "Plan: chum down the Caribbean slope into the
   deep, crustaceans on the line — and don't blink, because this shark
   is smaller than the bait."
-- Change: delete the answer line only. Entry ends on the Least Concern
+- Change (revised per Mira round 2, two corrections): (a) DEPTH —
+  deep-only was a mislabel. The live "roughly 280 to 440 metres"
+  becomes "roughly 189 to 598 metres" (IUCN 2020-3 assessment; the
+  Smithsonian describes 283–439 m specimens, including one at 290 m,
+  as twilight-zone animals). The game tiers are twilight 100–400 and
+  deep 400–1000, so the range spans both. Planned depths become
+  ["twilight", "deep"] at implementation. (b) DIET UNCERTAINTY — the
+  live "feeds on tiny deep-sea invertebrates — shrimp-like
+  crustaceans drifting in the water column" states a categorical diet
+  the species has no prey study for. Replace with: "It likely feeds
+  on small crustaceans and other tiny prey, though its diet is poorly
+  known." Delete the answer line. Entry ends on the Least Concern
   sentence. (The "smaller than the bait" charm survives in the body:
   "small enough to rest in your cupped hands.")
-- Combo check: Caribbean slope (Colombia/Venezuela) ✓, 280–440 m
-  (deep) ✓, shrimp-like crustaceans (already in body) ✓. No bake needed.
+- Combo check: Caribbean slope (Colombia/Venezuela) ✓, 189–598 m
+  (spans twilight + deep) ✓, crustaceans flagged as an INFORMED
+  GAMEPLAY SIMPLIFICATION — no species-level prey study exists, and
+  the text now says so honestly. For Avery to accept or reject: with
+  no better-supported bait, rejecting it leaves the species with no
+  combo.
 
-### 21. kitefin — open Atlantic / deep / squid, schooling-fish / chum
+### 21. kitefin — open Atlantic / deep / squid (planned at implementation) / chum
 - Current answer line: "Plan: chum the deep open Atlantic slopes, squid
   or schooling fish on the line — and watch the dark for a heavy shadow
   with big dark eyes."
@@ -386,6 +419,12 @@ accuracy and gameplay convenience conflict, accuracy wins. Outcomes:
    credible species reference for newly added concrete assertions +
    bold-clues extension for all 50 (sequenced with this batch, per
    Avery 2026-10-21; bold natural biology only, never a stealth
-   instruction list) + version bump.
+   instruction list) + version bump. Implementation checklist (Mira
+   round 2): alter the ACTUAL combo/depth arrays in sharks-data.js
+   (greenland, kitefin, sawshark baits; dwarflantern depths), not just
+   text and clue matrix; test removed bait paths as negative and
+   preserved squid/crustacean options as positive, plus dwarflantern's
+   revised depth choice; drive the downstream all-50 clue matrix from
+   the FINAL combos, not the draft headings.
 4. Merge only on Mira's review + Avery's explicit word. This drafts PR
    (#150) itself is NOT for merging.
