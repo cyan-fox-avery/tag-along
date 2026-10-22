@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.3-beta** — *a shark research game*
+**v2.7.4-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -12,6 +12,7 @@ science.
 Built for sarah, who loves sharks. 🦈
 
 ## v2.7.x changes
+- **v2.7.4** — ambient life batch: anglerfish (deep only), sunfish (warm + open-water surface), penguins (South Africa + Galápagos only), and distant uncatchable shark silhouettes (hammerhead, whale shark, tiger). Fish most common everywhere, dolphins and turtles a bit less so; everything drifts in from both sides.
 - **v2.7.3** — logbook Species filter now lists sharks alphabetically (A–Z) instead of in roster order, so finding one in the big dropdown is faster. 'All species' stays first; research-tab ordering is untouched.
 - **v2.7.2** — tour layout fixes from iPad QA: the tour card now parks in one fixed spot for all ten slides (bigger window, nav row pinned so Back/Skip/Next never move), a yellow arrow below the tab bar points at the tab each slide explains, and the replay ? button moved from the header to the footer beside Export/Import save, with its glyph properly centred.
 - **v2.7.1** — the Bukangi easter egg updated: she made it out of the canal (Oct 21 2026 — the third guide-back worked, 1+ km past the waterway; officials watching for her to reach open water). First-time dusky encounters now get the success story; players who already saw the old version get Sarah's good-news follow-up on their next dusky encounter.
