@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.3-beta', VERSION === 'v2.7.3-beta');
+  ok('version v2.7.4-beta', VERSION === 'v2.7.4-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5833,6 +5833,53 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("logbook filter builder uses the alphabetical options (source)",
       fileCode.indexOf("logbookSpeciesOptions().forEach") !== -1);
   } catch (e) { ok("v2.7.3 logbook alpha block (" + e.message + ")", false); }
+
+  /* ---------- v2.7.4: ambient batch — new sprites, shark silhouettes, regions, weighting, both sides ---------- */
+  try {
+    ok("new ambient sprites registered (anglerfish, penguin, mola)",
+      typeof CREATURE_ART.anglerfish === "string" && CREATURE_ART.anglerfish.indexOf("bg-anglerfish") !== -1 &&
+      typeof CREATURE_ART.penguin === "string" && CREATURE_ART.penguin.indexOf("bg-penguin") !== -1 &&
+      typeof CREATURE_ART.mola === "string" && CREATURE_ART.mola.indexOf("bg-mola") !== -1);
+    const hasCreature = function(pool, c) { return pool.some(function(s) { return s.creature === c; }); };
+    ok("penguins appear in South Africa + Galapagos surface decks only",
+      hasCreature(buildSightingDeck("surface", "south-africa").pool, "penguin") &&
+      hasCreature(buildSightingDeck("surface", "galapagos").pool, "penguin") &&
+      !hasCreature(buildSightingDeck("surface", "north-carolina").pool, "penguin") &&
+      !hasCreature(buildSightingDeck("surface", "arctic").pool, "penguin") &&
+      !hasCreature(buildSightingDeck("surface", "maldives").pool, "penguin"));
+    ok("anglerfish in the deep deck only (never twilight), mola + shark silhouettes at warm surfaces",
+      !hasCreature(buildSightingDeck("twilight", "open-atlantic").pool, "anglerfish") &&
+      hasCreature(buildSightingDeck("deep", "arctic").pool, "anglerfish") &&
+      hasCreature(buildSightingDeck("surface", "caribbean").pool, "mola") &&
+      hasCreature(buildSightingDeck("surface", "caribbean").pool, "shark:hammerhead") &&
+      hasCreature(buildSightingDeck("surface", "caribbean").pool, "shark:whale") &&
+      hasCreature(buildSightingDeck("reef", "caribbean").pool, "shark:tiger"));
+    ok("sighting weights: fish 3, dolphin + turtle 2, everything else 1",
+      CREATURE_WEIGHT.fish === 3 && CREATURE_WEIGHT.dolphin === 2 && CREATURE_WEIGHT.turtle === 2 &&
+      sightingWeight({ creature: "shark:hammerhead" }) === 1 && sightingWeight({ creature: "penguin" }) === 1);
+    const realRandom = Math.random;
+    try {
+      const seq = [0.99, 0.01, 0.5]; let ri = 0;
+      Math.random = function() { return seq[ri++ % seq.length]; };
+      const firstDealt = weightedSightingShuffle([{ creature: "fish" }, { creature: "turtle" }, { creature: "mola" }]).pop();
+      ok("weighted deck deals the fish-biased entry first (stubbed random, pop consumption)",
+        firstDealt && firstDealt.creature === "fish");
+    } finally { Math.random = realRandom; }
+    const wsIn = [{ creature: "fish" }, { creature: "turtle" }, { creature: "mola" }];
+    const wsOut = weightedSightingShuffle(wsIn);
+    ok("weighted shuffle is a permutation (no entry lost or duplicated)",
+      wsOut.length === 3 && wsOut.slice().sort(function(a, b) { return a.creature < b.creature ? -1 : 1; }).map(function(s) { return s.creature; }).join(",") === "fish,mola,turtle");
+    const fishCount = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
+    ok("drift weighting: fish tripled in every biome list",
+      fishCount(BIOME_CREATURES.tropical) === 3 && fishCount(BIOME_CREATURES.temperate) === 3 &&
+      fishCount(BIOME_CREATURES.kelp) === 3 && fishCount(BIOME_CREATURES.pelagic) === 3 &&
+      fishCount(BIOME_CREATURES.polar) === 3 && fishCount(BIOME_CREATURES.volcanic) === 3);
+    ok("ambient spawns handle shark silhouettes + travel both ways (source)",
+      fileCode.indexOf('type.indexOf("shark:")') !== -1 &&
+      fileCode.indexOf('class="shark-shadow"') !== -1 &&
+      fileCode.indexOf('scaleX(-1)') !== -1 && fileCode.indexOf('swim-left') !== -1 &&
+      cssCode.indexOf('.dive-scene .ambient .shark-shadow img') !== -1);
+  } catch (e) { ok("v2.7.4 ambient batch block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
