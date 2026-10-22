@@ -5966,6 +5966,20 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       ok("background animals stay relatively close (drift 18-30px, sightings 24-50px)",
         bgH >= 18 && bgH <= 30 && fgH >= 24 && fgH <= 50);
     })();
+    ok("lanternfish sighting carries the lit flag; ordinary spawns do not (source + behavior)",
+      fileCode.indexOf('spawnCreature(s.creature, false, s.text.toLowerCase().indexOf("lanternfish")') !== -1 &&
+      cssCode.indexOf(".dive-scene .ambient.lit img { filter: drop-shadow(0 0 14px rgba(255, 210, 120, 0.9)) brightness(1.4)") !== -1 &&
+      (function() {
+        const _ce = document.createElement;
+        let lastEl = null;
+        document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+        spawnCreature("fish", false, true);
+        const lit = lastEl.classList.contains("lit");
+        spawnCreature("fish", false);
+        const unlit = !lastEl.classList.contains("lit");
+        document.createElement = _ce;
+        return lit && unlit;
+      })());
     const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
     ok("drift weighting holds: fish boosted to five in every biome list",
       fishN(BIOME_CREATURES.tropical) === 5 && fishN(BIOME_CREATURES.temperate) === 5 &&

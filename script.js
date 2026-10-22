@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.5-beta": [
-"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too. Sarah's re-sighting reactions fixed: her 'THREE TIMES?!' lines now fire only on the actual third re-sighting — later reunions get her generic best-friend lines instead of repeating the third-time ones.",
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too. Sarah's re-sighting reactions fixed: her 'THREE TIMES?!' lines now fire only on the actual third re-sighting — later reunions get her generic best-friend lines instead of repeating the third-time ones. The lanternfish school glows now: its sighting carries a warm bright light that throws the whole school into relief (sighting only — ordinary fish drift stays dark).",
   ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
@@ -2676,7 +2676,7 @@ function stopAmbientLife() {
 /* v2.7.5-fix (Avery): these shadows move at half speed — drifters and
    loungers, not cruisers. Everything else keeps the usual 9-17s crossing. */
 const SLOW_CREATURES = ["jellyfish", "mola", "seahorse", "manatee", "snailfish", "siphonophore", "krill", "anglerfish"];
-function spawnCreature(type, background) {
+function spawnCreature(type, background, lit) {
   const scene = $("diveScene");
   let art = CREATURE_ART[type];
   /* v2.7.4-beta: ambient shark silhouettes — existing shark art, darkened
@@ -2690,6 +2690,10 @@ function spawnCreature(type, background) {
   if (!art) return;
   const el = document.createElement("div");
   el.className = "ambient" + (background ? " bg-fish" : "");
+  /* v2.7.5-fix (Avery): the lanternfish school carries its own lights —
+     a warm bright glow that throws the whole school into relief.
+     Sighting only (the flag), so ordinary fish drift stays dark. */
+  if (lit) el.classList.add("lit");
   el.innerHTML = art;
   el.style.top = (8 + Math.random() * 55) + "%";
   /* v2.7.5-fix (Avery): famously slow creatures cross at half speed —
@@ -2737,7 +2741,7 @@ async function showSighting(depth) {
     if (tripDecks && !tripDecks.sightings.deck.length) return;
     const s = tripDecks ? deal(tripDecks.sightings.deck, tripDecks.sightings.pool) : pick(options);
     logLine(`👁️ ${s.text}`);
-    spawnCreature(s.creature);
+    spawnCreature(s.creature, false, s.text.toLowerCase().indexOf("lanternfish") !== -1);
   }
 }
 

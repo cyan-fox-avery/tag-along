@@ -1214,6 +1214,9 @@ select option:disabled { color: #7a8a9e; }
 .dive-scene.depth-deep .ambient.bg-fish img { filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.7)); }
 .dive-scene.depth-midwater .ambient .shark-shadow img,
 .dive-scene.depth-deep .ambient .shark-shadow img { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)); }
+/* v2.7.5-fix (Avery): the lanternfish school's own lights — warm, bright,
+   and big enough to throw the school into relief. Sighting only. */
+.dive-scene .ambient.lit img { filter: drop-shadow(0 0 14px rgba(255, 210, 120, 0.9)) brightness(1.4); }
 /* v0.26.1: ambient creatures swim both ways — .swim-left reverses the drift
    so creatures can travel right-to-left, facing their direction of travel. */
 .ambient.swim-left { animation-name: driftLeft; }
