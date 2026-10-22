@@ -13,6 +13,15 @@ prey description leads the mechanics, never the reverse, so where the
 truthful diet doesn't support a bait label, the combo/label (not the
 animal) is what gets revisited.
 
+**Avery's ruling 2026-10-22: the game is to be as scientifically accurate
+as possible.** Accuracy wins over gameplay convenience wherever the two
+conflict. That resolves the open decisions below: greenland and kitefin
+lose their unsupported schooling-fish baits (squid only), sawshark loses
+its unsubstantiated squid bait (crustaceans only), and the salmon
+"oily fish" mapping stands because the displayed option literally reads
+"Tuna / large oily fish". Combo changes land at implementation, not in
+this doc — the doc records what the text must then clue.
+
 **Verification first (2026-10-22, against live main):** the list matches the
 audit exactly — 50 species, Batch 1's 10 entries clean, and these 24 still
 carrying giveaways. One precision note: Tier 2 is 8 labeled answer lines
@@ -158,10 +167,10 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   instruction. Entry ends on the males-west/females-east sentence.
 - Combo check: Japan (follow the salmon toward Japan) ✓, just under the
   surface ✓, oily fish + squid (baked, were answer-line-only) ✓.
-  Open mapping question for Avery: the displayed option is "Tuna /
-  large oily fish", so "oily fish" in the text is the honest clue to
-  that option — confirm that mapping is acceptable, or mark it as an
-  explicit gameplay mapping decision.
+  Mapping RESOLVED per Avery's accuracy ruling: the displayed option
+  literally reads "Tuna / large oily fish", so "oily fish (herring,
+  mackerel)" in the text is an honest clue to that option, not a tuna
+  claim.
 
 ### 13. greenland — Arctic / deep / schooling-fish, squid / chum
 - Current ending: "Oily fish or squid on chum, deep and cold."
@@ -174,11 +183,9 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   chemical cues carry further than sight." Delete the combo line.
   Entry ends on the bycatch sentence.
 - Combo check: Arctic ✓, hundreds of metres down (deep) ✓, squid ✓.
-  OPEN DECISION for Avery: the truthful diet does not support
-  schooling-fish as a defining habit, so the game's schooling-fish bait
-  for greenland needs revisiting — adjust the combo/label, or keep it
-  as an explicit gameplay mapping? Prey leads mechanics, never the
-  reverse.
+  RESOLVED per Avery's accuracy ruling: schooling-fish is removed from
+  greenland's combo at implementation (squid only). The text needs no
+  further change — squid is already in the diet sentence.
 
 ## Tier 2 — literal answer line (labeled or bare combo)
 
@@ -223,8 +230,11 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   Project sentence.
 - Combo check: southwest Britain + Wales ✓, shallow coastal waters
   over sand and mud, 5–150 m (Mira confirms this already supports
-  30–100) ✓, crabs (already in body) ✓. Open: confirm Cornwall
-  specifically if sourceable.
+  30–100) ✓, crabs (already in body) ✓. VERIFIED 2026-10-22: historic
+  Cornwall records are solid (Yarrell 1836, Day 1880–84, Garstang
+  1903 — common in Cornwall, southwest England), and current
+  "rare records" phrasing matches occasional southern/western British
+  Isles observations. The stronghold claim stays out.
 
 ### 18. sawshark — East Australia / reef+twilight / squid, crustaceans / chum
 - Current ending (bare combo): "Squid or crustaceans on chum, reef edge
@@ -235,14 +245,19 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   Replace the habitat phrase: "Adults reach about 1.4 metres and live
   over sandy or muddy shelf-bottoms off southern and eastern Australia,
   roughly 40 to 310 metres down, from the shallower shelf into deeper
-  offshore water." Diet sentence unchanged (fish, squid, crustaceans
-  — pre-existing). Delete the combo line. Entry ends on the Least
-  Concern sentence.
+  offshore water." Diet sentence CORRECTED (this also fixes live body
+  text, not just the draft): "stunning, pinning, and slicing fish,
+  squid, and crustaceans" → "stunning, pinning, and slicing small
+  fishes and crustaceans" (Australian Museum / FishBase species
+  accounts for P. cirratus). Delete the combo line. Entry ends on the
+  Least Concern sentence.
 - Combo check: southern/eastern Australia ✓, ~40–310 m (spans reef
-  30–100 + twilight 100–400, without inventing reefs) ✓, squid +
-  crustaceans (already in body) ✓. Open: squid as a bait clue needs
-  species-level substantiation — AFMA lists small fish, molluscs and
-  crustaceans, and molluscs ≠ automatically squid.
+  30–100 + twilight 100–400, without inventing reefs) ✓, crustaceans ✓.
+  RESOLVED per Avery's accuracy ruling: squid is documented for
+  sawsharks generally but could NOT be substantiated for common
+  sawshark specifically, so squid leaves the combo at implementation
+  (crustaceans only). If a species-level squid source turns up, it
+  goes back in.
 
 ### 19. velvetbelly — Cornwall / twilight+deep / squid / chum
 - Current answer line: "Plan: chum over a Cornwall deep slope in the
@@ -254,8 +269,10 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   mostly between 200 and 500 metres" (verify southwest-Britain waters).
   Diet firming kept (cephalopods → squid, approved by Mira). Delete
   the answer line. Entry ends on the bycatch/Vulnerable sentence.
-- Combo check: southwest Britain (revised bake, to verify) ✓, 200–500 m
-  slopes (twilight+deep) ✓, squid (firmed from cephalopods) ✓.
+- Combo check: southwest Britain (VERIFIED 2026-10-22: range runs south
+  along the slope west of Ireland and Britain; common in deep water
+  around the British Isles) ✓, 200–500 m slopes (twilight+deep) ✓,
+  squid (firmed from cephalopods) ✓.
 
 ### 20. dwarflantern — Caribbean / deep / crustaceans / chum
 - Current answer line: "Plan: chum down the Caribbean slope into the
@@ -279,10 +296,10 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   Vulnerable sentence. (The big-eyes image survives in the body: "huge
   greenish eyes built for near-total darkness.")
 - Combo check: open Atlantic (baked, was answer-line-only) ✓, 200–1800 m
-  (deep) ✓, squid (already in body) ✓. OPEN DECISION for Avery:
-  schooling-fish bait clue gap — leave "fish" and accept the gap
-  honestly, find a supported schooling example, or revisit the
-  combo/label?
+  (deep) ✓, squid (already in body) ✓. RESOLVED per Avery's accuracy
+  ruling: schooling-fish is removed from kitefin's combo at
+  implementation (squid only). The text needs no further change —
+  squid is already in the diet sentence.
 
 ### 22. pacificsleeper — Japan / deep / squid, schooling-fish / chum
 - Current answer line: "Plan: chum Japan's offshore deep, squid or
@@ -331,30 +348,37 @@ whitetip, dusky (sardine-run support), spinydogfish (Cornwall bake
 unchallenged). "Art deferred" for goblin/Galápagos/dusky has no bearing
 on whether their accurate text belongs in Research.
 
-## Open decisions for Avery (game design, not drafting)
+## Resolved per Avery's accuracy-first ruling (2026-10-22)
 
-1. **Greenland bait label:** truthful diet (demersal/benthic fish, squid,
-   carrion) doesn't support schooling-fish as a defining habit. Adjust
-   the combo/label, or keep schooling-fish as an explicit gameplay
-   mapping?
-2. **Kitefin schooling-fish gap:** truthful diet is varied deep-water
-   fish, not specifically school-hunting. Leave "fish" and accept the
-   gap honestly, find a supported schooling example, or revisit the
-   combo/label?
-3. **Salmon "oily fish" mapping:** the displayed option is "Tuna / large
-   oily fish" — is "oily fish (herring, mackerel)" in the text an
-   acceptable clue to that option, or an explicit gameplay mapping to
-   mark?
-4. **Sawshark squid:** needs species-level substantiation before the
-   squid bait clue is kept as-is.
-5. **Southwest-Britain phrasings:** velvetbelly "waters around southwest
-   Britain" and angelshark "southwest Britain and Wales" need
-   verification; angelshark Cornwall specifically if sourceable.
+Avery: the game is to be as scientifically accurate as possible. Where
+accuracy and gameplay convenience conflict, accuracy wins. Outcomes:
+
+1. **Greenland bait:** schooling-fish removed at implementation (squid
+   only). Truthful diet (demersal/benthic fish, squid, carrion) doesn't
+   support schooling-fish as a defining habit.
+2. **Kitefin bait:** schooling-fish removed at implementation (squid
+   only). Truthful diet is varied deep-water fish, not specifically
+   school-hunting.
+3. **Salmon mapping:** stands — the displayed option literally reads
+   "Tuna / large oily fish", so "oily fish (herring, mackerel)" in the
+   text is an honest clue to that option, not a tuna claim.
+4. **Sawshark squid:** removed at implementation (crustaceans only).
+   Squid is documented for sawsharks generally but could NOT be
+   substantiated for common sawshark specifically (Australian Museum /
+   FishBase list small fishes + crustaceans). Body diet line corrected
+   accordingly. If a species-level squid source turns up, it goes
+   back in.
+5. **Southwest-Britain phrasings:** VERIFIED. Velvetbelly: range runs
+   south along the slope west of Ireland and Britain; common around
+   the British Isles. Angelshark: historic Cornwall records solid
+   (Yarrell 1836, Day 1880–84, Garstang 1903); current "rare records"
+   phrasing matches occasional southern/western British Isles
+   observations. Stronghold claim stays out.
 
 ## Ship sequence (not started)
 
-1. Avery shapes/vetoes these drafts here (including the open decisions
-   above).
+1. Avery shapes/vetoes these drafts here (accuracy decisions resolved
+   per his ruling; voice-shaping still open).
 2. Mira re-checks the revised doc.
 3. One implementation branch + PR: 24 rewrites + clue-matrix test
    extended to all 24, mapping every accepted region, depth and bait
