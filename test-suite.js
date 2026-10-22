@@ -484,7 +484,7 @@ code += `
   // v1.8.5-beta: three more variants added; the originals all remain.
   ok('THREE pool has the five 3rd lines; generic excited pool keeps the AGAIN line',
     RESIGHT_NOTES_3RD.length === 5 &&
-    RESIGHT_NOTES_3RD.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+    RESIGHT_NOTES_3RD.includes("THREE RE-SIGHTINGS?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
     RESIGHT_NOTES_EXCITED.length === 3 &&
     RESIGHT_NOTES_EXCITED.includes("It's back AGAIN! I think this shark has adopted us. We're its humans now."));
   // v1.8.5-beta: three more variants added; the originals all remain.
