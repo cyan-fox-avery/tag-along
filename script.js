@@ -3521,7 +3521,7 @@ const RESIGHT_NOTES_2ND = [
   "Back for round two! This shark is becoming a regular.",
   "Twice now! Either it likes this spot or it likes us. Probably both.",
   /* v1.8.5-beta: more variants so repeats are rare. */
-  "Two sightings! This one's officially on our radar.",
+  "Two re-sightings! This one's officially on our radar.",
   "Again! I'm starting to feel like we know this shark.",
   "Round two with this one — the tracker doesn't lie."
 ];
@@ -3531,12 +3531,12 @@ const RESIGHT_NOTES_2ND = [
    "THIRD TIME!" again on the 4th. 4th+ reunions use the generic excited
    pool below, which never counts. */
 const RESIGHT_NOTES_3RD = [
-  "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
+  "THREE RE-SIGHTINGS?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
   "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
   "Third re-sighting! I'm doing a little happy dance. This shark keeps coming back to say hi!",
   "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
   /* v1.8.5-beta: more variants so repeats are rare. */
-  "THREE! This shark is a regular now. I'm genuinely attached."
+  "THREE RE-SIGHTINGS! This shark is a regular now. I'm genuinely attached."
 ];
 
 /* Generic best-friend energy for the 4th re-sighting onward — no counts,

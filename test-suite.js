@@ -5939,6 +5939,15 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       buildSightingDeck("surface", "maldives").pool.some(function(s) { return s.creature === "clownfish"; }) &&
       !buildSightingDeck("surface", "caribbean").pool.some(function(s) { return s.creature === "clownfish"; }) &&
       !buildSightingDeck("reef", "philippines").pool.some(function(s) { return s.creature === "clownfish"; }));
+    ok("v2.7.5-fix (Mira): counted re-sighting lines name re-sightings, never bare sightings/times",
+      RESIGHT_NOTES_2ND.concat(RESIGHT_NOTES_3RD).every(function(line) {
+        const lower = line.toLowerCase();
+        const hasCountUnit = /sightings?/.test(lower) || /\btimes\b/.test(lower) || /\bthree\b/.test(lower) || /\bthird\b/.test(lower);
+        return !hasCountUnit || lower.indexOf("re-sighting") !== -1;
+      }) &&
+      RESIGHT_NOTES_2ND.concat(RESIGHT_NOTES_3RD).every(function(line) {
+        return line.toLowerCase().indexOf("two sightings") === -1 && line.toLowerCase().indexOf("third time") === -1;
+      }));
     ok("slow shadows list covers the drifters and loungers, not the cruisers",
       ["jellyfish","mola","seahorse","manatee","snailfish","siphonophore","krill","anglerfish"].every(function(c) { return SLOW_CREATURES.indexOf(c) !== -1; }) &&
       ["fish","dolphin","turtle","tuna","shark:greatwhite"].every(function(c) { return SLOW_CREATURES.indexOf(c) === -1; }));
