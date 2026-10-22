@@ -5931,6 +5931,14 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       surfaceDriftList("kelp").indexOf("otter") !== -1 &&
       surfaceDriftList("pelagic").indexOf("tuna") !== -1 &&
       surfaceDriftList("tropical").filter(function(c) { return c === "fish"; }).length === 5);
+    ok("v2.7.5-fix (Mira): clownfish is a scripted Indo-Pacific surface visitor only, never ambient drift",
+      Object.keys(BIOME_CREATURES).every(function(b) { return BIOME_CREATURES[b].indexOf("clownfish") === -1; }) &&
+      surfaceDriftList("tropical").indexOf("clownfish") === -1 &&
+      buildSightingDeck("surface", "philippines").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      buildSightingDeck("surface", "papua-new-guinea").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      buildSightingDeck("surface", "maldives").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      !buildSightingDeck("surface", "caribbean").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      !buildSightingDeck("reef", "philippines").pool.some(function(s) { return s.creature === "clownfish"; }));
     ok("slow shadows list covers the drifters and loungers, not the cruisers",
       ["jellyfish","mola","seahorse","manatee","snailfish","siphonophore","krill","anglerfish"].every(function(c) { return SLOW_CREATURES.indexOf(c) !== -1; }) &&
       ["fish","dolphin","turtle","tuna","shark:greatwhite"].every(function(c) { return SLOW_CREATURES.indexOf(c) === -1; }));

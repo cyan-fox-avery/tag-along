@@ -2573,7 +2573,7 @@ function surfaceDriftList(biome) {
     .filter(function(c) { return REEF_RESIDENTS.indexOf(c) === -1; });
 }
 const BIOME_CREATURES = {
-  "tropical":  ["fish", "fish", "fish", "fish", "fish", "turtle", "dolphin", "ray", "mola", "moray", "clownfish", "parrotfish", "pufferfish", "lionfish"],
+  "tropical":  ["fish", "fish", "fish", "fish", "fish", "turtle", "dolphin", "ray", "mola", "moray", "parrotfish", "pufferfish", "lionfish"],
   "temperate": ["fish", "fish", "fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola", "seahorse", "pufferfish", "lionfish"],
   "kelp":      ["fish", "fish", "fish", "fish", "fish", "seal", "dolphin", "otter"],
   "pelagic":   ["fish", "fish", "fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola", "tuna"],
@@ -3533,7 +3533,7 @@ const RESIGHT_NOTES_2ND = [
 const RESIGHT_NOTES_3RD = [
   "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
   "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
-  "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
+  "Third re-sighting! I'm doing a little happy dance. This shark keeps coming back to say hi!",
   "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
   /* v1.8.5-beta: more variants so repeats are rare. */
   "THREE! This shark is a regular now. I'm genuinely attached."
