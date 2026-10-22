@@ -311,11 +311,9 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   sentence. (The "smaller than the bait" charm survives in the body:
   "small enough to rest in your cupped hands.")
 - Combo check: Caribbean slope (Colombia/Venezuela) ✓, 189–598 m
-  (spans twilight + deep) ✓, crustaceans flagged as an INFORMED
-  GAMEPLAY SIMPLIFICATION — no species-level prey study exists, and
-  the text now says so honestly. For Avery to accept or reject: with
-  no better-supported bait, rejecting it leaves the species with no
-  combo.
+  (spans twilight + deep) ✓, crustaceans ACCEPTED by Avery 2026-10-22
+  as an informed gameplay simplification — no species-level prey
+  study exists, and the text now says so honestly.
 
 ### 21. kitefin — open Atlantic / deep / squid (planned at implementation) / chum
 - Current answer line: "Plan: chum the deep open Atlantic slopes, squid
@@ -410,8 +408,10 @@ accuracy and gameplay convenience conflict, accuracy wins. Outcomes:
 
 ## Ship sequence (not started)
 
-1. Avery shapes/vetoes these drafts here (accuracy decisions resolved
-   per his ruling; voice-shaping still open).
+1. Avery's voice pass: WAIVED 2026-10-22 — the research text is
+   supposed to sound like a textbook, so a separate voice-shaping pass
+   isn't necessary. No vetoes; drafts proceed as written (plus Mira's
+   rounds 1–2 and the accuracy ruling).
 2. Mira re-checks the revised doc.
 3. One implementation branch + PR: 24 rewrites + clue-matrix test
    extended to all 24, mapping every accepted region, depth and bait
