@@ -4,6 +4,15 @@
 (veto any entry), Mira accuracy-checks, then it ships as its own version
 with the bold-clues extension for all 50 entries.
 
+**Revision 2026-10-22 (Mira review round 1, comment on PR #150):** disposition
+🟡 — strong drafting pass, substantive accuracy edits requested before the
+implementation PR. The corrections below are applied in this revision; the
+entries Mira approved or found broadly workable are unchanged. Open
+game-design decisions for Avery are collected under "Open decisions" — the
+prey description leads the mechanics, never the reverse, so where the
+truthful diet doesn't support a bait label, the combo/label (not the
+animal) is what gets revisited.
+
 **Verification first (2026-10-22, against live main):** the list matches the
 audit exactly — 50 species, Batch 1's 10 entries clean, and these 24 still
 carrying giveaways. One precision note: Tier 2 is 8 labeled answer lines
@@ -37,8 +46,10 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 ### 2. sandtiger — North Carolina / surface+reef / squid, schooling-fish, ray / chum
 - Current ending: "They're scent-hunters first: a fish-oil slick on the
   current speaks their language."
-- Change: keep the biology half, drop the prescription: "They're
-  scent-hunters first, and they return to the same wrecks year after year."
+- Change (revised per Mira): delete the fish-oil sentence only. The
+  "return to the wrecks" ending repeated paragraph 1, and
+  "scent-hunters first" is an unsubstantiated comparative claim. Entry
+  ends: "...preferring the sunlit shallows around reefs and wrecks."
 - Combo check: North Carolina (Outer Banks) ✓, sunlit shallows around
   reefs and wrecks, ≤190 m ✓, schools of fish, squid and rays ✓.
 
@@ -61,19 +72,27 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 ### 5. mako — open Atlantic / surface+reef / tuna, squid / chum
 - Current ending: "Chum works on them — makos pick up the scent of fish oil
   from far down-current."
-- Change: delete the sentence. Entry ends: "If something out here is
-  moving at 70 kilometres an hour, it's a mako."
-- Combo check: open Atlantic ✓, sunlit surface waters, rarely below
-  150 m (range spans surface+reef) ✓, mackerel and tuna, squid ✓.
-  Flag for Mira: is the 150 m range enough to pin the reef tier, or does
-  it need firming?
+- Change (revised per Mira): do NOT strengthen "rarely below 150 m" —
+  tagged shortfin makos dive to ~980 m, so it overgeneralizes. Replace
+  the depth sentence: "They often hunt in the upper 100 metres of the
+  open ocean, where the light is good and the prey is quick, though
+  tracking shows they sometimes dive far deeper." Then delete the chum
+  sentence. Entry ends: "If something out here is moving at 70
+  kilometres an hour, it's a mako."
+- Combo check: open Atlantic ✓, upper 100 m (signals the game's curated
+  surface + shallows encounter choices honestly, without claiming a
+  biological limit) ✓, mackerel and tuna, squid ✓. No "reef edge" for
+  this pelagic species — the menu's 30–100 tier is "reef/shallows",
+  not a coral reef.
 
 ### 6. lemon — Caribbean / surface+reef / schooling-fish / chum
 - Current ending: "Fish the Caribbean shallows after dark: a chum slick
   with sardines (schooling fish) is the classic combination."
-- Change: bake the bait into the night-hunting sentence, then delete the
-  instruction: "They hunt mostly at night, sensing the faint electricity
-  of sleeping sardines and other schooling fish."
+- Change (revised per Mira): bake the bait into the night-hunting
+  sentence, then delete the instruction: "They hunt mostly at night,
+  sensing the faint electricity of small schooling fishes." ("Sleeping
+  sardines" is not an established specific observation; "small
+  schooling fishes hunted after dark" carries the clue.)
 - Combo check: Caribbean (mangrove lagoons, shallow bays) ✓, <90 m,
   surface waters and reefs ✓, sardines/schooling fish (baked, was
   answer-line-only) ✓. Night hunting kept as flavor.
@@ -82,10 +101,11 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 - Current ending: "Work the Maldivian shallows, surface to reef: a chum
   slick over a reef flat with schooling fish (mackerel) or crabs and
   lobster will bring the locals in."
-- Change: bake a diet sentence into paragraph 1 (after the leaping
-  sentence): "They feed on schooling fish like mackerel, and on crabs and
-  lobster over the reef flats." Then delete the instruction. Entry ends
-  on the friendships sentence.
+- Change (revised per Mira): bake a diet sentence into paragraph 1
+  (after the leaping sentence): "They feed on schools of small reef
+  fish and crustaceans over the reef flats." (No mackerel/crabs/lobster
+  specifics without species-level dietary support.) Then delete the
+  instruction. Entry ends on the friendships sentence.
 - Combo check: Maldives ✓, reef flats so shallow fins break water ✓,
   both baits (baked, were answer-line-only) ✓.
 
@@ -113,12 +133,13 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 ### 10. smooth — Cornwall, North Carolina / surface+reef / schooling-fish, squid / chum
 - Current ending: "They hunt schooling fish and squid in the upper water
   column, and like most hammerheads they find a chum slick hard to ignore."
-- Change: keep the diet sentence, drop the chum clause: "They hunt
-  schooling fish and squid in the upper water column."
-- Combo check: Cornwall + US east coast ✓, upper water column (surface)
-  ✓, both baits ✓. Flag for Mira: the reef tier currently rests on
-  "upper water column" alone — firm to reef edges, or is the range
-  enough?
+- Change (revised per Mira): "upper water column" alone doesn't teach
+  both 0–30 and 30–100. New diet+depth sentence: "They hunt schooling
+  fish and squid near the surface and over the upper continental shelf,
+  from the first few metres to roughly 100 metres or more." (Reported
+  0–200 m; no invented reef association.) Drop the chum clause.
+- Combo check: Cornwall + US east coast ✓, surface + upper shelf to
+  ~100 m ✓, both baits ✓.
 
 ### 11. bull — Caribbean / surface+reef / tuna, schooling-fish / chum
 - Current ending: "A chum slick works; they're not subtle animals."
@@ -130,22 +151,34 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 ### 12. salmon — Japan / surface / tuna, squid / chum
 - Current ending: "Fish the surface with big oily bait on a chum slick —
   tuna or squid."
-- Change: bake a diet sentence after the salmon-run sentence: "Salmon are
-  the famous prey, but tuna and squid are taken too." Then delete the
+- Change (revised per Mira): tuna as a documented prey item is not
+  verified (accounts support salmon, herring, mackerel, pollock, squid).
+  Bake instead: "They hunt salmon above all, but other oily fish —
+  herring, mackerel — and squid are on the menu too." Then delete the
   instruction. Entry ends on the males-west/females-east sentence.
 - Combo check: Japan (follow the salmon toward Japan) ✓, just under the
-  surface ✓, both baits (baked, were answer-line-only) ✓.
+  surface ✓, oily fish + squid (baked, were answer-line-only) ✓.
+  Open mapping question for Avery: the displayed option is "Tuna /
+  large oily fish", so "oily fish" in the text is the honest clue to
+  that option — confirm that mapping is acceptable, or mark it as an
+  explicit gameplay mapping decision.
 
 ### 13. greenland — Arctic / deep / schooling-fish, squid / chum
 - Current ending: "Oily fish or squid on chum, deep and cold."
-- Change (two parts): firm the diet wording ("feeding on fish, squid,
-  and even seals and whale carcasses" → "feeding on schooling fish,
-  squid, and even seals and whale carcasses"); trim the scent clause
-  ("scent is everything down there, which is why chum works" → "scent
-  is everything down there"); delete the combo line. Entry ends on the
-  bycatch sentence.
-- Combo check: Arctic ✓, hundreds of metres down (deep) ✓, schooling
-  fish (firmed) + squid ✓.
+- Change (revised per Mira): do NOT firm to "schooling fish" — stomach
+  studies emphasize squid in smaller sharks and demersal/benthic fish
+  (cod, halibut, skates, wolffish) plus mammals in larger ones, not a
+  defining habit of hunting fish schools. Keep "feeding on fish, squid,
+  and even seals and whale carcasses", and replace the scent clause
+  with a truthful chemical-cues sentence: "and in water that dark,
+  chemical cues carry further than sight." Delete the combo line.
+  Entry ends on the bycatch sentence.
+- Combo check: Arctic ✓, hundreds of metres down (deep) ✓, squid ✓.
+  OPEN DECISION for Avery: the truthful diet does not support
+  schooling-fish as a defining habit, so the game's schooling-fish bait
+  for greenland needs revisiting — adjust the combo/label, or keep it
+  as an explicit gameplay mapping? Prey leads mechanics, never the
+  reverse.
 
 ## Tier 2 — literal answer line (labeled or bare combo)
 
@@ -179,34 +212,50 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 
 ### 17. angelshark — Cornwall / reef / crustaceans / chum
 - Current ending (bare combo): "Crabs on chum, reef shallows."
-- Change: delete the combo line only. Entry ends on the Angel Shark
+- Change (revised per Mira, two parts): soften the stronghold sentence
+  — the Canary Islands are a major documented contemporary stronghold,
+  so don't equate regions: "Rare records persist around parts of the
+  British Isles, including southwest Britain and Wales, and Wales's
+  Angel Shark Project is mapping sightings with anglers and divers to
+  protect what remains." Cornwall is clued via "southwest Britain" (the
+  game's only SW-Britain region) — no "Cornwall's reefs" bake, and no
+  coral-reef insertion. Delete the combo line. Entry ends on the
   Project sentence.
-- Combo check: Cornwall + Welsh coast ✓, shallow coastal waters over
-  sand and mud ✓, crabs (already in body) ✓. Flag for Mira: the reef
-  tier currently rests on "shallow coastal waters" — firm, or is that
-  the reef cue?
+- Combo check: southwest Britain + Wales ✓, shallow coastal waters
+  over sand and mud, 5–150 m (Mira confirms this already supports
+  30–100) ✓, crabs (already in body) ✓. Open: confirm Cornwall
+  specifically if sourceable.
 
 ### 18. sawshark — East Australia / reef+twilight / squid, crustaceans / chum
 - Current ending (bare combo): "Squid or crustaceans on chum, reef edge
   into the twilight zone."
-- Change: delete the combo line only. Entry ends on the Least Concern
-  sentence.
-- Combo check: southern/eastern Australia ✓, shallow reef flats down
-  into the twilight zone ✓, squid + crustaceans (already in body) ✓.
-  No bake needed.
+- Change (revised per Mira — correcting an inherited factual error):
+  common sawsharks are demersal animals of sandy/muddy continental
+  shelves and slopes (~40–310 m per AFMA), not reef-flat hunters.
+  Replace the habitat phrase: "Adults reach about 1.4 metres and live
+  over sandy or muddy shelf-bottoms off southern and eastern Australia,
+  roughly 40 to 310 metres down, from the shallower shelf into deeper
+  offshore water." Diet sentence unchanged (fish, squid, crustaceans
+  — pre-existing). Delete the combo line. Entry ends on the Least
+  Concern sentence.
+- Combo check: southern/eastern Australia ✓, ~40–310 m (spans reef
+  30–100 + twilight 100–400, without inventing reefs) ✓, squid +
+  crustaceans (already in body) ✓. Open: squid as a bait clue needs
+  species-level substantiation — AFMA lists small fish, molluscs and
+  crustaceans, and molluscs ≠ automatically squid.
 
 ### 19. velvetbelly — Cornwall / twilight+deep / squid / chum
 - Current answer line: "Plan: chum over a Cornwall deep slope in the
   twilight-to-deep zone, squid on the line — a classic lanternshark dive."
-- Change (two bakes, then delete): name Cornwall in the range sentence
-  ("one of the commonest deepwater sharks off Cornwall and the
-  north-eastern Atlantic, living on continental slopes..."); firm the
-  diet wording ("It hunts cephalopods, crustaceans, and small bony fish"
-  → "It hunts squid, crustaceans, and small bony fish in the dark").
-  Entry ends on the bycatch/Vulnerable sentence.
-- Combo check: Cornwall (baked, was answer-line-only; NE Atlantic is the
-  only NE-Atlantic game region, but the name should be explicit) ✓,
-  200–500 m slopes (twilight+deep) ✓, squid (firmed from cephalopods) ✓.
+- Change (revised per Mira): do NOT claim "off Cornwall" as a local
+  abundance claim. Region bake becomes: "one of the commonest
+  deepwater sharks of the north-eastern Atlantic, living on
+  continental slopes, including waters around southwest Britain,
+  mostly between 200 and 500 metres" (verify southwest-Britain waters).
+  Diet firming kept (cephalopods → squid, approved by Mira). Delete
+  the answer line. Entry ends on the bycatch/Vulnerable sentence.
+- Combo check: southwest Britain (revised bake, to verify) ✓, 200–500 m
+  slopes (twilight+deep) ✓, squid (firmed from cephalopods) ✓.
 
 ### 20. dwarflantern — Caribbean / deep / crustaceans / chum
 - Current answer line: "Plan: chum down the Caribbean slope into the
@@ -222,29 +271,33 @@ to rescue a clue — anything uncertain is flagged, not asserted.
 - Current answer line: "Plan: chum the deep open Atlantic slopes, squid
   or schooling fish on the line — and watch the dark for a heavy shadow
   with big dark eyes."
-- Change (two bakes, then delete): name the Atlantic in the range
-  sentence ("found on continental slopes and around seamounts of the
-  open Atlantic and beyond — from 200 metres down to nearly 1800");
-  firm the diet wording ("deep-water fish, smaller sharks, squid,
-  crustaceans, and carrion" → "schooling fish, smaller sharks, squid,
-  crustaceans, and carrion"). Entry ends on the Vulnerable sentence.
-  (The big-eyes image survives in the body: "huge greenish eyes built
-  for near-total darkness.")
+- Change (revised per Mira): REVERT the schooling-fish firming — kitefin
+  prey studies describe deepwater bony fishes, other sharks and squid,
+  not specifically school-hunting. Keep "deep-water fish, smaller
+  sharks, squid, crustaceans, and carrion." Atlantic bake kept ("open
+  Atlantic and beyond"). Delete the answer line. Entry ends on the
+  Vulnerable sentence. (The big-eyes image survives in the body: "huge
+  greenish eyes built for near-total darkness.")
 - Combo check: open Atlantic (baked, was answer-line-only) ✓, 200–1800 m
-  (deep) ✓, squid (already in body) + schooling fish (firmed) ✓.
+  (deep) ✓, squid (already in body) ✓. OPEN DECISION for Avery:
+  schooling-fish bait clue gap — leave "fish" and accept the gap
+  honestly, find a supported schooling example, or revisit the
+  combo/label?
 
 ### 22. pacificsleeper — Japan / deep / squid, schooling-fish / chum
 - Current answer line: "Plan: chum Japan's offshore deep, squid or
   schooling fish on the line — and be patient, because a sleeper shark
   is never in a hurry."
-- Change (two bakes, then delete): name Japan in the roaming sentence
-  ("individuals can roam whole ocean basins, Japan's offshore deep
-  among them"); firm the diet wording ("It eats squid, fish,
-  crustaceans, and carrion" → "It eats squid, schooling fish,
-  crustaceans, and carrion"). Entry ends on the Near Threatened sentence.
-  (The slow charm survives: "slow-moving, barrel-bodied".)
+- Change (revised per Mira): diet firming replaced with a supported
+  specific example — "It eats squid, pollock and other fish,
+  crustaceans, and carrion, including the remains of seals and
+  porpoises." (Pollock may form schools.) Japan bake kept ("Japan's
+  offshore deep among them"). Delete the answer line. Entry ends on
+  the Near Threatened sentence. (The slow charm survives:
+  "slow-moving, barrel-bodied".)
 - Combo check: Japan (baked, was answer-line-only) ✓, cold deep water /
-  deep by day ✓, squid (already in body) + schooling fish (firmed) ✓.
+  deep by day ✓, squid (already in body) + pollock as the schooling
+  clue ✓.
 
 ### 23. spinydogfish — Cornwall / reef+surface / schooling-fish / chum
 - Current answer line: "Plan: chum the shallow coastal water off
@@ -270,33 +323,45 @@ to rescue a clue — anything uncertain is flagged, not asserted.
   British-Isles game region, but the name should be explicit) ✓,
   shallow reefs and kelp beds ✓, crabs (already in body) ✓.
 
-## Flags for Mira (accuracy check, before any ship)
+## Unchanged in this revision (Mira round 1: approved direction or broadly workable)
 
-1. Goblin: scent hint dropped entirely (frilled already carries the
-   scent-travels sentence). Acceptable, or keep a reworded hint?
-2. Mako reef tier: does "sunlit surface waters, rarely below 150 m"
-   pin surface+reef, or firm it?
-3. Smooth reef tier: does "upper water column" pin surface+reef, or
-   firm to reef edges?
-4. Angelshark reef tier: does "shallow coastal waters over sand and
-   mud" pin reef, or firm it?
-5. Firmed diet words (game's accepted baits moved into the body, Batch 1
-   pattern): scalloped fish → schooling fish; velvetbelly cephalopods →
-   squid; kitefin deep-water fish → schooling fish (added alongside);
-   pacificsleeper fish → schooling fish; leopard small fish → small
-   schooling fish; salmon added tuna + squid; blacktip added mackerel +
-   crabs/lobster; lemon added sardines; whitetip added schooling fish;
-   dusky added sardines + squid. All match the game's accepted combos;
-   confirm each is biologically fair, not just game-legal.
-6. Baked regions (Batch 1 cookiecutter pattern): velvetbelly Cornwall,
-   kitefin open Atlantic, pacificsleeper Japan, spinydogfish Cornwall,
-   catshark Cornwall. All true ranges; confirm the phrasing is fair.
+goblin, galapagos, hammerhead, scalloped, bull, portjackson,
+dwarflantern, leopard (small schooling fish supported), catshark,
+whitetip, dusky (sardine-run support), spinydogfish (Cornwall bake
+unchallenged). "Art deferred" for goblin/Galápagos/dusky has no bearing
+on whether their accurate text belongs in Research.
+
+## Open decisions for Avery (game design, not drafting)
+
+1. **Greenland bait label:** truthful diet (demersal/benthic fish, squid,
+   carrion) doesn't support schooling-fish as a defining habit. Adjust
+   the combo/label, or keep schooling-fish as an explicit gameplay
+   mapping?
+2. **Kitefin schooling-fish gap:** truthful diet is varied deep-water
+   fish, not specifically school-hunting. Leave "fish" and accept the
+   gap honestly, find a supported schooling example, or revisit the
+   combo/label?
+3. **Salmon "oily fish" mapping:** the displayed option is "Tuna / large
+   oily fish" — is "oily fish (herring, mackerel)" in the text an
+   acceptable clue to that option, or an explicit gameplay mapping to
+   mark?
+4. **Sawshark squid:** needs species-level substantiation before the
+   squid bait clue is kept as-is.
+5. **Southwest-Britain phrasings:** velvetbelly "waters around southwest
+   Britain" and angelshark "southwest Britain and Wales" need
+   verification; angelshark Cornwall specifically if sourceable.
 
 ## Ship sequence (not started)
 
-1. Avery shapes/vetoes these drafts here.
-2. Mira accuracy-checks (flags above + full read).
-3. One branch + PR: 24 rewrites + clue-matrix test extended to all 24 +
+1. Avery shapes/vetoes these drafts here (including the open decisions
+   above).
+2. Mira re-checks the revised doc.
+3. One implementation branch + PR: 24 rewrites + clue-matrix test
+   extended to all 24, mapping every accepted region, depth and bait
+   alternative to at least one truthful sentence fragment, with a
+   credible species reference for newly added concrete assertions +
    bold-clues extension for all 50 (sequenced with this batch, per
-   Avery 2026-10-21) + version bump.
-4. Merge only on Mira's review + Avery's explicit word.
+   Avery 2026-10-21; bold natural biology only, never a stealth
+   instruction list) + version bump.
+4. Merge only on Mira's review + Avery's explicit word. This drafts PR
+   (#150) itself is NOT for merging.
