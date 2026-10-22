@@ -447,8 +447,9 @@ code += `
   // v1.7.24-beta: tiered SARAH reactions — resightThread ordinal 1
   // returns the generic closer fallback (the reunion closer variants
   // are delivered by maybeReunionReaction), 2nd uses the middle
-  // pool, 3rd+ uses the excited pool. These lines live in Sarah's
-  // chat bubble only, never in the field note.
+  // pool, 3rd uses the THREE pool once only, 4th+ uses the generic
+  // excited pool (no counts, so no repeated THREE lines). These lines
+  // live in Sarah's chat bubble only, never in the field note.
   (function () {
     const n1 = resightSarahReactionFor(1);
     const n2 = resightSarahReactionFor(2);
@@ -458,17 +459,20 @@ code += `
       n1 === RESIGHT_GENERIC_CLOSER && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
     ok('resightSarahReactionFor(2) uses middle pool',
       RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_REUNION_CLOSERS.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
-    ok('resightSarahReactionFor(3) uses excited pool',
-      RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_REUNION_CLOSERS.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
-    ok('resightSarahReactionFor(5) still uses excited pool',
-      RESIGHT_NOTES_EXCITED.includes(n5));
+    ok('resightSarahReactionFor(3) uses THREE pool once only',
+      RESIGHT_NOTES_3RD.includes(n3) && !RESIGHT_REUNION_CLOSERS.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3) && !RESIGHT_NOTES_EXCITED.includes(n3));
+    ok('resightSarahReactionFor(5) uses generic excited pool, never a THREE line',
+      RESIGHT_NOTES_EXCITED.includes(n5) && !RESIGHT_NOTES_3RD.includes(n5));
+    ok('THREE pool lines all count three; generic excited pool never counts',
+      RESIGHT_NOTES_3RD.every(function(l) { return /three|third/i.test(l); }) &&
+      RESIGHT_NOTES_EXCITED.every(function(l) { return !/three|third/i.test(l); }));
   })();
   // v1.7.24-beta Mira review: pool separation is deterministic — the
   // field-note pool shares NOTHING with any Sarah pool, so no random
   // field note can ever speak Sarah's voice.
   ok('field notes are observational only, disjoint from Sarah pools',
     FIELD_RESIGHT_NOTES.length === 8 &&
-    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l)));
+    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l) || RESIGHT_NOTES_3RD.includes(l)));
   // v1.8.5-beta: five more variants added; the originals all remain.
   ok('reunion closers have original closer + all four Avery-picked Sarah lines',
     RESIGHT_REUNION_CLOSERS.length === 10 &&
@@ -478,9 +482,10 @@ code += `
     RESIGHT_REUNION_CLOSERS.includes("The tag's holding up great. This shark is basically wearing a Fitbit and thriving.") &&
     RESIGHT_REUNION_CLOSERS.includes("Back again! At this point I'm starting to think it likes us."));
   // v1.8.5-beta: three more variants added; the originals all remain.
-  ok('excited pool has all five Avery picks',
-    RESIGHT_NOTES_EXCITED.length === 8 &&
-    RESIGHT_NOTES_EXCITED.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+  ok('THREE pool has the five 3rd lines; generic excited pool keeps the AGAIN line',
+    RESIGHT_NOTES_3RD.length === 5 &&
+    RESIGHT_NOTES_3RD.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+    RESIGHT_NOTES_EXCITED.length === 3 &&
     RESIGHT_NOTES_EXCITED.includes("It's back AGAIN! I think this shark has adopted us. We're its humans now."));
   // v1.8.5-beta: three more variants added; the originals all remain.
   ok('middle pool has all five Avery picks',
@@ -492,9 +497,9 @@ code += `
   ok('2nd pool line says re-sighting, no future-sightings implication',
     RESIGHT_NOTES_2ND.includes("Second re-sighting! Okay, this one keeps showing up.") &&
     !RESIGHT_NOTES_2ND.some(l => l.includes("Second sighting!") || l.includes("keeping an eye on")));
-  ok('3rd+ pool line says re-sightings',
-    RESIGHT_NOTES_EXCITED.includes("Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!") &&
-    !RESIGHT_NOTES_EXCITED.some(l => l.includes("Three sightings of the same shark!")));
+  ok('3rd pool line says re-sightings',
+    RESIGHT_NOTES_3RD.includes("Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!") &&
+    !RESIGHT_NOTES_3RD.some(l => l.includes("Three sightings of the same shark!")));
   (function () {
     const nurse = SHARKS.find(s => s.id === 'nurse');
     const origTagged = state.tagged;
@@ -649,10 +654,10 @@ code += `
         !RESIGHT_REUNION_CLOSERS.some(l => t2[1].text.includes(l)) &&
         !RESIGHT_NOTES_2ND.some(l => t2[1].text.includes(l)) &&
         !RESIGHT_NOTES_EXCITED.some(l => t2[1].text.includes(l)));
-      // 3rd re-sighting (male): Sarah excited-pool line, no food reply.
+      // 3rd re-sighting (male): Sarah THREE-pool line, no food reply.
       const t3 = threadWith(3, 'male');
-      ok('3rd resightThread Sarah bubble uses excited pool, no food reply',
-        t3.length === 3 && t3[2].who === 'them' && RESIGHT_NOTES_EXCITED.includes(t3[2].text));
+      ok('3rd resightThread Sarah bubble uses THREE pool, no food reply',
+        t3.length === 3 && t3[2].who === 'them' && RESIGHT_NOTES_3RD.includes(t3[2].text));
       // Food-reply gating, deterministic: only after the likes-us line.
       ok('food reply follows likes-us line, she pronoun',
         resightFoodReplyFor(RESIGHT_LIKES_US_LINE, { sex: 'female' }) === 'Maybe. Or maybe she just knows where the food is.');

@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.5-beta": [
-"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too.",
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too. Sarah's re-sighting reactions fixed: her 'THREE TIMES?!' lines now fire only on the actual third re-sighting — later reunions get her generic best-friend lines instead of repeating the third-time ones.",
   ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
@@ -3507,8 +3507,9 @@ const RESIGHT_GENERIC_CLOSER = "That's the best part of tagging — you get to k
 
 /* v1.7.24-beta: tiered re-sighting reactions — Sarah gets more excited
    as she sees the same shark again. 2nd re-sighting: warm recognition.
-   3rd+: full best-friend energy. Tiers count RE-sightings
-   (ordinal = resightings.length + 1). */
+   3rd: the THREE lines, once only. 4th+: generic best-friend
+   energy (no counts, so the lines stay true). Tiers count
+   RE-sightings (ordinal = resightings.length, after logging). */
 const RESIGHT_NOTES_2ND = [
   "It's back! I was hoping we'd see this one again.",
   "Second re-sighting! Okay, this one keeps showing up.",
@@ -3521,14 +3522,23 @@ const RESIGHT_NOTES_2ND = [
   "Round two with this one — the tracker doesn't lie."
 ];
 
-const RESIGHT_NOTES_EXCITED = [
+/* v2.7.5-fix (Avery): the THREE lines fire ONLY on the 3rd re-sighting —
+   the old >= 3 tier repeated them at every later reunion, so Sarah said
+   "THIRD TIME!" again on the 4th. 4th+ reunions use the generic excited
+   pool below, which never counts. */
+const RESIGHT_NOTES_3RD = [
   "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
   "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
   "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
   "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
-  "It's back AGAIN! I think this shark has adopted us. We're its humans now.",
   /* v1.8.5-beta: more variants so repeats are rare. */
-  "THREE! This shark is a regular now. I'm genuinely attached.",
+  "THREE! This shark is a regular now. I'm genuinely attached."
+];
+
+/* Generic best-friend energy for the 4th re-sighting onward — no counts,
+   so these lines stay true no matter how many times the shark returns. */
+const RESIGHT_NOTES_EXCITED = [
+  "It's back AGAIN! I think this shark has adopted us. We're its humans now.",
   "It keeps coming back! I'm not saying we're best friends, but we're best friends.",
   "Another one! This shark has a favorite spot and we're lucky enough to know it."
 ];
@@ -3543,7 +3553,8 @@ const RESIGHT_NOTES_EXCITED = [
    only runs in unusual histories (an earlier encounter consumed the
    reunion reaction without logging a re-sighting). */
 function resightSarahReactionFor(ordinal) {
-  if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
+  if (ordinal === 3) return pick(RESIGHT_NOTES_3RD);
+  if (ordinal >= 4) return pick(RESIGHT_NOTES_EXCITED);
   if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
   return RESIGHT_GENERIC_CLOSER;
 }
