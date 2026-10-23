@@ -6284,13 +6284,14 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("v2.7.8 (Avery): every ambient creature has a size factor",
       Object.keys(CREATURE_ART).every(function(k) { return typeof CREATURE_SIZE[k] === "number"; }));
     /* v2.7.13-beta (Avery, on-device): otter halved — its wide sprite read too
-       big at 1, so it now sits below krill in height factor. Screen presence,
-       not biology, is what the factors tune. */
-    ok("v2.7.13 (Avery): size order with halved otter (otter < krill < seahorse < fish < manatee)",
+       big at 1. This chain is a screen-presence tuning, NOT a zoological
+       claim: otters are not smaller than krill. Factors compress real size
+       so nothing vanishes and wide sprites don't dominate. */
+    ok("v2.7.13 (Avery): otter visual tuning — half-height factor (otter < krill < seahorse < fish < manatee)",
       CREATURE_SIZE.otter < CREATURE_SIZE.krill && CREATURE_SIZE.krill < CREATURE_SIZE.seahorse &&
       CREATURE_SIZE.seahorse < CREATURE_SIZE.fish && CREATURE_SIZE.fish < CREATURE_SIZE.manatee &&
       CREATURE_SIZE.manatee === 1.5);
-    ok("v2.7.13 (Avery): relative heights render (otter < krill < fish < manatee, fixed random)",
+    ok("v2.7.13 (Avery): otter renders compressed (otter < krill < fish < manatee, fixed random)",
       (function() {
         const _ce = document.createElement;
         const realRandom = Math.random;
@@ -6304,6 +6305,27 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
             heights[c] = parseInt(lastEl.style.height, 10);
           });
           return heights.otter < heights.krill && heights.krill < heights.fish && heights.fish < heights.manatee;
+        } finally {
+          document.createElement = _ce;
+          Math.random = realRandom;
+        }
+      })());
+    /* v2.7.13-beta (Mira review): Avery explicitly decided BOTH paths halve —
+       drift shadow and scripted sighting. Assert actual spawn heights per
+       path at fixed random, not just the shared factor. */
+    ok("v2.7.13 (Avery): otter spawn heights halve on both paths (drift 9-15, sighting 12-25, fixed random)",
+      (function() {
+        const _ce = document.createElement;
+        const realRandom = Math.random;
+        let lastEl = null;
+        try {
+          document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+          Math.random = function() { return 0.5; };
+          spawnCreature("otter", true);
+          const bgH = parseInt(lastEl.style.height, 10);
+          spawnCreature("otter", false);
+          const fgH = parseInt(lastEl.style.height, 10);
+          return bgH >= 9 && bgH <= 15 && fgH >= 12 && fgH <= 25 && bgH < fgH;
         } finally {
           document.createElement = _ce;
           Math.random = realRandom;
