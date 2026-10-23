@@ -113,6 +113,14 @@ const ACHIEVEMENTS = [
     })
   },
   {
+    id: "maiden-voyage",
+    name: "Maiden Voyage",
+    icon: "⛵",
+    breadcrumb: "you're really doing it",
+    description: "Ran your first expedition. Sarah packed extra snacks. She always packs extra snacks.",
+    check: (st) => (st.stats.expeditions || 0) >= 1
+  },
+  {
     id: "sea-legs",
     name: "Sea Legs",
     icon: "⚓",
@@ -121,14 +129,6 @@ const ACHIEVEMENTS = [
     breadcrumb: "steady on your feet",
     description: "Completed 10 expeditions. You're not a landlubber anymore.",
     check: (st) => (st.stats.expeditions || 0) >= 10
-  },
-  {
-    id: "maiden-voyage",
-    name: "Maiden Voyage",
-    icon: "⛵",
-    breadcrumb: "you're really doing it",
-    description: "Ran your first expedition. Sarah packed extra snacks. She always packs extra snacks.",
-    check: (st) => (st.stats.expeditions || 0) >= 1
   },
   {
     id: "twilight-dive",
@@ -143,7 +143,7 @@ const ACHIEVEMENTS = [
     name: "Midnight Zone",
     icon: "🌑",
     breadcrumb: "below the last light",
-    description: "Dived to the deep dark for the first time. No sunlight, no problem — the sharks down here bring their own light.",
+    description: "Dived to the deep dark for the first time. No sunlight reaches this far down. Some deep-sea sharks make their own light — and others navigate the dark without it.",
     check: (st) => (st.stats.depthsVisited || []).includes("deep")
   },
   {
