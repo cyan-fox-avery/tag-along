@@ -2059,26 +2059,25 @@ function highlightClues(s) {
   }
   return text;
 }
-/* v2.7.9-beta fix (Mira review): species-aware clue emphasis.
+/* v2.7.9-beta fix (Mira re-review): species-aware clue emphasis, v2.
    Bait emphasis comes ONLY from the species' own baitList(s) via
-   BAIT_SYNONYMS — a prey word bolds only when it evidences a bait
-   this shark actually accepts (greenland squid-only never bolds fish
-   or seals; kitefin squid-only never bolds fish or crustaceans).
-   Herring/mackerel sit in both the tuna and schooling-fish sets:
-   they are genuinely both oily fish and schooling fish, so they
-   evidence whichever of those baits the species accepts.
-   Region emphasis comes from REGION_ALIASES (the species' own
-   regions), which cover prose wording, not just REGIONS display
-   labels ("Cornwall" for "Cornwall, UK"; "Australia's east coast"
-   for "Eastern Australia"; "Galápagos" for "Galápagos Islands").
-   Depth emphasis is DEPTH_EVIDENCE phrases plus metre numbers.
-   Metre numbers bold as measurement evidence; a few are body
-   lengths (greenland 6 m, leopard 1.2-1.5 m, sawshark 1.4 m) — they
-   read as size facts in context, not depth claims, and no planner
-   dimension keys on size. Single pass, longest terms first, so no
-   nested <strong> tags. Same font/size, just bold. A genuine clue
-   may stay unbolded where emphasis could mislead; the clue-matrix
-   and combo-behaviour tests, not the bolding, prove deducibility. */
+   BAIT_SYNONYMS, plus SPECIES_SYNONYMS for the two reviewed cases
+   where the honest clue word is species-specific (pacificsleeper
+   pollock for schooling-fish; silvertip cephalopods for squid) —
+   never generalized to other species. Region emphasis comes from
+   REGION_ALIASES (the species' own regions), covering prose wording,
+   not just REGIONS display labels. Depth emphasis is DEPTH_EVIDENCE
+   phrases plus metre numbers.
+   Metre numbers: decimal-safe, with a protected start and no
+   lookbehind (older WebKit-safe) — a number never bolds mid-number,
+   so "1.4 metres" can only ever match whole. Known body lengths in
+   LENGTH_PHRASES are masked before bolding and restored after, so
+   lengths stay unbolded while depth cues bold (verified by
+   enumeration: every decimal metre phrase in the 50 texts is a body
+   length; every depth phrase is an integer). Single-pass term
+   bolding (longest first, no nested <strong>); number bolding is a
+   separate pass that cannot nest inside term bolds (terms contain
+   no digits). Same font/size, just bold. */
 const BAIT_SYNONYMS = {
   "squid": ["squid"],
   "crustaceans": ["crustaceans", "crabs", "crab", "shrimp", "lobster"],
@@ -2087,6 +2086,10 @@ const BAIT_SYNONYMS = {
   "schooling-fish": ["schools of small reef fish", "schools of smaller fish", "schools of reef fish", "school of reef fish", "schools of fish", "schooling fishes", "schooling fish", "small schooling fish", "sardines", "sardine", "anchovies", "anchovy", "herring", "mackerel"],
   "urchins": ["sea urchins", "urchins", "shellfish"],
   "plankton": ["plankton", "krill"]
+};
+const SPECIES_SYNONYMS = {
+  "pacificsleeper": ["pollock"],
+  "silvertip": ["cephalopods"]
 };
 const REGION_ALIASES = {
   "caribbean": ["Caribbean Sea", "Caribbean"],
@@ -2114,8 +2117,20 @@ const DEPTH_EVIDENCE = [
   "kelp and rocky reefs", "deep tropical", "patch of reef",
   "sunlit shallows", "surface down through the reefs"
 ];
+const LENGTH_PHRASES = [
+  "1.9 to 2.4 metres", "1.2 to 1.5 metres", "1.65 metres", "2.4 metres",
+  "5.5 metres", "1.4 metres", "6 metres", "4.8 metres", "1.6 metres",
+  "4.3 metres"
+];
 function highlightResearchClues(s, text) {
   text = text || s.research || "";
+  const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const masked = [];
+  let work = text;
+  LENGTH_PHRASES.forEach(phrase => {
+    const re = new RegExp("\\b" + esc(phrase) + "\\b", "gi");
+    work = work.replace(re, () => { masked.push(phrase); return "\u0001" + (masked.length - 1) + "\u0001"; });
+  });
   const terms = [];
   regionList(s).forEach(r => {
     const aliases = REGION_ALIASES[r] || [ (REGIONS[r] || {}).name || r ];
@@ -2125,11 +2140,13 @@ function highlightResearchClues(s, text) {
     const syns = BAIT_SYNONYMS[b] || [ String(b).replace(/-/g, " ") ];
     syns.forEach(a => terms.push(a));
   });
+  (SPECIES_SYNONYMS[s.id] || []).forEach(a => terms.push(a));
   DEPTH_EVIDENCE.forEach(a => terms.push(a));
   terms.sort((a, b) => b.length - a.length);
-  const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = terms.map(esc).join("|") + "|\\d[\\d,]*\\s*(?:to|and|–|—|-)\\s*\\d[\\d,]*\\s*metres|\\d[\\d,]*\\s*metres";
-  return text.replace(new RegExp("\\b(" + pattern + ")\\b", "gi"), "<strong>$1</strong>");
+  work = work.replace(new RegExp("\\b(" + terms.map(esc).join("|") + ")\\b", "gi"), "<strong>$1</strong>");
+  const num = "\\d[\\d,]*(?:\\.\\d+)?";
+  work = work.replace(new RegExp("(^|[^\\d.])(" + num + "\\s*(?:to|and|–|—|-)\\s*" + num + "\\s*metres|" + num + "\\s*metres)\\b", "gi"), "$1<strong>$2</strong>");
+  return work.replace(/\u0001(\d+)\u0001/g, (_, i) => masked[+i]);
 }
 function renderPinnedCard(list) {
   /* v1.4.0-beta: pinned card lives in its own full-width section above the

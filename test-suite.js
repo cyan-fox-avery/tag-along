@@ -5818,6 +5818,35 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     if (unbolded.length) console.log("unbolded cards: " + unbolded.join(", "));
   } catch (e) { ok("v2.7.9 all-50 inspection block (" + e.message + ")", false); }
 
+/* ---------- v2.7.9 Mira re-review 2: decimal-safe metre bolding ---------- */
+  try {
+    const bolded = function(id) {
+      const sp = SHARKS.find(function(x) { return x.id === id; });
+      return sp.research.split("\\n\\n").map(function(p) { return highlightResearchClues(sp, p); }).join("");
+    };
+    const ss = bolded("sawshark");
+    ok("v2.7.9 decimal fix: sawshark length unbolded, depth range bolded whole",
+      ss.indexOf("1.<strong>4 metres</strong>") === -1 &&
+      ss.indexOf("<strong>1.4 metres</strong>") === -1 &&
+      ss.indexOf("<strong>40 to 310 metres</strong>") !== -1);
+    const lp = bolded("leopard");
+    ok("v2.7.9 decimal fix: leopard length unbolded, no partial fragment",
+      lp.indexOf("1.<strong>5 metres</strong>") === -1 &&
+      lp.indexOf("<strong>1.2 to 1.5 metres</strong>") === -1);
+    ok("v2.7.9 decimal fix: dwarf depth range still bolds whole, greenland length unbolded",
+      bolded("dwarflantern").indexOf("<strong>189 to 598 metres</strong>") !== -1 &&
+      bolded("greenland").indexOf("<strong>6 metres</strong>") === -1 &&
+      bolded("greenland").indexOf("<strong>hundreds of metres</strong>") !== -1);
+    ok("v2.7.9 species synonyms: sleeper pollock + silvertip cephalopods bold",
+      bolded("pacificsleeper").indexOf("<strong>pollock</strong>") !== -1 &&
+      bolded("silvertip").indexOf("<strong>cephalopods</strong>") !== -1);
+    const probe = highlightResearchClues({ combo: { regions: ["caribbean"], bait: ["squid"] } }, "It eats squid, pollock and cephalopods.");
+    ok("v2.7.9 species synonyms: pollock/cephalopods do not generalize to other squid species",
+      probe.indexOf("<strong>squid</strong>") !== -1 &&
+      probe.indexOf("<strong>pollock</strong>") === -1 &&
+      probe.indexOf("<strong>cephalopods</strong>") === -1);
+  } catch (e) { ok("v2.7.9 decimal fix block (" + e.message + ")", false); }
+
 /* ---------- v2.7.1: Bukangi made it out ---------- */
   try {
     ok("v2.7.1 BUKANGI_THREAD updated to the success story",
