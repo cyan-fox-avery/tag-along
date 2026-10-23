@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.4-beta** — *a shark research game*
+**v2.7.5-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -12,6 +12,7 @@ science.
 Built for sarah, who loves sharks. 🦈
 
 ## v2.7.x changes
+- **v2.7.5** — ambient life batch 2: reef creatures (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), full-body surface visitors (otters in California, narwhal/beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows, and four more distant shark silhouettes (great white, mako, thresher, goblin). Fish still the most common drifting silhouette everywhere, and more frequent in surface and reef drift. Slow shadows (jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, anglerfish) cross at half speed. Background drift creatures swim closer (larger), and deep drift matches sighting opacity with a stronger halo. Sarah's THREE-times lines now fire only on the actual third re-sighting. The lanternfish school glows warm and bright on its sighting.
 - **v2.7.4** — ambient life batch: anglerfish (deep only), sunfish (warm + open-water surface), penguins (South Africa + Galápagos only), and distant uncatchable shark silhouettes (hammerhead, whale shark, tiger). Fish most common everywhere, dolphins and turtles a bit less so; everything drifts in from both sides.
 - **v2.7.3** — logbook Species filter now lists sharks alphabetically (A–Z) instead of in roster order, so finding one in the big dropdown is faster. 'All species' stays first; research-tab ordering is untouched.
 - **v2.7.2** — tour layout fixes from iPad QA: the tour card now parks in one fixed spot for all ten slides (bigger window, nav row pinned so Back/Skip/Next never move), a yellow arrow below the tab bar points at the tab each slide explains, and the replay ? button moved from the header to the footer beside Export/Import save, with its glyph properly centred.

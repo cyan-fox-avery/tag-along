@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.4-beta";
+const VERSION = "v2.7.5-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.5-beta": [
+"🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too. Sarah's re-sighting reactions fixed: her 'THREE TIMES?!' lines now fire only on the actual third re-sighting — later reunions get her generic best-friend lines instead of repeating the third-time ones. The lanternfish school glows now: its sighting carries a warm bright light that throws the whole school into relief (sighting only — ordinary fish drift stays dark).",
+  ],
   "v2.7.4-beta": [
 "🌊 <strong>More shadows in the water.</strong> Anglerfish lurk in the deep dark, sunfish bask at warm and open-water surfaces, and penguins dart past only in South Africa and the Galápagos. Distant shark silhouettes sometimes glide by — passing through, never encounters. Fish stay the most common sighting, dolphins and turtles a bit less so, and everything drifts in from both sides.",
   ],
@@ -612,7 +615,27 @@ const CREATURE_ART = {
   jellyfish: null,
   anglerfish: null,
   penguin: null,
-  mola: null
+  mola: null,
+  moray: null,
+  seahorse: null,
+  clownfish: null,
+  parrotfish: null,
+  pufferfish: null,
+  lionfish: null,
+  hatchetfish: null,
+  gulper: null,
+  vampire: null,
+  siphonophore: null,
+  krill: null,
+  viperfish: null,
+  snailfish: null,
+  cusk: null,
+  otter: null,
+  narwhal: null,
+  beluga: null,
+  snake: null,
+  manatee: null,
+  tuna: null,
 };
 /* Filled in at load: art-loader.js must be loaded before script.js. */
 function initCreatureArt() {
@@ -625,6 +648,26 @@ function initCreatureArt() {
   CREATURE_ART.anglerfish = bgCreatureImg("bg-anglerfish", "Anglerfish");
   CREATURE_ART.penguin = bgCreatureImg("bg-penguin", "Penguin");
   CREATURE_ART.mola = bgCreatureImg("bg-mola", "Sunfish");
+  CREATURE_ART.moray = bgCreatureImg("bg-moray", "Moray eel");
+  CREATURE_ART.seahorse = bgCreatureImg("bg-seahorse", "Seahorse");
+  CREATURE_ART.clownfish = bgCreatureImg("bg-clownfish", "Clownfish");
+  CREATURE_ART.parrotfish = bgCreatureImg("bg-parrotfish", "Parrotfish");
+  CREATURE_ART.pufferfish = bgCreatureImg("bg-pufferfish", "Pufferfish");
+  CREATURE_ART.lionfish = bgCreatureImg("bg-lionfish", "Lionfish");
+  CREATURE_ART.hatchetfish = bgCreatureImg("bg-hatchetfish", "Hatchetfish");
+  CREATURE_ART.gulper = bgCreatureImg("bg-gulper", "Gulper eel");
+  CREATURE_ART.vampire = bgCreatureImg("bg-vampire-squid", "Vampire squid");
+  CREATURE_ART.siphonophore = bgCreatureImg("bg-siphonophore", "Siphonophore");
+  CREATURE_ART.krill = bgCreatureImg("bg-krill", "Krill swarm");
+  CREATURE_ART.viperfish = bgCreatureImg("bg-viperfish", "Viperfish");
+  CREATURE_ART.snailfish = bgCreatureImg("bg-snailfish", "Snailfish");
+  CREATURE_ART.cusk = bgCreatureImg("bg-cusk-eel", "Cusk eel");
+  CREATURE_ART.otter = bgCreatureImg("bg-sea-otter", "Sea otter");
+  CREATURE_ART.narwhal = bgCreatureImg("bg-narwhal", "Narwhal");
+  CREATURE_ART.beluga = bgCreatureImg("bg-beluga", "Beluga");
+  CREATURE_ART.snake = bgCreatureImg("bg-sea-snake", "Sea snake");
+  CREATURE_ART.manatee = bgCreatureImg("bg-manatee", "Manatee");
+  CREATURE_ART.tuna = bgCreatureImg("bg-tuna", "Tuna school");
 }
 
 /* Flavour: the dive log describes the place, not just the mechanics.
@@ -683,7 +726,17 @@ const SIGHTINGS = {
     { text: "An African penguin torpedoes past in a burst of bubbles, impossibly fast for a bird.", creature: "penguin", regions: ["south-africa"] },
     { text: "A Galápagos penguin darts past, tiny and quick, gone before you can point.", creature: "penguin", regions: ["galapagos"] },
     { text: "A hammerhead's silhouette sweeps past in the distance, its wide head unmistakable even this far off.", creature: "shark:hammerhead", biomes: ["tropical","pelagic"] },
-    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and vast, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] }
+    { text: "Something enormous glides beneath the boat — a whale shark's shadow, slow and vast, there and gone.", creature: "shark:whale", biomes: ["tropical","pelagic"] },
+    { text: "A sea otter glides past, paws tucked, utterly at home in the kelp.", creature: "otter", biomes: ["kelp"] },
+    { text: "A narwhal glides through the cold green water, its long tusk leading the way.", creature: "narwhal", biomes: ["polar"] },
+    { text: "A beluga drifts past, pale and slow, with no dorsal fin to break its outline.", creature: "beluga", biomes: ["polar"] },
+    { text: "A sea snake ripples past, flat tail paddling, paying you no mind.", creature: "snake", regions: ["philippines","papua-new-guinea","maldives"] },
+    { text: "A manatee lumbers past, slow and whiskered, grazing as it goes.", creature: "manatee", regions: ["caribbean"] },
+    { text: "A school of tuna powers past, silver and fast, gone in a heartbeat.", creature: "tuna", biomes: ["pelagic"] },
+    { text: "A clownfish darts among the anemone tentacles, then ducks back in.", creature: "clownfish", regions: ["philippines","papua-new-guinea","maldives"] },
+    { text: "A great white's silhouette passes far off, huge and unhurried, too distant to follow.", creature: "shark:greatwhite", biomes: ["tropical","temperate","pelagic"] },
+    { text: "A mako's silhouette streaks past in the distance, too fast and too far to follow.", creature: "shark:mako", biomes: ["tropical","temperate","pelagic"] },
+    { text: "A thresher's silhouette sweeps by far off, its long tail trailing behind it, too distant to follow.", creature: "shark:thresher", biomes: ["tropical","temperate","pelagic"] }
   ],
   reef: [
     { text: "A sea turtle paddles over the coral, unbothered by your presence.", creature: "turtle", biomes: ["tropical","volcanic"] },
@@ -699,27 +752,41 @@ const SIGHTINGS = {
     { text: "A vast school of mackerel wheels overhead, a living cloud flashing silver.", creature: "fish", biomes: ["pelagic"] },
     { text: "A squid pulses through the blue, arms trailing, hunting in the open water.", creature: "fish", biomes: ["pelagic"] },
     { text: "A moon jelly drifts past in the open blue, pulsing gently.", creature: "jellyfish", biomes: ["pelagic"] },
-    { text: "A tiger shark's silhouette crosses the drop-off far below, too distant to follow.", creature: "shark:tiger", biomes: ["tropical"] }
+    { text: "A tiger shark's silhouette crosses the drop-off far below, too distant to follow.", creature: "shark:tiger", biomes: ["tropical"] },
+    { text: "A moray eel slides past, long and sinuous, mouth opening and closing as it goes.", creature: "moray", biomes: ["tropical"] },
+    { text: "A seahorse drifts past upright, tail curled tight, swaying with the water.", creature: "seahorse", biomes: ["tropical","temperate"] },
+    { text: "A parrotfish crunches coral with its beak mouth, trailing a puff of sand behind it.", creature: "parrotfish", biomes: ["tropical"] },
+    { text: "A pufferfish hovers over the reef, smooth and unhurried, fins fluttering to hold still.", creature: "pufferfish", biomes: ["tropical","temperate"] },
+    { text: "A lionfish hovers over the reef, fins flared wide, beautiful and unbothered.", creature: "lionfish", biomes: ["tropical","temperate"] },
   ],
   twilight: [
     { text: "A loose school of lanternfish flickers past, each one carrying its own small light.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A chain of salps drifts past, glassy barrels linked nose to tail.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A squid pulses through the edge of the lights, arms trailing, gone in a blink.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A moon jelly drifts past, pulsing gently, trailing its fine oral arms.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A hatchetfish flickers past, deep-bodied and silver, its belly lights blinking.", creature: "hatchetfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A gulper eel drifts by, huge mouth first, its long tail trailing into the dark.", creature: "gulper", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A vampire squid pulses past, dark cape of webbed arms trailing behind it.", creature: "vampire", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A siphonophore drifts past, a long chain of bells and threads, longer than you are.", creature: "siphonophore", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A cloud of krill swarms past, thousands of tiny bodies moving as one.", creature: "krill", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A viperfish hangs in the dark, fangs bared, its lure swaying ahead of it.", creature: "viperfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
   ],
   deep: [
     { text: "Something small and pale drifts through the edge of the lights — gone before you can focus.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A rattail fish noses through the mud at the edge of the lights, unhurried.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A dumbo octopus flaps past like a tiny ghost with ears.", creature: "fish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
     { text: "A deep-sea jellyfish pulses in the darkness, its bell glowing faintly red.", creature: "jellyfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
-    { text: "An anglerfish drifts through the edge of the lights, its lure glowing faintly ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] }
+    { text: "An anglerfish drifts through the edge of the lights, its lure glowing faintly ahead of all those teeth.", creature: "anglerfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A snailfish drifts past, soft and tadpole-shaped, unbothered by the dark.", creature: "snailfish", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A cusk eel slides through the mud, long and plain, tail tapering away.", creature: "cusk", biomes: ["tropical","temperate","kelp","pelagic","polar","volcanic"] },
+    { text: "A goblin shark's silhouette drifts through the dark below, too deep and too far to follow.", creature: "shark:goblin", biomes: ["tropical","temperate","kelp","pelagic","volcanic"] }
   ]
 };
 
 /* v0.13.0: the sighting deck is filtered against the region note so the
    trip doesn't echo it — the Caribbean note already mentions a green sea
    turtle, Japan's a lanternfish, the Maldives' dolphins. */
-const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly", penguin: "penguin", anglerfish: "angler", mola: "mola" };
+const SIGHTING_KEYWORDS = { turtle: "turtle", fish: "fish", dolphin: "dolphin", ray: "ray", seal: "seal", jellyfish: "jelly", penguin: "penguin", anglerfish: "angler", mola: "mola", moray: "moray", seahorse: "seahorse", clownfish: "clownfish", parrotfish: "parrotfish", pufferfish: "pufferfish", lionfish: "lionfish", hatchetfish: "hatchetfish", gulper: "gulper", vampire: "vampire", siphonophore: "siphonophore", krill: "krill", viperfish: "viperfish", snailfish: "snailfish", cusk: "cusk", otter: "otter", narwhal: "narwhal", beluga: "beluga", snake: "snake", manatee: "manatee", tuna: "tuna" };
 /* v2.7.4-beta: sighting-deck weighting — fish sightings surface most
    often, dolphins and turtles a bit less, everything else rarer. The deck
    still deals each sighting at most once per trip; weighting only orders
@@ -744,11 +811,20 @@ function buildSightingDeck(depth, region) {
      in the Arctic, no seals in the Maldives, no coral-reef animals in polar
      waters. Falls back to a neutral fish sighting, never an empty deck. */
   const biome = REGION_BIOME[region] || "temperate";
-  const filtered = pool.filter(s =>
-    !note.includes(SIGHTING_KEYWORDS[s.creature]) &&
-    (!s.biomes || s.biomes.indexOf(biome) !== -1) &&
-    (!s.regions || s.regions.indexOf(region) !== -1)
-  );
+  const filtered = pool.filter(s => {
+    let echo = note.includes(SIGHTING_KEYWORDS[s.creature]);
+    /* v2.7.5-fix (Mira review): "lanternfish" contains "fish" but is not a
+       generic-fish repeat — in a lanternfish note, suppress a fish-sprite
+       entry only when its own text repeats the lanternfish line. Other
+       fish-sprite entries (squid, salps, octopus, silver schools) are not
+       duplicates of the note. All other keyword de-dup is untouched. */
+    if (s.creature === "fish" && note.includes("lanternfish")) {
+      echo = s.text.toLowerCase().includes("lanternfish");
+    }
+    return !echo &&
+      (!s.biomes || s.biomes.indexOf(biome) !== -1) &&
+      (!s.regions || s.regions.indexOf(region) !== -1);
+  });
   const use = filtered.length ? filtered : pool.filter(s => s.creature === "fish");
   const final = use.length ? use : pool;
   return { deck: weightedSightingShuffle(final), pool: final };
@@ -2482,18 +2558,30 @@ const REGION_BIOME = {
   "galapagos": "volcanic"
 };
 /* Region-appropriate ambient creatures (keys into CREATURE_ART). */
-/* v2.7.4-beta: drift weighting by duplication — fish tripled everywhere
+/* v2.7.4-beta: drift weighting by duplication — fish fivefold in shallow lists (bumped from tripled in v2.7.5, Avery)
    (most common in most places), dolphins/turtles single (a bit less
    common), mola rare in warm and open water. Penguins are NOT here: they
    are region-specific (South Africa + Galápagos only) and join the drift
    via the region override in startAmbientLife. */
+/* v2.7.5-fix: bottom-dwellers cut on Avery's word (clam, nudibranch, tripod, isopod, yeti, cucumber) — removed from pools, drift, keywords, and tests.
+   v2.7.5-beta: batch-2 drift additions — reef/twilight/deep creatures join
+   their biome lists; surface visitors join theirs (otter to kelp =
+   California only; narwhal/beluga to polar = Arctic only; tuna to
+   pelagic). Fish boosted to five in every shallow list (v2.7.5, Avery), still the most common. */
+/* v2.7.5-fix (Mira review): reef residents stay in reef drift — surface
+   drift excludes them, so reef fish don't swim in open surface water. */
+const REEF_RESIDENTS = ["moray", "seahorse", "clownfish", "parrotfish", "pufferfish", "lionfish"];
+function surfaceDriftList(biome) {
+  return (BIOME_CREATURES[biome] || ["fish", "fish", "fish", "turtle", "dolphin"])
+    .filter(function(c) { return REEF_RESIDENTS.indexOf(c) === -1; });
+}
 const BIOME_CREATURES = {
-  "tropical":  ["fish", "fish", "fish", "turtle", "dolphin", "ray", "mola"],
-  "temperate": ["fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola"],
-  "kelp":      ["fish", "fish", "fish", "seal", "dolphin"],
-  "pelagic":   ["fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola"],
-  "polar":     ["fish", "fish", "fish", "seal", "jellyfish"],
-  "volcanic":  ["fish", "fish", "fish", "turtle", "ray", "seal"]
+  "tropical":  ["fish", "fish", "fish", "fish", "fish", "turtle", "dolphin", "ray", "mola", "moray", "parrotfish", "pufferfish", "lionfish"],
+  "temperate": ["fish", "fish", "fish", "fish", "fish", "seal", "dolphin", "jellyfish", "mola", "seahorse", "pufferfish", "lionfish"],
+  "kelp":      ["fish", "fish", "fish", "fish", "fish", "seal", "dolphin", "otter"],
+  "pelagic":   ["fish", "fish", "fish", "fish", "fish", "dolphin", "jellyfish", "ray", "mola", "tuna"],
+  "polar":     ["fish", "fish", "fish", "fish", "fish", "seal", "jellyfish", "narwhal", "beluga"],
+  "volcanic":  ["fish", "fish", "fish", "fish", "fish", "turtle", "ray", "seal"]
 };
 /* v2.5.0-beta: hand-painted expedition backgrounds (Avery + Mira).
    13 images covering all 52 region×depth combinations. Surface uses BG-01..06,
@@ -2571,8 +2659,9 @@ function startAmbientLife(depth, region) {
   const biome = REGION_BIOME[region] || "temperate";
   const shallow = depth === "surface" || depth === "reef";
   let creatures;
-  if (depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish"];
-  else if (!shallow) creatures = ["fish", "fish", "jellyfish"];
+  if (depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish", "snailfish", "cusk"];
+  else if (!shallow) creatures = ["fish", "fish", "jellyfish", "hatchetfish", "gulper", "vampire", "siphonophore", "krill", "viperfish"];
+  else if (depth === "surface") creatures = surfaceDriftList(biome);
   else creatures = (BIOME_CREATURES[biome] || ["fish", "fish", "fish", "turtle", "dolphin"]).slice();
   /* v2.7.4-beta: penguins drift only where they live — South Africa and
      the Galápagos — never in the Arctic or other temperate waters. */
@@ -2587,7 +2676,10 @@ function stopAmbientLife() {
 }
 
 /* Ambient sea life + quiet easter-egg flavour during the dive. */
-function spawnCreature(type, background) {
+/* v2.7.5-fix (Avery): these shadows move at half speed — drifters and
+   loungers, not cruisers. Everything else keeps the usual 9-17s crossing. */
+const SLOW_CREATURES = ["jellyfish", "mola", "seahorse", "manatee", "snailfish", "siphonophore", "krill", "anglerfish"];
+function spawnCreature(type, background, lit) {
   const scene = $("diveScene");
   let art = CREATURE_ART[type];
   /* v2.7.4-beta: ambient shark silhouettes — existing shark art, darkened
@@ -2601,11 +2693,21 @@ function spawnCreature(type, background) {
   if (!art) return;
   const el = document.createElement("div");
   el.className = "ambient" + (background ? " bg-fish" : "");
+  /* v2.7.5-fix (Avery): the lanternfish school carries its own lights —
+     a warm bright glow that throws the whole school into relief.
+     Sighting only (the flag), so ordinary fish drift stays dark. */
+  if (lit) el.classList.add("lit");
   el.innerHTML = art;
   el.style.top = (8 + Math.random() * 55) + "%";
-  el.style.animationDuration = (9 + Math.random() * 8).toFixed(1) + "s";
+  /* v2.7.5-fix (Avery): famously slow creatures cross at half speed —
+     their shadows linger instead of hurrying past like a fish. */
+  const slow = SLOW_CREATURES.indexOf(type) !== -1;
+  const dur = (9 + Math.random() * 8) * (slow ? 2 : 1);
+  el.style.animationDuration = dur.toFixed(1) + "s";
+  /* v2.7.5-fix (Avery): background animals stay relatively close — at
+     10-18px they read as fast-moving distant blobs, not creatures. */
   el.style.height = background
-    ? Math.round(10 + Math.random() * 8) + "px"
+    ? Math.round(18 + Math.random() * 12) + "px"
     : Math.round(24 + Math.random() * 26) + "px";
   /* v0.26.1: ambient creatures swim both ways — 50/50 per spawn. The art
      faces left by default, so leftward swimmers need no flip; rightward
@@ -2618,7 +2720,7 @@ function spawnCreature(type, background) {
   }
   el.addEventListener("animationend", () => el.remove());
   scene.appendChild(el);
-  setTimeout(() => el.remove(), 25000); // safety net
+  setTimeout(() => el.remove(), slow ? 45000 : 25000); // safety net (slow crossings run 18-34s)
 }
 
 /* Guaranteed ambient life before the shark reveal: the scene must feel
@@ -2642,7 +2744,7 @@ async function showSighting(depth) {
     if (tripDecks && !tripDecks.sightings.deck.length) return;
     const s = tripDecks ? deal(tripDecks.sightings.deck, tripDecks.sightings.pool) : pick(options);
     logLine(`👁️ ${s.text}`);
-    spawnCreature(s.creature);
+    spawnCreature(s.creature, false, s.text.toLowerCase().indexOf("lanternfish") !== -1);
   }
 }
 
@@ -3412,8 +3514,9 @@ const RESIGHT_GENERIC_CLOSER = "That's the best part of tagging — you get to k
 
 /* v1.7.24-beta: tiered re-sighting reactions — Sarah gets more excited
    as she sees the same shark again. 2nd re-sighting: warm recognition.
-   3rd+: full best-friend energy. Tiers count RE-sightings
-   (ordinal = resightings.length + 1). */
+   3rd: the THREE lines, once only. 4th+: generic best-friend
+   energy (no counts, so the lines stay true). Tiers count
+   RE-sightings (ordinal = resightings.length, after logging). */
 const RESIGHT_NOTES_2ND = [
   "It's back! I was hoping we'd see this one again.",
   "Second re-sighting! Okay, this one keeps showing up.",
@@ -3421,19 +3524,28 @@ const RESIGHT_NOTES_2ND = [
   "Back for round two! This shark is becoming a regular.",
   "Twice now! Either it likes this spot or it likes us. Probably both.",
   /* v1.8.5-beta: more variants so repeats are rare. */
-  "Two sightings! This one's officially on our radar.",
+  "Two re-sightings! This one's officially on our radar.",
   "Again! I'm starting to feel like we know this shark.",
   "Round two with this one — the tracker doesn't lie."
 ];
 
-const RESIGHT_NOTES_EXCITED = [
-  "THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
+/* v2.7.5-fix (Avery): the THREE lines fire ONLY on the 3rd re-sighting —
+   the old >= 3 tier repeated them at every later reunion, so Sarah said
+   "THIRD TIME!" again on the 4th. 4th+ reunions use the generic excited
+   pool below, which never counts. */
+const RESIGHT_NOTES_3RD = [
+  "THREE RE-SIGHTINGS?! This shark is basically family now. I'm naming it in my head and you can't stop me.",
   "Okay, this is officially a friendship. Three re-sightings means it knows us. It KNOWS us!",
-  "THIRD TIME! I'm doing a little happy dance. This shark keeps coming back to say hi!",
+  "Third re-sighting! I'm doing a little happy dance. This shark keeps coming back to say hi!",
   "Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!",
-  "It's back AGAIN! I think this shark has adopted us. We're its humans now.",
   /* v1.8.5-beta: more variants so repeats are rare. */
-  "THREE! This shark is a regular now. I'm genuinely attached.",
+  "THREE RE-SIGHTINGS! This shark is a regular now. I'm genuinely attached."
+];
+
+/* Generic best-friend energy for the 4th re-sighting onward — no counts,
+   so these lines stay true no matter how many times the shark returns. */
+const RESIGHT_NOTES_EXCITED = [
+  "It's back AGAIN! I think this shark has adopted us. We're its humans now.",
   "It keeps coming back! I'm not saying we're best friends, but we're best friends.",
   "Another one! This shark has a favorite spot and we're lucky enough to know it."
 ];
@@ -3448,7 +3560,8 @@ const RESIGHT_NOTES_EXCITED = [
    only runs in unusual histories (an earlier encounter consumed the
    reunion reaction without logging a re-sighting). */
 function resightSarahReactionFor(ordinal) {
-  if (ordinal >= 3) return pick(RESIGHT_NOTES_EXCITED);
+  if (ordinal === 3) return pick(RESIGHT_NOTES_3RD);
+  if (ordinal >= 4) return pick(RESIGHT_NOTES_EXCITED);
   if (ordinal === 2) return pick(RESIGHT_NOTES_2ND);
   return RESIGHT_GENERIC_CLOSER;
 }

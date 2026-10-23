@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.4-beta', VERSION === 'v2.7.4-beta');
+  ok('version v2.7.5-beta', VERSION === 'v2.7.5-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -447,8 +447,9 @@ code += `
   // v1.7.24-beta: tiered SARAH reactions — resightThread ordinal 1
   // returns the generic closer fallback (the reunion closer variants
   // are delivered by maybeReunionReaction), 2nd uses the middle
-  // pool, 3rd+ uses the excited pool. These lines live in Sarah's
-  // chat bubble only, never in the field note.
+  // pool, 3rd uses the THREE pool once only, 4th+ uses the generic
+  // excited pool (no counts, so no repeated THREE lines). These lines
+  // live in Sarah's chat bubble only, never in the field note.
   (function () {
     const n1 = resightSarahReactionFor(1);
     const n2 = resightSarahReactionFor(2);
@@ -458,17 +459,20 @@ code += `
       n1 === RESIGHT_GENERIC_CLOSER && !RESIGHT_NOTES_2ND.includes(n1) && !RESIGHT_NOTES_EXCITED.includes(n1));
     ok('resightSarahReactionFor(2) uses middle pool',
       RESIGHT_NOTES_2ND.includes(n2) && !RESIGHT_REUNION_CLOSERS.includes(n2) && !RESIGHT_NOTES_EXCITED.includes(n2));
-    ok('resightSarahReactionFor(3) uses excited pool',
-      RESIGHT_NOTES_EXCITED.includes(n3) && !RESIGHT_REUNION_CLOSERS.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3));
-    ok('resightSarahReactionFor(5) still uses excited pool',
-      RESIGHT_NOTES_EXCITED.includes(n5));
+    ok('resightSarahReactionFor(3) uses THREE pool once only',
+      RESIGHT_NOTES_3RD.includes(n3) && !RESIGHT_REUNION_CLOSERS.includes(n3) && !RESIGHT_NOTES_2ND.includes(n3) && !RESIGHT_NOTES_EXCITED.includes(n3));
+    ok('resightSarahReactionFor(5) uses generic excited pool, never a THREE line',
+      RESIGHT_NOTES_EXCITED.includes(n5) && !RESIGHT_NOTES_3RD.includes(n5));
+    ok('THREE pool lines all count three; generic excited pool never counts',
+      RESIGHT_NOTES_3RD.every(function(l) { return /three|third/i.test(l); }) &&
+      RESIGHT_NOTES_EXCITED.every(function(l) { return !/three|third/i.test(l); }));
   })();
   // v1.7.24-beta Mira review: pool separation is deterministic — the
   // field-note pool shares NOTHING with any Sarah pool, so no random
   // field note can ever speak Sarah's voice.
   ok('field notes are observational only, disjoint from Sarah pools',
     FIELD_RESIGHT_NOTES.length === 8 &&
-    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l)));
+    !FIELD_RESIGHT_NOTES.some(l => RESIGHT_REUNION_CLOSERS.includes(l) || RESIGHT_NOTES_2ND.includes(l) || RESIGHT_NOTES_EXCITED.includes(l) || RESIGHT_NOTES_3RD.includes(l)));
   // v1.8.5-beta: five more variants added; the originals all remain.
   ok('reunion closers have original closer + all four Avery-picked Sarah lines',
     RESIGHT_REUNION_CLOSERS.length === 10 &&
@@ -478,9 +482,10 @@ code += `
     RESIGHT_REUNION_CLOSERS.includes("The tag's holding up great. This shark is basically wearing a Fitbit and thriving.") &&
     RESIGHT_REUNION_CLOSERS.includes("Back again! At this point I'm starting to think it likes us."));
   // v1.8.5-beta: three more variants added; the originals all remain.
-  ok('excited pool has all five Avery picks',
-    RESIGHT_NOTES_EXCITED.length === 8 &&
-    RESIGHT_NOTES_EXCITED.includes("THREE TIMES?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+  ok('THREE pool has the five 3rd lines; generic excited pool keeps the AGAIN line',
+    RESIGHT_NOTES_3RD.length === 5 &&
+    RESIGHT_NOTES_3RD.includes("THREE RE-SIGHTINGS?! This shark is basically family now. I'm naming it in my head and you can't stop me.") &&
+    RESIGHT_NOTES_EXCITED.length === 3 &&
     RESIGHT_NOTES_EXCITED.includes("It's back AGAIN! I think this shark has adopted us. We're its humans now."));
   // v1.8.5-beta: three more variants added; the originals all remain.
   ok('middle pool has all five Avery picks',
@@ -492,9 +497,9 @@ code += `
   ok('2nd pool line says re-sighting, no future-sightings implication',
     RESIGHT_NOTES_2ND.includes("Second re-sighting! Okay, this one keeps showing up.") &&
     !RESIGHT_NOTES_2ND.some(l => l.includes("Second sighting!") || l.includes("keeping an eye on")));
-  ok('3rd+ pool line says re-sightings',
-    RESIGHT_NOTES_EXCITED.includes("Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!") &&
-    !RESIGHT_NOTES_EXCITED.some(l => l.includes("Three sightings of the same shark!")));
+  ok('3rd pool line says re-sightings',
+    RESIGHT_NOTES_3RD.includes("Three re-sightings of the same shark! Do you realize how special that is?? This one chose us!") &&
+    !RESIGHT_NOTES_3RD.some(l => l.includes("Three sightings of the same shark!")));
   (function () {
     const nurse = SHARKS.find(s => s.id === 'nurse');
     const origTagged = state.tagged;
@@ -649,10 +654,10 @@ code += `
         !RESIGHT_REUNION_CLOSERS.some(l => t2[1].text.includes(l)) &&
         !RESIGHT_NOTES_2ND.some(l => t2[1].text.includes(l)) &&
         !RESIGHT_NOTES_EXCITED.some(l => t2[1].text.includes(l)));
-      // 3rd re-sighting (male): Sarah excited-pool line, no food reply.
+      // 3rd re-sighting (male): Sarah THREE-pool line, no food reply.
       const t3 = threadWith(3, 'male');
-      ok('3rd resightThread Sarah bubble uses excited pool, no food reply',
-        t3.length === 3 && t3[2].who === 'them' && RESIGHT_NOTES_EXCITED.includes(t3[2].text));
+      ok('3rd resightThread Sarah bubble uses THREE pool, no food reply',
+        t3.length === 3 && t3[2].who === 'them' && RESIGHT_NOTES_3RD.includes(t3[2].text));
       // Food-reply gating, deterministic: only after the likes-us line.
       ok('food reply follows likes-us line, she pronoun',
         resightFoodReplyFor(RESIGHT_LIKES_US_LINE, { sex: 'female' }) === 'Maybe. Or maybe she just knows where the food is.');
@@ -5870,16 +5875,146 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("weighted shuffle is a permutation (no entry lost or duplicated)",
       wsOut.length === 3 && wsOut.slice().sort(function(a, b) { return a.creature < b.creature ? -1 : 1; }).map(function(s) { return s.creature; }).join(",") === "fish,mola,turtle");
     const fishCount = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
-    ok("drift weighting: fish tripled in every biome list",
-      fishCount(BIOME_CREATURES.tropical) === 3 && fishCount(BIOME_CREATURES.temperate) === 3 &&
-      fishCount(BIOME_CREATURES.kelp) === 3 && fishCount(BIOME_CREATURES.pelagic) === 3 &&
-      fishCount(BIOME_CREATURES.polar) === 3 && fishCount(BIOME_CREATURES.volcanic) === 3);
+    ok("drift weighting: fish fivefold in every biome list",
+      fishCount(BIOME_CREATURES.tropical) === 5 && fishCount(BIOME_CREATURES.temperate) === 5 &&
+      fishCount(BIOME_CREATURES.kelp) === 5 && fishCount(BIOME_CREATURES.pelagic) === 5 &&
+      fishCount(BIOME_CREATURES.polar) === 5 && fishCount(BIOME_CREATURES.volcanic) === 5);
     ok("ambient spawns handle shark silhouettes + travel both ways (source)",
       fileCode.indexOf('type.indexOf("shark:")') !== -1 &&
       fileCode.indexOf('class="shark-shadow"') !== -1 &&
       fileCode.indexOf('scaleX(-1)') !== -1 && fileCode.indexOf('swim-left') !== -1 &&
       cssCode.indexOf('.dive-scene .ambient .shark-shadow img') !== -1);
   } catch (e) { ok("v2.7.4 ambient batch block (" + e.message + ")", false); }
+
+  /* ---------- v2.7.5: ambient batch 2 — 20 sprites, region gating, shark silhouettes ---------- */
+  try {
+    const b2keys = ["moray","seahorse","clownfish","parrotfish","pufferfish","lionfish","hatchetfish","gulper","vampire","siphonophore","krill","viperfish","snailfish","cusk","otter","narwhal","beluga","snake","manatee","tuna"];
+    const b2files = { moray: "bg-moray", seahorse: "bg-seahorse", clownfish: "bg-clownfish", parrotfish: "bg-parrotfish", pufferfish: "bg-pufferfish", lionfish: "bg-lionfish", hatchetfish: "bg-hatchetfish", gulper: "bg-gulper", vampire: "bg-vampire-squid", siphonophore: "bg-siphonophore", krill: "bg-krill", viperfish: "bg-viperfish", snailfish: "bg-snailfish", cusk: "bg-cusk-eel", otter: "bg-sea-otter", narwhal: "bg-narwhal", beluga: "bg-beluga", snake: "bg-sea-snake", manatee: "bg-manatee", tuna: "bg-tuna" };
+    ok("batch-2 ambient sprites registered (20 keys)",
+      b2keys.every(function(k) { return typeof CREATURE_ART[k] === "string" && CREATURE_ART[k].indexOf(b2files[k]) !== -1; }));
+    const hasC = function(pool, c) { return pool.some(function(s) { return s.creature === c; }); };
+    const reefCar = buildSightingDeck("reef", "caribbean").pool;
+    ok("reef batch in a Caribbean reef deck (clownfish moved to surface shallows)",
+      ["moray","seahorse","parrotfish","pufferfish","lionfish"].every(function(c) { return hasC(reefCar, c); }) &&
+      !hasC(reefCar, "clownfish"));
+    const twiAtl = buildSightingDeck("twilight", "open-atlantic").pool;
+    ok("twilight batch in an open-Atlantic twilight deck",
+      ["hatchetfish","gulper","vampire","siphonophore","krill","viperfish"].every(function(c) { return hasC(twiAtl, c); }));
+    const deepArc = buildSightingDeck("deep", "arctic").pool;
+    ok("deep batch in an Arctic deep deck; goblin kept out of the Arctic",
+      ["snailfish","cusk"].every(function(c) { return hasC(deepArc, c); }) &&
+      !hasC(deepArc, "shark:goblin") &&
+      hasC(buildSightingDeck("deep", "open-atlantic").pool, "shark:goblin"));
+    ok("surface visitors gated to their waters",
+      hasC(buildSightingDeck("surface", "california").pool, "otter") &&
+      !hasC(buildSightingDeck("surface", "north-carolina").pool, "otter") &&
+      hasC(buildSightingDeck("surface", "arctic").pool, "narwhal") &&
+      hasC(buildSightingDeck("surface", "arctic").pool, "beluga") &&
+      hasC(buildSightingDeck("surface", "philippines").pool, "snake") &&
+      hasC(buildSightingDeck("surface", "maldives").pool, "snake") &&
+      !hasC(buildSightingDeck("surface", "caribbean").pool, "snake") &&
+      hasC(buildSightingDeck("surface", "caribbean").pool, "manatee") &&
+      !hasC(buildSightingDeck("surface", "philippines").pool, "manatee") &&
+      hasC(buildSightingDeck("surface", "open-atlantic").pool, "tuna") &&
+      hasC(buildSightingDeck("surface", "philippines").pool, "clownfish") &&
+      hasC(buildSightingDeck("surface", "papua-new-guinea").pool, "clownfish") &&
+      hasC(buildSightingDeck("surface", "maldives").pool, "clownfish") &&
+      !hasC(buildSightingDeck("surface", "caribbean").pool, "clownfish"));
+    ok("batch-2 shark silhouettes at warm surfaces, never on reefs",
+      hasC(buildSightingDeck("surface", "caribbean").pool, "shark:greatwhite") &&
+      hasC(buildSightingDeck("surface", "caribbean").pool, "shark:mako") &&
+      hasC(buildSightingDeck("surface", "caribbean").pool, "shark:thresher") &&
+      !hasC(buildSightingDeck("reef", "caribbean").pool, "shark:greatwhite"));
+    const japanFish = function(d) { return buildSightingDeck(d, "japan").pool.filter(function(s) { return s.creature === "fish"; }); };
+    ok("Japan decks keep non-lanternfish fish-sprite sightings at every depth",
+      ["surface","reef","twilight","deep"].every(function(d) { return japanFish(d).length > 0; }) &&
+      japanFish("deep").some(function(s) { return s.text.indexOf("dumbo octopus") !== -1; }));
+    ok("Japan decks still suppress the actual lanternfish repeat",
+      !buildSightingDeck("twilight", "japan").pool.some(function(s) { return s.text.toLowerCase().indexOf("lanternfish") !== -1; }));
+    ok("other regional note de-dup preserved (turtle/ray/dolphin/seal)",
+      !buildSightingDeck("surface", "caribbean").pool.some(function(s) { return s.creature === "turtle"; }) &&
+      !buildSightingDeck("surface", "philippines").pool.some(function(s) { return s.creature === "ray"; }) &&
+      !buildSightingDeck("surface", "maldives").pool.some(function(s) { return s.creature === "dolphin"; }) &&
+      !buildSightingDeck("surface", "south-africa").pool.some(function(s) { return s.creature === "seal"; }));
+    ok("surface drift excludes reef residents, reef drift keeps them",
+      ["moray","seahorse","clownfish","parrotfish","pufferfish","lionfish"].every(function(c) { return surfaceDriftList("tropical").indexOf(c) === -1; }) &&
+      surfaceDriftList("tropical").indexOf("moray") === -1 &&
+      BIOME_CREATURES.tropical.indexOf("moray") !== -1 &&
+      surfaceDriftList("kelp").indexOf("otter") !== -1 &&
+      surfaceDriftList("pelagic").indexOf("tuna") !== -1 &&
+      surfaceDriftList("tropical").filter(function(c) { return c === "fish"; }).length === 5);
+    ok("v2.7.5-fix (Mira): clownfish is a scripted Indo-Pacific surface visitor only, never ambient drift",
+      Object.keys(BIOME_CREATURES).every(function(b) { return BIOME_CREATURES[b].indexOf("clownfish") === -1; }) &&
+      surfaceDriftList("tropical").indexOf("clownfish") === -1 &&
+      buildSightingDeck("surface", "philippines").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      buildSightingDeck("surface", "papua-new-guinea").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      buildSightingDeck("surface", "maldives").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      !buildSightingDeck("surface", "caribbean").pool.some(function(s) { return s.creature === "clownfish"; }) &&
+      !buildSightingDeck("reef", "philippines").pool.some(function(s) { return s.creature === "clownfish"; }));
+    ok("v2.7.5-fix (Mira): counted re-sighting lines name re-sightings, never bare sightings/times",
+      RESIGHT_NOTES_2ND.concat(RESIGHT_NOTES_3RD).every(function(line) {
+        const lower = line.toLowerCase();
+        const hasCountUnit = /sightings?/.test(lower) || /\btimes\b/.test(lower) || /\bthree\b/.test(lower) || /\bthird\b/.test(lower);
+        return !hasCountUnit || lower.indexOf("re-sighting") !== -1;
+      }) &&
+      RESIGHT_NOTES_2ND.concat(RESIGHT_NOTES_3RD).every(function(line) {
+        return line.toLowerCase().indexOf("two sightings") === -1 && line.toLowerCase().indexOf("third time") === -1;
+      }));
+    ok("slow shadows list covers the drifters and loungers, not the cruisers",
+      ["jellyfish","mola","seahorse","manatee","snailfish","siphonophore","krill","anglerfish"].every(function(c) { return SLOW_CREATURES.indexOf(c) !== -1; }) &&
+      ["fish","dolphin","turtle","tuna","shark:greatwhite"].every(function(c) { return SLOW_CREATURES.indexOf(c) === -1; }));
+    (function() {
+      const _ce = document.createElement;
+      const _st = setTimeout;
+      let lastEl = null, lastDelay = 0;
+      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+      setTimeout = function(fn, ms) { lastDelay = ms; return 0; };
+      spawnCreature("jellyfish", true);
+      const jDur = parseFloat(lastEl.style.animationDuration), jDelay = lastDelay;
+      spawnCreature("fish", true);
+      const fDur = parseFloat(lastEl.style.animationDuration), fDelay = lastDelay;
+      document.createElement = _ce;
+      setTimeout = _st;
+      ok("slow shadows cross at half speed (jellyfish 18-34s + 45s net, fish 9-17s + 25s net)",
+        jDur >= 18 && jDur <= 34 && jDelay === 45000 && fDur >= 9 && fDur <= 17 && fDelay === 25000);
+    })();
+    ok("deep drift matches sighting opacity + halo; deep sharks keep black fill with halo (source)",
+      cssCode.indexOf(".dive-scene.depth-deep .ambient.bg-fish { opacity: 0.8") !== -1 &&
+      cssCode.indexOf(".dive-scene.depth-deep .ambient.bg-fish img { filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.7)") !== -1 &&
+      cssCode.indexOf("brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)") !== -1 &&
+      cssCode.indexOf(".dive-scene .ambient.bg-fish { opacity: 0.45") !== -1);
+    (function() {
+      const _ce = document.createElement;
+      let lastEl = null;
+      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+      spawnCreature("fish", true);
+      const bgH = parseInt(lastEl.style.height, 10);
+      spawnCreature("fish", false);
+      const fgH = parseInt(lastEl.style.height, 10);
+      document.createElement = _ce;
+      ok("background animals stay relatively close (drift 18-30px, sightings 24-50px)",
+        bgH >= 18 && bgH <= 30 && fgH >= 24 && fgH <= 50);
+    })();
+    ok("lanternfish sighting carries the lit flag; ordinary spawns do not (source + behavior)",
+      fileCode.indexOf('spawnCreature(s.creature, false, s.text.toLowerCase().indexOf("lanternfish")') !== -1 &&
+      cssCode.indexOf(".dive-scene .ambient.lit img { filter: drop-shadow(0 0 14px rgba(255, 210, 120, 0.9)) brightness(1.4)") !== -1 &&
+      (function() {
+        const _ce = document.createElement;
+        let lastEl = null;
+        document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+        spawnCreature("fish", false, true);
+        const lit = lastEl.classList.contains("lit");
+        spawnCreature("fish", false);
+        const unlit = !lastEl.classList.contains("lit");
+        document.createElement = _ce;
+        return lit && unlit;
+      })());
+    const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
+    ok("drift weighting holds: fish boosted to five in every biome list",
+      fishN(BIOME_CREATURES.tropical) === 5 && fishN(BIOME_CREATURES.temperate) === 5 &&
+      fishN(BIOME_CREATURES.kelp) === 5 && fishN(BIOME_CREATURES.pelagic) === 5 &&
+      fishN(BIOME_CREATURES.polar) === 5 && fishN(BIOME_CREATURES.volcanic) === 5);
+  } catch (e) { ok("v2.7.5 ambient batch 2 block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
