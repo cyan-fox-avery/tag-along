@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.11-beta";
+const VERSION = "v2.7.13-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.13-beta": [
+    "🦦 <strong>Otter shadows halved.</strong> The sea otter drifted by at twice the size it should read — its sprite is wide, so at full height it took up far more screen than the other kelp life. Otter shadows (and the otter sighting, which shares the same size factor) now render at half size. Other shadows are untouched: tell Roman which others still read too big and by how much.",
+  ],
   "v2.7.11-beta": [
     "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
   ],
@@ -2797,12 +2800,14 @@ function stopAmbientLife() {
    loungers, not cruisers. Everything else keeps the usual 9-17s crossing. */
 const SLOW_CREATURES = ["jellyfish", "mola", "seahorse", "manatee", "snailfish", "siphonophore", "krill", "anglerfish"];
 /* v2.7.8-beta: relative size factors for ambient creatures (see spawnCreature).
-   Tiny 0.55 / small 0.7 / medium-small 0.85 / medium 1 / large 1.2-1.3 / very large 1.5. */
+   Tiny 0.55 / small 0.7 / medium-small 0.85 / medium 1 / large 1.2-1.3 / very large 1.5.
+   v2.7.13-beta (Avery, on-device): the otter reads too big at 1 — its sprite is
+   wide, so height alone understates its screen presence. Halved to 0.5. */
 const CREATURE_SIZE = {
   krill: 0.55, hatchetfish: 0.55,
   seahorse: 0.7, clownfish: 0.7, viperfish: 0.7, snailfish: 0.7,
   fish: 0.85, pufferfish: 0.85, lionfish: 0.85, vampire: 0.85, parrotfish: 0.85, cusk: 0.85, gulper: 0.85,
-  penguin: 1, jellyfish: 1, siphonophore: 1, snake: 1, moray: 1, anglerfish: 1, otter: 1,
+  penguin: 1, jellyfish: 1, siphonophore: 1, snake: 1, moray: 1, anglerfish: 1, otter: 0.5,
   turtle: 1.2, seal: 1.2, ray: 1.2,
   dolphin: 1.3, tuna: 1.3,
   mola: 1.5, manatee: 1.5, narwhal: 1.5, beluga: 1.5

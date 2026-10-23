@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.11-beta', VERSION === 'v2.7.11-beta');
+  ok('version v2.7.13-beta', VERSION === 'v2.7.13-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -6283,11 +6283,14 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   try {
     ok("v2.7.8 (Avery): every ambient creature has a size factor",
       Object.keys(CREATURE_ART).every(function(k) { return typeof CREATURE_SIZE[k] === "number"; }));
-    ok("v2.7.8 (Avery): size order is honest (krill < seahorse < fish < otter < manatee)",
-      CREATURE_SIZE.krill < CREATURE_SIZE.seahorse && CREATURE_SIZE.seahorse < CREATURE_SIZE.fish &&
-      CREATURE_SIZE.fish < CREATURE_SIZE.otter && CREATURE_SIZE.otter < CREATURE_SIZE.manatee &&
+    /* v2.7.13-beta (Avery, on-device): otter halved — its wide sprite read too
+       big at 1, so it now sits below krill in height factor. Screen presence,
+       not biology, is what the factors tune. */
+    ok("v2.7.13 (Avery): size order with halved otter (otter < krill < seahorse < fish < manatee)",
+      CREATURE_SIZE.otter < CREATURE_SIZE.krill && CREATURE_SIZE.krill < CREATURE_SIZE.seahorse &&
+      CREATURE_SIZE.seahorse < CREATURE_SIZE.fish && CREATURE_SIZE.fish < CREATURE_SIZE.manatee &&
       CREATURE_SIZE.manatee === 1.5);
-    ok("v2.7.8 (Avery): relative heights render (krill < fish < otter < manatee, fixed random)",
+    ok("v2.7.13 (Avery): relative heights render (otter < krill < fish < manatee, fixed random)",
       (function() {
         const _ce = document.createElement;
         const realRandom = Math.random;
@@ -6296,11 +6299,11 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
           document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
           Math.random = function() { return 0.5; };
           const heights = {};
-          ["krill", "fish", "otter", "manatee"].forEach(function(c) {
+          ["otter", "krill", "fish", "manatee"].forEach(function(c) {
             spawnCreature(c, false);
             heights[c] = parseInt(lastEl.style.height, 10);
           });
-          return heights.krill < heights.fish && heights.fish < heights.otter && heights.otter < heights.manatee;
+          return heights.otter < heights.krill && heights.krill < heights.fish && heights.fish < heights.manatee;
         } finally {
           document.createElement = _ce;
           Math.random = realRandom;
