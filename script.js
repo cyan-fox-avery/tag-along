@@ -23,6 +23,12 @@ const WHATS_NEW = {
   "v2.7.14-beta": [
     "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top.",
   ],
+  "v2.7.13-beta": [
+    "🦦 <strong>Otter shadows halved.</strong> The sea otter drifted by at twice the size it should read — its sprite is wide, so at full height it took up far more screen than the other kelp life. Otter shadows (and the otter sighting, which shares the same size factor) now render at half size. Other shadows are untouched: tell Roman which others still read too big and by how much.",
+  ],
+  "v2.7.12-beta": [
+    "🧭 <strong>Off the Map fixed.</strong> The achievement now checks where you actually tagged the shark — the Gal\u00e1pagos or South Africa — instead of where the species could theoretically live. A tag in the Caribbean no longer counts just because the species also swims in the Gal\u00e1pagos, and a record with no region never awards. Your logbook backs it up: a genuine earned tag still counts even if a later tag of the same species overwrote the record. Already-earned achievements stay earned.",
+  ],
   "v2.7.11-beta": [
     "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
   ],
@@ -2805,12 +2811,14 @@ function stopAmbientLife() {
    loungers, not cruisers. Everything else keeps the usual 9-17s crossing. */
 const SLOW_CREATURES = ["jellyfish", "mola", "seahorse", "manatee", "snailfish", "siphonophore", "krill", "anglerfish"];
 /* v2.7.8-beta: relative size factors for ambient creatures (see spawnCreature).
-   Tiny 0.55 / small 0.7 / medium-small 0.85 / medium 1 / large 1.2-1.3 / very large 1.5. */
+   Tiny 0.55 / small 0.7 / medium-small 0.85 / medium 1 / large 1.2-1.3 / very large 1.5.
+   v2.7.13-beta (Avery, on-device): the otter reads too big at 1 — its sprite is
+   wide, so height alone understates its screen presence. Halved to 0.5. */
 const CREATURE_SIZE = {
   krill: 0.55, hatchetfish: 0.55,
   seahorse: 0.7, clownfish: 0.7, viperfish: 0.7, snailfish: 0.7,
   fish: 0.85, pufferfish: 0.85, lionfish: 0.85, vampire: 0.85, parrotfish: 0.85, cusk: 0.85, gulper: 0.85,
-  penguin: 1, jellyfish: 1, siphonophore: 1, snake: 1, moray: 1, anglerfish: 1, otter: 1,
+  penguin: 1, jellyfish: 1, siphonophore: 1, snake: 1, moray: 1, anglerfish: 1, otter: 0.5,
   turtle: 1.2, seal: 1.2, ray: 1.2,
   dolphin: 1.3, tuna: 1.3,
   mola: 1.5, manatee: 1.5, narwhal: 1.5, beluga: 1.5

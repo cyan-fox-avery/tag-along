@@ -1118,6 +1118,8 @@ code += `
     SHARKS.forEach(s => { fullTagged[s.id] = { name: 'X', researchId: 'R' }; });
     fullTagged.nurse.name = 'Sarah';
     fullTagged.nurse.resightings = [{}, {}, {}];
+    /* #149: full completion includes a tag actually made in an earned region. */
+    fullTagged.scalloped.region = 'galapagos';
     const fullState = {
       tagged: fullTagged,
       stats: {
@@ -1223,9 +1225,59 @@ code += `
   checkAchievements();
   ok('Pen Pal unlocks at 3 resights', !!state.achievements['pen-pal']);
   resetA();
-  state.tagged = { scalloped: { name: "S", researchId: "R" } };
+  state.tagged = { scalloped: { name: "S", researchId: "R", region: "galapagos" } };
+  state.logbook = [];
   checkAchievements();
-  ok('Off the Map unlocks in locked region', !!state.achievements['off-map']);
+  ok('Off the Map unlocks on a Galapagos tag', !!state.achievements['off-map']);
+  resetA();
+  state.tagged = { dusky: { name: "D", researchId: "R", region: "south-africa" } };
+  state.logbook = [];
+  checkAchievements();
+  ok('Off the Map unlocks on a South Africa tag', !!state.achievements['off-map']);
+  resetA();
+  /* #149: a roster that permits an earned region no longer counts — the
+     actual tag location does. Scalloped lists Galapagos but this tag was
+     in the Caribbean. Note: this fixture is artificial under the present
+     roster (scalloped is Galapagos-exclusive today) — it is a unit test
+     of the location rule, and it futureproofs multi-region placements. */
+  state.tagged = { scalloped: { name: "S", researchId: "R", region: "caribbean" } };
+  state.logbook = [];
+  checkAchievements();
+  ok('Off the Map stays locked on a Caribbean tag of a Galapagos-roster species', !state.achievements['off-map']);
+  resetA();
+  /* #149: a record with no region never awards, even for an earned-region species. */
+  state.tagged = { scalloped: { name: "S", researchId: "R" } };
+  state.logbook = [];
+  checkAchievements();
+  ok('Off the Map stays locked on a region-less record', !state.achievements['off-map']);
+  resetA();
+  /* #149: earning or visiting an earned region without tagging there does not award. */
+  state.logbook = [];
+  state.stats = state.stats || {};
+  state.stats.regionsVisited = ["galapagos"];
+  checkAchievements();
+  ok('Off the Map stays locked on a visit without a tag', !state.achievements['off-map']);
+  resetA();
+  /* #149: a genuine earned tag preserved in the logbook counts even if the
+     one-per-species record was overwritten by a later tag elsewhere. */
+  state.tagged = { scalloped: { name: "S", researchId: "R", region: "caribbean" } };
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "tagged" }] }];
+  checkAchievements();
+  ok('Off the Map unlocks from a logged earned tag after an overwrite', !!state.achievements['off-map']);
+  resetA();
+  /* #149: a logged earned tag counts even with no current tagged record
+     at all (not just after an overwrite). */
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "tagged" }] }];
+  checkAchievements();
+  ok('Off the Map unlocks from a logged earned tag with no current record', !!state.achievements['off-map']);
+  resetA();
+  /* #149: watch-only logbook history does not award — neither resighted
+     nor watched encounters are tags. */
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "resighted" }, { speciesId: "scalloped", result: "watched" }] }];
+  checkAchievements();
+  ok('Off the Map stays locked on watch-only history', !state.achievements['off-map']);
+  state.logbook = [];
+  state.stats.regionsVisited = [];
   /* v2.7.14-beta: expedition moments + CR capstone + Sea Legs breadcrumb. */
   resetA();
   state.stats.expeditions = 1; state.logbook = [];
@@ -6336,11 +6388,15 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
   try {
     ok("v2.7.8 (Avery): every ambient creature has a size factor",
       Object.keys(CREATURE_ART).every(function(k) { return typeof CREATURE_SIZE[k] === "number"; }));
-    ok("v2.7.8 (Avery): size order is honest (krill < seahorse < fish < otter < manatee)",
-      CREATURE_SIZE.krill < CREATURE_SIZE.seahorse && CREATURE_SIZE.seahorse < CREATURE_SIZE.fish &&
-      CREATURE_SIZE.fish < CREATURE_SIZE.otter && CREATURE_SIZE.otter < CREATURE_SIZE.manatee &&
+    /* v2.7.13-beta (Avery, on-device): otter halved — its wide sprite read too
+       big at 1. This chain is a screen-presence tuning, NOT a zoological
+       claim: otters are not smaller than krill. Factors compress real size
+       so nothing vanishes and wide sprites don't dominate. */
+    ok("v2.7.13 (Avery): otter visual tuning — half-height factor (otter < krill < seahorse < fish < manatee)",
+      CREATURE_SIZE.otter < CREATURE_SIZE.krill && CREATURE_SIZE.krill < CREATURE_SIZE.seahorse &&
+      CREATURE_SIZE.seahorse < CREATURE_SIZE.fish && CREATURE_SIZE.fish < CREATURE_SIZE.manatee &&
       CREATURE_SIZE.manatee === 1.5);
-    ok("v2.7.8 (Avery): relative heights render (krill < fish < otter < manatee, fixed random)",
+    ok("v2.7.13 (Avery): otter renders compressed (otter < krill < fish < manatee, fixed random)",
       (function() {
         const _ce = document.createElement;
         const realRandom = Math.random;
@@ -6349,11 +6405,32 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
           document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
           Math.random = function() { return 0.5; };
           const heights = {};
-          ["krill", "fish", "otter", "manatee"].forEach(function(c) {
+          ["otter", "krill", "fish", "manatee"].forEach(function(c) {
             spawnCreature(c, false);
             heights[c] = parseInt(lastEl.style.height, 10);
           });
-          return heights.krill < heights.fish && heights.fish < heights.otter && heights.otter < heights.manatee;
+          return heights.otter < heights.krill && heights.krill < heights.fish && heights.fish < heights.manatee;
+        } finally {
+          document.createElement = _ce;
+          Math.random = realRandom;
+        }
+      })());
+    /* v2.7.13-beta (Mira review): Avery explicitly decided BOTH paths halve —
+       drift shadow and scripted sighting. Assert actual spawn heights per
+       path at fixed random, not just the shared factor. */
+    ok("v2.7.13 (Avery): otter spawn heights halve on both paths (drift 9-15, sighting 12-25, fixed random)",
+      (function() {
+        const _ce = document.createElement;
+        const realRandom = Math.random;
+        let lastEl = null;
+        try {
+          document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+          Math.random = function() { return 0.5; };
+          spawnCreature("otter", true);
+          const bgH = parseInt(lastEl.style.height, 10);
+          spawnCreature("otter", false);
+          const fgH = parseInt(lastEl.style.height, 10);
+          return bgH >= 9 && bgH <= 15 && fgH >= 12 && fgH <= 25 && bgH < fgH;
         } finally {
           document.createElement = _ce;
           Math.random = realRandom;
