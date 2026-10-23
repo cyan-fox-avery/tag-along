@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.6-beta";
+const VERSION = "v2.7.8-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.8-beta": [
+"📏 <strong>Creatures sized to each other.</strong> Small animals no longer render as large as big ones: krill, seahorses, and clownfish now read small, fish and otters mid-sized, and manatees, sunfish, narwhals, and belugas properly large. Real sizes are compressed so nothing vanishes — a krill is still visible, just clearly smaller than a tuna. Distant shark silhouettes are unchanged.",
+  ],
   "v2.7.6-beta": [
 "🐟 <strong>Busier water where life teems.</strong> Coral reefs and kelp forests now feel properly populated: fish drift by more often and in greater numbers there — spawns run about twice as often, and more of them are fish. Open water keeps its usual spawn pace (tropical surface water carries a few more fish, since it draws from the same list), and twilight and the deep stay quiet, as they should.",
   ],
@@ -2692,6 +2695,17 @@ function stopAmbientLife() {
 /* v2.7.5-fix (Avery): these shadows move at half speed — drifters and
    loungers, not cruisers. Everything else keeps the usual 9-17s crossing. */
 const SLOW_CREATURES = ["jellyfish", "mola", "seahorse", "manatee", "snailfish", "siphonophore", "krill", "anglerfish"];
+/* v2.7.8-beta: relative size factors for ambient creatures (see spawnCreature).
+   Tiny 0.55 / small 0.7 / medium-small 0.85 / medium 1 / large 1.2-1.3 / very large 1.5. */
+const CREATURE_SIZE = {
+  krill: 0.55, hatchetfish: 0.55,
+  seahorse: 0.7, clownfish: 0.7, viperfish: 0.7, snailfish: 0.7,
+  fish: 0.85, pufferfish: 0.85, lionfish: 0.85, vampire: 0.85, parrotfish: 0.85, cusk: 0.85, gulper: 0.85,
+  penguin: 1, jellyfish: 1, siphonophore: 1, snake: 1, moray: 1, anglerfish: 1, otter: 1,
+  turtle: 1.2, seal: 1.2, ray: 1.2,
+  dolphin: 1.3, tuna: 1.3,
+  mola: 1.5, manatee: 1.5, narwhal: 1.5, beluga: 1.5
+};
 function spawnCreature(type, background, lit) {
   const scene = $("diveScene");
   let art = CREATURE_ART[type];
@@ -2719,9 +2733,15 @@ function spawnCreature(type, background, lit) {
   el.style.animationDuration = dur.toFixed(1) + "s";
   /* v2.7.5-fix (Avery): background animals stay relatively close — at
      10-18px they read as fast-moving distant blobs, not creatures. */
+  /* v2.7.8-beta (Avery): relative sizing — small animals no longer render
+     as large as big ones (an otter was reading as a manatee). Factors
+     compress real size so nothing vanishes: krill stays visible, just
+     clearly smaller than a tuna. Distant shark silhouettes keep factor
+     1 — they are far away by definition, not nearby. */
+  const sizeFactor = (type && CREATURE_SIZE[type]) || 1;
   el.style.height = background
-    ? Math.round(18 + Math.random() * 12) + "px"
-    : Math.round(24 + Math.random() * 26) + "px";
+    ? Math.round((18 + Math.random() * 12) * sizeFactor) + "px"
+    : Math.round((24 + Math.random() * 26) * sizeFactor) + "px";
   /* v0.26.1: ambient creatures swim both ways — 50/50 per spawn. The art
      faces left by default, so leftward swimmers need no flip; rightward
      swimmers are mirrored to face their direction of travel. (Replaces the
