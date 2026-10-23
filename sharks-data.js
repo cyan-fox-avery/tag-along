@@ -174,7 +174,7 @@ const SHARKS = [
     depths: ["surface", "reef"],
     methods: { attract: ["chum"] },
     sizeRange: [2.0, 3.8],
-    research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They often hunt in the upper 100 metres of the open ocean, where the light is good and the prey is quick, though tracking shows they sometimes dive far deeper. If something out here has been estimated to reach bursts of 70 kilometres an hour, it's a mako.",
+    research: "The fastest shark in the sea lives life in the fast lane of the open Atlantic. Makos are built like torpedoes — deep blue above, warm-muscled — and they chase down squid and speedy fish like mackerel and tuna. They often hunt in the upper 100 metres of the open ocean, where the light is good and the prey is quick, though tracking shows they sometimes dive far deeper. Shortfin makos have been estimated to reach speeds of 70 kilometres an hour in short bursts.",
     hook: "A mako's long, slender teeth stay visible even when its mouth is shut — a permanent snarl built for gripping slippery tuna.",
     bonus: "Makos cross whole oceans — tagged individuals have covered thousands of kilometres on single journeys.",
     conservation: "Listed as Endangered — one of the fastest sharks and one of the most overfished; North Atlantic populations crashed, ICCAT catch limits are a start, and sport-fishing release programs are growing.",
