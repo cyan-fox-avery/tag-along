@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.6-beta";
+const VERSION = "v2.7.7-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.7-beta": [
+"🦦 <strong>Clean otter silhouette.</strong> The sea otter's sprite had whisker, ear, and paw-crease gaps showing through as light lines against the water — it now reads as a single solid silhouette, as intended. No other sprites changed.",
+  ],
   "v2.7.6-beta": [
 "🐟 <strong>Busier water where life teems.</strong> Coral reefs and kelp forests now feel properly populated: fish drift by more often and in greater numbers there — spawns run about twice as often, and more of them are fish. Open water keeps its usual spawn pace (tropical surface water carries a few more fish, since it draws from the same list), and twilight and the deep stay quiet, as they should.",
   ],
