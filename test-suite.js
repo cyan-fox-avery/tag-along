@@ -5772,6 +5772,52 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       fileCode.indexOf("highlightResearchClues(s, p)") !== -1);
   } catch (e) { ok("v2.7.9 bold clues block (" + e.message + ")", false); }
 
+/* ---------- v2.7.9 Mira re-review: species-aware emphasis ---------- */
+  try {
+    const bolded = function(id) {
+      const sp = SHARKS.find(function(x) { return x.id === id; });
+      return sp.research.split("\\n\\n").map(function(p) { return highlightResearchClues(sp, p); }).join("");
+    };
+    const gl = bolded("greenland");
+    ok("v2.7.9 Mira re-review: greenland bolds squid only, never fish/seals",
+      gl.indexOf("<strong>squid</strong>") !== -1 &&
+      gl.indexOf("<strong>fish</strong>") === -1 &&
+      gl.indexOf("<strong>seals</strong>") === -1);
+    const kf = bolded("kitefin");
+    ok("v2.7.9 Mira re-review: kitefin bolds squid only, never fish/crustaceans",
+      kf.indexOf("<strong>squid</strong>") !== -1 &&
+      kf.indexOf("<strong>fish</strong>") === -1 &&
+      kf.indexOf("<strong>crustaceans</strong>") === -1);
+    const ss = bolded("sawshark");
+    ok("v2.7.9 Mira re-review: sawshark bolds crustaceans, never fishes",
+      ss.indexOf("<strong>crustaceans</strong>") !== -1 &&
+      ss.indexOf("<strong>fishes</strong>") === -1);
+    ok("v2.7.9 Mira re-review: region aliases bold prose wording",
+      bolded("catshark").indexOf("<strong>Cornwall</strong>") !== -1 &&
+      bolded("portjackson").indexOf("<strong>Australia's east coast</strong>") !== -1 &&
+      bolded("galapagos").indexOf("<strong>Galápagos</strong>") !== -1 &&
+      bolded("velvetbelly").indexOf("<strong>southwest Britain</strong>") !== -1);
+    ok("v2.7.9 Mira re-review: depth aliases bold habitat wording",
+      bolded("portjackson").indexOf("<strong>rocky reefs</strong>") !== -1 &&
+      bolded("angelshark").indexOf("<strong>shallow coastal waters</strong>") !== -1);
+  } catch (e) { ok("v2.7.9 Mira re-review emphasis block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9: all-50 rendered emphasis inspection ---------- */
+  try {
+    let nested = 0, chumBold = 0, unbolded = [];
+    SHARKS.forEach(function(sp) {
+      const out = sp.research.split("\\n\\n").map(function(p) { return highlightResearchClues(sp, p); }).join("");
+      if (out.indexOf("<strong><strong>") !== -1) nested++;
+      if (out.indexOf("<strong>chum</strong>") !== -1) chumBold++;
+      if (out.indexOf("<strong>") === -1) unbolded.push(sp.id);
+    });
+    ok("v2.7.9 all-50 inspection: no nested strongs, no bolded chum",
+      nested === 0 && chumBold === 0);
+    ok("v2.7.9 all-50 inspection: every card gets at least one bold clue",
+      unbolded.length === 0);
+    if (unbolded.length) console.log("unbolded cards: " + unbolded.join(", "));
+  } catch (e) { ok("v2.7.9 all-50 inspection block (" + e.message + ")", false); }
+
 /* ---------- v2.7.1: Bukangi made it out ---------- */
   try {
     ok("v2.7.1 BUKANGI_THREAD updated to the success story",

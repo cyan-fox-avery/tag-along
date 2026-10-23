@@ -2059,22 +2059,73 @@ function highlightClues(s) {
   }
   return text;
 }
-/* v2.7.9-beta: bold research clues across the FULL text (not just the
-   pinned preview's first two sentences). Bolds natural evidence —
-   region names, prey words, and depth evidence — never planner labels
-   or instruction phrasing. Single pass, longest terms first, so no
-   nested <strong> tags. Same font/size, just bold. */
+/* v2.7.9-beta fix (Mira review): species-aware clue emphasis.
+   Bait emphasis comes ONLY from the species' own baitList(s) via
+   BAIT_SYNONYMS — a prey word bolds only when it evidences a bait
+   this shark actually accepts (greenland squid-only never bolds fish
+   or seals; kitefin squid-only never bolds fish or crustaceans).
+   Herring/mackerel sit in both the tuna and schooling-fish sets:
+   they are genuinely both oily fish and schooling fish, so they
+   evidence whichever of those baits the species accepts.
+   Region emphasis comes from REGION_ALIASES (the species' own
+   regions), which cover prose wording, not just REGIONS display
+   labels ("Cornwall" for "Cornwall, UK"; "Australia's east coast"
+   for "Eastern Australia"; "Galápagos" for "Galápagos Islands").
+   Depth emphasis is DEPTH_EVIDENCE phrases plus metre numbers.
+   Metre numbers bold as measurement evidence; a few are body
+   lengths (greenland 6 m, leopard 1.2-1.5 m, sawshark 1.4 m) — they
+   read as size facts in context, not depth claims, and no planner
+   dimension keys on size. Single pass, longest terms first, so no
+   nested <strong> tags. Same font/size, just bold. A genuine clue
+   may stay unbolded where emphasis could mislead; the clue-matrix
+   and combo-behaviour tests, not the bolding, prove deducibility. */
+const BAIT_SYNONYMS = {
+  "squid": ["squid"],
+  "crustaceans": ["crustaceans", "crabs", "crab", "shrimp", "lobster"],
+  "ray": ["stingrays", "rays", "ray"],
+  "tuna": ["large oily fish", "oily fish", "tuna", "herring", "mackerel"],
+  "schooling-fish": ["schools of small reef fish", "schools of smaller fish", "schools of reef fish", "school of reef fish", "schools of fish", "schooling fishes", "schooling fish", "small schooling fish", "sardines", "sardine", "anchovies", "anchovy", "herring", "mackerel"],
+  "urchins": ["sea urchins", "urchins", "shellfish"],
+  "plankton": ["plankton", "krill"]
+};
+const REGION_ALIASES = {
+  "caribbean": ["Caribbean Sea", "Caribbean"],
+  "north-carolina": ["Outer Banks, North Carolina", "Outer Banks", "North Carolina", "US east coast"],
+  "philippines": ["Philippines", "Philippine"],
+  "maldives": ["Maldives", "Maldivian"],
+  "japan": ["Sagami Bay, Japan", "Sagami Bay", "Japan"],
+  "open-atlantic": ["Open Atlantic"],
+  "cornwall": ["Cornwall, UK", "Cornwall", "southwest Britain"],
+  "galapagos": ["Galápagos Islands", "Galápagos", "Galapagos"],
+  "south-africa": ["South Africa"],
+  "east-australia": ["Eastern Australia", "Australia's east coast", "southern and eastern Australia"],
+  "california": ["California Coast", "California"],
+  "arctic": ["Arctic Waters", "Arctic"],
+  "papua-new-guinea": ["Papua New Guinea", "PNG"]
+};
+const DEPTH_EVIDENCE = [
+  "twilight zone", "continental shelf", "continental slope",
+  "near the surface", "just under the surface", "hundreds of metres",
+  "reef flats", "shallow reefs", "shallow reef crevices", "reef edges",
+  "reef ledges", "rocky reefs", "shallow coastal waters",
+  "warm shallow water", "coastlines and estuaries", "surf zone",
+  "outer shelf", "upper continental shelf", "shallow outer slopes",
+  "deep by day", "mid-water", "surface waters", "kelp beds",
+  "kelp and rocky reefs", "deep tropical", "patch of reef",
+  "sunlit shallows", "surface down through the reefs"
+];
 function highlightResearchClues(s, text) {
   text = text || s.research || "";
   const terms = [];
-  regionNames(s).forEach(n => { if (n) terms.push(n); });
-  ["schooling fishes", "schooling fish", "oily fish", "small crustaceans",
-   "plankton", "krill", "squid", "crabs", "lobster", "fishes", "fish",
-   "seals", "seal", "rays", "stingrays", "urchins", "shellfish",
-   "crustaceans", "shrimp", "mackerel", "herring", "pollock", "sardines",
-   "anchovies", "cephalopods", "tuna",
-   "twilight zone", "continental shelf", "continental slope",
-   "near the surface", "just under the surface", "hundreds of metres"].forEach(w => terms.push(w));
+  regionList(s).forEach(r => {
+    const aliases = REGION_ALIASES[r] || [ (REGIONS[r] || {}).name || r ];
+    aliases.forEach(a => { if (a) terms.push(a); });
+  });
+  baitList(s).forEach(b => {
+    const syns = BAIT_SYNONYMS[b] || [ String(b).replace(/-/g, " ") ];
+    syns.forEach(a => terms.push(a));
+  });
+  DEPTH_EVIDENCE.forEach(a => terms.push(a));
   terms.sort((a, b) => b.length - a.length);
   const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const pattern = terms.map(esc).join("|") + "|\\d[\\d,]*\\s*(?:to|and|–|—|-)\\s*\\d[\\d,]*\\s*metres|\\d[\\d,]*\\s*metres";
