@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.6-beta": [
-"🐟 <strong>Busier water where life teems.</strong> Coral reefs and kelp forests now feel properly populated: fish drift by more often and in greater numbers there — spawns run about twice as often, and more of them are fish. Open water, twilight, and the deep keep their quieter pace, as they should.",
+"🐟 <strong>Busier water where life teems.</strong> Coral reefs and kelp forests now feel properly populated: fish drift by more often and in greater numbers there — spawns run about twice as often, and more of them are fish. Open water keeps its usual spawn pace (tropical surface water carries a few more fish, since it draws from the same list), and twilight and the deep stay quiet, as they should.",
   ],
   "v2.7.5-beta": [
 "🌊 <strong>More shadows in the water, batch 2.</strong> Reef life (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), plus full-body surface visitors — otters in California, narwhal and beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows. Four more distant shark silhouettes glide by, never encounters: great white, mako, thresher, and goblin in the deep. Fish silhouettes drift by more often in surface and reef waters. Japan's dive logs no longer lose their fish sightings to a wording quirk. Slow shadows — jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, and anglerfish — now cross at half speed. Background drift creatures swim closer now — larger, so they read as animals instead of distant blobs. Deep drift is visible now: same opacity as sightings with a stronger halo, and deep shark silhouettes gain the halo too. Sarah's re-sighting reactions fixed: her 'THREE TIMES?!' lines now fire only on the actual third re-sighting — later reunions get her generic best-friend lines instead of repeating the third-time ones. The lanternfish school glows now: its sighting carries a warm bright light that throws the whole school into relief (sighting only — ordinary fish drift stays dark).",
@@ -2674,8 +2674,11 @@ function startAmbientLife(depth, region) {
   /* v2.7.6-beta (Avery): populated water — coral reefs and kelp forests
      teem, so spawns run about twice as often there (4s at 75% vs the
      usual 6s at 55%). Everywhere else keeps the usual pace; twilight
-     and the deep stay sparse, as they should. */
-  const populated = (biome === "tropical" && depth === "reef") || biome === "kelp";
+     and the deep stay sparse, as they should.
+     v2.7.6-fix (Mira review): kelp counts only in shallow water —
+     California twilight/deep were wrongly boosted, since kelp is the
+     biome at all four California depths. */
+  const populated = (biome === "tropical" && depth === "reef") || (biome === "kelp" && shallow);
   ambientTimer = setInterval(() => {
     if (document.hidden) return;
     if (Math.random() < (populated ? 0.75 : 0.55)) spawnCreature(pick(creatures), true);
