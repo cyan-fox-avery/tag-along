@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.8-beta** — *a shark research game*
+**v2.7.10-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -12,6 +12,7 @@ science.
 Built for sarah, who loves sharks. 🦈
 
 ## v2.7.x changes
+- **v2.7.10** — deep shark shadows go dark blue: in the deep dark, a blackened shark illustration stood out against the other shadows (dark blue on black vs solid black), so deep ambient shark shadows now use the species' own dark-blue silhouette art — same shape, same halo, same opacity. Midwater shadows and the mystery phase keep their black fill. (Merges after #154.)
 - **v2.7.8** — creatures sized to each other: small animals no longer render as large as big ones (krill, seahorses, clownfish read small; fish and otters mid-sized; manatees, sunfish, narwhals, belugas properly large). Real sizes compressed so nothing vanishes. Distant shark silhouettes unchanged. (Merges after #152.)
 - **v2.7.7** — clean otter silhouette: the sea otter sprite had whisker, ear, and paw-crease gaps showing through as light lines — filled, so it reads as a single solid silhouette as intended. No other sprites changed.
 - **v2.7.6** — busier water where life teems: coral reefs and kelp forests now feel properly populated — fish drift by about twice as often there, and more of the drift is fish (eightfold in tropical and kelp lists, was fivefold). Open water keeps its usual spawn pace (tropical surface water carries a few more fish, since it draws from the same list); twilight and the deep stay quiet.

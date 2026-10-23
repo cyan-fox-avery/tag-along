@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.8-beta";
+const VERSION = "v2.7.10-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.10-beta": [
+    "🦈 <strong>Deep shark shadows go dark blue.</strong> In the deep dark, a blackened shark illustration stood out against the other shadows — they read dark blue on black, the shark read solid black. Deep ambient shark shadows now use the species' own dark-blue silhouette art (same shape, same halo, same opacity). Midwater shadows and the mystery phase keep their black fill. (Merges after #154.)"
+  ],
   "v2.7.8-beta": [
 "📏 <strong>Creatures sized to each other.</strong> Small animals no longer render as large as big ones: krill, seahorses, and clownfish now read small, fish and otters mid-sized, and manatees, sunfish, narwhals, and belugas properly large. Real sizes are compressed so nothing vanishes — a krill is still visible, just clearly smaller than a tuna. Distant shark silhouettes are unchanged.",
   ],
@@ -2718,7 +2721,22 @@ function spawnCreature(type, background, lit) {
      They drift by uncatchably: the sighting text says distant/too far,
      and nothing here creates an encounter. */
   if (!art && typeof type === "string" && type.indexOf("shark:") === 0 && typeof sharkArtImg === "function") {
-    art = '<div class="shark-shadow">' + sharkArtImg(type.slice(6), "illustration", "Distant shark silhouette") + '</div>';
+    /* v2.7.10-beta (Avery): in the deep dark, a blackened illustration
+       stands out — the other shadows are dark blue on black, the shark
+       was solid black. Deep ambient shark shadows use the species' own
+       dark-blue silhouette art instead (same shape, same halo, same
+       opacity — only the body colour changes to match the other deep
+       shadows). Derpy mode keeps the blackened derpy art; midwater and
+       the mystery phase are untouched. */
+    const deepSilhouette = scene && scene.classList && typeof scene.classList.contains === "function" &&
+      scene.classList.contains("depth-deep") && typeof derpyModeOn === "function" && !derpyModeOn() &&
+      typeof ART_URL === "function";
+    if (deepSilhouette) {
+      const sid = type.slice(6);
+      art = '<div class="shark-shadow deep-silhouette"><img src="' + ART_URL(sid, "silhouette") + '" alt="Distant shark silhouette" loading="lazy" data-shark-art="' + sid + '" data-art-type="silhouette" onerror="sharkArtFallback(this)" /></div>';
+    } else {
+      art = '<div class="shark-shadow">' + sharkArtImg(type.slice(6), "illustration", "Distant shark silhouette") + '</div>';
+    }
   }
   if (!art) return;
   const el = document.createElement("div");
