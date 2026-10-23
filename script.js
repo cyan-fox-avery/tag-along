@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.11-beta";
+const VERSION = "v2.7.12-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.12-beta": [
+    "🧭 <strong>Off the Map fixed.</strong> The achievement now checks where you actually tagged the shark — the Gal\u00e1pagos or South Africa — instead of where the species could theoretically live. A tag in the Caribbean no longer counts just because the species also swims in the Gal\u00e1pagos, and a record with no region never awards. Your logbook backs it up: a genuine earned tag still counts even if a later tag of the same species overwrote the record. Already-earned achievements stay earned.",
+  ],
   "v2.7.11-beta": [
     "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
   ],

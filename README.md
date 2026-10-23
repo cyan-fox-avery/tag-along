@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.11-beta** — *a shark research game*
+**v2.7.12-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
