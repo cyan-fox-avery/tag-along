@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.6-beta";
+const VERSION = "v2.7.9-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.9-beta": [
+"📖 <strong>Research text, final batch.</strong> The last 24 field-guide entries no longer end by stating the expedition answer — clues live inside the natural history, as with batch 1. Greenland, kitefin, and sawshark combos corrected to match the science (squid-only, squid-only, crustaceans-only), and the dwarf lanternshark's depth range corrected to span twilight and deep. Research clues now stand out in bold across the full text — range, prey, and depth evidence, never the answers themselves. The mako's 70 km/h is now framed as an estimated burst, not a cruising speed.",
+  ],
   "v2.7.6-beta": [
 "🐟 <strong>Busier water where life teems.</strong> Coral reefs and kelp forests now feel properly populated: fish drift by more often and in greater numbers there — spawns run about twice as often, and more of them are fish. Open water keeps its usual spawn pace (tropical surface water carries a few more fish, since it draws from the same list), and twilight and the deep stay quiet, as they should.",
   ],
@@ -2056,6 +2059,27 @@ function highlightClues(s) {
   }
   return text;
 }
+/* v2.7.9-beta: bold research clues across the FULL text (not just the
+   pinned preview's first two sentences). Bolds natural evidence —
+   region names, prey words, and depth evidence — never planner labels
+   or instruction phrasing. Single pass, longest terms first, so no
+   nested <strong> tags. Same font/size, just bold. */
+function highlightResearchClues(s, text) {
+  text = text || s.research || "";
+  const terms = [];
+  regionNames(s).forEach(n => { if (n) terms.push(n); });
+  ["schooling fishes", "schooling fish", "oily fish", "small crustaceans",
+   "plankton", "krill", "squid", "crabs", "lobster", "fishes", "fish",
+   "seals", "seal", "rays", "stingrays", "urchins", "shellfish",
+   "crustaceans", "shrimp", "mackerel", "herring", "pollock", "sardines",
+   "anchovies", "cephalopods", "tuna",
+   "twilight zone", "continental shelf", "continental slope",
+   "near the surface", "just under the surface", "hundreds of metres"].forEach(w => terms.push(w));
+  terms.sort((a, b) => b.length - a.length);
+  const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = terms.map(esc).join("|") + "|\\d[\\d,]*\\s*(?:to|and|–|—|-)\\s*\\d[\\d,]*\\s*metres|\\d[\\d,]*\\s*metres";
+  return text.replace(new RegExp("\\b(" + pattern + ")\\b", "gi"), "<strong>$1</strong>");
+}
 function renderPinnedCard(list) {
   /* v1.4.0-beta: pinned card lives in its own full-width section above the
      grid, not as the first grid cell. */
@@ -2278,7 +2302,7 @@ function renderResearch() {
       <div class="guide-row-body hidden">
         <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
         <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
-        ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
+        ${s.research.split("\n\n").map(p => `<p class="research-text">${highlightResearchClues(s, p)}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
