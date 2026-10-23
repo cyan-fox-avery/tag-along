@@ -5987,21 +5987,45 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       cssCode.indexOf(".dive-scene .ambient.bg-fish { opacity: 0.45") !== -1);
     (function() {
       const _ce = document.createElement;
+      const scene = $("diveScene");
+      const hadDeep = scene.classList.contains("depth-deep");
+      const hadMid = scene.classList.contains("depth-midwater");
       let lastEl = null;
       document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
-      const scene = $("diveScene");
-      scene.classList.add("depth-deep");
-      spawnCreature("shark:goblin", true);
-      const deepHtml = lastEl.innerHTML;
-      scene.classList.remove("depth-deep");
-      spawnCreature("shark:goblin", true);
-      const plainHtml = lastEl.innerHTML;
-      document.createElement = _ce;
+      let deepHtml = "", plainHtml = "", derpyHtml = "", midHtml = "";
+      try {
+        scene.classList.add("depth-deep");
+        spawnCreature("shark:goblin", true);
+        deepHtml = lastEl.innerHTML;
+        if (!hadDeep) scene.classList.remove("depth-deep");
+        spawnCreature("shark:goblin", true);
+        plainHtml = lastEl.innerHTML;
+        localStorage.setItem("tyi-derpy-mode", "1");
+        scene.classList.add("depth-deep");
+        spawnCreature("shark:goblin", true);
+        derpyHtml = lastEl.innerHTML;
+        if (!hadDeep) scene.classList.remove("depth-deep");
+        localStorage.removeItem("tyi-derpy-mode");
+        scene.classList.add("depth-midwater");
+        spawnCreature("shark:goblin", true);
+        midHtml = lastEl.innerHTML;
+      } finally {
+        document.createElement = _ce;
+        if (hadDeep) scene.classList.add("depth-deep"); else scene.classList.remove("depth-deep");
+        if (hadMid) scene.classList.add("depth-midwater"); else scene.classList.remove("depth-midwater");
+        localStorage.removeItem("tyi-derpy-mode");
+      }
       ok("v2.7.10 deep shark shadows use dark-blue silhouette art; elsewhere keep blackened illustration",
         deepHtml.indexOf("goblin-silhouette.webp") !== -1 &&
         deepHtml.indexOf("deep-silhouette") !== -1 &&
         plainHtml.indexOf("illustration.webp") !== -1 &&
         plainHtml.indexOf("deep-silhouette") === -1);
+      ok("v2.7.10 derpy deep shark keeps black SVG in plain shadow + scoped halo CSS; midwater keeps illustration",
+        derpyHtml.indexOf("<svg") !== -1 &&
+        derpyHtml.indexOf("deep-silhouette") === -1 &&
+        cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow:not(.deep-silhouette) svg { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65))") !== -1 &&
+        midHtml.indexOf("illustration.webp") !== -1 &&
+        midHtml.indexOf("deep-silhouette") === -1);
     })();
     (function() {
       const _ce = document.createElement;
