@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.9-beta', VERSION === 'v2.7.9-beta');
+  ok('version v2.7.10-beta', VERSION === 'v2.7.10-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5847,6 +5847,50 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       probe.indexOf("<strong>cephalopods</strong>") === -1);
   } catch (e) { ok("v2.7.9 decimal fix block (" + e.message + ")", false); }
 
+    (function() {
+      const _ce = document.createElement;
+      const scene = $("diveScene");
+      const hadDeep = scene.classList.contains("depth-deep");
+      const hadMid = scene.classList.contains("depth-midwater");
+      const prevDerpy = localStorage.getItem("tyi-derpy-mode");
+      let lastEl = null;
+      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+      let deepHtml = "", plainHtml = "", derpyHtml = "", midHtml = "";
+      try {
+        localStorage.removeItem("tyi-derpy-mode");
+        scene.classList.add("depth-deep");
+        spawnCreature("shark:goblin", true);
+        deepHtml = lastEl.innerHTML;
+        scene.classList.remove("depth-deep");
+        spawnCreature("shark:goblin", true);
+        plainHtml = lastEl.innerHTML;
+        localStorage.setItem("tyi-derpy-mode", "1");
+        scene.classList.add("depth-deep");
+        spawnCreature("shark:goblin", true);
+        derpyHtml = lastEl.innerHTML;
+        localStorage.removeItem("tyi-derpy-mode");
+        scene.classList.remove("depth-deep");
+        scene.classList.add("depth-midwater");
+        spawnCreature("shark:goblin", true);
+        midHtml = lastEl.innerHTML;
+      } finally {
+        document.createElement = _ce;
+        if (hadDeep) scene.classList.add("depth-deep"); else scene.classList.remove("depth-deep");
+        if (hadMid) scene.classList.add("depth-midwater"); else scene.classList.remove("depth-midwater");
+        if (prevDerpy === null) localStorage.removeItem("tyi-derpy-mode"); else localStorage.setItem("tyi-derpy-mode", prevDerpy);
+      }
+      ok("v2.7.10 deep shark shadows use dark-blue silhouette art; elsewhere keep blackened illustration",
+        deepHtml.indexOf("goblin-silhouette.webp") !== -1 &&
+        deepHtml.indexOf("deep-silhouette") !== -1 &&
+        plainHtml.indexOf("illustration.webp") !== -1 &&
+        plainHtml.indexOf("deep-silhouette") === -1);
+      ok("v2.7.10 derpy deep shark keeps black SVG in plain shadow + scoped halo CSS; midwater keeps illustration",
+        derpyHtml.indexOf("<svg") !== -1 &&
+        derpyHtml.indexOf("deep-silhouette") === -1 &&
+        cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow:not(.deep-silhouette) svg { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65))") !== -1 &&
+        midHtml.indexOf("illustration.webp") !== -1 &&
+        midHtml.indexOf("deep-silhouette") === -1);
+    })();
 /* ---------- v2.7.1: Bukangi made it out ---------- */
   try {
     ok("v2.7.1 BUKANGI_THREAD updated to the success story",
@@ -6145,10 +6189,12 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       ok("slow shadows cross at half speed (jellyfish 18-34s + 45s net, fish 9-17s + 25s net)",
         jDur >= 18 && jDur <= 34 && jDelay === 45000 && fDur >= 9 && fDur <= 17 && fDelay === 25000);
     })();
-    ok("deep drift matches sighting opacity + halo; deep sharks keep black fill with halo (source)",
+    ok("deep drift matches sighting opacity + halo; deep sharks go dark blue, midwater keeps black (source)",
       cssCode.indexOf(".dive-scene.depth-deep .ambient.bg-fish { opacity: 0.8") !== -1 &&
       cssCode.indexOf(".dive-scene.depth-deep .ambient.bg-fish img { filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.7)") !== -1 &&
-      cssCode.indexOf("brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)") !== -1 &&
+      cssCode.indexOf(".dive-scene.depth-midwater .ambient .shark-shadow img { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)") !== -1 &&
+      cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow.deep-silhouette img") !== -1 &&
+      cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow img { filter: brightness(0)") === -1 &&
       cssCode.indexOf(".dive-scene .ambient.bg-fish { opacity: 0.45") !== -1);
     (function() {
       const _ce = document.createElement;
