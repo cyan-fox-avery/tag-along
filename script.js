@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.11-beta";
+const VERSION = "v2.7.14-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.14-beta": [
+    "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top.",
+  ],
   "v2.7.11-beta": [
     "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
   ],
@@ -1558,7 +1561,7 @@ const state = {
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
-      depthsTagged: [], methodsUsed: [] },
+      depthsTagged: [], depthsVisited: [], methodsUsed: [] },
     statsStore.load()
   ),
   achievements: achieveStore.load(), // id -> timestamp
@@ -1601,6 +1604,11 @@ const state = {
   log.forEach(t => {
     if (t.region && !s.regionsVisited.includes(t.region)) { s.regionsVisited.push(t.region); changed = true; }
     if (t.bait && !s.baitsUsed.includes(t.bait)) { s.baitsUsed.push(t.bait); changed = true; }
+    /* v2.7.14-beta: backfill depths visited so established players get
+       credit for past dives (same pattern as regions/baits). */
+    if (t.depth && !(s.depthsVisited || []).includes(t.depth)) {
+      (s.depthsVisited = s.depthsVisited || []).push(t.depth); changed = true;
+    }
   });
   let resights = 0;
   Object.values(state.tagged || {}).forEach(t => { resights += (t.resightings || []).length; });
@@ -3328,6 +3336,11 @@ async function runExpedition(plan) {
   if (plan.bait && !state.stats.baitsUsed.includes(plan.bait)) {
     state.stats.baitsUsed.push(plan.bait);
   }
+  /* v2.7.14-beta: feed the twilight/deep-dive achievements — the depth of
+     every expedition launched, tag or no tag. */
+  if (plan.depth && !(state.stats.depthsVisited || []).includes(plan.depth)) {
+    (state.stats.depthsVisited = state.stats.depthsVisited || []).push(plan.depth);
+  }
   if (plan.methodOpt && plan.methodOpt !== "none" && !state.stats.methodsUsed.includes(plan.methodOpt)) {
     state.stats.methodsUsed.push(plan.methodOpt);
   }
@@ -3475,6 +3488,10 @@ async function runExpedition(plan) {
     }
     state.logbook.unshift(tripLog);
     logStore.save(state.logbook);
+    /* v2.7.14-beta: Fieldwork reads the logbook, so the check must run
+       after this trip is recorded — the earlier call above runs before
+       the unshift. Re-running is safe: earned ids are skipped. */
+    checkAchievements();
     tripLog = null;
     renderLogbook();
   }

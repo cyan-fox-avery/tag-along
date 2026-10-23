@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.11-beta', VERSION === 'v2.7.11-beta');
+  ok('version v2.7.14-beta', VERSION === 'v2.7.14-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -1096,8 +1096,8 @@ code += `
   // every advertised achievement is attainable (no permanently-locked entries)
   ok('all live achievements attainable',
     ACHIEVEMENTS.every(a => { try { return typeof a.check === 'function'; } catch { return false; } }));
-  ok('21 achievements (20 visible + Bruce hidden)', ACHIEVEMENTS.length === 21 &&
-    ACHIEVEMENTS.filter(a => !a.hidden).length === 20);
+  ok('26 achievements (25 visible + Bruce hidden)', ACHIEVEMENTS.length === 26 &&
+    ACHIEVEMENTS.filter(a => !a.hidden).length === 25);
   // v1.7.28-beta: Dedicated + Certified Shark Nerd.
   (function () {
     const dedicated = ACHIEVEMENTS.find(a => a.id === 'dedicated');
@@ -1125,7 +1125,11 @@ code += `
         regionsVisited: Object.keys(REGIONS),
         baitsUsed: Object.keys(BAITS),
         depthsTagged: Object.keys(DEPTHS),
+        depthsVisited: Object.keys(DEPTHS),
       },
+      /* v2.7.14-beta: full completion includes an empty-handed trip in the
+         logbook, for the Fieldwork milestone. */
+      logbook: [{ region: "caribbean", encounters: [{ speciesId: "nurse", result: "resighted" }] }],
       unlockedFacts: allFacts,
       bruceEgg: null,
       bruceChainComplete: false,
@@ -1222,6 +1226,55 @@ code += `
   state.tagged = { scalloped: { name: "S", researchId: "R" } };
   checkAchievements();
   ok('Off the Map unlocks in locked region', !!state.achievements['off-map']);
+  /* v2.7.14-beta: expedition moments + CR capstone + Sea Legs breadcrumb. */
+  resetA();
+  state.stats.expeditions = 1; state.logbook = [];
+  checkAchievements();
+  ok('Maiden Voyage unlocks on the first trip', !!state.achievements['maiden-voyage']);
+  resetA();
+  state.stats.expeditions = 0; state.logbook = [];
+  checkAchievements();
+  ok('Maiden Voyage stays locked with no trips', !state.achievements['maiden-voyage']);
+  resetA();
+  state.stats.depthsVisited = ["twilight"]; state.logbook = [];
+  checkAchievements();
+  ok('Twilight Zone unlocks on a twilight dive', !!state.achievements['twilight-dive']);
+  resetA();
+  state.stats.depthsVisited = ["reef"]; state.logbook = [];
+  checkAchievements();
+  ok('Twilight Zone stays locked on a reef-only dive', !state.achievements['twilight-dive']);
+  resetA();
+  state.stats.depthsVisited = ["deep"]; state.logbook = [];
+  checkAchievements();
+  ok('Midnight Zone unlocks on a deep dive', !!state.achievements['deep-dive']);
+  resetA();
+  state.stats.depthsVisited = ["twilight"]; state.logbook = [];
+  checkAchievements();
+  ok('Midnight Zone stays locked on a twilight-only dive', !state.achievements['deep-dive']);
+  resetA();
+  state.logbook = [{ region: "caribbean", encounters: [] }];
+  checkAchievements();
+  ok('Fieldwork unlocks on a trip with no encounters', !!state.achievements['fieldwork']);
+  resetA();
+  state.logbook = [{ region: "caribbean", encounters: [{ speciesId: "nurse", result: "tagged" }] }];
+  checkAchievements();
+  ok('Fieldwork stays locked when the trip tagged a shark', !state.achievements['fieldwork']);
+  resetA();
+  state.logbook = [{ region: "caribbean", encounters: [{ speciesId: "nurse", result: "resighted" }] }];
+  checkAchievements();
+  ok('Fieldwork unlocks on sightings with no tag', !!state.achievements['fieldwork']);
+  resetA();
+  state.tagged = { sandtiger: { name: "T", researchId: "R" } }; state.logbook = [];
+  checkAchievements();
+  ok('On the Brink unlocks on a Critically Endangered tag', !!state.achievements['on-the-brink']);
+  resetA();
+  const nonCR = SHARKS.find(x => x.status !== "Critically Endangered").id;
+  state.tagged = { [nonCR]: { name: "N", researchId: "R" } }; state.logbook = [];
+  checkAchievements();
+  ok('On the Brink stays locked on a non-CR tag', !state.achievements['on-the-brink']);
+  ok('Sea Legs breadcrumb no longer states the requirement',
+    ACHIEVEMENTS.find(a => a.id === 'sea-legs').breadcrumb === 'steady on your feet');
+  state.stats.expeditions = 0; state.stats.depthsVisited = []; state.logbook = [];
   resetA();
   const byStatus = {};
   SHARKS.forEach(s => { if (!byStatus[s.status]) byStatus[s.status] = s.id; });
@@ -1229,7 +1282,7 @@ code += `
   checkAchievements();
   ok('Every Shade unlocks across statuses', !!state.achievements['every-shade']);
   ok('new breadcrumbs stay hints',
-    ["full-fathom","finished","pen-pal","off-map","every-shade"].every(id => {
+    ["full-fathom","finished","pen-pal","off-map","every-shade","maiden-voyage","twilight-dive","deep-dive","fieldwork","on-the-brink","sea-legs"].every(id => {
       const a = ACHIEVEMENTS.find(x => x.id === id);
       return a && a.breadcrumb && !/tag your first|complete \d+|visit every/i.test(a.breadcrumb);
     }));
