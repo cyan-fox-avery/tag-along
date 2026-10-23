@@ -6159,8 +6159,8 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       spawnCreature("fish", false);
       const fgH = parseInt(lastEl.style.height, 10);
       document.createElement = _ce;
-      ok("background animals stay relatively close (drift 18-30px, sightings 24-50px)",
-        bgH >= 18 && bgH <= 30 && fgH >= 24 && fgH <= 50);
+      ok("background animals stay relatively close (fish drift 15-26px, sightings 20-43px at 0.85)",
+        bgH >= 15 && bgH <= 26 && fgH >= 20 && fgH <= 43);
     })();
     ok("lanternfish sighting carries the lit flag; ordinary spawns do not (source + behavior)",
       fileCode.indexOf('spawnCreature(s.creature, false, s.text.toLowerCase().indexOf("lanternfish")') !== -1 &&
@@ -6231,6 +6231,35 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       fileCode.indexOf('depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish", "snailfish", "cusk"]') !== -1 &&
       fileCode.indexOf('["fish", "fish", "jellyfish", "hatchetfish", "gulper", "vampire", "siphonophore", "krill", "viperfish"]') !== -1);
   } catch (e) { ok("v2.7.6 populated-water block (" + e.message + ")", false); }
+
+  /* ---------- v2.7.8: relative creature sizing ---------- */
+  try {
+    ok("v2.7.8 (Avery): every ambient creature has a size factor",
+      Object.keys(CREATURE_ART).every(function(k) { return typeof CREATURE_SIZE[k] === "number"; }));
+    ok("v2.7.8 (Avery): size order is honest (krill < seahorse < fish < otter < manatee)",
+      CREATURE_SIZE.krill < CREATURE_SIZE.seahorse && CREATURE_SIZE.seahorse < CREATURE_SIZE.fish &&
+      CREATURE_SIZE.fish < CREATURE_SIZE.otter && CREATURE_SIZE.otter < CREATURE_SIZE.manatee &&
+      CREATURE_SIZE.manatee === 1.5);
+    ok("v2.7.8 (Avery): relative heights render (krill < fish < otter < manatee, fixed random)",
+      (function() {
+        const _ce = document.createElement;
+        const realRandom = Math.random;
+        let lastEl = null;
+        try {
+          document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+          Math.random = function() { return 0.5; };
+          const heights = {};
+          ["krill", "fish", "otter", "manatee"].forEach(function(c) {
+            spawnCreature(c, false);
+            heights[c] = parseInt(lastEl.style.height, 10);
+          });
+          return heights.krill < heights.fish && heights.fish < heights.otter && heights.otter < heights.manatee;
+        } finally {
+          document.createElement = _ce;
+          Math.random = realRandom;
+        }
+      })());
+  } catch (e) { ok("v2.7.8 sizing block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
