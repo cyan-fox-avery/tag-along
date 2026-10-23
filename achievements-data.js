@@ -144,10 +144,18 @@ const ACHIEVEMENTS = [
     description: "Tagged your first shark in waters that had to be earned — the Galápagos or South Africa.",
     check: (st) => {
       const locked = ["galapagos", "south-africa"];
-      return Object.keys(st.tagged).some(id => {
-        const s = SHARKS.find(x => x.id === id);
-        return s && regionList(s).some(r => locked.includes(r));
-      });
+      /* #149: award on the ACTUAL tag location, never on a species' possible
+         habitat. A tagged record's own region key (written by confirmTag
+         before checkAchievements) is the source of truth. The logbook
+         preserves a genuine earned tag even if a later tag of the same
+         species overwrote the one-per-species record. A record with no
+         region never awards, and already-earned achievements are never
+         revoked (checkAchievements skips earned ids). */
+      const taggedHere = Object.values(st.tagged || {}).some(t => t && locked.includes(t.region));
+      const loggedHere = (st.logbook || []).some(trip =>
+        trip && locked.includes(trip.region) &&
+        (trip.encounters || []).some(e => e && e.result === "tagged"));
+      return taggedHere || loggedHere;
     }
   },
   {

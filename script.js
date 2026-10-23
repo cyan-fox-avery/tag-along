@@ -23,6 +23,9 @@ const WHATS_NEW = {
   "v2.7.13-beta": [
     "🦦 <strong>Otter shadows halved.</strong> The sea otter drifted by at twice the size it should read — its sprite is wide, so at full height it took up far more screen than the other kelp life. Otter shadows (and the otter sighting, which shares the same size factor) now render at half size. Other shadows are untouched: tell Roman which others still read too big and by how much.",
   ],
+  "v2.7.12-beta": [
+    "🧭 <strong>Off the Map fixed.</strong> The achievement now checks where you actually tagged the shark — the Gal\u00e1pagos or South Africa — instead of where the species could theoretically live. A tag in the Caribbean no longer counts just because the species also swims in the Gal\u00e1pagos, and a record with no region never awards. Your logbook backs it up: a genuine earned tag still counts even if a later tag of the same species overwrote the record. Already-earned achievements stay earned.",
+  ],
   "v2.7.11-beta": [
     "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
   ],
