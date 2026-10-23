@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.5-beta', VERSION === 'v2.7.5-beta');
+  ok('version v2.7.6-beta', VERSION === 'v2.7.6-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -5875,9 +5875,9 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("weighted shuffle is a permutation (no entry lost or duplicated)",
       wsOut.length === 3 && wsOut.slice().sort(function(a, b) { return a.creature < b.creature ? -1 : 1; }).map(function(s) { return s.creature; }).join(",") === "fish,mola,turtle");
     const fishCount = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
-    ok("drift weighting: fish fivefold in every biome list",
-      fishCount(BIOME_CREATURES.tropical) === 5 && fishCount(BIOME_CREATURES.temperate) === 5 &&
-      fishCount(BIOME_CREATURES.kelp) === 5 && fishCount(BIOME_CREATURES.pelagic) === 5 &&
+    ok("drift weighting: fish eightfold in tropical + kelp, fivefold elsewhere",
+      fishCount(BIOME_CREATURES.tropical) === 8 && fishCount(BIOME_CREATURES.kelp) === 8 &&
+      fishCount(BIOME_CREATURES.temperate) === 5 && fishCount(BIOME_CREATURES.pelagic) === 5 &&
       fishCount(BIOME_CREATURES.polar) === 5 && fishCount(BIOME_CREATURES.volcanic) === 5);
     ok("ambient spawns handle shark silhouettes + travel both ways (source)",
       fileCode.indexOf('type.indexOf("shark:")') !== -1 &&
@@ -5942,7 +5942,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       BIOME_CREATURES.tropical.indexOf("moray") !== -1 &&
       surfaceDriftList("kelp").indexOf("otter") !== -1 &&
       surfaceDriftList("pelagic").indexOf("tuna") !== -1 &&
-      surfaceDriftList("tropical").filter(function(c) { return c === "fish"; }).length === 5);
+      surfaceDriftList("tropical").filter(function(c) { return c === "fish"; }).length === 8);
     ok("v2.7.5-fix (Mira): clownfish is a scripted Indo-Pacific surface visitor only, never ambient drift",
       Object.keys(BIOME_CREATURES).every(function(b) { return BIOME_CREATURES[b].indexOf("clownfish") === -1; }) &&
       surfaceDriftList("tropical").indexOf("clownfish") === -1 &&
@@ -6010,11 +6010,60 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         return lit && unlit;
       })());
     const fishN = function(list) { return list.filter(function(c) { return c === "fish"; }).length; };
-    ok("drift weighting holds: fish boosted to five in every biome list",
-      fishN(BIOME_CREATURES.tropical) === 5 && fishN(BIOME_CREATURES.temperate) === 5 &&
-      fishN(BIOME_CREATURES.kelp) === 5 && fishN(BIOME_CREATURES.pelagic) === 5 &&
+    ok("drift weighting holds: fish eightfold in tropical + kelp, fivefold elsewhere",
+      fishN(BIOME_CREATURES.tropical) === 8 && fishN(BIOME_CREATURES.kelp) === 8 &&
+      fishN(BIOME_CREATURES.temperate) === 5 && fishN(BIOME_CREATURES.pelagic) === 5 &&
       fishN(BIOME_CREATURES.polar) === 5 && fishN(BIOME_CREATURES.volcanic) === 5);
   } catch (e) { ok("v2.7.5 ambient batch 2 block (" + e.message + ")", false); }
+
+  /* ---------- v2.7.6: populated-water drift boost ---------- */
+  try {
+    /* v2.7.6-fix (Mira): the timer + chance are now tested behaviorally —
+       capture the setInterval delay, drive the callback under a fixed
+       Math.random, count spawns via a stubbed spawnCreature, restore all. */
+    try {
+      const realSI = global.setInterval;
+      const realRandom = Math.random;
+      const realSpawn = spawnCreature;
+      let captured = null;
+      let spawns = 0;
+      try {
+        global.setInterval = function(fn, ms) { captured = { fn: fn, ms: ms }; return 999; };
+        spawnCreature = function() { spawns++; };
+        const run = function(depth, region, rnd) {
+          captured = null; spawns = 0;
+          Math.random = function() { return rnd; };
+          startAmbientLife(depth, region);
+          const ms = captured ? captured.ms : -1;
+          if (captured) captured.fn();
+          return { ms: ms, spawns: spawns };
+        };
+        /* 0.6 discriminates: below populated 75%, above standard 55%. */
+        [["reef", "caribbean", 4000, true],
+         ["surface", "california", 4000, true],
+         ["reef", "california", 4000, true],
+         ["twilight", "california", 6000, false],
+         ["deep", "california", 6000, false],
+         ["surface", "caribbean", 6000, false],
+         ["reef", "north-carolina", 6000, false],
+         ["deep", "arctic", 6000, false]].forEach(function(c) {
+          const res = run(c[0], c[1], 0.6);
+          ok("v2.7.6-fix (Mira): drift timer " + c[0] + "/" + c[1] + " = " + c[2] + "ms, spawns at 0.6: " + c[3],
+            res.ms === c[2] && (res.spawns > 0) === c[3]);
+        });
+        ok("v2.7.6-fix (Mira): 0.9 never spawns, 0.0 always spawns",
+          run("reef", "caribbean", 0.9).spawns === 0 && run("deep", "california", 0.0).spawns > 0);
+      } finally {
+        global.setInterval = realSI;
+        Math.random = realRandom;
+        spawnCreature = realSpawn;
+        stopAmbientLife();
+      }
+    } catch (e) { ok("v2.7.6-fix populated timer block (" + e.message + ")", false); }
+    ok("v2.7.6: deep + twilight drift untouched by the populated boost (source)",
+      fileCode.indexOf('depth === "deep") creatures = ["fish", "fish", "fish", "anglerfish", "snailfish", "cusk"]') !== -1 &&
+      fileCode.indexOf('["fish", "fish", "jellyfish", "hatchetfish", "gulper", "vampire", "siphonophore", "krill", "viperfish"]') !== -1);
+  } catch (e) { ok("v2.7.6 populated-water block (" + e.message + ")", false); }
 
 console.log(out.join('\\n'));
   const fails = out.filter(l => l.startsWith('FAIL')).length;
