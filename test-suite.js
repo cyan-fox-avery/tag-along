@@ -88,7 +88,7 @@ code += `
   ok('frilled is archival kind', TRACK_ENVELOPES.frilled.kind === 'archival');
 
   // research clarity (v0.14.0)
-  ok('blacktip names real baits', /schooling fish/.test(sharkById('blacktip').research));
+  ok('blacktip names real baits', /schools of small reef fish/.test(sharkById('blacktip').research) && /crustaceans/.test(sharkById('blacktip').research));
   ok('whitetip names squid, no octopus', /squid/i.test(sharkById('whitetip').research) && !/octopus/i.test(sharkById('whitetip').research));
   ok('sandtiger names rays', /rays/.test(sharkById('sandtiger').research));
   ok('sevengill names squid', /squid/i.test(sharkById('sevengill').research));
@@ -5680,6 +5680,217 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
     ok("v2.7.0 Mira review: batch-1 clue matrix fully covered", missing.length === 0);
     if (missing.length) console.log("matrix gaps: " + missing.join(", "));
   } catch (e) { ok("v2.7.0 clue matrix block (" + e.message + ")", false); }
+/* ---------- v2.7.9: research-text final batch (24) + bold clues ---------- */
+  try {
+    const final24 = ["goblin", "sandtiger", "galapagos", "hammerhead", "mako", "lemon", "blacktip", "whitetip", "scalloped", "smooth", "bull", "salmon", "greenland", "dusky", "leopard", "portjackson", "angelshark", "sawshark", "velvetbelly", "dwarflantern", "kitefin", "pacificsleeper", "spinydogfish", "catshark"];
+    ok("v2.7.9 research final batch: no giveaway endings remain",
+      final24.every(function(id) {
+        const sp = SHARKS.find(function(x) { return x.id === id; });
+        return sp && sp.research.indexOf("Game plan:") === -1 && sp.research.indexOf("Plan:") === -1 &&
+          sp.research.indexOf("chum") === -1;
+      }));
+  } catch (e) { ok("v2.7.9 no-giveaway block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9 Mira review: clue-coverage matrix, final batch ----------
+     Every accepted region, bait option and depth zone must have a
+     discoverable phrase in the final prose. Driven by the FINAL combos:
+     greenland/kitefin are squid-only, sawshark is crustaceans-only,
+     dwarflantern spans twilight+deep. */
+  try {
+    const matrix = [
+      { id: "goblin", regions: ["Sagami Bay"], baits: ["squid"], depths: ["270 and 960 metres"] },
+      { id: "sandtiger", regions: ["North Carolina"], baits: ["schools of fish", "squid", "rays"], depths: ["190 metres", "sunlit shallows around reefs and wrecks"] },
+      { id: "galapagos", regions: ["Galápagos"], baits: ["schools of reef fish", "squid"], depths: ["80 metres"] },
+      { id: "hammerhead", regions: ["Caribbean"], baits: ["stingrays", "school of reef fish"], depths: ["80 metres", "reef flats"] },
+      { id: "mako", regions: ["open Atlantic"], baits: ["tuna", "squid"], depths: ["upper 100 metres"] },
+      { id: "lemon", regions: ["Caribbean"], baits: ["small schooling fishes"], depths: ["90 metres"] },
+      { id: "blacktip", regions: ["Maldives"], baits: ["small reef fish", "crustaceans"], depths: ["reef flats"] },
+      { id: "whitetip", regions: ["Philippine"], baits: ["squid", "schooling fish"], depths: ["shallow reefs"] },
+      { id: "scalloped", regions: ["Galápagos"], baits: ["schooling fish", "squid"], depths: ["near the surface", "reef edges"] },
+      { id: "smooth", regions: ["Cornwall", "US east coast"], baits: ["schooling fish", "squid"], depths: ["first few metres to roughly 100 metres"] },
+      { id: "bull", regions: ["Caribbean"], baits: ["tuna", "schools of smaller fish"], depths: ["coastlines and estuaries"] },
+      { id: "salmon", regions: ["Japan"], baits: ["oily fish", "squid"], depths: ["just under the surface"] },
+      { id: "greenland", regions: ["Arctic"], baits: ["squid"], depths: ["hundreds of metres down"] },
+      { id: "dusky", regions: ["South Africa"], baits: ["sardines", "squid"], depths: ["surf zone to the outer shelf"] },
+      { id: "leopard", regions: ["California"], baits: ["crabs", "small schooling fish"], depths: ["warm shallow water"] },
+      { id: "portjackson", regions: ["east coast"], baits: ["urchins", "crustaceans"], depths: ["rocky reefs"] },
+      { id: "angelshark", regions: ["southwest Britain", "Wales"], baits: ["crabs"], depths: ["5 and 150 metres"] },
+      { id: "sawshark", regions: ["southern and eastern Australia"], baits: ["crustaceans"], depths: ["40 to 310 metres"] },
+      { id: "velvetbelly", regions: ["southwest Britain"], baits: ["squid"], depths: ["200 and 500 metres"] },
+      { id: "dwarflantern", regions: ["Colombia and Venezuela"], baits: ["small crustaceans"], depths: ["189 to 598 metres"] },
+      { id: "kitefin", regions: ["open Atlantic"], baits: ["squid"], depths: ["200 metres down to nearly 1800"] },
+      { id: "pacificsleeper", regions: ["Japan"], baits: ["squid", "pollock"], depths: ["deep by day"] },
+      { id: "spinydogfish", regions: ["Cornwall"], baits: ["schooling fish"], depths: ["from the surface down the shelf"] },
+      { id: "catshark", regions: ["Cornwall"], baits: ["crabs"], depths: ["shallow reefs and kelp beds"] },
+    ];
+    const missing = [];
+    matrix.forEach(function(row) {
+      const sp = SHARKS.find(function(x) { return x.id === row.id; });
+      ["regions", "baits", "depths"].forEach(function(dim) {
+        row[dim].forEach(function(phrase) {
+          if (!sp || sp.research.indexOf(phrase) === -1) missing.push(row.id + ":" + dim + ":" + phrase);
+        });
+      });
+    });
+    ok("v2.7.9 Mira review: final-batch clue matrix fully covered", missing.length === 0);
+    if (missing.length) console.log("matrix gaps: " + missing.join(", "));
+  } catch (e) { ok("v2.7.9 clue matrix block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9: corrected combos behave correctly ---------- */
+  try {
+    const has = function(plan, id) { return resolveEncounters(plan).some(function(x) { return x.id === id; }); };
+    ok("v2.7.9 greenland: schooling-fish no longer matches, squid does",
+      !has({ region: "arctic", depth: "deep", bait: "schooling-fish" }, "greenland") &&
+      has({ region: "arctic", depth: "deep", bait: "squid" }, "greenland"));
+    ok("v2.7.9 kitefin: schooling-fish no longer matches, squid does",
+      !has({ region: "open-atlantic", depth: "deep", bait: "schooling-fish" }, "kitefin") &&
+      has({ region: "open-atlantic", depth: "deep", bait: "squid" }, "kitefin"));
+    ok("v2.7.9 sawshark: squid no longer matches, crustaceans does (reef + twilight)",
+      !has({ region: "east-australia", depth: "reef", bait: "squid" }, "sawshark") &&
+      has({ region: "east-australia", depth: "reef", bait: "crustaceans" }, "sawshark") &&
+      has({ region: "east-australia", depth: "twilight", bait: "crustaceans" }, "sawshark"));
+    ok("v2.7.9 dwarflantern: twilight now matches, deep still matches",
+      has({ region: "caribbean", depth: "twilight", bait: "crustaceans" }, "dwarflantern") &&
+      has({ region: "caribbean", depth: "deep", bait: "crustaceans" }, "dwarflantern"));
+  } catch (e) { ok("v2.7.9 combo behaviour block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9: bold research clues across the full text ---------- */
+  try {
+    const mako = SHARKS.find(function(x) { return x.id === "mako"; });
+    const makoBold = highlightResearchClues(mako, mako.research);
+    ok("v2.7.9 bold clues: region, prey and depth bolded in full text",
+      makoBold.indexOf("<strong>open Atlantic</strong>") !== -1 &&
+      makoBold.indexOf("<strong>tuna</strong>") !== -1 &&
+      makoBold.indexOf("<strong>100 metres</strong>") !== -1);
+    ok("v2.7.9 bold clues: no nested strong tags, no planner labels bolded",
+      makoBold.indexOf("<strong><strong>") === -1 &&
+      makoBold.indexOf("<strong>chum</strong>") === -1);
+    const dl = SHARKS.find(function(x) { return x.id === "dwarflantern"; });
+    ok("v2.7.9 bold clues: metre ranges bolded as one phrase",
+      highlightResearchClues(dl, dl.research).indexOf("<strong>189 to 598 metres</strong>") !== -1);
+    ok("v2.7.9 bold clues: research rendering uses the full-text highlighter",
+      fileCode.indexOf("highlightResearchClues(s, p)") !== -1);
+  } catch (e) { ok("v2.7.9 bold clues block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9 Mira re-review: species-aware emphasis ---------- */
+  try {
+    const bolded = function(id) {
+      const sp = SHARKS.find(function(x) { return x.id === id; });
+      return sp.research.split("\\n\\n").map(function(p) { return highlightResearchClues(sp, p); }).join("");
+    };
+    const gl = bolded("greenland");
+    ok("v2.7.9 Mira re-review: greenland bolds squid only, never fish/seals",
+      gl.indexOf("<strong>squid</strong>") !== -1 &&
+      gl.indexOf("<strong>fish</strong>") === -1 &&
+      gl.indexOf("<strong>seals</strong>") === -1);
+    const kf = bolded("kitefin");
+    ok("v2.7.9 Mira re-review: kitefin bolds squid only, never fish/crustaceans",
+      kf.indexOf("<strong>squid</strong>") !== -1 &&
+      kf.indexOf("<strong>fish</strong>") === -1 &&
+      kf.indexOf("<strong>crustaceans</strong>") === -1);
+    const ss = bolded("sawshark");
+    ok("v2.7.9 Mira re-review: sawshark bolds crustaceans, never fishes",
+      ss.indexOf("<strong>crustaceans</strong>") !== -1 &&
+      ss.indexOf("<strong>fishes</strong>") === -1);
+    ok("v2.7.9 Mira re-review: region aliases bold prose wording",
+      bolded("catshark").indexOf("<strong>Cornwall</strong>") !== -1 &&
+      bolded("portjackson").indexOf("<strong>Australia's east coast</strong>") !== -1 &&
+      bolded("galapagos").indexOf("<strong>Galápagos</strong>") !== -1 &&
+      bolded("velvetbelly").indexOf("<strong>southwest Britain</strong>") !== -1);
+    ok("v2.7.9 Mira re-review: depth aliases bold habitat wording",
+      bolded("portjackson").indexOf("<strong>rocky reefs</strong>") !== -1 &&
+      bolded("angelshark").indexOf("<strong>shallow coastal waters</strong>") !== -1);
+  } catch (e) { ok("v2.7.9 Mira re-review emphasis block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9: all-50 rendered emphasis inspection ---------- */
+  try {
+    let nested = 0, chumBold = 0, unbolded = [];
+    SHARKS.forEach(function(sp) {
+      const out = sp.research.split("\\n\\n").map(function(p) { return highlightResearchClues(sp, p); }).join("");
+      if (out.indexOf("<strong><strong>") !== -1) nested++;
+      if (out.indexOf("<strong>chum</strong>") !== -1) chumBold++;
+      if (out.indexOf("<strong>") === -1) unbolded.push(sp.id);
+    });
+    ok("v2.7.9 all-50 inspection: no nested strongs, no bolded chum",
+      nested === 0 && chumBold === 0);
+    ok("v2.7.9 all-50 inspection: every card gets at least one bold clue",
+      unbolded.length === 0);
+    if (unbolded.length) console.log("unbolded cards: " + unbolded.join(", "));
+  } catch (e) { ok("v2.7.9 all-50 inspection block (" + e.message + ")", false); }
+
+/* ---------- v2.7.9 Mira re-review 2: decimal-safe metre bolding ---------- */
+  try {
+    const bolded = function(id) {
+      const sp = SHARKS.find(function(x) { return x.id === id; });
+      return sp.research.split("\\n\\n").map(function(p) { return highlightResearchClues(sp, p); }).join("");
+    };
+    const ss = bolded("sawshark");
+    ok("v2.7.9 decimal fix: sawshark length unbolded, depth range bolded whole",
+      ss.indexOf("1.<strong>4 metres</strong>") === -1 &&
+      ss.indexOf("<strong>1.4 metres</strong>") === -1 &&
+      ss.indexOf("<strong>40 to 310 metres</strong>") !== -1);
+    const lp = bolded("leopard");
+    ok("v2.7.9 decimal fix: leopard length unbolded, no partial fragment",
+      lp.indexOf("1.<strong>5 metres</strong>") === -1 &&
+      lp.indexOf("<strong>1.2 to 1.5 metres</strong>") === -1);
+    ok("v2.7.9 decimal fix: dwarf depth range still bolds whole, greenland length unbolded",
+      bolded("dwarflantern").indexOf("<strong>189 to 598 metres</strong>") !== -1 &&
+      bolded("greenland").indexOf("<strong>6 metres</strong>") === -1 &&
+      bolded("greenland").indexOf("<strong>hundreds of metres</strong>") !== -1);
+    ok("v2.7.9 species synonyms: sleeper pollock + silvertip cephalopods bold",
+      bolded("pacificsleeper").indexOf("<strong>pollock</strong>") !== -1 &&
+      bolded("silvertip").indexOf("<strong>cephalopods</strong>") !== -1);
+    const probe = highlightResearchClues({ combo: { regions: ["caribbean"], bait: ["squid"] } }, "It eats squid, pollock and cephalopods.");
+    ok("v2.7.9 species synonyms: pollock/cephalopods do not generalize to other squid species",
+      probe.indexOf("<strong>squid</strong>") !== -1 &&
+      probe.indexOf("<strong>pollock</strong>") === -1 &&
+      probe.indexOf("<strong>cephalopods</strong>") === -1);
+  } catch (e) { ok("v2.7.9 decimal fix block (" + e.message + ")", false); }
+
+    (function() {
+      const _ce = document.createElement;
+      const scene = $("diveScene");
+      const hadDeep = scene.classList.contains("depth-deep");
+      const hadMid = scene.classList.contains("depth-midwater");
+      const prevDerpy = localStorage.getItem("tyi-derpy-mode");
+      let lastEl = null;
+      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
+      let deepHtml = "", plainHtml = "", derpyHtml = "", midHtml = "";
+      try {
+        localStorage.removeItem("tyi-derpy-mode");
+        scene.classList.add("depth-deep");
+        spawnCreature("shark:goblin", true);
+        deepHtml = lastEl.innerHTML;
+        scene.classList.remove("depth-deep");
+        spawnCreature("shark:goblin", true);
+        plainHtml = lastEl.innerHTML;
+        localStorage.setItem("tyi-derpy-mode", "1");
+        scene.classList.add("depth-deep");
+        spawnCreature("shark:goblin", true);
+        derpyHtml = lastEl.innerHTML;
+        localStorage.removeItem("tyi-derpy-mode");
+        scene.classList.remove("depth-deep");
+        scene.classList.add("depth-midwater");
+        spawnCreature("shark:goblin", true);
+        midHtml = lastEl.innerHTML;
+      } finally {
+        document.createElement = _ce;
+        if (hadDeep) scene.classList.add("depth-deep"); else scene.classList.remove("depth-deep");
+        if (hadMid) scene.classList.add("depth-midwater"); else scene.classList.remove("depth-midwater");
+        if (prevDerpy === null) localStorage.removeItem("tyi-derpy-mode"); else localStorage.setItem("tyi-derpy-mode", prevDerpy);
+      }
+      ok("v2.7.10 deep shark shadows use dark-blue silhouette art; elsewhere keep blackened illustration",
+        deepHtml.indexOf("goblin-silhouette.webp") !== -1 &&
+        deepHtml.indexOf("deep-silhouette") !== -1 &&
+        plainHtml.indexOf("illustration.webp") !== -1 &&
+        plainHtml.indexOf("deep-silhouette") === -1);
+      ok("v2.7.10 derpy deep shark keeps black SVG in plain shadow + scoped halo CSS; midwater keeps illustration",
+        derpyHtml.indexOf("<svg") !== -1 &&
+        derpyHtml.indexOf("deep-silhouette") === -1 &&
+        cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow:not(.deep-silhouette) svg { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65))") !== -1 &&
+        midHtml.indexOf("illustration.webp") !== -1 &&
+        midHtml.indexOf("deep-silhouette") === -1);
+    })();
 /* ---------- v2.7.1: Bukangi made it out ---------- */
   try {
     ok("v2.7.1 BUKANGI_THREAD updated to the success story",
@@ -5985,50 +6196,6 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow.deep-silhouette img") !== -1 &&
       cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow img { filter: brightness(0)") === -1 &&
       cssCode.indexOf(".dive-scene .ambient.bg-fish { opacity: 0.45") !== -1);
-    (function() {
-      const _ce = document.createElement;
-      const scene = $("diveScene");
-      const hadDeep = scene.classList.contains("depth-deep");
-      const hadMid = scene.classList.contains("depth-midwater");
-      const prevDerpy = localStorage.getItem("tyi-derpy-mode");
-      let lastEl = null;
-      document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
-      let deepHtml = "", plainHtml = "", derpyHtml = "", midHtml = "";
-      try {
-        localStorage.removeItem("tyi-derpy-mode");
-        scene.classList.add("depth-deep");
-        spawnCreature("shark:goblin", true);
-        deepHtml = lastEl.innerHTML;
-        scene.classList.remove("depth-deep");
-        spawnCreature("shark:goblin", true);
-        plainHtml = lastEl.innerHTML;
-        localStorage.setItem("tyi-derpy-mode", "1");
-        scene.classList.add("depth-deep");
-        spawnCreature("shark:goblin", true);
-        derpyHtml = lastEl.innerHTML;
-        localStorage.removeItem("tyi-derpy-mode");
-        scene.classList.remove("depth-deep");
-        scene.classList.add("depth-midwater");
-        spawnCreature("shark:goblin", true);
-        midHtml = lastEl.innerHTML;
-      } finally {
-        document.createElement = _ce;
-        if (hadDeep) scene.classList.add("depth-deep"); else scene.classList.remove("depth-deep");
-        if (hadMid) scene.classList.add("depth-midwater"); else scene.classList.remove("depth-midwater");
-        if (prevDerpy === null) localStorage.removeItem("tyi-derpy-mode"); else localStorage.setItem("tyi-derpy-mode", prevDerpy);
-      }
-      ok("v2.7.10 deep shark shadows use dark-blue silhouette art; elsewhere keep blackened illustration",
-        deepHtml.indexOf("goblin-silhouette.webp") !== -1 &&
-        deepHtml.indexOf("deep-silhouette") !== -1 &&
-        plainHtml.indexOf("illustration.webp") !== -1 &&
-        plainHtml.indexOf("deep-silhouette") === -1);
-      ok("v2.7.10 derpy deep shark keeps black SVG in plain shadow + scoped halo CSS; midwater keeps illustration",
-        derpyHtml.indexOf("<svg") !== -1 &&
-        derpyHtml.indexOf("deep-silhouette") === -1 &&
-        cssCode.indexOf(".dive-scene.depth-deep .ambient .shark-shadow:not(.deep-silhouette) svg { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65))") !== -1 &&
-        midHtml.indexOf("illustration.webp") !== -1 &&
-        midHtml.indexOf("deep-silhouette") === -1);
-    })();
     (function() {
       const _ce = document.createElement;
       let lastEl = null;
