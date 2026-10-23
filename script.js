@@ -23,6 +23,12 @@ const WHATS_NEW = {
   "v2.7.11-beta": [
     "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
   ],
+  "v2.7.10-beta": [
+    "🦈 <strong>Deep shark shadows go dark blue.</strong> In the deep dark, a blackened shark illustration stood out against the other shadows — they read dark blue on black, the shark read solid black. Deep ambient shark shadows now use the species' own dark-blue silhouette art (same shape, same halo, same opacity). Midwater shadows and the mystery phase keep their black fill. (Merges after #154.)"
+  ],
+  "v2.7.9-beta": [
+"📖 <strong>Research text, final batch.</strong> The last 24 field-guide entries no longer end by stating the expedition answer — clues live inside the natural history, as with batch 1. Greenland, kitefin, and sawshark combos corrected to match the science (squid-only, squid-only, crustaceans-only), and the dwarf lanternshark's depth range corrected to span twilight and deep. Research clues now stand out in bold across the full text — range, prey, and depth evidence, never the answers themselves. The mako's 70 km/h is now framed as an estimated burst, not a cruising speed.",
+  ],
   "v2.7.8-beta": [
 "📏 <strong>Creatures sized to each other.</strong> Small animals no longer render as large as big ones: krill, seahorses, and clownfish now read small, fish and otters mid-sized, and manatees, sunfish, narwhals, and belugas properly large. Real sizes are compressed so nothing vanishes — a krill is still visible, just clearly smaller than a tuna. Distant shark silhouettes are unchanged.",
   ],
@@ -2065,6 +2071,95 @@ function highlightClues(s) {
   }
   return text;
 }
+/* v2.7.9-beta fix (Mira re-review): species-aware clue emphasis, v2.
+   Bait emphasis comes ONLY from the species' own baitList(s) via
+   BAIT_SYNONYMS, plus SPECIES_SYNONYMS for the two reviewed cases
+   where the honest clue word is species-specific (pacificsleeper
+   pollock for schooling-fish; silvertip cephalopods for squid) —
+   never generalized to other species. Region emphasis comes from
+   REGION_ALIASES (the species' own regions), covering prose wording,
+   not just REGIONS display labels. Depth emphasis is DEPTH_EVIDENCE
+   phrases plus metre numbers.
+   Metre numbers: decimal-safe, with a protected start and no
+   lookbehind (older WebKit-safe) — a number never bolds mid-number,
+   so "1.4 metres" can only ever match whole. Known body lengths in
+   LENGTH_PHRASES are masked before bolding and restored after, so
+   lengths stay unbolded while depth cues bold (verified by
+   enumeration: every decimal metre phrase in the 50 texts is a body
+   length; every depth phrase is an integer). Single-pass term
+   bolding (longest first, no nested <strong>); number bolding is a
+   separate pass that cannot nest inside term bolds (terms contain
+   no digits). Same font/size, just bold. */
+const BAIT_SYNONYMS = {
+  "squid": ["squid"],
+  "crustaceans": ["crustaceans", "crabs", "crab", "shrimp", "lobster"],
+  "ray": ["stingrays", "rays", "ray"],
+  "tuna": ["large oily fish", "oily fish", "tuna", "herring", "mackerel"],
+  "schooling-fish": ["schools of small reef fish", "schools of smaller fish", "schools of reef fish", "school of reef fish", "schools of fish", "schooling fishes", "schooling fish", "small schooling fish", "sardines", "sardine", "anchovies", "anchovy", "herring", "mackerel"],
+  "urchins": ["sea urchins", "urchins", "shellfish"],
+  "plankton": ["plankton", "krill"]
+};
+const SPECIES_SYNONYMS = {
+  "pacificsleeper": ["pollock"],
+  "silvertip": ["cephalopods"]
+};
+const REGION_ALIASES = {
+  "caribbean": ["Caribbean Sea", "Caribbean"],
+  "north-carolina": ["Outer Banks, North Carolina", "Outer Banks", "North Carolina", "US east coast"],
+  "philippines": ["Philippines", "Philippine"],
+  "maldives": ["Maldives", "Maldivian"],
+  "japan": ["Sagami Bay, Japan", "Sagami Bay", "Japan"],
+  "open-atlantic": ["Open Atlantic"],
+  "cornwall": ["Cornwall, UK", "Cornwall", "southwest Britain"],
+  "galapagos": ["Galápagos Islands", "Galápagos", "Galapagos"],
+  "south-africa": ["South Africa"],
+  "east-australia": ["Eastern Australia", "Australia's east coast", "southern and eastern Australia"],
+  "california": ["California Coast", "California"],
+  "arctic": ["Arctic Waters", "Arctic"],
+  "papua-new-guinea": ["Papua New Guinea", "PNG"]
+};
+const DEPTH_EVIDENCE = [
+  "twilight zone", "continental shelf", "continental slope",
+  "near the surface", "just under the surface", "hundreds of metres",
+  "reef flats", "shallow reefs", "shallow reef crevices", "reef edges",
+  "reef ledges", "rocky reefs", "shallow coastal waters",
+  "warm shallow water", "coastlines and estuaries", "surf zone",
+  "outer shelf", "upper continental shelf", "shallow outer slopes",
+  "deep by day", "mid-water", "surface waters", "kelp beds",
+  "kelp and rocky reefs", "deep tropical", "patch of reef",
+  "sunlit shallows", "surface down through the reefs"
+];
+const LENGTH_PHRASES = [
+  "1.9 to 2.4 metres", "1.2 to 1.5 metres", "1.65 metres", "2.4 metres",
+  "5.5 metres", "1.4 metres", "6 metres", "4.8 metres", "1.6 metres",
+  "4.3 metres"
+];
+function highlightResearchClues(s, text) {
+  text = text || s.research || "";
+  const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const masked = [];
+  let work = text;
+  LENGTH_PHRASES.forEach(phrase => {
+    const re = new RegExp("\\b" + esc(phrase) + "\\b", "gi");
+    work = work.replace(re, () => { masked.push(phrase); return "\u0001" + (masked.length - 1) + "\u0001"; });
+  });
+  const terms = [];
+  regionList(s).forEach(r => {
+    const aliases = REGION_ALIASES[r] || [ (REGIONS[r] || {}).name || r ];
+    aliases.forEach(a => { if (a) terms.push(a); });
+  });
+  baitList(s).forEach(b => {
+    const syns = BAIT_SYNONYMS[b] || [ String(b).replace(/-/g, " ") ];
+    syns.forEach(a => terms.push(a));
+  });
+  (SPECIES_SYNONYMS[s.id] || []).forEach(a => terms.push(a));
+  DEPTH_EVIDENCE.forEach(a => terms.push(a));
+  terms.sort((a, b) => b.length - a.length);
+  work = work.replace(new RegExp("\\b(" + terms.map(esc).join("|") + ")\\b", "gi"), "<strong>$1</strong>");
+  const num = "\\d[\\d,]*(?:\\.\\d+)?";
+  work = work.replace(new RegExp("(^|[^\\d.])(" + num + "\\s*(?:to|and|–|—|-)\\s*" + num + "\\s*metres|" + num + "\\s*metres)\\b", "gi"), "$1<strong>$2</strong>");
+  return work.replace(/\u0001(\d+)\u0001/g, (_, i) => masked[+i]);
+}
 function renderPinnedCard(list) {
   /* v1.4.0-beta: pinned card lives in its own full-width section above the
      grid, not as the first grid cell. */
@@ -2287,7 +2382,7 @@ function renderResearch() {
       <div class="guide-row-body hidden">
         <button type="button" class="guide-close" aria-label="Close ${s.name} details">\u2715</button>
         <p class="iucn-full">IUCN Red List: <strong>${s.status}</strong></p>
-        ${s.research.split("\n\n").map(p => `<p class="research-text">${p}</p>`).join("")}
+        ${s.research.split("\n\n").map(p => `<p class="research-text">${highlightResearchClues(s, p)}</p>`).join("")}
         ${done
           ? `<p class="hook">Tagged ${idLine(state.tagged[s.id])}${state.tagged[s.id].name ? ` as <strong>${esc(state.tagged[s.id].name)}</strong>` : ""} 🎉</p>`
           : regionLocked
@@ -2721,7 +2816,22 @@ function spawnCreature(type, background, lit) {
      They drift by uncatchably: the sighting text says distant/too far,
      and nothing here creates an encounter. */
   if (!art && typeof type === "string" && type.indexOf("shark:") === 0 && typeof sharkArtImg === "function") {
-    art = '<div class="shark-shadow">' + sharkArtImg(type.slice(6), "illustration", "Distant shark silhouette") + '</div>';
+    /* v2.7.10-beta (Avery): in the deep dark, a blackened illustration
+       stands out — the other shadows are dark blue on black, the shark
+       was solid black. Deep ambient shark shadows use the species' own
+       dark-blue silhouette art instead (same shape, same halo, same
+       opacity — only the body colour changes to match the other deep
+       shadows). Derpy mode keeps the blackened derpy art; midwater and
+       the mystery phase are untouched. */
+    const deepSilhouette = scene && scene.classList && typeof scene.classList.contains === "function" &&
+      scene.classList.contains("depth-deep") && typeof derpyModeOn === "function" && !derpyModeOn() &&
+      typeof ART_URL === "function";
+    if (deepSilhouette) {
+      const sid = type.slice(6);
+      art = '<div class="shark-shadow deep-silhouette"><img src="' + ART_URL(sid, "silhouette") + '" alt="Distant shark silhouette" loading="lazy" data-shark-art="' + sid + '" data-art-type="silhouette" onerror="sharkArtFallback(this)" /></div>';
+    } else {
+      art = '<div class="shark-shadow">' + sharkArtImg(type.slice(6), "illustration", "Distant shark silhouette") + '</div>';
+    }
   }
   if (!art) return;
   const el = document.createElement("div");
