@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.6-beta', VERSION === 'v2.7.6-beta');
+  ok('version v2.7.7-beta', VERSION === 'v2.7.7-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
