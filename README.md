@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.7-beta** — *a shark research game*
+**v2.7.8-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -12,6 +12,7 @@ science.
 Built for sarah, who loves sharks. 🦈
 
 ## v2.7.x changes
+- **v2.7.8** — creatures sized to each other: small animals no longer render as large as big ones (krill, seahorses, clownfish read small; fish and otters mid-sized; manatees, sunfish, narwhals, belugas properly large). Real sizes compressed so nothing vanishes. Distant shark silhouettes unchanged. (Merges after #152.)
 - **v2.7.7** — clean otter silhouette: the sea otter sprite had whisker, ear, and paw-crease gaps showing through as light lines — filled, so it reads as a single solid silhouette as intended. No other sprites changed.
 - **v2.7.6** — busier water where life teems: coral reefs and kelp forests now feel properly populated — fish drift by about twice as often there, and more of the drift is fish (eightfold in tropical and kelp lists, was fivefold). Open water keeps its usual spawn pace (tropical surface water carries a few more fish, since it draws from the same list); twilight and the deep stay quiet.
 - **v2.7.5** — ambient life batch 2: reef creatures (moray, seahorse, parrotfish, pufferfish, lionfish), twilight drifters (hatchetfish, gulper eel, vampire squid, siphonophore, krill, viperfish), deep dwellers (snailfish, cusk eel), full-body surface visitors (otters in California, narwhal/beluga in the Arctic, sea snakes in the Indo-Pacific, manatees in the Caribbean, tuna offshore, clownfish in Indo-Pacific shallows, and four more distant shark silhouettes (great white, mako, thresher, goblin). Fish still the most common drifting silhouette everywhere, and more frequent in surface and reef drift. Slow shadows (jellyfish, sunfish, seahorses, manatees, snailfish, siphonophores, krill, anglerfish) cross at half speed. Background drift creatures swim closer (larger), and deep drift matches sighting opacity with a stronger halo. Sarah's THREE-times lines now fire only on the actual third re-sighting. The lanternfish school glows warm and bright on its sighting.
