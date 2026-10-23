@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.11-beta', VERSION === 'v2.7.11-beta');
+  ok('version v2.7.12-beta', VERSION === 'v2.7.12-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -1118,6 +1118,8 @@ code += `
     SHARKS.forEach(s => { fullTagged[s.id] = { name: 'X', researchId: 'R' }; });
     fullTagged.nurse.name = 'Sarah';
     fullTagged.nurse.resightings = [{}, {}, {}];
+    /* #149: full completion includes a tag actually made in an earned region. */
+    fullTagged.scalloped.region = 'galapagos';
     const fullState = {
       tagged: fullTagged,
       stats: {
@@ -1219,9 +1221,59 @@ code += `
   checkAchievements();
   ok('Pen Pal unlocks at 3 resights', !!state.achievements['pen-pal']);
   resetA();
-  state.tagged = { scalloped: { name: "S", researchId: "R" } };
+  state.tagged = { scalloped: { name: "S", researchId: "R", region: "galapagos" } };
+  state.logbook = [];
   checkAchievements();
-  ok('Off the Map unlocks in locked region', !!state.achievements['off-map']);
+  ok('Off the Map unlocks on a Galapagos tag', !!state.achievements['off-map']);
+  resetA();
+  state.tagged = { dusky: { name: "D", researchId: "R", region: "south-africa" } };
+  state.logbook = [];
+  checkAchievements();
+  ok('Off the Map unlocks on a South Africa tag', !!state.achievements['off-map']);
+  resetA();
+  /* #149: a roster that permits an earned region no longer counts — the
+     actual tag location does. Scalloped lists Galapagos but this tag was
+     in the Caribbean. Note: this fixture is artificial under the present
+     roster (scalloped is Galapagos-exclusive today) — it is a unit test
+     of the location rule, and it futureproofs multi-region placements. */
+  state.tagged = { scalloped: { name: "S", researchId: "R", region: "caribbean" } };
+  state.logbook = [];
+  checkAchievements();
+  ok('Off the Map stays locked on a Caribbean tag of a Galapagos-roster species', !state.achievements['off-map']);
+  resetA();
+  /* #149: a record with no region never awards, even for an earned-region species. */
+  state.tagged = { scalloped: { name: "S", researchId: "R" } };
+  state.logbook = [];
+  checkAchievements();
+  ok('Off the Map stays locked on a region-less record', !state.achievements['off-map']);
+  resetA();
+  /* #149: earning or visiting an earned region without tagging there does not award. */
+  state.logbook = [];
+  state.stats = state.stats || {};
+  state.stats.regionsVisited = ["galapagos"];
+  checkAchievements();
+  ok('Off the Map stays locked on a visit without a tag', !state.achievements['off-map']);
+  resetA();
+  /* #149: a genuine earned tag preserved in the logbook counts even if the
+     one-per-species record was overwritten by a later tag elsewhere. */
+  state.tagged = { scalloped: { name: "S", researchId: "R", region: "caribbean" } };
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "tagged" }] }];
+  checkAchievements();
+  ok('Off the Map unlocks from a logged earned tag after an overwrite', !!state.achievements['off-map']);
+  resetA();
+  /* #149: a logged earned tag counts even with no current tagged record
+     at all (not just after an overwrite). */
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "tagged" }] }];
+  checkAchievements();
+  ok('Off the Map unlocks from a logged earned tag with no current record', !!state.achievements['off-map']);
+  resetA();
+  /* #149: watch-only logbook history does not award — neither resighted
+     nor watched encounters are tags. */
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "resighted" }, { speciesId: "scalloped", result: "watched" }] }];
+  checkAchievements();
+  ok('Off the Map stays locked on watch-only history', !state.achievements['off-map']);
+  state.logbook = [];
+  state.stats.regionsVisited = [];
   resetA();
   const byStatus = {};
   SHARKS.forEach(s => { if (!byStatus[s.status]) byStatus[s.status] = s.id; });
