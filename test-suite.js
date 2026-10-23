@@ -1233,7 +1233,9 @@ code += `
   resetA();
   /* #149: a roster that permits an earned region no longer counts — the
      actual tag location does. Scalloped lists Galapagos but this tag was
-     in the Caribbean. */
+     in the Caribbean. Note: this fixture is artificial under the present
+     roster (scalloped is Galapagos-exclusive today) — it is a unit test
+     of the location rule, and it futureproofs multi-region placements. */
   state.tagged = { scalloped: { name: "S", researchId: "R", region: "caribbean" } };
   state.logbook = [];
   checkAchievements();
@@ -1259,8 +1261,15 @@ code += `
   checkAchievements();
   ok('Off the Map unlocks from a logged earned tag after an overwrite', !!state.achievements['off-map']);
   resetA();
-  /* #149: watch-only logbook history does not award. */
-  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "resighted" }] }];
+  /* #149: a logged earned tag counts even with no current tagged record
+     at all (not just after an overwrite). */
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "tagged" }] }];
+  checkAchievements();
+  ok('Off the Map unlocks from a logged earned tag with no current record', !!state.achievements['off-map']);
+  resetA();
+  /* #149: watch-only logbook history does not award — neither resighted
+     nor watched encounters are tags. */
+  state.logbook = [{ region: "galapagos", encounters: [{ speciesId: "scalloped", result: "resighted" }, { speciesId: "scalloped", result: "watched" }] }];
   checkAchievements();
   ok('Off the Map stays locked on watch-only history', !state.achievements['off-map']);
   state.logbook = [];
