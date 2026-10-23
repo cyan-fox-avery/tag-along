@@ -1086,15 +1086,6 @@ const ARCHIVE_MEDIA = {
     "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Etmopterus_perryi_SI.jpg/960px-Etmopterus_perryi_SI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
     "full": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Etmopterus_perryi_SI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
    },
-   {
-    "type": "photo",
-    "caption": "The dwarf lanternshark held in hand — scale for one of the ocean’s tiniest sharks. Smithsonian Institution.",
-    "credit": "Chip Clark / Smithsonian Institution",
-    "license": "public domain (U.S. federal work)",
-    "page": "https://commons.wikimedia.org/wiki/File%3AEtmopterus_perryi_SI_cr.jpg",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/9/99/Etmopterus_perryi_SI_cr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
-    "full": "https://upload.wikimedia.org/wikipedia/commons/9/99/Etmopterus_perryi_SI_cr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-   },
   ]
  },
  "kitefin": {

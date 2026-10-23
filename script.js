@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.10-beta";
+const VERSION = "v2.7.11-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.11-beta": [
+    "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
+  ],
   "v2.7.10-beta": [
     "🦈 <strong>Deep shark shadows go dark blue.</strong> In the deep dark, a blackened shark illustration stood out against the other shadows — they read dark blue on black, the shark read solid black. Deep ambient shark shadows now use the species' own dark-blue silhouette art (same shape, same halo, same opacity). Midwater shadows and the mystery phase keep their black fill. (Merges after #154.)"
   ],

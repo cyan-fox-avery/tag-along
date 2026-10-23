@@ -1,6 +1,6 @@
 # Tag Along
 
-**v2.7.10-beta** — *a shark research game*
+**v2.7.11-beta** — *a shark research game*
 
 A pro-shark conservation collection game.
 
@@ -12,6 +12,7 @@ science.
 Built for sarah, who loves sharks. 🦈
 
 ## v2.7.x changes
+- **v2.7.11** — dwarf lanternshark Archive deduplicated: its two entries were the same Smithsonian hand-held photo (full + cropped version), so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)
 - **v2.7.10** — deep shark shadows go dark blue: in the deep dark, a blackened shark illustration stood out against the other shadows (dark blue on black vs solid black), so deep ambient shark shadows now use the species' own dark-blue silhouette art — same shape, same halo, same opacity. Midwater shadows and the mystery phase keep their black fill. (Merges after #154.)
 - **v2.7.9** — research text, final batch: the last 24 entries no longer end by stating the expedition answer; clues live in the natural history. Combo corrections (greenland/kitefin squid-only, sawshark crustaceans-only, dwarf lanternshark twilight+deep) + bold research clues across the full text for all 50 + mako speed framed as an estimated burst. (Merges after #152/#153.)
 - **v2.7.8** — creatures sized to each other: small animals no longer render as large as big ones (krill, seahorses, clownfish read small; fish and otters mid-sized; manatees, sunfish, narwhals, belugas properly large). Real sizes compressed so nothing vanishes. Distant shark silhouettes unchanged. (Merges after #152.)
