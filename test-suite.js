@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.8-beta', VERSION === 'v2.7.8-beta');
+  ok('version v2.7.11-beta', VERSION === 'v2.7.11-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -1042,6 +1042,7 @@ code += `
     }
   })());
   ok('basking duplicate removed', ARCHIVE_MEDIA.basking.assets.length === 1);
+  ok('dwarflantern duplicate removed', ARCHIVE_MEDIA.dwarflantern.assets.length === 1 && fileCode.indexOf('Etmopterus_perryi_SI_cr') === -1);
 
   // v1.7.23-beta: cookiecutter archive is illustration-only (Avery's call — no dead specimens)
   (function () {

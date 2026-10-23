@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.8-beta";
+const VERSION = "v2.7.11-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.11-beta": [
+    "🖼️ <strong>Dwarf lanternshark Archive no longer shows the same photo twice.</strong> Its two entries were the same Smithsonian hand-held shot — the full image and a cropped version of it — so the cropped duplicate is removed and the single photo stays. (Merges after #154 and #155.)"
+  ],
   "v2.7.8-beta": [
 "📏 <strong>Creatures sized to each other.</strong> Small animals no longer render as large as big ones: krill, seahorses, and clownfish now read small, fish and otters mid-sized, and manatees, sunfish, narwhals, and belugas properly large. Real sizes are compressed so nothing vanishes — a krill is still visible, just clearly smaller than a tuna. Distant shark silhouettes are unchanged.",
   ],
