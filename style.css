@@ -1222,13 +1222,6 @@ select option:disabled { color: #7a8a9e; }
    dark-blue mystery fallback if the silhouette file ever fails). */
 .dive-scene.depth-deep .ambient .shark-shadow.deep-silhouette img,
 .dive-scene.depth-deep .ambient .shark-shadow.deep-silhouette svg { filter: drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)); }
-/* v2.7.10-fix (Mira review): derpy-mode SVG sharks in deep water kept
-   their black mystery fill but had no halo — invisible in the black
-   upper deep scene. They keep brightness(0) but gain the same restrained
-   halo. Scoped to plain (non-silhouette) ambient shadows in deep water
-   only: the normal dark-blue WebP is excluded by :not, the foreground
-   mystery SVG has no .ambient ancestor, and midwater is untouched. */
-.dive-scene.depth-deep .ambient .shark-shadow:not(.deep-silhouette) svg { filter: brightness(0) drop-shadow(0 0 8px rgba(180, 220, 255, 0.65)); }
 /* v2.7.5-fix (Avery): the lanternfish school's own lights — warm, bright,
    and big enough to throw the school into relief. Sighting only. */
 .dive-scene .ambient.lit img { filter: drop-shadow(0 0 14px rgba(255, 210, 120, 0.9)) brightness(1.4); }

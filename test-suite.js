@@ -5990,22 +5990,24 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
       const scene = $("diveScene");
       const hadDeep = scene.classList.contains("depth-deep");
       const hadMid = scene.classList.contains("depth-midwater");
+      const prevDerpy = localStorage.getItem("tyi-derpy-mode");
       let lastEl = null;
       document.createElement = function(tag) { lastEl = _ce(tag); return lastEl; };
       let deepHtml = "", plainHtml = "", derpyHtml = "", midHtml = "";
       try {
+        localStorage.removeItem("tyi-derpy-mode");
         scene.classList.add("depth-deep");
         spawnCreature("shark:goblin", true);
         deepHtml = lastEl.innerHTML;
-        if (!hadDeep) scene.classList.remove("depth-deep");
+        scene.classList.remove("depth-deep");
         spawnCreature("shark:goblin", true);
         plainHtml = lastEl.innerHTML;
         localStorage.setItem("tyi-derpy-mode", "1");
         scene.classList.add("depth-deep");
         spawnCreature("shark:goblin", true);
         derpyHtml = lastEl.innerHTML;
-        if (!hadDeep) scene.classList.remove("depth-deep");
         localStorage.removeItem("tyi-derpy-mode");
+        scene.classList.remove("depth-deep");
         scene.classList.add("depth-midwater");
         spawnCreature("shark:goblin", true);
         midHtml = lastEl.innerHTML;
@@ -6013,7 +6015,7 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
         document.createElement = _ce;
         if (hadDeep) scene.classList.add("depth-deep"); else scene.classList.remove("depth-deep");
         if (hadMid) scene.classList.add("depth-midwater"); else scene.classList.remove("depth-midwater");
-        localStorage.removeItem("tyi-derpy-mode");
+        if (prevDerpy === null) localStorage.removeItem("tyi-derpy-mode"); else localStorage.setItem("tyi-derpy-mode", prevDerpy);
       }
       ok("v2.7.10 deep shark shadows use dark-blue silhouette art; elsewhere keep blackened illustration",
         deepHtml.indexOf("goblin-silhouette.webp") !== -1 &&
