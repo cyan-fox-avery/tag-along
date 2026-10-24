@@ -4826,7 +4826,7 @@ const SECRET_FACTS = {
     "They've been studied at Bimini for over three decades — one of the longest-running shark studies in the world — and in lab tests they've shown they can learn and remember visual cues — solid evidence of visual learning and memory."
   ],
   blacktip: [
-    "Blacktip sharks hunt in spectacular spinning leaps, corkscrewing out of the water through schools of fish with their mouths open.",
+    "Blacktip reef sharks often return to familiar patches of reef for years. That makes careful tagging valuable: a re-sighting can help researchers recognize the same individual over time.",
     "They're sprinters of the shallows, often hunting in packs that herd baitfish against the shoreline."
   ],
   whitetip: [
