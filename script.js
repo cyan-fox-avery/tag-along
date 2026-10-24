@@ -1588,9 +1588,6 @@ const state = {
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
-  /* v1.7.19-beta: Bukangi easter egg — one-time flag for the first dusky encounter. */
-  bukangiEgg: (() => { try { return localStorage.getItem("tyi-bukangi") === "1"; } catch { return false; } })(),
-  bukangiUpdate: (() => { try { return localStorage.getItem("tyi-bukangi-update") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
   deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
   /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
@@ -3060,11 +3057,6 @@ function doEncounter(species, plan) {
           `<div class="encounter-badge ${badgeClass}">${badgeText}</div>` +
           `</div>`;
         logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
-        /* v1.7.19-beta: Bukangi easter egg — first dusky encounter, one-time.
-           Defensive guards like the naming eggs: this must never crash the
-           encounter, even if thread data or pushThread is unavailable. */
-        maybeBukangiUpdate(species);
-        maybeBukangiEgg(species);
         showEncounterActions();
       };
       if (reducedMotion) {
@@ -5583,104 +5575,6 @@ function maybeNameEgg(speciesId, rec) {
   } catch (e) {
     /* v1.5.2-beta: never let an easter egg crash naming — log and continue. */
     if (typeof console !== "undefined" && console.warn) console.warn("maybeNameEgg:", e);
-  }
-}
-
-/* v1.7.19-beta: Bukangi easter egg — durable-delivery check.
-   The dedup must run against the PERSISTED Phone thread (localStorage), not
-   in-memory state.messages. If a previous attempt appended to memory but
-   localStorage failed, the thread was never durable — retry the push instead
-   of silently consuming the egg on an in-memory ghost. */
-function bukangiThreadPersisted() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("tyi-messages") || "{}");
-    const threads = saved.messages || [];
-    return threads.some(thread =>
-      (thread.msgs || []).some(m => (m.text || "").includes("Bukangi")));
-  } catch { return false; }
-}
-
-/* v1.7.19-beta: Bukangi easter egg — first dusky shark encounter, one-time.
-   Extracted as a named helper (like maybeNameEgg) so the one-shot behavior
-   is behaviorally testable. Defensive guards: this must never crash the
-   encounter, even if thread data or pushThread is unavailable. */
-function maybeBukangiEgg(species) {
-  try {
-    if (!species || species.id !== "dusky") return false;
-    if (state.bukangiEgg) return false;
-    if (typeof pushThread !== "function") return false;
-    if (typeof BUKANGI_THREAD === "undefined" || !Array.isArray(BUKANGI_THREAD)) return false;
-    if (bukangiThreadPersisted()) {
-      /* v1.7.19-beta Mira review: the thread is durable but the flag was
-         never recorded (interrupted save) — record the flag without sending
-         Sarah's thread a second time. */
-      state.bukangiEgg = true;
-      try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
-      return true;
-    }
-    /* Snapshot in-memory message state so a storage failure mid-push can be
-       rolled back — otherwise the ghost thread would linger in memory and a
-       later retry would double-post. */
-    const _msgLen = state.messages.length;
-    const _unread = state.unread;
-    try {
-      pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
-    } catch (pushErr) {
-      try { state.messages.length = _msgLen; state.unread = _unread; } catch {}
-      throw pushErr;
-    }
-    /* v1.7.19-beta Mira review: mark the trigger complete only AFTER the
-       thread is durable. If the save failed, the flag stays unset so a later
-       dusky encounter retries instead of silently consuming the egg. */
-    if (!bukangiThreadPersisted()) return false;
-    state.bukangiEgg = true;
-    try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
-    return true;
-  } catch (e) {
-    if (typeof console !== "undefined" && console.warn) console.warn("maybeBukangiEgg:", e);
-    return false;
-  }
-}
-
-/* v2.7.1-beta: Bukangi good-news follow-up — one-time, for players who
-   already saw the pre-rescue egg. Mirrors maybeBukangiEgg's durable-delivery
-   discipline: the flag is set only after the thread is durable, so an
-   interrupted save retries instead of silently consuming the update. */
-function bukangiUpdatePersisted() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("tyi-messages") || "{}");
-    const threads = saved.messages || [];
-    return threads.some(thread =>
-      (thread.msgs || []).some(m => (m.text || "").includes("REMEMBER BUKANGI")));
-  } catch { return false; }
-}
-function maybeBukangiUpdate(species) {
-  try {
-    if (!species || species.id !== "dusky") return false;
-    if (!state.bukangiEgg) return false; /* only players who saw the old egg */
-    if (state.bukangiUpdate) return false;
-    if (typeof pushThread !== "function") return false;
-    if (typeof BUKANGI_UPDATE_THREAD === "undefined" || !Array.isArray(BUKANGI_UPDATE_THREAD)) return false;
-    if (bukangiUpdatePersisted()) {
-      state.bukangiUpdate = true;
-      try { localStorage.setItem("tyi-bukangi-update", "1"); } catch {}
-      return true;
-    }
-    const _msgLen = state.messages.length;
-    const _unread = state.unread;
-    try {
-      pushThread(BUKANGI_UPDATE_THREAD.map(m => ({ ...m })));
-    } catch (pushErr) {
-      try { state.messages.length = _msgLen; state.unread = _unread; } catch {}
-      throw pushErr;
-    }
-    if (!bukangiUpdatePersisted()) return false;
-    state.bukangiUpdate = true;
-    try { localStorage.setItem("tyi-bukangi-update", "1"); } catch {}
-    return true;
-  } catch (e) {
-    if (typeof console !== "undefined" && console.warn) console.warn("maybeBukangiUpdate:", e);
-    return false;
   }
 }
 
