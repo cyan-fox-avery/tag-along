@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.14-beta": [
-    "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top.",
+    "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top. The Research tab subtitle drops \u201cand sketches\u201d \u2014 the field-guide sketch idea is dropped, so the tab no longer promises what isn't there.",
   ],
   "v2.7.13-beta": [
     "🦦 <strong>Otter shadows halved.</strong> The sea otter drifted by at twice the size it should read — its sprite is wide, so at full height it took up far more screen than the other kelp life. Otter shadows (and the otter sighting, which shares the same size factor) now render at half size. Other shadows are untouched: tell Roman which others still read too big and by how much.",
@@ -1911,7 +1911,7 @@ function goTab(name) {
 /* ---------- Research: a field-guide database ----------
    v0.7.0: the guide is a compact roster list; each row expands into the
    full entry. Hard rule stands: NO pictures of the actual shark here —
-   sketches only. The real face is earned at tagging. */
+   text only. The real face is earned at tagging. */
 /* ---------- Field guide database (v0.19.0) ----------
    Search + stacked filters. Filters narrow the notebook; they never solve
    the expedition — matching is on the shark's own data, nothing is revealed.
