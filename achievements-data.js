@@ -102,13 +102,61 @@ const ACHIEVEMENTS = [
     })
   },
   {
+    id: "on-the-brink",
+    name: "On the Brink",
+    icon: "🚨",
+    breadcrumb: "right on the edge",
+    description: "Tagged a Critically Endangered species. The data from this tag carries real weight.",
+    check: (st) => Object.keys(st.tagged).some(id => {
+      const s = SHARKS.find(x => x.id === id);
+      return s && s.status === "Critically Endangered";
+    })
+  },
+
+  {
+    id: "maiden-voyage",
+    name: "Maiden Voyage",
+    icon: "⛵",
+    breadcrumb: "you're really doing it",
+    description: "Ran your first expedition. Sarah packed extra snacks. She always packs extra snacks.",
+    check: (st) => (st.stats.expeditions || 0) >= 1
+  },
+  {
     id: "sea-legs",
     name: "Sea Legs",
     icon: "⚓",
-    breadcrumb: "ten trips out",
+    /* v2.7.14-beta: breadcrumb was literal ("ten trips out") — now evocative,
+       per the never-the-requirement rule. Trigger unchanged. */
+    breadcrumb: "steady on your feet",
     description: "Completed 10 expeditions. You're not a landlubber anymore.",
     check: (st) => (st.stats.expeditions || 0) >= 10
   },
+  {
+    id: "twilight-dive",
+    name: "Twilight Zone",
+    icon: "🌆",
+    breadcrumb: "where the sun starts to fade",
+    description: "Dived to the twilight zone for the first time. The light gets thin down here, and everything looks a little more curious.",
+    check: (st) => (st.stats.depthsVisited || []).includes("twilight")
+  },
+  {
+    id: "deep-dive",
+    name: "Midnight Zone",
+    icon: "🌑",
+    breadcrumb: "below the last light",
+    description: "Dived to the deep dark for the first time. No sunlight reaches this far down. Some deep-sea sharks make their own light — and others navigate the dark without it.",
+    check: (st) => (st.stats.depthsVisited || []).includes("deep")
+  },
+  {
+    id: "fieldwork",
+    name: "Fieldwork",
+    icon: "📓",
+    breadcrumb: "the water teaches anyway",
+    description: "Came back from a trip with no tag — and a notebook full of observations. That's still science.",
+    check: (st) => (st.logbook || []).some(trip =>
+      !(trip.encounters || []).some(e => e && e.result === "tagged"))
+  },
+
   {
     id: "full-fathom",
     name: "Full Fathom",

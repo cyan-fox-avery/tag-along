@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.13-beta";
+const VERSION = "v2.7.14-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.14-beta": [
+    "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top. The Research tab subtitle drops \u201cand sketches\u201d \u2014 the field-guide sketch idea is dropped, so the tab no longer promises what isn't there.",
+  ],
   "v2.7.13-beta": [
     "🦦 <strong>Otter shadows halved.</strong> The sea otter drifted by at twice the size it should read — its sprite is wide, so at full height it took up far more screen than the other kelp life. Otter shadows (and the otter sighting, which shares the same size factor) now render at half size. Other shadows are untouched: tell Roman which others still read too big and by how much.",
   ],
@@ -1564,7 +1567,7 @@ const state = {
   /* v0.18.0: stats feed achievement checks; achievements persist unlocked IDs. */
   stats: Object.assign(
     { regionsVisited: [], baitsUsed: [], resights: 0, chumTags: 0, expeditions: 0,
-      depthsTagged: [], methodsUsed: [] },
+      depthsTagged: [], depthsVisited: [], methodsUsed: [] },
     statsStore.load()
   ),
   achievements: achieveStore.load(), // id -> timestamp
@@ -1607,6 +1610,11 @@ const state = {
   log.forEach(t => {
     if (t.region && !s.regionsVisited.includes(t.region)) { s.regionsVisited.push(t.region); changed = true; }
     if (t.bait && !s.baitsUsed.includes(t.bait)) { s.baitsUsed.push(t.bait); changed = true; }
+    /* v2.7.14-beta: backfill depths visited so established players get
+       credit for past dives (same pattern as regions/baits). */
+    if (t.depth && !(s.depthsVisited || []).includes(t.depth)) {
+      (s.depthsVisited = s.depthsVisited || []).push(t.depth); changed = true;
+    }
   });
   let resights = 0;
   Object.values(state.tagged || {}).forEach(t => { resights += (t.resightings || []).length; });
@@ -1903,7 +1911,7 @@ function goTab(name) {
 /* ---------- Research: a field-guide database ----------
    v0.7.0: the guide is a compact roster list; each row expands into the
    full entry. Hard rule stands: NO pictures of the actual shark here —
-   sketches only. The real face is earned at tagging. */
+   text only. The real face is earned at tagging. */
 /* ---------- Field guide database (v0.19.0) ----------
    Search + stacked filters. Filters narrow the notebook; they never solve
    the expedition — matching is on the shark's own data, nothing is revealed.
@@ -3336,6 +3344,11 @@ async function runExpedition(plan) {
   if (plan.bait && !state.stats.baitsUsed.includes(plan.bait)) {
     state.stats.baitsUsed.push(plan.bait);
   }
+  /* v2.7.14-beta: feed the twilight/deep-dive achievements — the depth of
+     every expedition launched, tag or no tag. */
+  if (plan.depth && !(state.stats.depthsVisited || []).includes(plan.depth)) {
+    (state.stats.depthsVisited = state.stats.depthsVisited || []).push(plan.depth);
+  }
   if (plan.methodOpt && plan.methodOpt !== "none" && !state.stats.methodsUsed.includes(plan.methodOpt)) {
     state.stats.methodsUsed.push(plan.methodOpt);
   }
@@ -3483,6 +3496,10 @@ async function runExpedition(plan) {
     }
     state.logbook.unshift(tripLog);
     logStore.save(state.logbook);
+    /* v2.7.14-beta: Fieldwork reads the logbook, so the check must run
+       after this trip is recorded — the earlier call above runs before
+       the unshift. Re-running is safe: earned ids are skipped. */
+    checkAchievements();
     tripLog = null;
     renderLogbook();
   }
