@@ -21,7 +21,7 @@ const IUCN_ABBR = {
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
   "v2.7.15-beta": [
-    "🔧 <strong>Final English fixes.</strong> The Archive tour no longer claims its photos show your exact tagged sharks — they show animals of the same species, plus documented scientific illustrations. Sea conditions no longer narrate a chum slick on trips that never used chum, and the warm-water bait line now makes physical sense (warm water needs more ice, not less). Greenland, velvetbelly, and megamouth wording corrected to the science: regional eye-parasite rates with the glow lure unproven, Vulnerable instead of Least Concern, and reflection instead of glow. And Sarah's method hint finally fires when your approach doesn't match the shark.",
+    "🔧 <strong>Final English fixes.</strong> The Archive tour no longer claims its photos show your exact tagged sharks — they show animals of the same species, plus documented scientific illustrations. Sea conditions no longer narrate a chum slick on trips that never used chum, and the warm-water line no longer assumes bait on board — plankton trips read right too. Greenland, velvetbelly, and megamouth wording corrected to the science: regional eye-parasite rates with the glow lure unproven, Vulnerable instead of Least Concern, and reflection instead of glow. And Sarah's method hint finally fires when your approach doesn't match the shark.",
   ],
   "v2.7.14-beta": [
     "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top. The Research tab subtitle drops \u201cand sketches\u201d \u2014 the field-guide sketch idea is dropped, so the tab no longer promises what isn't there.",
@@ -887,7 +887,7 @@ const SEA_CONDITIONS = {
     "Puffy trade-wind clouds marching in rows, whitecaps glittering between them.",
     "Hot, bright, and breezy — the chum slick stretches out straight behind us.",
     "Morning rain, afternoon glare. The tropics can't decide, and neither can the sharks.",
-    "The water is so warm the bait needs extra ice to stay fresh. Flat calm, not a ripple.",
+    "The water is so warm the ice in our drinks is already gone. Flat calm, not a ripple.",
     "A light swell from yesterday's storm, easing. The boat rolls gently, like it's thinking.",
     "High thin cloud veiling the sun — bright but soft, the water turned to hammered silver.",
     "Humid and still at dawn, then the sea breeze fills in by ten. Classic tropical day."
@@ -932,13 +932,18 @@ const SEA_CONDITIONS = {
 /* v1.8.5-beta: sea conditions follow the expedition's climate zone. */
 /* v2.7.15-beta: chum-slick conditions only appear when the expedition
    actually used chum — same rule as pickFieldNote (v1.2.0). The filter
-   also applies without a plan, matching pickFieldNote's no-plan case. */
-function pickSeaCondition(regionId, plan) {
+   also applies without a plan, matching pickFieldNote's no-plan case.
+   The eligible pool is a separate function so tests can inspect it
+   (Mira re-review: a positive chum-plan case, not just negatives). */
+function eligibleSeaConditions(regionId, plan) {
   const zone = regionClimate(regionId);
   let arr = SEA_CONDITIONS[zone] || SEA_CONDITIONS.generic;
   const usedChum = plan && plan.method === "attract" && plan.methodOpt === "chum";
   if (!usedChum) arr = arr.filter(l => !/chum slick/i.test(l));
-  return pick(arr);
+  return arr;
+}
+function pickSeaCondition(regionId, plan) {
+  return pick(eligibleSeaConditions(regionId, plan));
 }
 /* v0.22.0 Mira review: wildlife sightings are region-appropriate.
    No mantas in the Arctic! */
@@ -2239,9 +2244,11 @@ function methodMismatch(s, trip) {
   const methods = s.methods || {};
   if (Object.keys(methods).length === 0) return false;
   if (!trip.method) return false;
+  // No concrete approach selected yet (old/partial logbook entries can
+  // name a method with methodOpt "none") — not a mismatch (Mira re-review).
+  if (!trip.methodOpt || trip.methodOpt === "none") return false;
   const opts = methods[trip.method];
   if (!opts) return true;
-  if (!trip.methodOpt || trip.methodOpt === "none") return false;
   return !opts.includes(trip.methodOpt);
 }
 /* v0.22.0 Mira review: hints are grounded in COMPLETED expeditions, not the
