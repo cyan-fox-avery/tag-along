@@ -211,7 +211,7 @@ const COUSIN_CHATS = {
   megamouth: [
     { them: "Only about 300 megamouth sightings in all of recorded science. They were discovered in 1976 when one got caught on a Navy anchor — a whole new family of shark, found by accident!", me: "One of the last big animals to be discovered. Humbling." },
     { them: "Megamouths are vertical migrators — deep in the twilight zone by day, rising toward the surface at night following the krill. So sightings cluster at night, near the surface, over deep water.", me: "Night watch it is. Big silhouette, bigger mouth." },
-    { them: "That silvery band on a megamouth's upper jaw might glow to lure krill straight in. Nobody's proven it — it's one of those beautiful theories waiting on the right photograph.", me: "The shark is a hypothesis. You just tagged a hypothesis." }
+    { them: "That silvery band on a megamouth's upper jaw might reflect light to lure krill straight in. Nobody's proven it works that way — it's one of those beautiful theories waiting on the right photograph.", me: "The shark is a hypothesis. You just tagged a hypothesis." }
   ],
   sawshark: [
     { them: "The saw isn't decoration — sawsharks slash it side to side through schools of fish, stunning and wounding everything the teeth touch. Then they pick up the pieces.", me: "A weapon and a net in one. Brutal efficiency." },
@@ -221,7 +221,7 @@ const COUSIN_CHATS = {
   greenland: [
     { them: "The 400-year Greenland shark estimate comes from radiocarbon-dating the lenses of their eyes — 392 plus or minus 120 years for one big female. So the real number could be anywhere in there, but even the low end is absurd.", me: "Even being wrong about it still means centuries. Incredible." },
     { them: "Greenland sharks don't reach maturity until around 150 years old. Imagine: born around 1875, reproducing for the first time this century. Evolution's most patient creature.", me: "A century and a half of childhood. Relatable, honestly." },
-    { them: "Almost all Greenland sharks carry a glowing eye parasite that blinds them. They don't care — it's dark down there anyway, and the glow might actually attract curious prey. Accidental lure!", me: "Blind, ancient, and possibly baiting dinner with its own eye parasite. Respect." }
+    { them: "Greenland sharks often carry a tiny copepod parasite on their eyes — over 90% of them in parts of the Eastern Canadian Arctic and around Greenland, but under 10% in the St. Lawrence Estuary and the northwestern Atlantic. It can damage the cornea, and it might glow and lure in prey, but nobody's ever proven that. They get by in the dark either way.", me: "Ancient, maybe half-blind, and possibly baiting dinner with its own eye parasite. Respect." }
   ],
   cookiecutter: [
     { them: "The wound is the signature — a perfect round crater, like someone used a melon baller. Marine biologists can ID a cookiecutter attack on a whale from a photo of the scar alone.", me: "A shark that signs its work." },
@@ -235,7 +235,7 @@ const COUSIN_CHATS = {
   ],
   velvetbelly: [
     { them: "A velvet-belly's glow isn't decoration — it's counter-illumination. Downwelling light gets brighter toward the surface, so a dark silhouette shows up against it. The photophores erase the silhouette. It's wearing invisibility.", me: "A shark that brings its own cloaking device. Respect." },
-    { them: "Lanternsharks mature fast for deep-sea sharks. Most deep species take a decade or more; velvet-bellies are ready in a few years. That's a huge reason they're still Least Concern despite the trawl bycatch.", me: "Fast-living deep-sea shark. Breaks every rule." },
+    { them: "Lanternsharks mature fast for deep-sea sharks. Most deep species take a decade or more; velvet-bellies are ready in a few years. That helps them absorb trawl bycatch — but the species is listed as Vulnerable, and populations stay fragile under trawling.", me: "Fast-living deep-sea shark. Breaks every rule." },
     { them: "Male velvet-bellies grow these weird little hooks on their heads — patches of modified denticles, probably for gripping during mating. It's called a frontal tenaculum. Deep-sea dating is strange.", me: "I'm going to pretend I understand that. Sounds glorious." }
   ],
   dwarflantern: [
