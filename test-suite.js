@@ -38,7 +38,7 @@ code += `
 ;(function tests(){
   const out = [];
   const ok = (name, cond) => out.push((cond ? 'PASS' : 'FAIL') + ' ' + name);
-  ok('version v2.7.14-beta', VERSION === 'v2.7.14-beta');
+  ok('version v2.7.15-beta', VERSION === 'v2.7.15-beta');
   ok('whats-new has v2.5.4 entry', Array.isArray(WHATS_NEW['v2.5.4-beta']) && WHATS_NEW['v2.5.4-beta'].length === 1);
   ok('whats-new has v2.5.6 entry', Array.isArray(WHATS_NEW['v2.5.6-beta']) && WHATS_NEW['v2.5.6-beta'].length === 2);
   ok('whats-new has v2.5.5 entry', Array.isArray(WHATS_NEW['v2.5.5-beta']) && WHATS_NEW['v2.5.5-beta'].length === 1);
@@ -2047,6 +2047,77 @@ code += `
   ok('v0.22.0: pin hint wording is observational', (() => {
     return Object.values(PIN_HINTS).every(h => !/correct|wrong|right answer/i.test(h));
   })());
+  // v2.7.15-beta: final English fixes
+  ok('v2.7.15: tour archive no longer claims exact tagged individuals', (() => {
+    const slide = TOUR_SLIDES.find(s => s.tab === 'archive');
+    return slide && /species you've tagged/.test(slide.text) && !/the actual animals/.test(slide.text) && /illustrations/.test(slide.text);
+  })());
+  ok('v2.7.15: warm-water line assumes no bait (plankton trips read right)', (() => {
+    const noBait = Object.values(SEA_CONDITIONS).every(arr => arr.every(l => !/bait/i.test(l)));
+    return fileCode.indexOf('the ice in our drinks is already gone') !== -1
+      && fileCode.indexOf('the bait needs extra ice to stay fresh') === -1
+      && noBait;
+  })());
+  ok('v2.7.15: sea conditions never narrate chum without a chum plan', (() => {
+    for (let i = 0; i < 200; i++) {
+      if (/chum slick/i.test(pickSeaCondition('caribbean', { method: 'aggregation', methodOpt: 'boat' }))) return false;
+      if (/chum slick/i.test(pickSeaCondition('caribbean', { method: 'attract', methodOpt: 'none' }))) return false;
+      if (/chum slick/i.test(pickSeaCondition('caribbean'))) return false;
+    }
+    return true;
+  })());
+  ok('v2.7.15: a genuine chum plan can still select the chum line', (() => {
+    const chumLine = 'the chum slick stretches out straight behind us';
+    const pool = eligibleSeaConditions('caribbean', { method: 'attract', methodOpt: 'chum' });
+    const noPool = eligibleSeaConditions('caribbean', { method: 'aggregation', methodOpt: 'boat' });
+    return pool.some(l => l.includes(chumLine)) && !noPool.some(l => /chum slick/i.test(l));
+  })());
+  ok('v2.7.15: sea-condition call site passes the plan', fileCode.indexOf('pickSeaCondition(plan.region, plan)') !== -1);
+  ok('v2.7.15: Greenland dialogue hedged by region, lure unproven', (() => {
+    return fileCode.indexOf('over 90% of them in parts of the Eastern Canadian Arctic') !== -1
+      && fileCode.indexOf('under 10% in the St. Lawrence Estuary') !== -1
+      && fileCode.indexOf('Almost all Greenland sharks carry a glowing eye parasite that blinds them') === -1
+      && fileCode.indexOf('with a parasite hitchhiker') !== -1
+      && fileCode.indexOf('maybe half-blind') === -1;
+  })());
+  ok('v2.7.15: velvetbelly dialogue states Vulnerable, not Least Concern', (() => {
+    return fileCode.indexOf('the species is listed as Vulnerable, and populations stay fragile under trawling') !== -1
+      && fileCode.indexOf("they're still Least Concern despite the trawl bycatch") === -1;
+  })());
+  ok('v2.7.15: megamouth dialogue says reflection, not glow', (() => {
+    return fileCode.indexOf('might reflect light to lure krill straight in') !== -1
+      && fileCode.indexOf('might glow to lure krill straight in') === -1;
+  })());
+  ok('v2.7.15: no mojibake in source', fileCode.indexOf('â') === -1);
+  ok('v2.7.15: method hint fires on a mismatched approach', (() => {
+    const saved = state.tagged; state.tagged = {};
+    const trip = { region: 'cornwall', depth: 'twilight', bait: 'squid', method: 'aggregation', methodOpt: 'boat', encounters: [] };
+    const h = pinHintForTrip(trip, 'velvetbelly');
+    state.tagged = saved;
+    return h && h.kind === 'hint' && h.dimension === 'method' && h.hint === PIN_HINTS.method;
+  })());
+  ok('v2.7.15: method hint stays warm when the approach matches', (() => {
+    const saved = state.tagged; state.tagged = {};
+    const trip = { region: 'cornwall', depth: 'twilight', bait: 'squid', method: 'attract', methodOpt: 'chum', encounters: [] };
+    const h = pinHintForTrip(trip, 'velvetbelly');
+    state.tagged = saved;
+    return h && h.kind === 'warm';
+  })());
+  ok('v2.7.15: method hint stays warm with no method chosen', (() => {
+    const saved = state.tagged; state.tagged = {};
+    const trip = { region: 'cornwall', depth: 'twilight', bait: 'squid', encounters: [] };
+    const h = pinHintForTrip(trip, 'velvetbelly');
+    state.tagged = saved;
+    return h && h.kind === 'warm';
+  })());
+  ok('v2.7.15: method hint stays warm for a legacy method-without-option trip', (() => {
+    const saved = state.tagged; state.tagged = {};
+    const trip = { region: 'cornwall', depth: 'twilight', bait: 'squid', method: 'aggregation', methodOpt: 'none', encounters: [] };
+    const h = pinHintForTrip(trip, 'velvetbelly');
+    state.tagged = saved;
+    return h && h.kind === 'warm';
+  })());
+  ok('v2.7.15: whats-new has v2.7.15-beta entry', Array.isArray(WHATS_NEW['v2.7.15-beta']) && WHATS_NEW['v2.7.15-beta'].length === 1);
 
   // v0.22.0: logbook filters
   ok('v0.22.0: logbook filter by outcome', (() => {

@@ -813,7 +813,7 @@ const SHARKS = [
     id: "velvetbelly",
     name: "Velvet-Belly Lanternshark", latin: "Etmopterus spinax", status: "Vulnerable",
     code: "VB",
-    /* v0.21.0 sharknado wave. IUCN Least Concern per assessment; bycatch levels and population trend fine to state as non-targeted. Photophore functio */
+    /* v0.21.0 sharknado wave. IUCN Vulnerable per 2020 assessment; bycatch levels and population trend fine to state as non-targeted. Photophore functio */
     combo: { regions: ["cornwall"], bait: ["squid"] },
     depths: ["twilight", "deep"],
     methods: { attract: ["chum"] },

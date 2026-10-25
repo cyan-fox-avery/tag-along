@@ -5,7 +5,7 @@
 "use strict";
 
 /* Build number — shown in the top corner of the page. Bump every release. */
-const VERSION = "v2.7.14-beta";
+const VERSION = "v2.7.15-beta";
 
 /* v1.4.2: standard IUCN Red List category abbreviations for the compact
    field-guide pills. Full category names appear in expanded entries. */
@@ -20,6 +20,9 @@ const IUCN_ABBR = {
 
 /* v0.22.0: "What's new?" — shown once per version update. */
 const WHATS_NEW = {
+  "v2.7.15-beta": [
+    "🔧 <strong>Final English fixes.</strong> The Archive tour no longer claims its photos show your exact tagged sharks — they show animals of the same species, plus documented scientific illustrations. Sea conditions no longer narrate a chum slick on trips that never used chum, and the warm-water line no longer assumes bait on board — plankton trips read right too. Greenland, velvetbelly, and megamouth wording corrected to the science: regional eye-parasite rates with the glow lure unproven, Vulnerable instead of Least Concern, and reflection instead of glow. And Sarah's method hint finally fires when your approach doesn't match the shark.",
+  ],
   "v2.7.14-beta": [
     "\u26f5 <strong>New expedition milestones.</strong> Five new achievements, all moments rather than tallies: Maiden Voyage (first trip out), Twilight Zone (first dive to twilight), Midnight Zone (first dive to the deep dark), Fieldwork (first trip back with no tag — a notebook full of observations is still science), and On the Brink (first Critically Endangered tag). Sea Legs keeps its 10-trip trigger, but its breadcrumb no longer states the requirement outright: \u201csteady on your feet.\u201d Every One Counts is unchanged on purpose — a Critically Endangered tag should still count toward it, with On the Brink as the extra honour on top. The Research tab subtitle drops \u201cand sketches\u201d \u2014 the field-guide sketch idea is dropped, so the tab no longer promises what isn't there.",
   ],
@@ -884,7 +887,7 @@ const SEA_CONDITIONS = {
     "Puffy trade-wind clouds marching in rows, whitecaps glittering between them.",
     "Hot, bright, and breezy — the chum slick stretches out straight behind us.",
     "Morning rain, afternoon glare. The tropics can't decide, and neither can the sharks.",
-    "The water is so warm the bait barely needs ice. Flat calm, not a ripple.",
+    "The water is so warm the ice in our drinks is already gone. Flat calm, not a ripple.",
     "A light swell from yesterday's storm, easing. The boat rolls gently, like it's thinking.",
     "High thin cloud veiling the sun — bright but soft, the water turned to hammered silver.",
     "Humid and still at dawn, then the sea breeze fills in by ten. Classic tropical day."
@@ -927,10 +930,20 @@ const SEA_CONDITIONS = {
   ]
 };
 /* v1.8.5-beta: sea conditions follow the expedition's climate zone. */
-function pickSeaCondition(regionId) {
+/* v2.7.15-beta: chum-slick conditions only appear when the expedition
+   actually used chum — same rule as pickFieldNote (v1.2.0). The filter
+   also applies without a plan, matching pickFieldNote's no-plan case.
+   The eligible pool is a separate function so tests can inspect it
+   (Mira re-review: a positive chum-plan case, not just negatives). */
+function eligibleSeaConditions(regionId, plan) {
   const zone = regionClimate(regionId);
-  const arr = SEA_CONDITIONS[zone] || SEA_CONDITIONS.generic;
-  return pick(arr);
+  let arr = SEA_CONDITIONS[zone] || SEA_CONDITIONS.generic;
+  const usedChum = plan && plan.method === "attract" && plan.methodOpt === "chum";
+  if (!usedChum) arr = arr.filter(l => !/chum slick/i.test(l));
+  return arr;
+}
+function pickSeaCondition(regionId, plan) {
+  return pick(eligibleSeaConditions(regionId, plan));
 }
 /* v0.22.0 Mira review: wildlife sightings are region-appropriate.
    No mantas in the Arctic! */
@@ -2218,8 +2231,26 @@ const PIN_HINTS = {
   method: "They didn't seem to notice us at all — maybe a different approach?"
 };
 
-/* Pure: given a plan and a pinned shark id, return {dimension, hint} when
-   exactly 3 of 4 dimensions match, else null. Testable. */
+/* Pure: given a plan and a pinned shark id, return a hint when the trip
+   doesn't explain the miss, else null. Testable. Region/depth/bait decide
+   whether the encounter was possible; method only picks the hint when the
+   conditions were right but the approach didn't match (v2.7.15). */
+/* v2.7.15-beta: a method mismatch is a CHOSEN approach this species
+   doesn't respond to. No method chosen, no specific attractant, or no
+   methods data for the species all mean "can't judge" — not a mismatch
+   (so the existing warm case and approach-independent species keep
+   their warm hint). */
+function methodMismatch(s, trip) {
+  const methods = s.methods || {};
+  if (Object.keys(methods).length === 0) return false;
+  if (!trip.method) return false;
+  // No concrete approach selected yet (old/partial logbook entries can
+  // name a method with methodOpt "none") — not a mismatch (Mira re-review).
+  if (!trip.methodOpt || trip.methodOpt === "none") return false;
+  const opts = methods[trip.method];
+  if (!opts) return true;
+  return !opts.includes(trip.methodOpt);
+}
 /* v0.22.0 Mira review: hints are grounded in COMPLETED expeditions, not the
    live planner. The logbook helps interpret evidence; it doesn't reveal
    answers by trial-and-error clicking.
@@ -2236,6 +2267,11 @@ function pinHintForTrip(trip, pinnedId) {
   // Did the player encounter (or tag) the pinned shark this trip?
   const encountered = (trip.encounters || []).some(e => e.speciesId === pinnedId);
   if (possible && !encountered) {
+    // Conditions were right but the approach didn't match — the method
+    // hint finally fires (v2.7.15); method never gates possibility.
+    if (methodMismatch(s, trip)) {
+      return { kind: "hint", dimension: "method", hint: PIN_HINTS.method };
+    }
     // Conditions were right, shark just wasn't there — "you're warm"
     return { kind: "warm", hint: "The water felt right for " + s.name.toLowerCase() + " today. Sometimes they're just not there." };
   }
@@ -3359,7 +3395,7 @@ async function runExpedition(plan) {
     methodOpt: plan.methodOpt || "none",
     /* v0.22.0: fieldwork conditions — weather/sea state for the logbook.
        v1.8.5-beta: climate-zoned via pickSeaCondition. */
-    conditions: pickSeaCondition(plan.region),
+    conditions: pickSeaCondition(plan.region, plan),
     encounters: []
   };
   $("launchBtn").disabled = true;
@@ -6986,7 +7022,7 @@ const TOUR_SLIDES = [
   { tab: "phone", icon: "📱", title: "Phone",
     text: "Your cousin Sarah — shark superfan. She'll text you reactions and check-ins as you play, and if you're ever stuck, you can ask her about your pinned shark." },
   { tab: "archive", icon: "📸", title: "Archive",
-    text: "Real photographs and footage of the sharks you've tagged — the actual animals, hand-picked. This tab unlocks with your first tag." },
+    text: "Real photographs and footage of the species you've tagged — animals of the same species, plus documented scientific illustrations, hand-picked. This tab unlocks with your first tag." },
   { tab: "achievements", icon: "🏆", title: "Achievements",
     text: "Milestones of the journey. Finish the collection book and you'll earn your Master Shark Tagger certificate here." },
   { tab: null, icon: "🌊", title: "Off you go!",
