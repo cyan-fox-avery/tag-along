@@ -4736,6 +4736,12 @@ ok('WHATS_NEW has v1.7.23-beta', Array.isArray(WHATS_NEW['v1.7.23-beta']) && WHA
      saves reset/clear cleanly; they simply never fire again. */
   ok('Bukangi keys remain in RESET_KEYS for clean reset of stale saves',
     RESET_KEYS.includes('tyi-bukangi') && RESET_KEYS.includes('tyi-bukangi-update'));
+  /* 2026-10-24 Mira review (PR #161): negative regression guard — the retired
+     Bukangi behaviour must not silently come back in a later content merge. */
+  ok('Bukangi removal regression: dusky reveal no longer references Bukangi triggers',
+    !fileCode.includes('maybeBukangiEgg') && !fileCode.includes('maybeBukangiUpdate') &&
+    typeof BUKANGI_THREAD === 'undefined' && typeof BUKANGI_UPDATE_THREAD === 'undefined' &&
+    SHARKS.some(function(s){ return s.id === 'dusky'; }));
   ok('v1.7.19 dusky species exists in roster',
     SHARKS.some(function(s){ return s.id === 'dusky'; }));
   /* v1.7.26-beta: thresher hook — "perpetually nervous" describes the whole
