@@ -61,7 +61,7 @@ const WHATS_NEW = {
 "🔁 <strong>The replay button moved.</strong> The ? button that reopens the tour now lives at the bottom of the page, beside Export and Import save — and the ? sits properly centred in its circle.",
   ],
   "v2.7.1-beta": [
-"🦈💙 <strong>Bukangi made it out of the canal!</strong> The dusky shark from Busan North Port made it out of the canal — the third guide-back worked, and officials are watching and hoping she reaches open water safely. Sarah's dusky story is updated, and if you already heard the old version, she'll share the good news the next time you meet a dusky.",
+"🦈💙 <strong>Bukangi made it out of the canal!</strong> The dusky shark from Busan North Port made it out of the canal — the third guide-back worked, and officials are watching and hoping she reaches open water safely. Sarah's dusky story is updated, and if you already heard the old version, she'll share the good news the next time you meet a dusky. Update (Oct 24, 2026): Bukangi returned to the canal area on Oct 22 — the Oct 21 guide-back was not a confirmed safe return to open sea, so this easter egg is temporarily disabled pending a confirmed safe return to open sea.",
   ],
   "v2.7.0-beta": [
 "📖 <strong>Research text, first pass.</strong> Ten field-guide entries no longer end by giving the answer away — the 'Game plan' lines and closing instruction sentences are gone, and the clues now live inside the natural history itself: habitat, diet, depth and senses. The game stays solvable: every combination can still be worked out from what the entry actually says. More entries follow in later batches.",
@@ -253,7 +253,7 @@ const WHATS_NEW = {
   "v1.7.19-beta": [
 "🏅 <strong>Achievement cards, tidied.</strong> The achievement name now sits above its description instead of beside it — roomier cards, easier scanning.",
 "🏆 <strong>Trophy moved.</strong> Your Master Shark Tagger certificate button now lives in the Achievements tab, where it belongs. The derpy mode toggle stays in your Collection.",
-"🦈 <strong>Bukangi.</strong> Encounter a dusky shark and Sarah will tell you about the shark captivating Busan — a real dusky in a canal, and why watching wildlife respectfully matters.",
+"🦈 <strong>Bukangi.</strong> Encounter a dusky shark and Sarah will tell you about the shark captivating Busan — a real dusky in a canal, and why watching wildlife respectfully matters. Update (Oct 24, 2026): temporarily disabled — Bukangi returned to the canal area on Oct 22; pending a confirmed safe return to open sea.",
   ],
   "v1.7.18-beta": [
 "🎁 <strong>Derpy claim button hardened.</strong> The manual derpy award claim button now validates every shark in the roster (not just the count, so stale entries can't pass) and stays hidden while a win ceremony is pending — the ceremony presents Sarah's gift itself. The claim is one-time and can never double-send her thread.",
@@ -1588,9 +1588,6 @@ const state = {
   /* v0.23.0: Bruce easter egg chain state: { stage, sharkId, lastAdvance } or null */
   bruceEgg: (() => { try { return JSON.parse(localStorage.getItem("tyi-bruce") || "null"); } catch { return null; } })(),
   bruceChainComplete: (() => { try { return localStorage.getItem("tyi-bruce-done") === "1"; } catch { return false; } })(),
-  /* v1.7.19-beta: Bukangi easter egg — one-time flag for the first dusky encounter. */
-  bukangiEgg: (() => { try { return localStorage.getItem("tyi-bukangi") === "1"; } catch { return false; } })(),
-  bukangiUpdate: (() => { try { return localStorage.getItem("tyi-bukangi-update") === "1"; } catch { return false; } })(),
   pendingTagAlong: null, // v1.4.0-beta: species id to focus on map after tag-along trip
   deferredTagAlong: null, // v1.4.0-beta: tag-along deferred until win ceremony acknowledged
   /* v1.7.0-beta: derpy award — win-unlocked completion reward. derpyUnlocked
@@ -3060,11 +3057,6 @@ function doEncounter(species, plan) {
           `<div class="encounter-badge ${badgeClass}">${badgeText}</div>` +
           `</div>`;
         logLine(`🦈 <span class="found">Shark! A ${species.name}${already}</span>`, "found");
-        /* v1.7.19-beta: Bukangi easter egg — first dusky encounter, one-time.
-           Defensive guards like the naming eggs: this must never crash the
-           encounter, even if thread data or pushThread is unavailable. */
-        maybeBukangiUpdate(species);
-        maybeBukangiEgg(species);
         showEncounterActions();
       };
       if (reducedMotion) {
@@ -5583,104 +5575,6 @@ function maybeNameEgg(speciesId, rec) {
   } catch (e) {
     /* v1.5.2-beta: never let an easter egg crash naming — log and continue. */
     if (typeof console !== "undefined" && console.warn) console.warn("maybeNameEgg:", e);
-  }
-}
-
-/* v1.7.19-beta: Bukangi easter egg — durable-delivery check.
-   The dedup must run against the PERSISTED Phone thread (localStorage), not
-   in-memory state.messages. If a previous attempt appended to memory but
-   localStorage failed, the thread was never durable — retry the push instead
-   of silently consuming the egg on an in-memory ghost. */
-function bukangiThreadPersisted() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("tyi-messages") || "{}");
-    const threads = saved.messages || [];
-    return threads.some(thread =>
-      (thread.msgs || []).some(m => (m.text || "").includes("Bukangi")));
-  } catch { return false; }
-}
-
-/* v1.7.19-beta: Bukangi easter egg — first dusky shark encounter, one-time.
-   Extracted as a named helper (like maybeNameEgg) so the one-shot behavior
-   is behaviorally testable. Defensive guards: this must never crash the
-   encounter, even if thread data or pushThread is unavailable. */
-function maybeBukangiEgg(species) {
-  try {
-    if (!species || species.id !== "dusky") return false;
-    if (state.bukangiEgg) return false;
-    if (typeof pushThread !== "function") return false;
-    if (typeof BUKANGI_THREAD === "undefined" || !Array.isArray(BUKANGI_THREAD)) return false;
-    if (bukangiThreadPersisted()) {
-      /* v1.7.19-beta Mira review: the thread is durable but the flag was
-         never recorded (interrupted save) — record the flag without sending
-         Sarah's thread a second time. */
-      state.bukangiEgg = true;
-      try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
-      return true;
-    }
-    /* Snapshot in-memory message state so a storage failure mid-push can be
-       rolled back — otherwise the ghost thread would linger in memory and a
-       later retry would double-post. */
-    const _msgLen = state.messages.length;
-    const _unread = state.unread;
-    try {
-      pushThread(BUKANGI_THREAD.map(m => ({ ...m })));
-    } catch (pushErr) {
-      try { state.messages.length = _msgLen; state.unread = _unread; } catch {}
-      throw pushErr;
-    }
-    /* v1.7.19-beta Mira review: mark the trigger complete only AFTER the
-       thread is durable. If the save failed, the flag stays unset so a later
-       dusky encounter retries instead of silently consuming the egg. */
-    if (!bukangiThreadPersisted()) return false;
-    state.bukangiEgg = true;
-    try { localStorage.setItem("tyi-bukangi", "1"); } catch {}
-    return true;
-  } catch (e) {
-    if (typeof console !== "undefined" && console.warn) console.warn("maybeBukangiEgg:", e);
-    return false;
-  }
-}
-
-/* v2.7.1-beta: Bukangi good-news follow-up — one-time, for players who
-   already saw the pre-rescue egg. Mirrors maybeBukangiEgg's durable-delivery
-   discipline: the flag is set only after the thread is durable, so an
-   interrupted save retries instead of silently consuming the update. */
-function bukangiUpdatePersisted() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("tyi-messages") || "{}");
-    const threads = saved.messages || [];
-    return threads.some(thread =>
-      (thread.msgs || []).some(m => (m.text || "").includes("REMEMBER BUKANGI")));
-  } catch { return false; }
-}
-function maybeBukangiUpdate(species) {
-  try {
-    if (!species || species.id !== "dusky") return false;
-    if (!state.bukangiEgg) return false; /* only players who saw the old egg */
-    if (state.bukangiUpdate) return false;
-    if (typeof pushThread !== "function") return false;
-    if (typeof BUKANGI_UPDATE_THREAD === "undefined" || !Array.isArray(BUKANGI_UPDATE_THREAD)) return false;
-    if (bukangiUpdatePersisted()) {
-      state.bukangiUpdate = true;
-      try { localStorage.setItem("tyi-bukangi-update", "1"); } catch {}
-      return true;
-    }
-    const _msgLen = state.messages.length;
-    const _unread = state.unread;
-    try {
-      pushThread(BUKANGI_UPDATE_THREAD.map(m => ({ ...m })));
-    } catch (pushErr) {
-      try { state.messages.length = _msgLen; state.unread = _unread; } catch {}
-      throw pushErr;
-    }
-    if (!bukangiUpdatePersisted()) return false;
-    state.bukangiUpdate = true;
-    try { localStorage.setItem("tyi-bukangi-update", "1"); } catch {}
-    return true;
-  } catch (e) {
-    if (typeof console !== "undefined" && console.warn) console.warn("maybeBukangiUpdate:", e);
-    return false;
   }
 }
 
